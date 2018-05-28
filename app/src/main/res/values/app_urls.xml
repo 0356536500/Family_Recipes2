@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="url_get_books">http://localhost:4000/api/books</string>
-    <string name="url_login">http://localhost:4000/api/login</string>
-    <string name="url_signup">http://localhost:4000/api/signup</string>
+    <string name="url_get_books">http://localhost:4000/books</string>
+    <string name="url_login">http://localhost:4000/login</string>
+    <string name="url_signup">http://localhost:4000/signup</string>
 </resources>
