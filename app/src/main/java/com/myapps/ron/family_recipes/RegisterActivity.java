@@ -3,6 +3,7 @@ package com.myapps.ron.family_recipes;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -46,6 +47,9 @@ public class RegisterActivity extends AppCompatActivity {
         editPassword = findViewById(R.id.register_email);
         editEmail = findViewById(R.id.register_email);
 
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        setTitle("Register");
         register = findViewById(R.id.register_button);
 
         register.setOnClickListener(new View.OnClickListener() {

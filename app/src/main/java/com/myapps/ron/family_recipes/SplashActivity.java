@@ -21,11 +21,13 @@ import com.myapps.ron.family_recipes.utils.SharedPreferencesHandler;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class SplashActivity extends AppCompatActivity {
 
     private static final String TAG = SplashActivity.class.getSimpleName();
     private static final int SPLASH_TIME_OUT = 2500;
+    private AtomicInteger serverResponse = new AtomicInteger(0);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +42,7 @@ public class SplashActivity extends AppCompatActivity {
         final Map<String, String> params = new HashMap<String, String>();
         params.put("username", userParam);
         params.put("password", passParam);
-
+        //Toast.makeText(getBaseContext(), R.string.right_credentials, Toast.LENGTH_SHORT).show();
         new Handler().postDelayed(new Runnable() {
 
             @Override
@@ -52,21 +54,24 @@ public class SplashActivity extends AppCompatActivity {
                             new Response.Listener<JSONObject>() {
                                 @Override
                                 public void onResponse(JSONObject response) {
-                                    if (response == null) {
+                                    if (response != null) {
                                         try {
                                             if (response.getInt(getApplicationContext().getString(R.string.server_response)) == 1) {
-                                                Toast.makeText(getApplicationContext(), R.string.right_credentials, Toast.LENGTH_SHORT).show();
-                                                startActivity(new Intent(getApplicationContext(), MainActivity.class));
-                                                finish();
+                                                Toast.makeText(SplashActivity.this, R.string.right_credentials, Toast.LENGTH_SHORT).show();
+                                                SplashActivity.this.startActivity(new Intent(SplashActivity.this, MainActivity.class));
+                                                SplashActivity.this.finish();
                                             } else if (response.getInt(getApplicationContext().getString(R.string.server_response)) == 0) {
-                                                Toast.makeText(getApplicationContext(), R.string.wrong_credentials, Toast.LENGTH_LONG).show();
-                                                startActivity(new Intent(SplashActivity.this, LoginActivity.class));
+                                                //need to register
+                                                Toast.makeText(SplashActivity.this, R.string.wrong_credentials, Toast.LENGTH_LONG).show();
+                                                SplashActivity.this.startActivity(new Intent(SplashActivity.this, RegisterActivity.class));
+                                                SplashActivity.this.finish();
                                             }
                                         } catch (JSONException e) {
-                                            Toast.makeText(getApplicationContext(), "response error", Toast.LENGTH_LONG).show();
+                                            Toast.makeText( SplashActivity.this, "response error", Toast.LENGTH_LONG).show();
                                             Log.e(TAG, e.getMessage());
                                         }
                                     }
+
                                 }
                             }, new Response.ErrorListener() {
                         @Override
@@ -88,6 +93,25 @@ public class SplashActivity extends AppCompatActivity {
                 }
             }
         }, SPLASH_TIME_OUT);
+        //executeResults();
+    }
+
+    private void executeResults() {
+        switch(serverResponse.get()) {
+            case -1:
+                Toast.makeText(getApplicationContext(), "response error", Toast.LENGTH_LONG).show();
+                break;
+            case 0:
+                Toast.makeText(getApplicationContext(), R.string.wrong_credentials, Toast.LENGTH_LONG).show();
+                startActivity(new Intent(SplashActivity.this, RegisterActivity.class));
+                finish();
+                break;
+            case 1:
+                Toast.makeText(getApplicationContext(), R.string.right_credentials, Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(getApplicationContext(), RegisterActivity.class));
+                finish();
+                break;
+        }
     }
 
     private void writeToSharedPref() {
