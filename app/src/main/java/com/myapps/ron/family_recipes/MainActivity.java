@@ -12,19 +12,10 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
-
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonArrayRequest;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
-import org.json.JSONArray;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,35 +64,7 @@ public class MainActivity extends AppCompatActivity implements ContactsAdapter.C
      * fetches json by making http calls
      */
     private void fetchContacts() {
-        JsonArrayRequest request = new JsonArrayRequest(getString(R.string.url_get_books),
-                new Response.Listener<JSONArray>() {
-                    @Override
-                    public void onResponse(JSONArray response) {
-                        if (response == null) {
-                            Toast.makeText(getApplicationContext(), "Couldn't fetch the contacts! Pleas try again.", Toast.LENGTH_LONG).show();
-                            return;
-                        }
 
-                        List<Contact> items = new Gson().fromJson(response.toString(), new TypeToken<List<Contact>>() {
-                        }.getType());
-
-                        // adding contacts to contacts list
-                        contactList.clear();
-                        contactList.addAll(items);
-
-                        // refreshing recycler view
-                        mAdapter.notifyDataSetChanged();
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                // error in getting json
-                Log.e(TAG, "Error: " + error.getMessage());
-                Toast.makeText(getApplicationContext(), "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        MyApplication.getInstance().addToRequestQueue(request);
     }
 
     public MenuItem getSearchMenuItem() {

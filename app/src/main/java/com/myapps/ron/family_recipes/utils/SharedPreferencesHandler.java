@@ -17,17 +17,17 @@ public class SharedPreferencesHandler {
         editor.apply();
     }
 
-    public static void writeInt(Context ctx, String key, int valor) {
+    public static void writeInt(Context ctx, String key, int value) {
         SharedPreferences sharedPref = ctx.getSharedPreferences(ctx.getString(R.string.sharedPreferences), Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putInt(key, valor);
+        editor.putInt(key, value);
         editor.apply();
     }
 
-    public static void writeString(Context ctx, String key, String valor) {
+    public static void writeString(Context ctx, String key, String value) {
         SharedPreferences sharedPref = ctx.getSharedPreferences(ctx.getString(R.string.sharedPreferences), Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putString(key, valor);
+        editor.putString(key, value);
         editor.apply();
     }
 

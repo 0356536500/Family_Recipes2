@@ -4,8 +4,6 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.support.v7.widget.LinearLayoutManager;
@@ -14,17 +12,16 @@ import android.util.TypedValue;
 import android.view.View;
 
 /**
- * Created by ravi on 17/11/17.
+ * Created by ravi on 18/01/18.
  */
 
-public class MyDividerItemDecoration  extends RecyclerView.ItemDecoration {
+public class MyDividerItemDecoration extends RecyclerView.ItemDecoration {
 
     private static final int[] ATTRS = new int[]{
             android.R.attr.listDivider
     };
 
     public static final int HORIZONTAL_LIST = LinearLayoutManager.HORIZONTAL;
-
     public static final int VERTICAL_LIST = LinearLayoutManager.VERTICAL;
 
     private Drawable mDivider;
@@ -68,7 +65,7 @@ public class MyDividerItemDecoration  extends RecyclerView.ItemDecoration {
                     .getLayoutParams();
             final int top = child.getBottom() + params.bottomMargin;
             final int bottom = top + mDivider.getIntrinsicHeight();
-            mDivider.setBounds(left + dpToPx(margin), top, right, bottom);
+            mDivider.setBounds(left + dpToPx(margin), top, right - dpToPx(margin), bottom);
             mDivider.draw(c);
         }
     }
