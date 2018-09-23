@@ -1,6 +1,7 @@
 package com.myapps.ron.family_recipes.network;
 
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -18,21 +19,41 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class APICallsHandler {
 
-    private Gson gson = new Gson();
+    private static final String TAG = APICallsHandler.class.getSimpleName();
+    private static Gson gson = new Gson();
     private static Retrofit retrofit;
-    private static final String BASE_URL = "https://jsonplaceholder.typicode.com";
+    //private static final String BASE_URL = "https://jsonplaceholder.typicode.com";
 
     public static Retrofit getRetrofitInstance() {
         if (retrofit == null) {
             retrofit = new retrofit2.Retrofit.Builder()
-                    .baseUrl(BASE_URL)
+                    .baseUrl(Constants.BASE_URL)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
         }
         return retrofit;
     }
 
-    public void getAllRecipes(String date, String token) {
+    public static void getOneRecipe(String token) {
+        RecipeService service = getRetrofitInstance().create(RecipeService.class);
+        Call<Recipe> call = service.getOneRecipe(token);
+
+        call.enqueue(new Callback<Recipe>() {
+            @Override
+            public void onResponse(@NonNull Call<Recipe> call, @NonNull Response<Recipe> response) {
+                Log.i(TAG, response.body().toString());
+                //generateDataList(response.body());
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<Recipe> call, @NonNull Throwable t) {
+                Log.e(TAG, "error getting one recipe");
+                //Toast.makeText(MainActivity.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    public static void getAllRecipes(String date, String token) {
         Map<String, String> headers = new HashMap<>();
         headers.put(Constants.CONTENT_TYPE, "application/json");
         headers.put(Constants.AUTHORIZATION, token);
@@ -43,11 +64,13 @@ public class APICallsHandler {
         call.enqueue(new Callback<List<Recipe>>() {
             @Override
             public void onResponse(@NonNull Call<List<Recipe>> call, @NonNull Response<List<Recipe>> response) {
+                Log.i(TAG, response.body().toString());
                 //generateDataList(response.body());
             }
 
             @Override
             public void onFailure(@NonNull Call<List<Recipe>> call, @NonNull Throwable t) {
+                Log.e(TAG, "error getting all recipes");
                 //Toast.makeText(MainActivity.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
             }
         });
@@ -72,6 +95,7 @@ public class APICallsHandler {
 
             @Override
             public void onFailure(@NonNull Call<JsonObject> call, @NonNull Throwable t) {
+
                 //Toast.makeText(MainActivity.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
             }
         });

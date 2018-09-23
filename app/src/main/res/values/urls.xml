@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="base_url">https://eku11o83ch.execute-api.eu-west-2.amazonaws.com/dev</string>
-
-    <string name="recipes">/recipes</string>
-    <string name="categories">/categories</string>
-
-</resources>

@@ -12,7 +12,7 @@ import java.util.Set;
 
 public class Recipe {
 
-    /*@SerializedName("id")
+    @SerializedName("id")
     private String id;
     @SerializedName("name")
     private String name;
@@ -27,17 +27,17 @@ public class Recipe {
     @SerializedName("uploader")
     private String uploader;
     @SerializedName("categories")
-    private Set<String> categories;
+    private List<String> categories;
     @SerializedName("comments")
     private List<String> comments;
     @SerializedName("foodFiles")
     private List<String> foodFiles;
     @SerializedName("likes")
     private int likes;
-    @SerializedName("sharedKey")
+/*    @SerializedName("sharedKey")
     private String sharedKey;*/
 
-    private String id;
+    /*private String id;
     private String name;
     private String description;
     private String createdAt;
@@ -48,17 +48,17 @@ public class Recipe {
     private List<String> comments;
     private List<String> foodFiles;
     private int likes;
-    private String sharedKey;
+    private String sharedKey;*/
 
-    private Gson gson = new Gson();
+    private static final Gson gson = new Gson();
 
     public Recipe() {
     }
 
     public Recipe(String id, String name, String description, String createdAt,
                   String lastModifiedAt, String recipeFile, String uploader,
-                  @Nullable Set<String> categories, @Nullable List<String> comments, @Nullable List<String> foodFiles,
-                  int likes, String sharedKey) {
+                  @Nullable List<String> categories, @Nullable List<String> comments, @Nullable List<String> foodFiles,
+                  int likes) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -70,13 +70,12 @@ public class Recipe {
         this.comments = comments;
         this.foodFiles = foodFiles;
         this.likes = likes;
-        this.sharedKey = sharedKey;
     }
 
     public Recipe(String id, String name, String description, String createdAt,
                   String lastModifiedAt, String recipeFile, String uploader,
                   String categories, String comments, String foodFiles,
-                  int likes, String sharedKey) {
+                  int likes) {
 
         this.id = id;
         this.name = name;
@@ -86,7 +85,6 @@ public class Recipe {
         this.recipeFile = recipeFile;
         this.uploader = uploader;
         this.likes = likes;
-        this.sharedKey = sharedKey;
 
         setStringCategories(categories);
         setStringComments(comments);
@@ -98,8 +96,8 @@ public class Recipe {
     }
 
     public void setStringCategories(String categories) {
-        Type type = new TypeToken<Set<String>>() {}.getType();
-        Set<String> value = gson.fromJson(categories, type);
+        Type type = new TypeToken<List<String>>() {}.getType();
+        List<String> value = gson.fromJson(categories, type);
         setCategories(value);
     }
 
@@ -179,11 +177,11 @@ public class Recipe {
         this.uploader = uploader;
     }
 
-    public Set<String> getCategories() {
+    public List<String> getCategories() {
         return categories;
     }
 
-    public void setCategories(Set<String> categories) {
+    public void setCategories(List<String> categories) {
         this.categories = categories;
     }
 
@@ -211,11 +209,20 @@ public class Recipe {
         this.likes = likes;
     }
 
-    public String getSharedKey() {
-        return sharedKey;
-    }
-
-    public void setSharedKey(String sharedKey) {
-        this.sharedKey = sharedKey;
+    @Override
+    public String toString() {
+        return "Recipe{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", createdAt='" + createdAt + '\'' +
+                ", lastModifiedAt='" + lastModifiedAt + '\'' +
+                ", recipeFile='" + recipeFile + '\'' +
+                ", uploader='" + uploader + '\'' +
+                ", categories=" + categories +
+                ", comments=" + comments +
+                ", foodFiles=" + foodFiles +
+                ", likes=" + likes +
+                '}';
     }
 }

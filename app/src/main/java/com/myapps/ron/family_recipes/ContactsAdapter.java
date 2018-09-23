@@ -10,8 +10,8 @@ import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
+//import com.bumptech.glide.Glide;
+//import com.bumptech.glide.request.RequestOptions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -69,10 +69,10 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.MyView
         holder.name.setText(contact.getName());
         holder.phone.setText(contact.getPhone());
 
-        Glide.with(context)
+        /*Glide.with(context)
                 .load(contact.getImage())
                 .apply(RequestOptions.circleCropTransform())
-                .into(holder.thumbnail);
+                .into(holder.thumbnail);*/
     }
 
     @Override

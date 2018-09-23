@@ -13,4 +13,10 @@ public class Constants {
 
     //PATCH body elements
     public static final String ATTRIBUTES = "attributes";
+
+    //urls
+    public static final String URL_RECIPES = "recipes";
+    public static final String URL_CATEGORIES = "recipes/categories";
+    public static final String URL_FOOD = "food";
+    public static final String BASE_URL = "https://eku11o83ch.execute-api.eu-west-2.amazonaws.com/dev/";
 }

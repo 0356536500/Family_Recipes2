@@ -10,6 +10,7 @@ import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 
+import retrofit2.http.Header;
 import retrofit2.http.HeaderMap;
 import retrofit2.http.PATCH;
 import retrofit2.http.POST;
@@ -19,10 +20,14 @@ import retrofit2.http.Query;
 
 public interface RecipeService {
 
-    String recipes = "/recipes";
-    String categories = "/recipes/categories";
-    String food = "/food";
+    String recipes = Constants.URL_RECIPES;
+    String categories = Constants.URL_CATEGORIES;
+    String food = Constants.URL_FOOD;
 
+
+    @GET(food)
+    Call<Recipe> getOneRecipe(
+            @Header(Constants.AUTHORIZATION) String token);
     //region recipes
     @GET(recipes)
     Call<List<Recipe>> getAllRecipes(

@@ -1,9 +1,10 @@
 package com.myapps.ron.family_recipes;
 
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 
+import com.myapps.ron.family_recipes.utils.DateUtil;
 import com.myapps.ron.family_recipes.utils.SharedPreferencesHandler;
 
 
@@ -22,7 +23,10 @@ public class SplashActivity extends AppCompatActivity {
         final String userParam = SharedPreferencesHandler.getString(this, "username");
         final String passParam = SharedPreferencesHandler.getString(this, "password");
 
-        new Handler().postDelayed(new Runnable() {
+        
+        //APICallsHandler.getAllRecipes("0", Constants.TOKEN);
+
+        /*new Handler().postDelayed(new Runnable() {
 
             @Override
             public void run() {
@@ -30,7 +34,7 @@ public class SplashActivity extends AppCompatActivity {
 
             }
             }
-        }, SPLASH_TIME_OUT);
+        }, SPLASH_TIME_OUT);*/
     }
 
     private void writeToSharedPref() {

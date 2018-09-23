@@ -112,7 +112,7 @@ public class RecipesDBHelper extends SQLiteOpenHelper{
                 cursor.getString(4),cursor.getString(5),
                 cursor.getString(6),cursor.getString(7),
                 cursor.getString(8),cursor.getString(9),
-                cursor.getInt(10), "default");
+                cursor.getInt(10));
     }
 
     // Getting All Records
@@ -140,7 +140,7 @@ public class RecipesDBHelper extends SQLiteOpenHelper{
                 recipe.setStringComments(cursor.getString(7));
                 recipe.setStringFoodFiles(cursor.getString(8));
                 recipe.setLikes(cursor.getInt(9));
-                recipe.setSharedKey(Constants.SHARED_KEY);
+                //recipe.setSharedKey(Constants.SHARED_KEY);
 
                 // Adding contact to list
                 recipeList.add(recipe);
