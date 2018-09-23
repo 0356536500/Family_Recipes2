@@ -7,6 +7,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.myapps.ron.family_recipes.model.Recipe;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +23,8 @@ public class APICallsHandler {
     private static final String TAG = APICallsHandler.class.getSimpleName();
     private static Gson gson = new Gson();
     private static Retrofit retrofit;
+
+    private static final int STATUS_OK = 200;
     //private static final String BASE_URL = "https://jsonplaceholder.typicode.com";
 
     public static Retrofit getRetrofitInstance() {
@@ -53,7 +56,7 @@ public class APICallsHandler {
         });
     }
 
-    public static void getAllRecipes(String date, String token) {
+    public static void getAllRecipes(String date, String token, final MyCallback<List<Recipe>> callback) {
         Map<String, String> headers = new HashMap<>();
         headers.put(Constants.CONTENT_TYPE, "application/json");
         headers.put(Constants.AUTHORIZATION, token);
@@ -64,13 +67,22 @@ public class APICallsHandler {
         call.enqueue(new Callback<List<Recipe>>() {
             @Override
             public void onResponse(@NonNull Call<List<Recipe>> call, @NonNull Response<List<Recipe>> response) {
-                Log.i(TAG, response.body().toString());
+                if (response.code() == STATUS_OK) {
+                    Log.i(TAG, response.body().toString());
+                    List<Recipe> list = response.body();
+                    callback.onFinished(list);
+                }
+                else {
+                    String body = response.body() != null ? response.body().toString() : "null";
+                    Log.e(TAG, "error getAllRecipes, code = " + response.code() + "\n body: " + body);
+                }
+
                 //generateDataList(response.body());
             }
 
             @Override
             public void onFailure(@NonNull Call<List<Recipe>> call, @NonNull Throwable t) {
-                Log.e(TAG, "error getting all recipes");
+                Log.e(TAG, "error getting all recipes. message: " + t.getMessage());
                 //Toast.makeText(MainActivity.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
             }
         });

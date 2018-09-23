@@ -1,5 +1,7 @@
 package com.myapps.ron.family_recipes.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 
 import com.google.gson.Gson;
@@ -7,10 +9,11 @@ import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-public class Recipe {
+public class Recipe implements Parcelable{
 
     @SerializedName("id")
     private String id;
@@ -89,6 +92,37 @@ public class Recipe {
         setStringCategories(categories);
         setStringComments(comments);
         setStringFoodFiles(foodFiles);
+    }
+
+
+    public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
+        public Recipe createFromParcel(Parcel in) {
+            return new Recipe(in);
+        }
+
+        public Recipe[] newArray(int size) {
+            return new Recipe[size];
+        }
+    };
+
+    private Recipe(Parcel in) {
+        this.id = in.readString();
+        this.name = in.readString();
+        this.description = in.readString();
+        this.createdAt = in.readString();
+        this.lastModifiedAt = in.readString();
+        this.recipeFile = in.readString();
+        this.uploader = in.readString();
+
+        categories = new ArrayList<>();
+        comments = new ArrayList<>();
+        foodFiles = new ArrayList<>();
+
+        in.readList(this.categories, String.class.getClassLoader());
+        in.readList(this.comments, String.class.getClassLoader());
+        in.readList(this.foodFiles, String.class.getClassLoader());
+
+        this.likes = in.readInt();
     }
 
     public String getStringCategories() {
@@ -224,5 +258,25 @@ public class Recipe {
                 ", foodFiles=" + foodFiles +
                 ", likes=" + likes +
                 '}';
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.id);
+        dest.writeString(this.name);
+        dest.writeString(this.description);
+        dest.writeString(this.createdAt);
+        dest.writeString(this.lastModifiedAt);
+        dest.writeString(this.recipeFile);
+        dest.writeString(this.uploader);
+        dest.writeList(this.categories);
+        dest.writeList(this.comments);
+        dest.writeList(this.foodFiles);
+        dest.writeInt(this.likes);
     }
 }

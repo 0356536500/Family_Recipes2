@@ -19,4 +19,6 @@ public class Constants {
     public static final String URL_CATEGORIES = "recipes/categories";
     public static final String URL_FOOD = "food";
     public static final String BASE_URL = "https://eku11o83ch.execute-api.eu-west-2.amazonaws.com/dev/";
+
+    public static final String DEFAULT_UPDATED_TIME = "2018-09-09 12:00:00";
 }

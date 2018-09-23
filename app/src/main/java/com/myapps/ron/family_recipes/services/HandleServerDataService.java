@@ -4,6 +4,11 @@ import android.app.IntentService;
 import android.content.Intent;
 import android.content.Context;
 
+import com.myapps.ron.family_recipes.model.Recipe;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * An {@link IntentService} subclass for handling asynchronous task requests in
  * a service on a separate handler thread.
@@ -32,11 +37,11 @@ public class HandleServerDataService extends IntentService {
      * @see IntentService
      */
     // TODO: Customize helper method
-    public static void startActionGetRecipes(Context context, String param1, String param2) {
+    public static void startActionGetRecipes(Context context, ArrayList<Recipe> recipes, String time) {
         Intent intent = new Intent(context, HandleServerDataService.class);
         intent.setAction(ACTION_GET_RECIPES);
-        intent.putExtra(EXTRA_PARAM1, param1);
-        intent.putExtra(EXTRA_PARAM2, param2);
+        intent.putParcelableArrayListExtra(EXTRA_PARAM1, recipes);
+        intent.putExtra(EXTRA_PARAM2, time);
         context.startService(intent);
     }
 
@@ -60,9 +65,9 @@ public class HandleServerDataService extends IntentService {
         if (intent != null) {
             final String action = intent.getAction();
             if (ACTION_GET_RECIPES.equals(action)) {
-                final String param1 = intent.getStringExtra(EXTRA_PARAM1);
-                final String param2 = intent.getStringExtra(EXTRA_PARAM2);
-                handleActionGetRecipes(param1, param2);
+                final List<Recipe> recipeList = intent.getParcelableArrayListExtra(EXTRA_PARAM1);
+                final String time = intent.getStringExtra(EXTRA_PARAM2);
+                handleActionGetRecipes(recipeList, time);
             } else if (ACTION_GET_IMAGE.equals(action)) {
                 final String param1 = intent.getStringExtra(EXTRA_PARAM1);
                 final String param2 = intent.getStringExtra(EXTRA_PARAM2);
@@ -75,7 +80,7 @@ public class HandleServerDataService extends IntentService {
      * Handle action Foo in the provided background thread with the provided
      * parameters.
      */
-    private void handleActionGetRecipes(String param1, String param2) {
+    private void handleActionGetRecipes(List<Recipe> recipes, String time) {
         // TODO: Handle action Foo
         throw new UnsupportedOperationException("Not yet implemented");
     }
