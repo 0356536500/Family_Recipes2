@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.Context;
 
 import com.myapps.ron.family_recipes.dal.db.RecipesDBHelper;
-import com.myapps.ron.family_recipes.dal.db.RecipesDBMaintainer;
 import com.myapps.ron.family_recipes.model.Recipe;
 import com.myapps.ron.family_recipes.utils.DateUtil;
 
@@ -40,7 +39,7 @@ public class HandleServerDataService extends IntentService {
      * @see IntentService
      */
     // TODO: Customize helper method
-    public static void startActionGetRecipes(Context context, ArrayList<Recipe> recipes, String time) {
+    public static void startActionUpdateRecipes(Context context, ArrayList<Recipe> recipes, String time) {
         Intent intent = new Intent(context, HandleServerDataService.class);
         intent.setAction(ACTION_GET_RECIPES);
         intent.putParcelableArrayListExtra(EXTRA_PARAM1, recipes);
@@ -70,7 +69,7 @@ public class HandleServerDataService extends IntentService {
             if (ACTION_GET_RECIPES.equals(action)) {
                 final List<Recipe> recipeList = intent.getParcelableArrayListExtra(EXTRA_PARAM1);
                 final String time = intent.getStringExtra(EXTRA_PARAM2);
-                handleActionGetRecipes(recipeList, time);
+                handleActionUpdateRecipes(recipeList, time);
             } else if (ACTION_GET_IMAGE.equals(action)) {
                 final String param1 = intent.getStringExtra(EXTRA_PARAM1);
                 final String param2 = intent.getStringExtra(EXTRA_PARAM2);
@@ -83,7 +82,7 @@ public class HandleServerDataService extends IntentService {
      * Handle action Foo in the provided background thread with the provided
      * parameters.
      */
-    private void handleActionGetRecipes(List<Recipe> recipes, String time) {
+    private void handleActionUpdateRecipes(List<Recipe> recipes, String time) {
         RecipesDBHelper dbHelper = new RecipesDBHelper(getApplicationContext());
         for(Recipe item : recipes) {
             if(dbHelper.recipeExists(item.getId()))

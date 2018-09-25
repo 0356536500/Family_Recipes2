@@ -26,7 +26,7 @@ public class APICallsHandler {
     private static final int STATUS_OK = 200;
     //private static final String BASE_URL = "https://jsonplaceholder.typicode.com";
 
-    public static Retrofit getRetrofitInstance() {
+    private static Retrofit getRetrofitInstance() {
         if (retrofit == null) {
             retrofit = new retrofit2.Retrofit.Builder()
                     .baseUrl(Constants.BASE_URL)
