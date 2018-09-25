@@ -7,7 +7,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.myapps.ron.family_recipes.model.Recipe;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +37,7 @@ public class APICallsHandler {
     }
 
     public static void getOneRecipe(String token) {
-        RecipeService service = getRetrofitInstance().create(RecipeService.class);
+        RecipeInterface service = getRetrofitInstance().create(RecipeInterface.class);
         Call<Recipe> call = service.getOneRecipe(token);
 
         call.enqueue(new Callback<Recipe>() {
@@ -57,12 +56,12 @@ public class APICallsHandler {
     }
 
     public static void getAllRecipes(String date, String token, final MyCallback<List<Recipe>> callback) {
-        Map<String, String> headers = new HashMap<>();
+        /*Map<String, String> headers = new HashMap<>();
         headers.put(Constants.CONTENT_TYPE, "application/json");
-        headers.put(Constants.AUTHORIZATION, token);
+        headers.put(Constants.AUTHORIZATION, token);*/
 
-        RecipeService service = getRetrofitInstance().create(RecipeService.class);
-        Call<List<Recipe>> call = service.getAllRecipes(headers, date);
+        RecipeInterface service = getRetrofitInstance().create(RecipeInterface.class);
+        Call<List<Recipe>> call = service.getAllRecipes(token, date);
 
         call.enqueue(new Callback<List<Recipe>>() {
             @Override
@@ -96,7 +95,7 @@ public class APICallsHandler {
         body.put(Constants.RECIPE_ITEM, gson.toJson(recipe));
         body.put(Constants.NUM_FILES_TO_UPLOAD, String.valueOf(numOfFiles));
 
-        RecipeService service = getRetrofitInstance().create(RecipeService.class);
+        RecipeInterface service = getRetrofitInstance().create(RecipeInterface.class);
         Call<JsonObject> call = service.postPendRecipe(headers, body);
 
         call.enqueue(new Callback<JsonObject>() {
@@ -122,7 +121,7 @@ public class APICallsHandler {
         body.put(Constants.ATTRIBUTES, gson.toJson(attributes));
         body.put(Constants.NUM_FILES_TO_UPLOAD, String.valueOf(numOfFiles));
 
-        RecipeService service = getRetrofitInstance().create(RecipeService.class);
+        RecipeInterface service = getRetrofitInstance().create(RecipeInterface.class);
         Call<Recipe> call = service.patchRecipe(headers, body);
 
         call.enqueue(new Callback<Recipe>() {

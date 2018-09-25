@@ -18,7 +18,7 @@ import retrofit2.http.PUT;
 import retrofit2.http.Query;
 
 
-public interface RecipeService {
+public interface RecipeInterface {
 
     String recipes = Constants.URL_RECIPES;
     String categories = Constants.URL_CATEGORIES;
@@ -31,7 +31,7 @@ public interface RecipeService {
     //region recipes
     @GET(recipes)
     Call<List<Recipe>> getAllRecipes(
-            @HeaderMap Map<String, String> headers,
+            @Header(Constants.AUTHORIZATION) String auth,
             @Query(Constants.DATE_QUERY) String query
     );
 

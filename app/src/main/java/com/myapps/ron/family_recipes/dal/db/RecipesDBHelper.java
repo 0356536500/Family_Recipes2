@@ -1,4 +1,4 @@
-package com.myapps.ron.family_recipes.dal;
+package com.myapps.ron.family_recipes.dal.db;
 
 import android.content.ContentValues;
 import android.content.Context;

@@ -1,4 +1,4 @@
-package com.myapps.ron.family_recipes.dal;
+package com.myapps.ron.family_recipes.dal.db;
 
 import android.content.Context;
 
@@ -11,11 +11,11 @@ import java.util.List;
  */
 public class RecipesDBMaintainer {
 
-    private Context context;
+    //private Context context;
     private RecipesDBHelper dbHelper;
 
     public RecipesDBMaintainer(Context context) {
-        this.context = context;
+        //this.context = context;
         dbHelper = new RecipesDBHelper(context);
     }
 

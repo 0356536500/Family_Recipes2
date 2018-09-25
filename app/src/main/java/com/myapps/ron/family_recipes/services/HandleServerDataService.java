@@ -4,7 +4,10 @@ import android.app.IntentService;
 import android.content.Intent;
 import android.content.Context;
 
+import com.myapps.ron.family_recipes.dal.db.RecipesDBHelper;
+import com.myapps.ron.family_recipes.dal.db.RecipesDBMaintainer;
 import com.myapps.ron.family_recipes.model.Recipe;
+import com.myapps.ron.family_recipes.utils.DateUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -81,8 +84,14 @@ public class HandleServerDataService extends IntentService {
      * parameters.
      */
     private void handleActionGetRecipes(List<Recipe> recipes, String time) {
-        // TODO: Handle action Foo
-        throw new UnsupportedOperationException("Not yet implemented");
+        RecipesDBHelper dbHelper = new RecipesDBHelper(getApplicationContext());
+        for(Recipe item : recipes) {
+            if(dbHelper.recipeExists(item.getId()))
+                dbHelper.updateRecipe(item);
+            else
+                dbHelper.insertRecipe(item);
+        }
+        DateUtil.updateServerTime(getApplicationContext(), time);
     }
 
     /**
