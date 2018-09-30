@@ -43,7 +43,8 @@ public class APICallsHandler {
         call.enqueue(new Callback<Recipe>() {
             @Override
             public void onResponse(@NonNull Call<Recipe> call, @NonNull Response<Recipe> response) {
-                Log.i(TAG, response.body().toString());
+                String body = response.body() != null ? response.body().toString() : "null";
+                Log.i(TAG, body);
                 //generateDataList(response.body());
             }
 
@@ -66,13 +67,14 @@ public class APICallsHandler {
         call.enqueue(new Callback<List<Recipe>>() {
             @Override
             public void onResponse(@NonNull Call<List<Recipe>> call, @NonNull Response<List<Recipe>> response) {
+                String body = response.body() != null ? response.body().toString() : "null";
+
                 if (response.code() == STATUS_OK) {
-                    Log.i(TAG, response.body().toString());
+                    Log.i(TAG, body);
                     List<Recipe> list = response.body();
                     callback.onFinished(list);
                 }
                 else {
-                    String body = response.body() != null ? response.body().toString() : "null";
                     Log.e(TAG, "error getAllRecipes, code = " + response.code() + "\n body: " + body);
                 }
 

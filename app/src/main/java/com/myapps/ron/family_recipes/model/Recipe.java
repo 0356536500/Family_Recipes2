@@ -11,6 +11,7 @@ import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 public class Recipe implements Parcelable{
@@ -123,6 +124,20 @@ public class Recipe implements Parcelable{
         in.readList(this.foodFiles, String.class.getClassLoader());
 
         this.likes = in.readInt();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof Recipe) {
+            return getId().equals(((Recipe)obj).getId());
+        }
+        return false;
+        //return super.equals(obj);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, description, createdAt, lastModifiedAt, recipeFile, uploader, categories, comments, foodFiles, likes);
     }
 
     public String getStringCategories() {

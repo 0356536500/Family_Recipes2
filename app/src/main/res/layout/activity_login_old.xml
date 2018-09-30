@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".LoginActivity">
+    tools:context=".LoginActivityOld">
 
     <include layout="@layout/toolbar"
         android:id="@+id/include" />
@@ -14,11 +14,9 @@
         android:id="@+id/user_search"
         android:layout_below="@+id/include"
         android:layout_marginTop="30dp"
-        android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginRight="10dp"
+        android:layout_marginEnd="10dp"
         android:hint="Username"
-        android:layout_toRightOf="@+id/imageView7"
         android:layout_toEndOf="@+id/imageView7" />
 
     <EditText
@@ -30,9 +28,7 @@
         android:layout_marginTop="24dp"
         android:hint="Password"
         android:layout_below="@+id/user_search"
-        android:layout_alignRight="@+id/user_search"
         android:layout_alignEnd="@+id/user_search"
-        android:layout_alignLeft="@+id/user_search"
         android:layout_alignStart="@+id/user_search" />
 
     <Button
@@ -42,15 +38,12 @@
         android:id="@+id/loginBtn"
         android:layout_below="@+id/pswd"
         android:layout_marginTop="34dp"
-        android:layout_alignRight="@+id/pswd"
         android:layout_alignEnd="@+id/pswd"
-        android:layout_alignLeft="@+id/imageView8"
         android:layout_alignStart="@+id/imageView8"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
         android:backgroundTint="@color/colorPrimary"
-        android:textColor="#ffffff"
-        android:onClick="login" />
+        android:textColor="#ffffff" />
 
     <Button
         android:layout_width="wrap_content"
@@ -58,24 +51,20 @@
         android:text="REGISTER"
         android:id="@+id/registerBtn"
         android:layout_below="@+id/loginBtn"
-        android:layout_alignRight="@+id/loginBtn"
         android:layout_alignEnd="@+id/loginBtn"
-        android:layout_alignLeft="@+id/loginBtn"
         android:layout_alignStart="@+id/loginBtn"
         android:backgroundTint="@color/colorPrimary"
-        android:textColor="#ffffff"
-        android:onClick="register" />
+        android:textColor="#ffffff" />
 
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/imageView7"
         android:layout_alignBottom="@+id/user_search"
-        android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:src="@drawable/circledude"
         android:layout_alignTop="@+id/user_search"
-        android:layout_marginLeft="10dp" />
+        android:layout_marginStart="10dp" />
 
     <ImageView
         android:layout_width="wrap_content"
@@ -83,7 +72,6 @@
         android:id="@+id/imageView8"
         android:src="@drawable/circlelock"
         android:layout_alignBottom="@+id/pswd"
-        android:layout_toLeftOf="@+id/pswd"
         android:layout_toStartOf="@+id/pswd"
         android:layout_alignTop="@+id/pswd" />
 
@@ -93,9 +81,8 @@
         android:text="Remember Me"
         android:id="@+id/cb_remember"
         android:layout_below="@+id/pswd"
-        android:layout_alignRight="@+id/pswd"
         android:layout_alignEnd="@+id/pswd"
         android:checked="true"
-        android:layout_marginRight="5dp" />
+        android:layout_marginEnd="5dp" />
 
 </RelativeLayout>

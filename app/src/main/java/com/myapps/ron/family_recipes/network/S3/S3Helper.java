@@ -77,7 +77,7 @@ class S3Helper {
         });
     }
 
-    void downloadFile(String key, String localPath, final MyCallback<Boolean> callback) {
+    void downloadFile(String key, final String localPath, final MyCallback<String> callback) {
 
         /*TransferObserver downloadObserver =
                 transferUtility.download(
@@ -93,7 +93,7 @@ class S3Helper {
             public void onStateChanged(int id, TransferState state) {
                 if (TransferState.COMPLETED == state) {
                     // Handle a completed upload.
-                    callback.onFinished(true);
+                    callback.onFinished(localPath);
                 }
             }
 
@@ -108,7 +108,7 @@ class S3Helper {
             @Override
             public void onError(int id, Exception ex) {
                 // Handle errors
-                callback.onFinished(false);
+                callback.onFinished(null);
             }
 
         });

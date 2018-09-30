@@ -1,10 +1,13 @@
 package com.myapps.ron.family_recipes;
 
 import android.app.SearchManager;
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
@@ -17,17 +20,24 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.myapps.ron.family_recipes.dal.DataViewModel;
+import com.myapps.ron.family_recipes.model.Recipe;
+import com.myapps.ron.family_recipes.recycler.Contact;
+import com.myapps.ron.family_recipes.recycler.RecipesAdapter;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements ContactsAdapter.ContactsAdapterListener {
+public class MainActivity extends AppCompatActivity implements RecipesAdapter.RecipesAdapterListener {
     private static final String TAG = MainActivity.class.getSimpleName();
     private RecyclerView recyclerView;
     private List<Contact> contactList;
-    private ContactsAdapter mAdapter;
+    private RecipesAdapter mAdapter;
     private SearchView searchView;
 
     private MenuItem searchMenuItem;
+
+    private DataViewModel viewModel;
 
     // url to fetch contacts json
     //private static final String URL = "http://192.168.1.5:3000/api/books";
@@ -37,6 +47,18 @@ public class MainActivity extends AppCompatActivity implements ContactsAdapter.C
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        init();
+
+        // white background notification bar
+        whiteNotificationBar(recyclerView);
+
+        initViewModel();
+
+        fetchRecipes();
+    }
+
+    private void init() {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -44,27 +66,38 @@ public class MainActivity extends AppCompatActivity implements ContactsAdapter.C
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(R.string.toolbar_title);
 
-        recyclerView = findViewById(R.id.recycler_view);
-        contactList = new ArrayList<>();
-        mAdapter = new ContactsAdapter(this, contactList, this);
+        bindUI();
 
-        // white background notification bar
-        whiteNotificationBar(recyclerView);
+        initRecycler();
+    }
+
+    private void bindUI() {
+        recyclerView = findViewById(R.id.recycler_view);
+    }
+
+    private void initRecycler() {
+        contactList = new ArrayList<>();
+        mAdapter = new RecipesAdapter(this, contactList, this);
 
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.addItemDecoration(new MyDividerItemDecoration(this, DividerItemDecoration.VERTICAL, 36));
         recyclerView.setAdapter(mAdapter);
-
-        fetchContacts();
     }
 
-    /**
-     * fetches json by making http calls
-     */
-    private void fetchContacts() {
+    private void initViewModel() {
+        viewModel =  ViewModelProviders.of(this).get(DataViewModel.class);
+        viewModel.getRecipes().observe(this, new Observer<List<Recipe>>() {
+            @Override
+            public void onChanged(@Nullable List<Recipe> recipes) {
+                mAdapter.updateRecipes(recipes);
+            }
+        });
+    }
 
+    private void fetchRecipes() {
+        viewModel.loadRecipes(this);
     }
 
     public MenuItem getSearchMenuItem() {
@@ -150,7 +183,7 @@ public class MainActivity extends AppCompatActivity implements ContactsAdapter.C
     }
 
     @Override
-    public void onContactSelected(Contact contact) {
+    public void onItemSelected(Contact contact) {
         Toast.makeText(getApplicationContext(), "Selected: " + contact.getName() + ", " + contact.getPhone(), Toast.LENGTH_LONG).show();
     }
 }

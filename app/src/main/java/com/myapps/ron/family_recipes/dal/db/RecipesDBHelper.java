@@ -105,14 +105,16 @@ public class RecipesDBHelper extends SQLiteOpenHelper{
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.query(TABLE_NAME,new String[]{KEY_ID,KEY_NAME},KEY_ID+"=?",
                 new String[]{String.valueOf(id)},null,null,null,null);
-        if(cursor != null)
+        if(cursor != null) {
             cursor.moveToFirst();
-        return new Recipe(cursor.getString(0),cursor.getString(1),
-                cursor.getString(2),cursor.getString(3),
-                cursor.getString(4),cursor.getString(5),
-                cursor.getString(6),cursor.getString(7),
-                cursor.getString(8),cursor.getString(9),
-                cursor.getInt(10));
+            return new Recipe(cursor.getString(0), cursor.getString(1),
+                    cursor.getString(2), cursor.getString(3),
+                    cursor.getString(4), cursor.getString(5),
+                    cursor.getString(6), cursor.getString(7),
+                    cursor.getString(8), cursor.getString(9),
+                    cursor.getInt(10));
+        }
+        return null;
     }
 
     // Getting All Records
@@ -140,7 +142,6 @@ public class RecipesDBHelper extends SQLiteOpenHelper{
                 recipe.setStringComments(cursor.getString(7));
                 recipe.setStringFoodFiles(cursor.getString(8));
                 recipe.setLikes(cursor.getInt(9));
-                //recipe.setSharedKey(Constants.SHARED_KEY);
 
                 // Adding contact to list
                 recipeList.add(recipe);

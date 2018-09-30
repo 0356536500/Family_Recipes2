@@ -1,4 +1,4 @@
-package com.myapps.ron.family_recipes;
+package com.myapps.ron.family_recipes.recycler;
 
 /**
  * Created by ravi on 16/11/17.

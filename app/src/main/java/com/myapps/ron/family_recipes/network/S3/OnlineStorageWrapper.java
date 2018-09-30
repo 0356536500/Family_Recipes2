@@ -2,6 +2,7 @@ package com.myapps.ron.family_recipes.network.S3;
 
 import android.content.Context;
 
+import com.myapps.ron.family_recipes.dal.storage.ExternalStorageHelper;
 import com.myapps.ron.family_recipes.network.MyCallback;
 
 public class OnlineStorageWrapper {
@@ -12,9 +13,9 @@ public class OnlineStorageWrapper {
         S3Helper.uploadFile(url, localPath, S3Helper.CONTENT_IMAGE, callback);
     }
 
-    public static void downloadFile(Context context, String key, String localPath, final MyCallback<Boolean> callback) {
+    public static void downloadFile(Context context, String key, final MyCallback<String> callback) {
         S3Helper s3 = S3Helper.getInstance(context);
-        s3.downloadFile(key, localPath, callback);
+        s3.downloadFile(key, ExternalStorageHelper.getFilesRootPath(context) + "/", callback);
     }
 
     /*static class MyAsyncUploader extends AsyncTask<Void, Integer, String> {

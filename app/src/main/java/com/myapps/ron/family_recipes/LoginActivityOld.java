@@ -11,9 +11,9 @@ import android.widget.EditText;
 import com.myapps.ron.family_recipes.utils.SharedPreferencesHandler;
 
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivityOld extends AppCompatActivity {
 
-    private static final String TAG = LoginActivity.class.getSimpleName();
+    private static final String TAG = LoginActivityOld.class.getSimpleName();
     EditText username;
     EditText password;
     Button loginButton;
@@ -24,7 +24,7 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+        setContentView(R.layout.activity_login_old);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
