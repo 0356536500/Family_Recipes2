@@ -1,5 +1,6 @@
 package com.myapps.ron.family_recipes.recycler;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.net.Uri;
 import android.support.annotation.NonNull;
@@ -75,11 +76,16 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
         return new MyViewHolder(itemView);
     }
 
+    @SuppressLint("CheckResult")
     @Override
     public void onBindViewHolder(@NonNull final MyViewHolder holder, final int position) {
         final Contact contact = recipeListFiltered.get(position);
         holder.name.setText(contact.getName());
         holder.phone.setText(contact.getPhone());
+
+        final RequestOptions requestOptions = new RequestOptions();
+        requestOptions.placeholder(android.R.drawable.progress_indeterminate_horizontal);// R.drawable.ic_placeholder);
+        requestOptions.error(android.R.drawable.stat_notify_error);// ic_error);
 
         //storageWrapper.getFoodFile(context, recipeListFiltered.get(position), );
         storageWrapper.getFoodFile(context, null, new MyCallback<String>() {
@@ -87,6 +93,7 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
             public void onFinished(String path) {
                 Glide.with(context)
                         .load(Uri.fromFile(new File(path)))
+                        .apply(requestOptions)
                         .into(holder.thumbnail);
             }
             //.apply(RequestOptions.circleCropTransform())
