@@ -1,4 +1,4 @@
-package com.myapps.ron.family_recipes;
+package com.myapps.ron.family_recipes.ui;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
@@ -10,6 +10,7 @@ import android.view.View;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 
+import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.utils.Constants;
 
 public class RecipeActivity extends AppCompatActivity {

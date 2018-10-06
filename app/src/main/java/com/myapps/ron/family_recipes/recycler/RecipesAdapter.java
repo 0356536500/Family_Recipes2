@@ -13,7 +13,6 @@ import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.module.AppGlideModule;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 
@@ -33,19 +32,19 @@ import java.util.List;
 public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHolder>
         implements Filterable {
     private Context context;
-    private List<Contact> recipeList;
-    private List<Contact> recipeListFiltered;
+    private List<Recipe> recipeList;
+    private List<Recipe> recipeListFiltered;
     private RecipesAdapterListener listener;
     private StorageWrapper storageWrapper;
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
-        public TextView name, phone;
+        public TextView name, description;
         public ImageView thumbnail;
 
         MyViewHolder(View view) {
             super(view);
             name = view.findViewById(R.id.name);
-            phone = view.findViewById(R.id.phone);
+            description = view.findViewById(R.id.description);
             thumbnail = view.findViewById(R.id.thumbnail);
 
             view.setOnClickListener(new View.OnClickListener() {
@@ -59,7 +58,7 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
     }
 
 
-    public RecipesAdapter(Context context, List<Contact> recipeList, RecipesAdapterListener listener) {
+    public RecipesAdapter(Context context, List<Recipe> recipeList, RecipesAdapterListener listener) {
         this.context = context;
         this.listener = listener;
         this.recipeList = recipeList;
@@ -79,16 +78,20 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
     @SuppressLint("CheckResult")
     @Override
     public void onBindViewHolder(@NonNull final MyViewHolder holder, final int position) {
-        final Contact contact = recipeListFiltered.get(position);
-        holder.name.setText(contact.getName());
-        holder.phone.setText(contact.getPhone());
+        final Recipe recipe = recipeListFiltered.get(position);
+        holder.name.setText(recipe.getName());
+        holder.description.setText(recipe.getDescription());
 
         final RequestOptions requestOptions = new RequestOptions();
         requestOptions.placeholder(android.R.drawable.progress_indeterminate_horizontal);// R.drawable.ic_placeholder);
         requestOptions.error(android.R.drawable.stat_notify_error);// ic_error);
 
+        Glide.with(context)
+                .load(recipe.image)
+                .apply(requestOptions)
+                .into(holder.thumbnail);
         //storageWrapper.getFoodFile(context, recipeListFiltered.get(position), );
-        storageWrapper.getFoodFile(context, null, new MyCallback<String>() {
+        /*storageWrapper.getFoodFile(context, recipe, new MyCallback<String>() {
             @Override
             public void onFinished(String path) {
                 Glide.with(context)
@@ -97,7 +100,7 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
                         .into(holder.thumbnail);
             }
             //.apply(RequestOptions.circleCropTransform())
-        });
+        });*/
     }
 
     @Override
@@ -114,12 +117,12 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
                 if (charString.isEmpty()) {
                     recipeListFiltered = recipeList;
                 } else {
-                    List<Contact> filteredList = new ArrayList<>();
-                    for (Contact row : recipeList) {
+                    List<Recipe> filteredList = new ArrayList<>();
+                    for (Recipe row : recipeList) {
 
                         // name match condition. this might differ depending on your requirement
-                        // here we are looking for name or phone number match
-                        if (row.getName().toLowerCase().contains(charString.toLowerCase()) || row.getPhone().contains(charSequence)) {
+                        // here we are looking for name or description number match
+                        if (row.getName().toLowerCase().contains(charString.toLowerCase()) || row.getDescription().contains(charSequence)) {
                             filteredList.add(row);
                         }
                     }
@@ -134,16 +137,15 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
 
             @Override
             protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
-                recipeListFiltered = (ArrayList<Contact>) filterResults.values;
+                recipeListFiltered = (ArrayList<Recipe>) filterResults.values;
                 notifyDataSetChanged();
             }
         };
     }
 
-    public void updateRecipes(List<Recipe> list1) {
-        List<Contact> list = new ArrayList<>();
+    public void updateRecipes(List<Recipe> list) {
         boolean changed = false;
-        for(Contact item : list) {
+        for(Recipe item : list) {
             int index = recipeList.indexOf(item);
             if(index >= 0 && item.hashCode() != recipeList.get(index).hashCode()) {
                 recipeList.set(index, item);
@@ -160,6 +162,6 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
     }
 
     public interface RecipesAdapterListener {
-        void onItemSelected(Contact contact);
+        void onItemSelected(Recipe recipe);
     }
 }

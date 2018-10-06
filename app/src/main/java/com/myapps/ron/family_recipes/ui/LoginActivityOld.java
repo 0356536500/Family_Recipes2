@@ -1,4 +1,4 @@
-package com.myapps.ron.family_recipes;
+package com.myapps.ron.family_recipes.ui;
 
 import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
@@ -8,6 +8,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 
+import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.utils.SharedPreferencesHandler;
 
 

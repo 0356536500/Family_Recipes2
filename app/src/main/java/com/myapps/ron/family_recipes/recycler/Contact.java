@@ -41,7 +41,7 @@ public class Contact {
 public class Contact {
     String name;
     String image;
-    String phone;
+    String description;
 
     public Contact() {
     }
@@ -55,7 +55,7 @@ public class Contact {
     }
 
     public String getPhone() {
-        return phone;
+        return description;
     }
 }
 */

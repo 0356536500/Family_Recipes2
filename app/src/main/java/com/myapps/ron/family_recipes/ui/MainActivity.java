@@ -1,4 +1,4 @@
-package com.myapps.ron.family_recipes;
+package com.myapps.ron.family_recipes.ui;
 
 import android.app.SearchManager;
 import android.arch.lifecycle.Observer;
@@ -20,6 +20,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.myapps.ron.family_recipes.MyDividerItemDecoration;
+import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.dal.DataViewModel;
 import com.myapps.ron.family_recipes.model.Recipe;
 import com.myapps.ron.family_recipes.recycler.Contact;
@@ -31,7 +33,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements RecipesAdapter.RecipesAdapterListener {
     private static final String TAG = MainActivity.class.getSimpleName();
     private RecyclerView recyclerView;
-    private List<Contact> contactList;
+    private List<Recipe> recipeList;
     private RecipesAdapter mAdapter;
     private SearchView searchView;
 
@@ -76,8 +78,8 @@ public class MainActivity extends AppCompatActivity implements RecipesAdapter.Re
     }
 
     private void initRecycler() {
-        contactList = new ArrayList<>();
-        mAdapter = new RecipesAdapter(this, contactList, this);
+        recipeList = new ArrayList<>();
+        mAdapter = new RecipesAdapter(this, recipeList, this);
 
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
@@ -183,7 +185,7 @@ public class MainActivity extends AppCompatActivity implements RecipesAdapter.Re
     }
 
     @Override
-    public void onItemSelected(Contact contact) {
-        Toast.makeText(getApplicationContext(), "Selected: " + contact.getName() + ", " + contact.getPhone(), Toast.LENGTH_LONG).show();
+    public void onItemSelected(Recipe recipe) {
+        Toast.makeText(getApplicationContext(), "Selected: " + recipe.getName() + ", " + recipe.getDescription(), Toast.LENGTH_LONG).show();
     }
 }

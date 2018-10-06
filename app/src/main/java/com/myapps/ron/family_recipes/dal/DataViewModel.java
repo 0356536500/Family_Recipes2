@@ -12,6 +12,7 @@ import com.myapps.ron.family_recipes.model.Recipe;
 import com.myapps.ron.family_recipes.network.APICallsHandler;
 import com.myapps.ron.family_recipes.network.CognitoHelper;
 import com.myapps.ron.family_recipes.network.MyCallback;
+import com.myapps.ron.family_recipes.network.cognito.AppHelper;
 import com.myapps.ron.family_recipes.utils.DateUtil;
 
 import java.util.List;
@@ -30,12 +31,14 @@ public class DataViewModel extends ViewModel {
 
     public void loadRecipes(final Context context) {
         final String time = DateUtil.getUTCTime();
-        APICallsHandler.getAllRecipes(DateUtil.getLastUpdateTime(context), CognitoHelper.getToken(), new MyCallback<List<Recipe>>() {
+        APICallsHandler.getAllRecipes(DateUtil.getLastUpdateTime(context), AppHelper.getAccessToken(), new MyCallback<List<Recipe>>() {
             @Override
             public void onFinished(List<Recipe> result) {
                 //HandleServerDataService.startActionUpdateRecipes(context, new ArrayList<>(result), time);
-                DateUtil.updateServerTime(context, time);
-                new MyAsyncRecipeUpdate(context, result).execute();
+                if(result != null) {
+                    DateUtil.updateServerTime(context, time);
+                    new MyAsyncRecipeUpdate(context, result).execute();
+                }
             }
         });
     }

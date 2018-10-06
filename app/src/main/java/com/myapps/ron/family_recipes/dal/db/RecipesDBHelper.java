@@ -7,7 +7,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.myapps.ron.family_recipes.model.Recipe;
-import com.myapps.ron.family_recipes.utils.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -79,7 +78,6 @@ public class RecipesDBHelper extends SQLiteOpenHelper{
      */
 
     public void insertRecipe(Recipe recipe) {
-
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -133,15 +131,15 @@ public class RecipesDBHelper extends SQLiteOpenHelper{
                 Recipe recipe = new Recipe();
                 recipe.setId(cursor.getString(0));
                 recipe.setName(cursor.getString(1));
-                recipe.setDescription(cursor.getString(1));
-                recipe.setCreatedAt(cursor.getString(2));
-                recipe.setLastModifiedAt(cursor.getString(3));
-                recipe.setRecipeFile(cursor.getString(4));
-                recipe.setUploader(cursor.getString(5));
-                recipe.setStringCategories(cursor.getString(6));
-                recipe.setStringComments(cursor.getString(7));
-                recipe.setStringFoodFiles(cursor.getString(8));
-                recipe.setLikes(cursor.getInt(9));
+                recipe.setDescription(cursor.getString(2));
+                recipe.setCreatedAt(cursor.getString(3));
+                recipe.setLastModifiedAt(cursor.getString(4));
+                recipe.setRecipeFile(cursor.getString(5));
+                recipe.setUploader(cursor.getString(6));
+                recipe.setStringCategories(cursor.getString(7));
+                recipe.setStringComments(cursor.getString(8));
+                recipe.setStringFoodFiles(cursor.getString(9));
+                recipe.setLikes(cursor.getInt(10));
 
                 // Adding contact to list
                 recipeList.add(recipe);
