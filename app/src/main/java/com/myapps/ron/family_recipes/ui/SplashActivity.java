@@ -18,6 +18,7 @@ import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.Auth
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.ChallengeContinuation;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.MultiFactorAuthenticationContinuation;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.AuthenticationHandler;
+import com.myapps.ron.family_recipes.MyApplication;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.dal.db.RecipesDBHelper;
 import com.myapps.ron.family_recipes.model.Recipe;
@@ -50,7 +51,7 @@ public class SplashActivity extends AppCompatActivity {
 
         AppHelper.init(getApplicationContext());
 
-        if(checkInternetConnection())
+        if(((MyApplication)getApplication()).checkInternetConnection())
             findCurrent();
         else if(SharedPreferencesHandler.getString(this, Constants.USERNAME) != null &&
                 SharedPreferencesHandler.getString(this, Constants.PASSWORD) != null){

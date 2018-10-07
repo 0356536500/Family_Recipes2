@@ -4,6 +4,7 @@ import android.app.SearchManager;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -24,8 +25,8 @@ import com.myapps.ron.family_recipes.MyDividerItemDecoration;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.dal.DataViewModel;
 import com.myapps.ron.family_recipes.model.Recipe;
-import com.myapps.ron.family_recipes.recycler.Contact;
 import com.myapps.ron.family_recipes.recycler.RecipesAdapter;
+import com.myapps.ron.family_recipes.utils.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -186,6 +187,9 @@ public class MainActivity extends AppCompatActivity implements RecipesAdapter.Re
 
     @Override
     public void onItemSelected(Recipe recipe) {
-        Toast.makeText(getApplicationContext(), "Selected: " + recipe.getName() + ", " + recipe.getDescription(), Toast.LENGTH_LONG).show();
+        //Toast.makeText(getApplicationContext(), "Selected: " + recipe.getName() + ", " + recipe.getDescription(), Toast.LENGTH_LONG).show();
+        Intent intent = new Intent(MainActivity.this, RecipeActivity.class);
+        intent.putExtra(Constants.RECIPE, recipe);
+        startActivityForResult(intent, 0);
     }
 }

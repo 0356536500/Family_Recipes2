@@ -108,32 +108,42 @@ public class APICallsHandler {
 
             @Override
             public void onFailure(@NonNull Call<JsonObject> call, @NonNull Throwable t) {
-
+                Log.e(TAG, "error posting recipe. message: " + t.getMessage());
                 //Toast.makeText(MainActivity.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
 
-    public void patchRecipe(Map<String, String> attributes, int numOfFiles, String token) {
+    public static void patchRecipe(Map<String, String> attributes, String id, String token, final MyCallback<Recipe> callback) {
         Map<String, String> headers = new HashMap<>();
         headers.put(Constants.CONTENT_TYPE, "application/json");
         headers.put(Constants.AUTHORIZATION, token);
         Map<String, String> body = new HashMap<>();
         body.put(Constants.ATTRIBUTES, gson.toJson(attributes));
-        body.put(Constants.NUM_FILES_TO_UPLOAD, String.valueOf(numOfFiles));
+        //body.put(Constants.NUM_FILES_TO_UPLOAD, String.valueOf(numOfFiles));
 
         RecipeInterface service = getRetrofitInstance().create(RecipeInterface.class);
-        Call<Recipe> call = service.patchRecipe(headers, body);
+        Call<Recipe> call = service.patchRecipe(headers, id, body);
 
         call.enqueue(new Callback<Recipe>() {
             @Override
             public void onResponse(@NonNull Call<Recipe> call, @NonNull Response<Recipe> response) {
-                //generateDataList(response.body());
+                String body = response.body() != null ? response.body().toString() : "null";
+
+                if (response.code() == STATUS_OK) {
+                    Log.i(TAG, body);
+                    Recipe recipe = response.body();
+                    callback.onFinished(recipe);
+                }
+                else {
+                    Log.e(TAG, "error patchRecipe, code = " + response.code() + "\n body: " + body);
+                }
             }
 
             @Override
             public void onFailure(@NonNull Call<Recipe> call, @NonNull Throwable t) {
+                Log.e(TAG, "error patching recipe. message: " + t.getMessage());
                 //Toast.makeText(MainActivity.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
             }
         });

@@ -40,6 +40,8 @@ public class Recipe implements Parcelable{
     private List<String> foodFiles;
     @SerializedName("likes")
     private int likes;
+
+    private boolean meLike;
 /*    @SerializedName("sharedKey")
     private String sharedKey;*/
 
@@ -61,6 +63,7 @@ public class Recipe implements Parcelable{
     public Recipe() {
     }
 
+    //from server
     public Recipe(String id, String name, String description, String createdAt,
                   String lastModifiedAt, String recipeFile, String uploader,
                   @Nullable List<String> categories, @Nullable List<String> comments, @Nullable List<String> foodFiles,
@@ -76,13 +79,15 @@ public class Recipe implements Parcelable{
         this.comments = comments;
         this.foodFiles = foodFiles;
         this.likes = likes;
+
+        this.meLike = false;
     }
 
+    //from db
     public Recipe(String id, String name, String description, String createdAt,
                   String lastModifiedAt, String recipeFile, String uploader,
                   String categories, String comments, String foodFiles,
-                  int likes) {
-
+                  int likes, boolean meLike) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -92,9 +97,20 @@ public class Recipe implements Parcelable{
         this.uploader = uploader;
         this.likes = likes;
 
+        this.meLike = meLike;
+
         setStringCategories(categories);
         setStringComments(comments);
         setStringFoodFiles(foodFiles);
+    }
+
+    public Recipe(String id, String name, String description, String createdAt,
+                  String lastModifiedAt, String recipeFile, String uploader,
+                  String categories, String comments, String foodFiles,
+                  int likes) {
+
+        this(id, name, description, createdAt, lastModifiedAt, recipeFile, uploader, categories,
+                comments, foodFiles, likes, false);
     }
 
 
@@ -260,10 +276,19 @@ public class Recipe implements Parcelable{
         this.likes = likes;
     }
 
+    public boolean getMeLike() {
+        return meLike;
+    }
+
+    public void setMeLike(boolean meLike) {
+        this.meLike = meLike;
+    }
+
     @Override
     public String toString() {
         return "Recipe{" +
-                "id='" + id + '\'' +
+                "image='" + image + '\'' +
+                ", id='" + id + '\'' +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", createdAt='" + createdAt + '\'' +
@@ -274,6 +299,7 @@ public class Recipe implements Parcelable{
                 ", comments=" + comments +
                 ", foodFiles=" + foodFiles +
                 ", likes=" + likes +
+                ", meLike=" + meLike +
                 '}';
     }
 

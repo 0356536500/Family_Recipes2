@@ -13,6 +13,8 @@ import java.util.List;
 
 
 public class RecipesDBHelper extends SQLiteOpenHelper{
+    private static final int FALSE = 0;
+    private static final int TRUE = 1;
     // All Static variables
     // Database Version
     private static final int DATABASE_VERSION = 1;
@@ -35,6 +37,7 @@ public class RecipesDBHelper extends SQLiteOpenHelper{
     private static final String KEY_COMMENTS = "comments";
     private static final String KEY_FOOD = "foodFiles";
     private static final String KEY_LIKES = "likes";
+    private static final String KEY_ME_LIKE = "meLike";
 
 
     private static final String CREATE_EXEC = "CREATE TABLE " + TABLE_NAME + "("
@@ -48,7 +51,8 @@ public class RecipesDBHelper extends SQLiteOpenHelper{
             + KEY_CATEGORIES + " TEXT,"
             + KEY_COMMENTS + " TEXT,"
             + KEY_FOOD + " TEXT,"
-            + KEY_LIKES + " INTEGER " + ")";
+            + KEY_LIKES + " INTEGER,"
+            + KEY_ME_LIKE + " INTEGER " + ")";
 
     public RecipesDBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -93,6 +97,8 @@ public class RecipesDBHelper extends SQLiteOpenHelper{
         values.put(KEY_COMMENTS, recipe.getStringComments());
         values.put(KEY_FOOD, recipe.getStringFoodFiles());
         values.put(KEY_LIKES, recipe.getLikes());
+        values.put(KEY_LIKES, recipe.getLikes());
+        values.put(KEY_ME_LIKE, recipe.getMeLike());
 
         // Inserting Row
         db.insert(TABLE_NAME, null, values);
@@ -110,7 +116,7 @@ public class RecipesDBHelper extends SQLiteOpenHelper{
                     cursor.getString(4), cursor.getString(5),
                     cursor.getString(6), cursor.getString(7),
                     cursor.getString(8), cursor.getString(9),
-                    cursor.getInt(10));
+                    cursor.getInt(10), cursor.getInt(11) == TRUE);
         }
         return null;
     }
@@ -140,6 +146,7 @@ public class RecipesDBHelper extends SQLiteOpenHelper{
                 recipe.setStringComments(cursor.getString(8));
                 recipe.setStringFoodFiles(cursor.getString(9));
                 recipe.setLikes(cursor.getInt(10));
+                recipe.setMeLike(cursor.getInt(11) == TRUE);
 
                 // Adding contact to list
                 recipeList.add(recipe);
@@ -161,6 +168,7 @@ public class RecipesDBHelper extends SQLiteOpenHelper{
         values.put(KEY_COMMENTS, recipe.getStringComments());
         values.put(KEY_FOOD, recipe.getStringFoodFiles());
         values.put(KEY_LIKES, recipe.getLikes());
+        values.put(KEY_ME_LIKE, recipe.getMeLike());
 
         // updating row
         return db.update(TABLE_NAME, values, KEY_ID + " = ?",

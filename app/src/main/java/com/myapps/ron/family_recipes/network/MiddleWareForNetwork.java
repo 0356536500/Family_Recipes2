@@ -1,22 +1,34 @@
-package com.myapps.ron.family_recipes;
+package com.myapps.ron.family_recipes.network;
 
-import android.app.Application;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
+public final class MiddleWareForNetwork {
 
-public class MyApplication extends Application {
+    //region APICallHandler
 
-    public static final String TAG = MyApplication.class.getSimpleName();
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
-    }
 
-    public boolean checkInternetConnection(){
-        ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+    //endregion
+
+
+
+    //region S3
+
+
+    //endregion
+
+
+    //region Cognito
+
+
+    //endregion
+
+
+    //check internet connection
+    public static boolean checkInternetConnection(Context context){
+        ConnectivityManager connectivityManager = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
         if (connectivityManager != null) {
             //we are connected to a network
             return connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||

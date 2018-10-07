@@ -44,6 +44,7 @@ public interface RecipeInterface {
     @PATCH(recipes)
     Call<Recipe> patchRecipe(
             @HeaderMap Map<String, String> headers,
+            @Query(Constants.ID_QUERY) String id,
             @Body Map<String, String> body
     );
 

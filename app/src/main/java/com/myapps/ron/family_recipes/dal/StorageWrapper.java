@@ -2,7 +2,6 @@ package com.myapps.ron.family_recipes.dal;
 
 import android.content.Context;
 
-import com.myapps.ron.family_recipes.dal.db.RecipesDBHelper;
 import com.myapps.ron.family_recipes.dal.storage.ExternalStorageHelper;
 import com.myapps.ron.family_recipes.model.Recipe;
 import com.myapps.ron.family_recipes.network.MyCallback;
@@ -10,7 +9,7 @@ import com.myapps.ron.family_recipes.network.S3.OnlineStorageWrapper;
 
 public class StorageWrapper {
 
-    private RecipesDBHelper dbHelper;
+    //private RecipesDBHelper dbHelper;
     private static StorageWrapper storage;
     //private Context context;
 
@@ -24,7 +23,7 @@ public class StorageWrapper {
     }
 
     private StorageWrapper(Context context) {
-        dbHelper = new RecipesDBHelper(context);
+        /*dbHelper = new RecipesDBHelper(context)*/;
     }
 
     public void getFoodFile(Context context, Recipe recipe, MyCallback<String> callback) {

@@ -43,6 +43,7 @@
         app:backgroundTint="@color/cardview_light_background"
         app:layout_anchor="@id/app_bar"
         app:layout_anchorGravity="bottom|end"
-        app:srcCompat="@drawable/ic_favorite_border_black_36dp" />
+        app:srcCompat="@drawable/ic_favorite_border_red_36dp"
+        android:onClick="doLike"/>
 
 </android.support.design.widget.CoordinatorLayout>
