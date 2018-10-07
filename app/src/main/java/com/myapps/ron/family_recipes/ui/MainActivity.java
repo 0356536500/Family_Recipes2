@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity implements RecipesAdapter.Re
         setSupportActionBar(toolbar);
 
         // toolbar fancy stuff
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         getSupportActionBar().setTitle(R.string.toolbar_title);
 
         bindUI();
