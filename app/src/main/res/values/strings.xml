@@ -4,6 +4,7 @@
     <string name="toolbar_title">Recipes</string>
     <string name="action_search">Search</string>
     <string name="action_filter">Filter</string>
+    <string name="action_share">Share</string>
     <string name="search_hint">Type name…</string>
 
     <string name="right_credentials">logged in</string>
