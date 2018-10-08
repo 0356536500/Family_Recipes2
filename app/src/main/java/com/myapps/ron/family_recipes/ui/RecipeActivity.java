@@ -15,8 +15,8 @@ import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.ButtonBarLayout;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,6 +30,7 @@ import com.bumptech.glide.request.transition.Transition;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.dal.RecipeViewModel;
 import com.myapps.ron.family_recipes.model.Recipe;
+import com.myapps.ron.family_recipes.network.MiddleWareForNetwork;
 import com.myapps.ron.family_recipes.utils.Constants;
 
 public class RecipeActivity extends AppCompatActivity {
@@ -44,6 +45,8 @@ public class RecipeActivity extends AppCompatActivity {
     private Recipe recipe;
     private RecipeViewModel viewModel;
     private Observer<Recipe> likeObserver, commentObserver;
+
+    private boolean showLikeMessage = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -100,9 +103,7 @@ public class RecipeActivity extends AppCompatActivity {
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent();
-                setResult(RESULT_OK, intent);
-                finish();
+                exit();
             }
         });
 
@@ -145,9 +146,12 @@ public class RecipeActivity extends AppCompatActivity {
             public void onChanged(@Nullable Recipe recipe) {
                 RecipeActivity.this.recipe = recipe;
                 loadLikeImage();
-                viewModel.getRecipe().removeObserver(likeObserver);
+                like.setEnabled(true);
+                //viewModel.getRecipe().removeObserver(likeObserver);
             }
         };
+
+        viewModel.getRecipe().observe(this, likeObserver);
 
         commentObserver = new Observer<Recipe>() {
             @Override
@@ -196,17 +200,22 @@ public class RecipeActivity extends AppCompatActivity {
     }
 
     private void loadLikeImage() {
+        Log.e(this.getClass().getSimpleName(), recipe.toString());
         String message;
         if(recipe.getMeLike()) {
+            Log.e(this.getClass().getSimpleName(), "showing full heart");
             like.setImageDrawable(getResources().getDrawable(R.drawable.ic_favorite_red_36dp));
             message = "like";
         }
         else {
+            Log.e(this.getClass().getSimpleName(), "showing empty heart");
             like.setImageDrawable(getResources().getDrawable(R.drawable.ic_favorite_border_red_36dp));
             message = "unlike";
         }
-        Snackbar.make(like, message, Snackbar.LENGTH_SHORT)
-                .setAction("Action", null).show();
+        if(showLikeMessage)
+            Snackbar.make(like, message, Snackbar.LENGTH_SHORT)
+                    .setAction("Action", null).show();
+        showLikeMessage = true;
     }
 
     @SuppressLint("CheckResult")
@@ -241,8 +250,10 @@ public class RecipeActivity extends AppCompatActivity {
 
     public void doLike(View view) {
         //recipe.setMeLike(!recipe.getMeLike());
-        viewModel.getRecipe().observe(this, likeObserver);
-        viewModel.changeLike(getApplicationContext(), !recipe.getMeLike(), recipe.getId());
+        if(MiddleWareForNetwork.checkInternetConnection(this))
+            like.setEnabled(false);
+        //viewModel.getRecipe().observe(this, likeObserver);
+        viewModel.changeLike(getApplicationContext(), recipe);
         /*String message;
         // do like
         loadRecipe();
@@ -259,5 +270,17 @@ public class RecipeActivity extends AppCompatActivity {
         }
             Snackbar.make(view, message, Snackbar.LENGTH_SHORT)
                     .setAction("Action", null).show();*/
+    }
+
+    private void exit() {
+        Intent intent = new Intent();
+        intent.putExtra(Constants.RECIPE, this.recipe);
+        setResult(RESULT_OK, intent);
+        finish();
+    }
+
+    @Override
+    public void onBackPressed() {
+        exit();
     }
 }

@@ -11,6 +11,8 @@ import com.myapps.ron.family_recipes.model.Recipe;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.parsers.FactoryConfigurationError;
+
 
 public class RecipesDBHelper extends SQLiteOpenHelper{
     private static final int FALSE = 0;
@@ -97,8 +99,7 @@ public class RecipesDBHelper extends SQLiteOpenHelper{
         values.put(KEY_COMMENTS, recipe.getStringComments());
         values.put(KEY_FOOD, recipe.getStringFoodFiles());
         values.put(KEY_LIKES, recipe.getLikes());
-        values.put(KEY_LIKES, recipe.getLikes());
-        values.put(KEY_ME_LIKE, recipe.getMeLike());
+        values.put(KEY_ME_LIKE, recipe.getMeLike() ? TRUE : FALSE);
 
         // Inserting Row
         db.insert(TABLE_NAME, null, values);
@@ -107,11 +108,12 @@ public class RecipesDBHelper extends SQLiteOpenHelper{
 
     public Recipe getRecipe(String id){
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.query(TABLE_NAME,new String[]{KEY_ID,KEY_NAME},KEY_ID+"=?",
+        //                                  new String[]{KEY_ID,KEY_NAME}
+        Cursor cursor = db.query(TABLE_NAME, null,KEY_ID+"=?",
                 new String[]{String.valueOf(id)},null,null,null,null);
         if(cursor != null) {
             cursor.moveToFirst();
-            return new Recipe(cursor.getString(0), cursor.getString(1),
+            return new Recipe(cursor.getString(cursor.getColumnIndex(KEY_ID)), cursor.getString(1),
                     cursor.getString(2), cursor.getString(3),
                     cursor.getString(4), cursor.getString(5),
                     cursor.getString(6), cursor.getString(7),
@@ -168,7 +170,7 @@ public class RecipesDBHelper extends SQLiteOpenHelper{
         values.put(KEY_COMMENTS, recipe.getStringComments());
         values.put(KEY_FOOD, recipe.getStringFoodFiles());
         values.put(KEY_LIKES, recipe.getLikes());
-        values.put(KEY_ME_LIKE, recipe.getMeLike());
+        values.put(KEY_ME_LIKE, recipe.getMeLike() ? TRUE : FALSE);
 
         // updating row
         return db.update(TABLE_NAME, values, KEY_ID + " = ?",

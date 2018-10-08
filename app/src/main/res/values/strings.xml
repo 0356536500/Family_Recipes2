@@ -7,18 +7,19 @@
     <string name="action_share">Share</string>
     <string name="search_hint">Type name…</string>
 
-    <string name="right_credentials">logged in</string>
-    <string name="wrong_credentials">Wrong username or password</string>
-    <string name="code_0">Connection timeout</string>
-    <string name="code_404">Resource not avaliable</string>
-    <string name="e_session_expired">Your session has expired</string>
-    <string name="e_cant_be_empty">This field can\'t be empty</string>
-    <string name="e_petition">Request error</string>
-    <string name="server_response">SERVER_RESPONSE</string>
-    <string name="server_message">SERVER_MESSAGE</string>
     <string name="sharedPreferences">com.myapps.ron.family_recipes</string>
     <string name="title_activity_recipe">RecipeActivity</string>
-    <!--<string name="title_activity_new_password">NewPassword</string>-->
+    <string name="title_activity_new_password">NewPassword</string>
+
+    <string name="title_activity_login">Sign in</string>
+    <!-- Strings related to login -->
+    <string name="app_main_screen">Sign in</string>
+    <string name="app_main_screen_title">Cognito Identity</string>
+    <string name="app_main_desc">A sample app to showcase Cognito Identity and the SDK for Android.</string>
+    <string name="nav_drawer_open">Open navigation drawer</string>
+    <string name="nav_drawer_close">Close navigation drawer</string>
+    <string name="Username">Username</string>
+    <string name="Password">Password</string>
     <string name="large_text">
         "Material is the metaphor.\n\n"
 
@@ -107,18 +108,5 @@
         "On the layout level, design your app layout to minimize opportunities for interference. "
         "For example, position the FAB to one side of stream of a cards so the FAB won’t interfere "
         "when a user tries to pick up one of cards.\n\n"
-    </string>
-    <string name="title_activity_login">Sign in</string>
-    <!-- Strings related to login -->
-    <string name="prompt_email">Email</string>
-    <string name="prompt_password">Password</string>
-    <string name="action_sign_in">Sign in</string>
-    <string name="action_sign_in_short">Sign in</string>
-    <string name="error_invalid_email">This email address is invalid</string>
-    <string name="error_invalid_password">This password is too short</string>
-    <string name="error_incorrect_password">This password is incorrect</string>
-    <string name="error_field_required">This field is required</string>
-    <string name="permission_rationale">"Contacts permissions are needed for providing email
-        completions."
     </string>
 </resources>

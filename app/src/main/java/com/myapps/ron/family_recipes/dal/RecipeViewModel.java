@@ -4,6 +4,7 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 import android.content.Context;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.myapps.ron.family_recipes.dal.db.RecipesDBHelper;
@@ -34,18 +35,19 @@ public class RecipeViewModel extends ViewModel {
         return recipe;
     }
 
-    public void changeLike(final Context context, final boolean like, final String id) {
+    public void changeLike(final Context context, final Recipe recipe) {
         if(MiddleWareForNetwork.checkInternetConnection(context)) {
             Map<String, String> attrs = new HashMap<>();
-            //TODO add support for like/unlike on server
-            attrs.put(Constants.LIKES, "");
-            APICallsHandler.patchRecipe(attrs, id, AppHelper.getAccessToken(), new MyCallback<Recipe>() {
+            String likeStr = recipe.getMeLike() ? "unlike" : "like";
+            attrs.put(Constants.LIKES, likeStr);
+            APICallsHandler.patchRecipe(attrs, recipe.getId(), AppHelper.getAccessToken(), new MyCallback<Recipe>() {
                 @Override
                 public void onFinished(Recipe result) {
-                    result.setMeLike(like);
+                    result.setMeLike(!recipe.getMeLike());
                     RecipesDBHelper dbHelper = new RecipesDBHelper(context);
                     dbHelper.updateRecipe(result);
-                    setRecipe(dbHelper.getRecipe(id));
+                    Log.e("viewModel", dbHelper.getRecipe(recipe.getId()).toString());
+                    setRecipe(dbHelper.getRecipe(recipe.getId()));
                 }
             });
         }

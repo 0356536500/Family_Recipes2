@@ -2,8 +2,10 @@ package com.myapps.ron.family_recipes.recycler;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.net.Uri;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.widget.CircularProgressDrawable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,17 +13,22 @@ import android.view.ViewGroup;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
 
+import com.bumptech.glide.request.target.Target;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.dal.StorageWrapper;
 import com.myapps.ron.family_recipes.model.Recipe;
-import com.myapps.ron.family_recipes.network.MyCallback;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -70,7 +77,7 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.user_row_item, parent, false);
+                .inflate(R.layout.recipe_row_item, parent, false);
 
         return new MyViewHolder(itemView);
     }
@@ -82,12 +89,32 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
         holder.name.setText(recipe.getName());
         holder.description.setText(recipe.getDescription());
 
+        CircularProgressDrawable circularProgressDrawable = new CircularProgressDrawable(context);
+        circularProgressDrawable.setStrokeWidth(5f);
+        circularProgressDrawable.setCenterRadius(35f);
+        circularProgressDrawable.start();
+
         final RequestOptions requestOptions = new RequestOptions();
-        requestOptions.placeholder(android.R.drawable.progress_indeterminate_horizontal);// R.drawable.ic_placeholder);
+        requestOptions.placeholder(circularProgressDrawable);
+        //requestOptions.placeholder(android.R.drawable.progress_indeterminate_horizontal);// R.drawable.ic_placeholder);
         requestOptions.error(android.R.drawable.stat_notify_error);// ic_error);
 
         Glide.with(context)
                 .load(recipe.image)
+                /*.listener(new RequestListener<Drawable>() {
+                    @Override
+                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                        holder.progressBar.setVisibility(View.GONE);
+                        holder.thumbnail.setImageResource(android.R.drawable.stat_notify_error);
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                        holder.progressBar.setVisibility(View.GONE);
+                        return false;
+                    }
+                })*/
                 .apply(requestOptions)
                 .into(holder.thumbnail);
         //storageWrapper.getFoodFile(context, recipeListFiltered.get(position), );
@@ -159,6 +186,19 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
 
         if (changed)
             notifyDataSetChanged();
+    }
+
+    public boolean updateOneRecipe(Recipe recipe) {
+        int index1 = recipeList.indexOf(recipe);
+        if(index1 >= 0)
+            recipeList.set(index1, recipe);
+
+        int index2 = recipeListFiltered.indexOf(recipe);
+        if(index2 >= 0)
+            recipeListFiltered.set(index2, recipe);
+        notifyDataSetChanged();
+
+        return index1 >= 0 && index2 >= 0;
     }
 
     public interface RecipesAdapterListener {

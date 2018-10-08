@@ -190,6 +190,15 @@ public class MainActivity extends AppCompatActivity implements RecipesAdapter.Re
         //Toast.makeText(getApplicationContext(), "Selected: " + recipe.getName() + ", " + recipe.getDescription(), Toast.LENGTH_LONG).show();
         Intent intent = new Intent(MainActivity.this, RecipeActivity.class);
         intent.putExtra(Constants.RECIPE, recipe);
-        startActivityForResult(intent, 0);
+        startActivityForResult(intent, Constants.RECIPE_ACTIVITY_CODE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        //super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == Constants.RECIPE_ACTIVITY_CODE) {
+            Recipe updatedRecipe = data.getParcelableExtra(Constants.RECIPE);
+            mAdapter.updateOneRecipe(updatedRecipe);
+        }
     }
 }

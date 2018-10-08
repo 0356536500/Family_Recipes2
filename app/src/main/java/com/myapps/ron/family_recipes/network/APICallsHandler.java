@@ -119,12 +119,12 @@ public class APICallsHandler {
         Map<String, String> headers = new HashMap<>();
         headers.put(Constants.CONTENT_TYPE, "application/json");
         headers.put(Constants.AUTHORIZATION, token);
-        Map<String, String> body = new HashMap<>();
-        body.put(Constants.ATTRIBUTES, gson.toJson(attributes));
+        //Map<String, String> body = new HashMap<>();
+        //body.put(Constants.ATTRIBUTES, gson.toJson(attributes));
         //body.put(Constants.NUM_FILES_TO_UPLOAD, String.valueOf(numOfFiles));
 
         RecipeInterface service = getRetrofitInstance().create(RecipeInterface.class);
-        Call<Recipe> call = service.patchRecipe(headers, id, body);
+        Call<Recipe> call = service.patchRecipe(headers, id, attributes);
 
         call.enqueue(new Callback<Recipe>() {
             @Override
