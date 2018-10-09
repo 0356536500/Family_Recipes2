@@ -2,6 +2,7 @@ package com.myapps.ron.family_recipes.network.S3;
 
 import android.content.Context;
 import android.net.Uri;
+import android.util.Log;
 
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver;
@@ -10,6 +11,7 @@ import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.myapps.ron.family_recipes.network.Constants;
+import com.myapps.ron.family_recipes.network.cognito.AppHelper;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -35,7 +37,12 @@ public class Util {
      * @return A default credential provider.
      */
     private CognitoCachingCredentialsProvider getCredProvider(Context context) {
-        if (sCredProvider == null) {
+        sCredProvider = AppHelper.getCredentialsProvider();
+        if(sCredProvider != null) {
+            Log.e("S3 Util", "credentials from AppHelper " + sCredProvider.getIdentityPoolId());
+            return sCredProvider;
+        }
+        else {//if (sCredProvider == null) {
             sCredProvider = new CognitoCachingCredentialsProvider(
                     context.getApplicationContext(),
                     Constants.COGNITO_POOL_ID,
@@ -53,8 +60,10 @@ public class Util {
      */
     public AmazonS3Client getS3Client(Context context) {
         if (sS3Client == null) {
-            sS3Client = new AmazonS3Client(getCredProvider(context.getApplicationContext()));
-            sS3Client.setRegion(Region.getRegion(Regions.fromName(Constants.BUCKET_REGION)));
+            sS3Client = new AmazonS3Client(AppHelper.getCredentialsProvider());
+            sS3Client.setRegion(Region.getRegion(Constants.COGNITO_REGION));
+            /*sS3Client = new AmazonS3Client(getCredProvider(context.getApplicationContext()));
+            sS3Client.setRegion(Region.getRegion(Regions.fromName(Constants.BUCKET_REGION)));*/
         }
         return sS3Client;
     }

@@ -86,7 +86,7 @@ public class SplashActivity extends AppCompatActivity {
         Log.e(TAG, "writing to db");
         for (Recipe item : recipes) {
             if(dbHelper.recipeExists(item.getId()))
-                dbHelper.updateRecipe(item);
+                dbHelper.updateRecipeServerChanges(item);
             else
                 dbHelper.insertRecipe(item);
         }
@@ -153,7 +153,8 @@ public class SplashActivity extends AppCompatActivity {
         @Override
         public void onFailure(Exception e) {
             closeWaitDialog();
-            launchLogin();
+            //launchLogin();
+            signInUser();
             Log.e(TAG, "Sign-in failed, " + AppHelper.formatException(e));
             //showDialogMessage("Sign-in failed", AppHelper.formatException(e));
         }
@@ -185,11 +186,13 @@ public class SplashActivity extends AppCompatActivity {
     private void launchMain() {
         Intent intent = new Intent(SplashActivity.this, MainActivity.class);
         startActivity(intent);
+        finish();
     }
 
     private void launchLogin() {
         Intent intent = new Intent(SplashActivity.this, LoginActivity.class);
         startActivity(intent);
+        finish();
     }
 
     private void signInUser() {

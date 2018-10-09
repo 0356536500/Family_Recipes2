@@ -1,6 +1,7 @@
 package com.myapps.ron.family_recipes.dal;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.myapps.ron.family_recipes.dal.storage.ExternalStorageHelper;
 import com.myapps.ron.family_recipes.model.Recipe;
@@ -28,6 +29,7 @@ public class StorageWrapper {
 
     public void getFoodFile(Context context, Recipe recipe, MyCallback<String> callback) {
         String path = ExternalStorageHelper.getFileAbsolutePath(context, recipe.getFoodFiles().get(0));
+        Log.e("StorageWrapper", "get local path - " + path);
         if(path != null)
             callback.onFinished(path);
         else {

@@ -3,6 +3,7 @@ package com.myapps.ron.family_recipes.recycler;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.CircularProgressDrawable;
@@ -28,7 +29,10 @@ import com.bumptech.glide.request.target.Target;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.dal.StorageWrapper;
 import com.myapps.ron.family_recipes.model.Recipe;
+import com.myapps.ron.family_recipes.network.MyCallback;
+import com.myapps.ron.family_recipes.utils.GlideApp;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -89,18 +93,50 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
         holder.name.setText(recipe.getName());
         holder.description.setText(recipe.getDescription());
 
+        /*final RequestOptions requestOptions = new RequestOptions();
+        requestOptions.placeholder(circularProgressDrawable);
+        //requestOptions.placeholder(android.R.drawable.progress_indeterminate_horizontal);// R.drawable.ic_placeholder);
+        requestOptions.error(android.R.drawable.stat_notify_error);// ic_error);*/
+
+
+        if(recipe.getFoodFiles() != null && recipe.getFoodFiles().size() > 0) {
+            storageWrapper.getFoodFile(context, recipe, new MyCallback<String>() {
+            @Override
+            public void onFinished(String path) {
+                if(path != null) {
+                    CircularProgressDrawable circularProgressDrawable = new CircularProgressDrawable(context);
+                    circularProgressDrawable.setStrokeWidth(5f);
+                    circularProgressDrawable.setCenterRadius(35f);
+                    circularProgressDrawable.start();
+
+                    GlideApp.with(context)
+                            .load(Uri.fromFile(new File(path)))
+                            .placeholder(circularProgressDrawable)
+                            //.apply(requestOptions)
+                            .into(holder.thumbnail);
+                }
+                else
+                    loadDefaultImage(recipe, holder);
+            }
+            //.apply(RequestOptions.circleCropTransform())
+        });
+        }
+        else {
+            loadDefaultImage(recipe, holder);
+        }
+        //storageWrapper.getFoodFile(context, recipeListFiltered.get(position), );
+
+    }
+
+    private void loadDefaultImage(Recipe recipe, final MyViewHolder holder) {
         CircularProgressDrawable circularProgressDrawable = new CircularProgressDrawable(context);
         circularProgressDrawable.setStrokeWidth(5f);
         circularProgressDrawable.setCenterRadius(35f);
         circularProgressDrawable.start();
 
-        final RequestOptions requestOptions = new RequestOptions();
-        requestOptions.placeholder(circularProgressDrawable);
-        //requestOptions.placeholder(android.R.drawable.progress_indeterminate_horizontal);// R.drawable.ic_placeholder);
-        requestOptions.error(android.R.drawable.stat_notify_error);// ic_error);
-
-        Glide.with(context)
+        GlideApp.with(context)
                 .load(recipe.image)
+                .placeholder(circularProgressDrawable)
                 /*.listener(new RequestListener<Drawable>() {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
@@ -115,19 +151,8 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
                         return false;
                     }
                 })*/
-                .apply(requestOptions)
+                //.apply(requestOptions)
                 .into(holder.thumbnail);
-        //storageWrapper.getFoodFile(context, recipeListFiltered.get(position), );
-        /*storageWrapper.getFoodFile(context, recipe, new MyCallback<String>() {
-            @Override
-            public void onFinished(String path) {
-                Glide.with(context)
-                        .load(Uri.fromFile(new File(path)))
-                        .apply(requestOptions)
-                        .into(holder.thumbnail);
-            }
-            //.apply(RequestOptions.circleCropTransform())
-        });*/
     }
 
     @Override
@@ -171,24 +196,19 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
     }
 
     public void updateRecipes(List<Recipe> list) {
-        boolean changed = false;
+        //boolean changed = false;
         for(Recipe item : list) {
             int index = recipeList.indexOf(item);
-            if(index >= 0 && item.hashCode() != recipeList.get(index).hashCode()) {
+            if(index >= 0)// && item.hashCode() != recipeList.get(index).hashCode()) {
                 recipeList.set(index, item);
-                changed = true;
-            }
-            else {
+            else
                 recipeList.add(recipeList.size(), item);
-                changed = true;
-            }
         }
 
-        if (changed)
-            notifyDataSetChanged();
+        notifyDataSetChanged();
     }
 
-    public boolean updateOneRecipe(Recipe recipe) {
+    public void updateOneRecipe(Recipe recipe) {
         int index1 = recipeList.indexOf(recipe);
         if(index1 >= 0)
             recipeList.set(index1, recipe);
@@ -198,7 +218,7 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
             recipeListFiltered.set(index2, recipe);
         notifyDataSetChanged();
 
-        return index1 >= 0 && index2 >= 0;
+        //return index1 >= 0 && index2 >= 0;
     }
 
     public interface RecipesAdapterListener {

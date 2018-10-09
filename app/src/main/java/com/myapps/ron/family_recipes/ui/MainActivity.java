@@ -16,6 +16,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -24,6 +25,7 @@ import android.widget.Toast;
 import com.myapps.ron.family_recipes.MyDividerItemDecoration;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.dal.DataViewModel;
+import com.myapps.ron.family_recipes.dal.db.RecipesDBHelper;
 import com.myapps.ron.family_recipes.model.Recipe;
 import com.myapps.ron.family_recipes.recycler.RecipesAdapter;
 import com.myapps.ron.family_recipes.utils.Constants;
@@ -195,10 +197,13 @@ public class MainActivity extends AppCompatActivity implements RecipesAdapter.Re
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        //super.onActivityResult(requestCode, resultCode, data);
+        super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == Constants.RECIPE_ACTIVITY_CODE) {
-            Recipe updatedRecipe = data.getParcelableExtra(Constants.RECIPE);
-            mAdapter.updateOneRecipe(updatedRecipe);
+            if(resultCode == RESULT_OK) {
+                //mAdapter.updateRecipes(new RecipesDBHelper(this).getAllRecipes());
+                Recipe updatedRecipe = data.getParcelableExtra(Constants.RECIPE);
+                mAdapter.updateOneRecipe(updatedRecipe);
+            }
         }
     }
 }

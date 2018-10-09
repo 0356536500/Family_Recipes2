@@ -70,7 +70,7 @@ public class DataViewModel extends ViewModel {
         protected Boolean doInBackground(Void... voids) {
             for (Recipe item : recipes) {
                 if(dbHelper.recipeExists(item.getId()))
-                    dbHelper.updateRecipe(item);
+                    dbHelper.updateRecipeServerChanges(item);
                 else
                     dbHelper.insertRecipe(item);
             }

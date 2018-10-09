@@ -45,7 +45,7 @@ public class RecipeViewModel extends ViewModel {
                 public void onFinished(Recipe result) {
                     result.setMeLike(!recipe.getMeLike());
                     RecipesDBHelper dbHelper = new RecipesDBHelper(context);
-                    dbHelper.updateRecipe(result);
+                    dbHelper.updateRecipeUserChanges(result);
                     Log.e("viewModel", dbHelper.getRecipe(recipe.getId()).toString());
                     setRecipe(dbHelper.getRecipe(recipe.getId()));
                 }

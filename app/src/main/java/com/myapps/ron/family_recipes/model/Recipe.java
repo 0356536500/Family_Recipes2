@@ -15,7 +15,8 @@ import java.util.Objects;
 import java.util.Set;
 
 public class Recipe implements Parcelable{
-
+    private static final int FALSE = 0;
+    private static final int TRUE = 1;
     public String image = "https://api.androidhive.info/json/images/keanu.jpg";
 
     @SerializedName("id")
@@ -142,6 +143,7 @@ public class Recipe implements Parcelable{
         in.readList(this.foodFiles, String.class.getClassLoader());
 
         this.likes = in.readInt();
+        this.meLike = in.readInt() == TRUE;
     }
 
     @Override
@@ -155,7 +157,7 @@ public class Recipe implements Parcelable{
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, createdAt, lastModifiedAt, recipeFile, uploader, categories, comments, foodFiles, likes);
+        return Objects.hash(id, name, description, createdAt, lastModifiedAt, recipeFile, uploader, categories, comments, foodFiles, likes, meLike);
     }
 
     public String getStringCategories() {
@@ -321,5 +323,6 @@ public class Recipe implements Parcelable{
         dest.writeList(this.comments);
         dest.writeList(this.foodFiles);
         dest.writeInt(this.likes);
+        dest.writeInt(getMeLike() ? TRUE : FALSE);
     }
 }

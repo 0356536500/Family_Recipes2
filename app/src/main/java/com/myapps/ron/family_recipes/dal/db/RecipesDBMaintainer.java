@@ -22,7 +22,7 @@ public class RecipesDBMaintainer {
     public void updateRecipes(List<Recipe> recipes) {
         for(Recipe item : recipes) {
             if(dbHelper.recipeExists(item.getId()))
-                dbHelper.updateRecipe(item);
+                dbHelper.updateRecipeServerChanges(item);
             else
                 dbHelper.insertRecipe(item);
         }

@@ -86,7 +86,7 @@ public class HandleServerDataService extends IntentService {
         RecipesDBHelper dbHelper = new RecipesDBHelper(getApplicationContext());
         for(Recipe item : recipes) {
             if(dbHelper.recipeExists(item.getId()))
-                dbHelper.updateRecipe(item);
+                dbHelper.updateRecipeServerChanges(item);
             else
                 dbHelper.insertRecipe(item);
         }

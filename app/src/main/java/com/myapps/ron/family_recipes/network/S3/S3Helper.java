@@ -10,9 +10,11 @@ import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferState;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.myapps.ron.family_recipes.network.Constants;
 import com.myapps.ron.family_recipes.network.MyCallback;
 
 import java.io.File;
+import java.io.IOException;
 
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
@@ -77,14 +79,26 @@ class S3Helper {
         });
     }
 
-    void downloadFile(String key, final String localPath, final MyCallback<String> callback) {
+    void downloadFile(String key, final String localDir, final MyCallback<String> callback) {
 
         /*TransferObserver downloadObserver =
                 transferUtility.download(
                         "public/s3Key.txt",
                         new File("/path/to/file/localFile.txt"));*/
 
-        TransferObserver downloadObserver = transferUtility.download(key, new File(localPath));
+        key = Constants.FOOD_DIR + "/" + key;
+        final String path = localDir.concat(key);
+        File file = new File(path);
+        if(!file.exists()) {
+            try {
+                if(!file.createNewFile())
+                    Log.e(TAG, "couldn't create the file in " + path);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        Log.e(TAG, "before downloading, key = " + key + " local path = " + path);
+        TransferObserver downloadObserver = transferUtility.download(key, file);
 
         // Attach a listener to the observer to get state update and progress notifications
         downloadObserver.setTransferListener(new TransferListener() {
@@ -93,7 +107,7 @@ class S3Helper {
             public void onStateChanged(int id, TransferState state) {
                 if (TransferState.COMPLETED == state) {
                     // Handle a completed upload.
-                    callback.onFinished(localPath);
+                    callback.onFinished(path);
                 }
             }
 
@@ -108,6 +122,7 @@ class S3Helper {
             @Override
             public void onError(int id, Exception ex) {
                 // Handle errors
+                Log.d(TAG, "error downloading file " + id + "\n" + ex.getMessage());
                 callback.onFinished(null);
             }
 

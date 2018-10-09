@@ -156,11 +156,12 @@ public class RecipesDBHelper extends SQLiteOpenHelper{
             } while (cursor.moveToNext());
         }
 
+        db.close();
         // return contact list
         return recipeList;
     }
 
-    public int updateRecipe(Recipe recipe) {
+    public int updateRecipeServerChanges(Recipe recipe) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -169,6 +170,22 @@ public class RecipesDBHelper extends SQLiteOpenHelper{
         values.put(KEY_CATEGORIES, recipe.getStringCategories());
         values.put(KEY_COMMENTS, recipe.getStringComments());
         values.put(KEY_FOOD, recipe.getStringFoodFiles());
+        values.put(KEY_LIKES, recipe.getLikes());
+
+        // updating row
+        return db.update(TABLE_NAME, values, KEY_ID + " = ?",
+                new String[]{String.valueOf(recipe.getId())});
+    }
+
+    public int updateRecipeUserChanges(Recipe recipe) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        //values.put(KEY_DESC, recipe.getDescription());
+        values.put(KEY_MODIFIED, recipe.getLastModifiedAt());
+        //values.put(KEY_CATEGORIES, recipe.getStringCategories());
+        values.put(KEY_COMMENTS, recipe.getStringComments());
+        //values.put(KEY_FOOD, recipe.getStringFoodFiles());
         values.put(KEY_LIKES, recipe.getLikes());
         values.put(KEY_ME_LIKE, recipe.getMeLike() ? TRUE : FALSE);
 
