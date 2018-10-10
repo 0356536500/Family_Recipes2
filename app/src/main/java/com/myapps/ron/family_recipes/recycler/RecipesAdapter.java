@@ -29,6 +29,7 @@ import com.bumptech.glide.request.target.Target;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.dal.StorageWrapper;
 import com.myapps.ron.family_recipes.model.Recipe;
+import com.myapps.ron.family_recipes.network.Constants;
 import com.myapps.ron.family_recipes.network.MyCallback;
 import com.myapps.ron.family_recipes.utils.GlideApp;
 
@@ -100,7 +101,7 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
 
 
         if(recipe.getFoodFiles() != null && recipe.getFoodFiles().size() > 0) {
-            storageWrapper.getFoodFile(context, recipe, new MyCallback<String>() {
+            storageWrapper.getFoodFile(context, recipe, Constants.FOOD_DIR, new MyCallback<String>() {
             @Override
             public void onFinished(String path) {
                 if(path != null) {

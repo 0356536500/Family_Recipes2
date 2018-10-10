@@ -6,6 +6,16 @@ import android.net.NetworkInfo;
 
 public final class MiddleWareForNetwork {
 
+    private static boolean InternetConnection = false;
+
+    public static void setConnection(boolean connection) {
+        InternetConnection = connection;
+    }
+
+    public static boolean getConnection() {
+        return InternetConnection;
+    }
+
     //region APICallHandler
 
 
@@ -31,9 +41,13 @@ public final class MiddleWareForNetwork {
         ConnectivityManager connectivityManager = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
         if (connectivityManager != null) {
             //we are connected to a network
-            return connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
-                    connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED;
+            NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
+            InternetConnection = activeNetwork != null && activeNetwork.isConnected();
+            return InternetConnection;
+            /*return connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
+                    connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED;*/
         }
-        return false;
+        InternetConnection = false;
+        return InternetConnection;
     }
 }

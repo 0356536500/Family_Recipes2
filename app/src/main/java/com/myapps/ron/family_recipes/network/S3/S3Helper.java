@@ -79,15 +79,23 @@ class S3Helper {
         });
     }
 
-    void downloadFile(String key, final String localDir, final MyCallback<String> callback) {
+
+    /**
+     * the file is located in bucket/{@param key}
+     * @param key
+     * @param rootPath
+     * @param dir - directory in bucket and in local storage
+     * @param callback
+     */
+    void downloadFile(String key, final String rootPath, String dir, final MyCallback<String> callback) {
 
         /*TransferObserver downloadObserver =
                 transferUtility.download(
                         "public/s3Key.txt",
                         new File("/path/to/file/localFile.txt"));*/
 
-        key = Constants.FOOD_DIR + "/" + key;
-        final String path = localDir.concat(key);
+        key = dir + "/" + key;
+        final String path = rootPath + "/" + dir + "/" + key;
         File file = new File(path);
         if(!file.exists()) {
             try {

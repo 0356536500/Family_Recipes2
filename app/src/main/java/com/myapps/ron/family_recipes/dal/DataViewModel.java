@@ -24,7 +24,7 @@ import java.util.List;
  * loads all recipes, updates local db and server time.
  */
 public class DataViewModel extends ViewModel {
-    private final MutableLiveData<List<Recipe>> recipeList = new MutableLiveData<>(); // list of recipes from api
+    private MutableLiveData<List<Recipe>> recipeList = new MutableLiveData<>(); // list of recipes from api
 
 
     public void setRecipes(List<Recipe> items) {
