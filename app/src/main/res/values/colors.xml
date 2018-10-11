@@ -7,6 +7,11 @@
     <color name="contact_name">#333333</color>
     <color name="contact_number">#8c8c8c</color>
 
+    <color name="logo_background">#FFFFF4</color>
+    <color name="logo_foreground1">#3b3b3b</color>
+    <color name="logo_foreground">#7c7c7c</color>
+    <color name="logo_circle_border">#e78200</color>
+
     <color name="toolbar_background">#404142</color>
     <color name="toolbar_items">#CBCBCB</color>
     <color name="alert">#AC1600</color>
@@ -18,12 +23,28 @@
     <color name="text_border_selected">#4EA9DC</color>
     <color name="warning">#E94700</color>
     <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
     <color name="grey_100">#F5F7F7</color>
     <color name="grey_300">#8D9496</color>
     <color name="grey_400">#5A5D5E</color>
     <color name="grey_500">#404142</color>
     <color name="grey_600">#303232</color>
     <color name="grey_700">#1D1E1E</color>
+
+
+    <array name="colors">
+        <item name="all" type="color">#827f93</item>
+        <item name="design" type="color">#c467f4</item>
+        <item name="ios" type="color">#3b9aee</item>
+        <item name="android" type="color">#9bc53d</item>
+        <item name="web" type="color">#f4a261</item>
+        <item name="business" type="color">#1ed2bb</item>
+        <item name="research" type="color">#778da9</item>
+        <item name="sales" type="color">#20bf55</item>
+        <item name="quality" type="color">#9f9fed</item>
+        <item name="customer" type="color">#fc6177</item>
+        <item name="other" type="color">#bcbcbc</item>
+    </array>
 </resources>
 
 

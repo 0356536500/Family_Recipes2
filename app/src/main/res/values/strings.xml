@@ -5,7 +5,11 @@
     <string name="action_search">Search</string>
     <string name="action_filter">Filter</string>
     <string name="action_share">Share</string>
+    <string name="action_sort_toggle">Sort By</string>
     <string name="search_hint">Type name…</string>
+
+    <string name="sort_toggle_text_on">recent</string>
+    <string name="sort_toggle_text_off">popular</string>
 
     <string name="sharedPreferences">com.myapps.ron.family_recipes</string>
     <string name="title_activity_recipe">RecipeActivity</string>
@@ -29,6 +33,23 @@
     <string name="nav_drawer_close">Close navigation drawer</string>
     <string name="Username">Username</string>
     <string name="Password">Password</string>
+
+    <string name="str_all_selected">All categories</string>
+
+    <string-array name="job_titles">
+        <item>All categories</item>
+        <item>Design</item>
+        <item>iOS development</item>
+        <item>Android development</item>
+        <item>Web development</item>
+        <item>Business analysis</item>
+        <item>Research</item>
+        <item>Sales</item>
+        <item>Quality assurance</item>
+        <item>Customer support</item>
+        <item>Other</item>
+    </string-array>
+
     <string name="large_text">
         "Material is the metaphor.\n\n"
 

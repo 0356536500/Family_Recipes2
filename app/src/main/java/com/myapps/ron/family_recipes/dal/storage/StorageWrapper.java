@@ -1,9 +1,7 @@
-package com.myapps.ron.family_recipes.dal;
+package com.myapps.ron.family_recipes.dal.storage;
 
 import android.content.Context;
-import android.util.Log;
 
-import com.myapps.ron.family_recipes.dal.storage.ExternalStorageHelper;
 import com.myapps.ron.family_recipes.model.Recipe;
 import com.myapps.ron.family_recipes.network.MyCallback;
 import com.myapps.ron.family_recipes.network.S3.OnlineStorageWrapper;

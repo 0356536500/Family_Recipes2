@@ -10,6 +10,13 @@
         <item name="windowActionBar">false</item>
         <item name="windowActionModeOverlay">true</item>
         <item name="android:windowContentOverlay">@null</item>
+
+        <!-- Active thumb color & Active track color(30% transparency) -->
+        <item name="colorControlActivated">@color/colorPrimaryDark</item>
+        <!-- Inactive thumb color -->
+        <item name="colorSwitchThumbNormal">@color/grey_300</item>
+        <!-- Inactive track color(30% transparency) -->
+        <item name="android:colorForeground">@color/grey_600</item>
     </style>
 
     <style name="MyAppTheme" parent="@style/AppTheme">
@@ -38,8 +45,9 @@
     <style name="AppTheme.PopupOverlayDark" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
         <item name="colorControlNormal">@color/cardview_dark_background</item>
     </style>
-    <!--<style name="AppTheme.PopupOverlayDark" parent="ThemeOverlay.AppCompat.Dark">
+
+    <style name="switchTheme" parent="ThemeOverlay.AppCompat.Dark">
         <item name="colorControlNormal">@color/cardview_dark_background</item>
-    </style>-->
+    </style>
 
 </resources>

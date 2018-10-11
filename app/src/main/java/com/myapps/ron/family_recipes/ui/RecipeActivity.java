@@ -83,7 +83,7 @@ public class RecipeActivity extends AppCompatActivity {
     private void bindUI() {
         appBarLayout = findViewById(R.id.activity_recipe_app_bar);
         collapsingToolbarLayout = findViewById(R.id.toolbar_layout);
-        toolbar = findViewById(R.id.toolbar);
+        toolbar = findViewById(R.id.recipe_toolbar);
         like = findViewById(R.id.recipe_like);
         loadLikeImage();
         //like.setTag(R.drawable.ic_favorite_border_red_36dp);

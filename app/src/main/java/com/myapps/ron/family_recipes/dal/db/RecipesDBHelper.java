@@ -41,6 +41,8 @@ public class RecipesDBHelper extends SQLiteOpenHelper{
     private static final String KEY_LIKES = "likes";
     private static final String KEY_ME_LIKE = "meLike";
 
+    public static final String SORT_POPULAR = KEY_LIKES;
+    public static final String SORT_RECENT = KEY_CREATED;
 
     private static final String CREATE_EXEC = "CREATE TABLE " + TABLE_NAME + "("
             + KEY_ID + " TEXT PRIMARY KEY,"
@@ -124,11 +126,8 @@ public class RecipesDBHelper extends SQLiteOpenHelper{
     }
 
     // Getting All Records
-    public List<Recipe> getAllRecipes() {
+    private List<Recipe> getAllRecipesFromQuery(String selectQuery) {
         List<Recipe> recipeList = new ArrayList<>();
-
-        // Select All Query
-        String selectQuery = "SELECT  * FROM " + TABLE_NAME + " ORDER BY " + KEY_CREATED + " DESC";
 
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
@@ -159,6 +158,21 @@ public class RecipesDBHelper extends SQLiteOpenHelper{
         db.close();
         // return contact list
         return recipeList;
+    }
+
+    // Getting All Records
+    public List<Recipe> getAllRecipes(String orderedBy) {
+        // Default is by creation date
+        if(orderedBy == null)
+            orderedBy = KEY_CREATED;
+        // Check if valid parameter
+        if(!orderedBy.equals(KEY_CREATED) && !orderedBy.equals(KEY_LIKES))
+            return null;
+
+        // Select All Query
+        String selectQuery = "SELECT  * FROM " + TABLE_NAME + " ORDER BY " + orderedBy + " DESC";
+
+        return getAllRecipesFromQuery(selectQuery);
     }
 
     public int updateRecipeServerChanges(Recipe recipe) {

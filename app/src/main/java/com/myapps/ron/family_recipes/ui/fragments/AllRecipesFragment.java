@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -19,26 +20,40 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.myapps.ron.family_recipes.MyDividerItemDecoration;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.dal.DataViewModel;
+import com.myapps.ron.family_recipes.model.Category;
 import com.myapps.ron.family_recipes.model.Recipe;
 import com.myapps.ron.family_recipes.recycler.RecipesAdapter;
 import com.myapps.ron.family_recipes.ui.MainActivity;
 import com.myapps.ron.family_recipes.ui.RecipeActivity;
 import com.myapps.ron.family_recipes.utils.Constants;
+import com.yalantis.filter.adapter.FilterAdapter;
+import com.yalantis.filter.animator.FiltersListItemAnimator;
+import com.yalantis.filter.listener.FilterListener;
+import com.yalantis.filter.widget.Filter;
+import com.yalantis.filter.widget.FilterItem;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static android.app.Activity.RESULT_OK;
 
-public class AllRecipesFragment extends Fragment implements RecipesAdapter.RecipesAdapterListener{
+public class AllRecipesFragment extends Fragment implements RecipesAdapter.RecipesAdapterListener, FilterListener<Category> {
 
     private static final String TAG = AllRecipesFragment.class.getSimpleName();
     private MainActivity activity;
+
+    private int[] mColors;
+    private String[] mTitles;
+    private Filter<Category> mFilter;
 
     private RecyclerView recyclerView;
     private RecipesAdapter mAdapter;
@@ -57,12 +72,28 @@ public class AllRecipesFragment extends Fragment implements RecipesAdapter.Recip
         recyclerView = view.findViewById(R.id.recycler_view);
 
         initViewModel();
+        initCategories();
         initRecycler();
 
         // Associate searchable configuration with the SearchView
-        setSearchView(activity.getMenu());
+        //setSearchView(activity.getMenu());
+        //setSortToggle(activity.getMenu());
 
-        activity.fetchRecipes();
+        activity.fetchRecipes(com.myapps.ron.family_recipes.dal.Constants.SORT_RECENT);
+    }
+
+    private void initCategories() {
+        mColors = getResources().getIntArray(R.array.colors);
+        mTitles = getResources().getStringArray(R.array.job_titles);
+
+        mFilter = activity.findViewById(R.id.content_main_filters);
+        mFilter.setAdapter(new Adapter(getCategories()));
+        mFilter.setListener(this);
+
+        //the text to show when there's no selected items
+        mFilter.setNoSelectedItemText(getString(R.string.str_all_selected));
+        mFilter.build();
+
     }
 
     private void initViewModel() {
@@ -85,6 +116,7 @@ public class AllRecipesFragment extends Fragment implements RecipesAdapter.Recip
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.addItemDecoration(new MyDividerItemDecoration(activity, DividerItemDecoration.VERTICAL, 36));
         recyclerView.setAdapter(mAdapter);
+        recyclerView.setItemAnimator(new FiltersListItemAnimator());
     }
 
     private void setSearchView(Menu menu) {
@@ -115,6 +147,17 @@ public class AllRecipesFragment extends Fragment implements RecipesAdapter.Recip
                 // filter recycler view when text is changed
                 mAdapter.getFilter().filter(query);
                 return false;
+            }
+        });
+    }
+
+    private void setSortToggle(Menu menu) {
+        ToggleButton toggleButton = menu.findItem(R.id.action_sort).getActionView().findViewById(R.id.toolbar_toggle_sort);
+        toggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                String order = isChecked ? com.myapps.ron.family_recipes.dal.Constants.SORT_RECENT : com.myapps.ron.family_recipes.dal.Constants.SORT_POPULAR;
+                viewModel.loadLocalRecipes(activity, order);
             }
         });
     }
@@ -168,6 +211,63 @@ public class AllRecipesFragment extends Fragment implements RecipesAdapter.Recip
                 Recipe updatedRecipe = data.getParcelableExtra(Constants.RECIPE);
                 mAdapter.updateOneRecipe(updatedRecipe);
             }
+        }
+    }
+
+    private List<Category> getCategories() {
+        List<Category> tags = new ArrayList<>();
+
+        for (int i = 0; i < mTitles.length; ++i) {
+            tags.add(new Category(mTitles[i], mColors[i]));
+        }
+
+        return tags;
+    }
+
+    @Override
+    public void onFilterDeselected(Category category) {
+
+    }
+
+    @Override
+    public void onFilterSelected(Category item) {
+        if (item.getText().equals(mTitles[0])) {
+            mFilter.deselectAll();
+            mFilter.collapse();
+        }
+    }
+
+    @Override
+    public void onFiltersSelected(ArrayList<Category> arrayList) {
+
+    }
+
+    @Override
+    public void onNothingSelected() {
+
+    }
+
+    class Adapter extends FilterAdapter<Category> {
+
+        Adapter(@NotNull List<? extends Category> items) {
+            super(items);
+        }
+
+        @NotNull
+        @Override
+        public FilterItem createView(int position, Category item) {
+            FilterItem filterItem = new FilterItem(activity);
+
+            filterItem.setStrokeColor(mColors[0]);
+            filterItem.setTextColor(mColors[0]);
+            filterItem.setCornerRadius(14);
+            filterItem.setCheckedTextColor(ContextCompat.getColor(activity, android.R.color.white));
+            filterItem.setColor(ContextCompat.getColor(activity, android.R.color.white));
+            filterItem.setCheckedColor(mColors[position]);
+            filterItem.setText(item.getText());
+            filterItem.deselect();
+
+            return filterItem;
         }
     }
 }

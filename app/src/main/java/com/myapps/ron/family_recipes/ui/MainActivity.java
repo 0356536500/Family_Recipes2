@@ -11,6 +11,7 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -51,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
     public Menu menu;
     public MenuItem searchMenuItem;
     public MenuItem filterMenuItem;
+    public MenuItem sortMenuItem;
 
     private Fragment currentFragment;
     private DataViewModel viewModel;
@@ -146,8 +148,8 @@ public class MainActivity extends AppCompatActivity {
         });
     }*/
 
-    public void fetchRecipes() {
-        viewModel.loadRecipes(this);
+    public void fetchRecipes(String orderBy) {
+        viewModel.loadRecipes(this, orderBy);
     }
 
     public Menu getMenu() {
@@ -163,11 +165,20 @@ public class MainActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         this.menu = menu;
         searchMenuItem = menu.findItem(R.id.action_search);
-        filterMenuItem = menu.findItem(R.id.action_filter);
+
+        setToggle(menu);
+        //filterMenuItem = menu.findItem(R.id.action_filter);
+        //sortMenuItem = menu.findItem(R.id.action_sort);
 
         // Associate searchable configuration with the SearchView
         //setSearchView(menu);
         return true;
+    }
+
+    private void setToggle(Menu menu) {
+        MenuItem toggleItem = menu.findItem(R.id.action_sort);
+        toggleItem.setActionView(R.layout.toggle_toolbar_layout);
+        toggleItem.setChecked(true);
     }
 
     @Override

@@ -94,7 +94,7 @@ public class SplashActivity extends AppCompatActivity {
 
     private void readFromDB() {
         Log.e(TAG, "reading from db");
-        List<Recipe> recipes = dbHelper.getAllRecipes();
+        List<Recipe> recipes = dbHelper.getAllRecipes(null);
         for (Recipe item : recipes) {
             Log.e(TAG, item.toString());
         }

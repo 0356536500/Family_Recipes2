@@ -12,62 +12,66 @@
 
     <ImageView
         android:id="@+id/imageViewAppMainIcon"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_margin="8dp"
-        android:layout_marginEnd="8dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
         android:scaleType="fitXY"
-        android:src="@drawable/ic_launcher_foreground"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/textViewNavUserSub"
+        android:src="@mipmap/ic_logo_round"
+        app:layout_constraintBottom_toTopOf="@+id/textViewNavUserSub"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.75"
+        app:layout_constraintVertical_chainStyle="packed" />
 
 
-    <TextView
+    <!--    <TextView
         android:id="@+id/textViewNavUser"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:fontFamily="@font/lemonada"
         android:text="@string/toolbar_title"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textColor="@color/toolbar_items"
-        android:fontFamily="monospace"
+        android:textColor="@color/colorPrimaryDark"
         app:layout_constraintBottom_toTopOf="@+id/textViewNavUserSub"
         app:layout_constraintStart_toStartOf="@+id/textViewNavUserSub"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_chainStyle="packed" />
+        app:layout_constraintVertical_chainStyle="packed" />-->
 
     <TextView
         android:id="@+id/textViewNavUserSub"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
+        android:fontFamily="@font/lemonada_semibold"
         android:text="User"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textColor="@color/toolbar_items"
-        android:fontFamily="monospace"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.42"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textViewNavUser" />
+        android:textColor="@color/colorPrimaryDark"
+        android:textSize="@dimen/activity_text_size_small"
+        app:layout_constraintBottom_toTopOf="@+id/textViewNavSupportEmail"
+        app:layout_constraintStart_toStartOf="@+id/imageViewAppMainIcon"
+        app:layout_constraintTop_toBottomOf="@+id/imageViewAppMainIcon" />
 
     <TextView
         android:id="@+id/textViewNavSupportEmail"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="8dp"
-        android:fontFamily="monospace"
+        android:layout_marginStart="8dp"
+        android:fontFamily="@font/lemonada"
         android:text="@string/support_email"
-        android:textColor="@color/colorPrimary"
+        android:textColor="@color/colorPrimaryDark"
+        android:textSize="12sp"
         android:textStyle="italic"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/space3"
+        app:layout_constraintStart_toStartOf="@+id/imageViewAppMainIcon"
         app:layout_constraintTop_toBottomOf="@+id/textViewNavUserSub" />
+
+    <TextView
+        android:id="@+id/space3"
+        android:layout_width="match_parent"
+        android:layout_height="10dp"
+        android:background="@color/logo_foreground1"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
 
 </android.support.constraint.ConstraintLayout>

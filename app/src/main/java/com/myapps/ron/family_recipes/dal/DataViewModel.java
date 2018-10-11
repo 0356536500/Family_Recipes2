@@ -5,8 +5,6 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.AsyncTask;
 
 import com.myapps.ron.family_recipes.dal.db.RecipesDBHelper;
@@ -35,7 +33,7 @@ public class DataViewModel extends ViewModel {
         return recipeList;
     }
 
-    public void loadRecipes(final Context context) {
+    /*public void loadRecipes(final Context context, final String orderBy) {
         if(MiddleWareForNetwork.checkInternetConnection(context)) {
             final String time = DateUtil.getUTCTime();
             APICallsHandler.getAllRecipes(DateUtil.getLastUpdateTime(context), AppHelper.getAccessToken(), new MyCallback<List<Recipe>>() {
@@ -44,26 +42,36 @@ public class DataViewModel extends ViewModel {
                     //HandleServerDataService.startActionUpdateRecipes(context, new ArrayList<>(result), time);
                     if(result != null) {
                         DateUtil.updateServerTime(context, time);
-                        new MyAsyncRecipeUpdate(context, result).execute();
+                        new MyAsyncRecipeUpdate(context, result, orderBy).execute();
                     }
                 }
             });
         }
         else {
-            RecipesDBHelper dbHelper = new RecipesDBHelper(context);
-            setRecipes(dbHelper.getAllRecipes());
+            loadLocalRecipes(context, orderBy);
         }
+    }*/
+
+    public void loadRecipes(final Context context, final String orderBy) {
+        loadLocalRecipes(context,orderBy);
+    }
+
+    public void loadLocalRecipes(final Context context, final String orderBy) {
+        RecipesDBHelper dbHelper = new RecipesDBHelper(context);
+        setRecipes(dbHelper.getAllRecipes(orderBy));
     }
 
     @SuppressLint("StaticFieldLeak")
     class MyAsyncRecipeUpdate extends AsyncTask<Void, Void, Boolean> {
 
+        private String orderBy;
         private List<Recipe> recipes;
         private RecipesDBHelper dbHelper;
 
-        MyAsyncRecipeUpdate(Context context, List<Recipe> recipes) {
+        MyAsyncRecipeUpdate(Context context, List<Recipe> recipes, String orderBy) {
             this.dbHelper = new RecipesDBHelper(context);
             this.recipes = recipes;
+            this.orderBy = orderBy;
         }
 
         @Override
@@ -81,7 +89,7 @@ public class DataViewModel extends ViewModel {
         protected void onPostExecute(Boolean aBoolean) {
             super.onPostExecute(aBoolean);
             if(aBoolean)
-                setRecipes(dbHelper.getAllRecipes());
+                setRecipes(dbHelper.getAllRecipes(orderBy));
         }
     }
 }

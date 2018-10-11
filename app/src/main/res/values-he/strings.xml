@@ -4,8 +4,12 @@
     <string name="toolbar_title">מתכונים</string>
     <string name="action_search">חיפוש</string>
     <string name="action_filter">סינון</string>
+    <string name="action_sort_toggle">מיון לפי</string>
     <string name="action_share">שיתוף</string>
     <string name="search_hint">הקלד/י לחיפוש…</string>
+
+    <string name="sort_toggle_text_on">חדשים</string>
+    <string name="sort_toggle_text_off">פופלריים</string>
 
     <string name="sharedPreferences">com.myapps.ron.family_recipes</string>
     <string name="title_activity_recipe">RecipeActivity</string>
@@ -27,6 +31,9 @@
     <string name="nav_drawer_close">Close navigation drawer</string>
     <string name="Username">שם משתמש</string>
     <string name="Password">סיסמה</string>
+
+    <string name="str_all_selected">כל הקטגוריות</string>
+
     <string name="large_text">
         "Material is the metaphor.\n\n"
 
