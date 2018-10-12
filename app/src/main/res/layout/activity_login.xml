@@ -10,12 +10,12 @@
     tools:context=".ui.LoginActivity">
 
     <ImageView
-        android:layout_width="110dp"
-        android:layout_height="110dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:id="@+id/imageViewAppMainCognitoIcon"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:src="@mipmap/cognito"
+        android:src="@mipmap/ic_logo_foreground"
         android:scaleType="fitXY"/>
 
     <Space
