@@ -44,6 +44,18 @@
         <item name="quality" type="color">#9f9fed</item>
         <item name="customer" type="color">#fc6177</item>
         <item name="other" type="color">#bcbcbc</item>
+
+        <item name="all1" type="color">#827f93</item>
+        <item name="design1" type="color">#c467f4</item>
+        <item name="ios1" type="color">#3b9aee</item>
+        <item name="android1" type="color">#9bc53d</item>
+        <item name="web1" type="color">#f4a261</item>
+        <item name="business1" type="color">#1ed2bb</item>
+        <item name="research1" type="color">#778da9</item>
+        <item name="sales1" type="color">#20bf55</item>
+        <item name="quality1" type="color">#9f9fed</item>
+        <item name="customer1" type="color">#fc6177</item>
+        <item name="other1" type="color">#bcbcbc</item>
     </array>
 </resources>
 

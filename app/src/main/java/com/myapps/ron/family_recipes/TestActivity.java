@@ -1,36 +1,25 @@
-package com.myapps.ron.family_recipes.ui.fragments;
+package com.myapps.ron.family_recipes;
 
-import android.app.SearchManager;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SearchView;
-import android.view.LayoutInflater;
-import android.view.Menu;
+import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.CompoundButton;
 import android.widget.Toast;
-import android.widget.ToggleButton;
 
-import com.myapps.ron.family_recipes.MyDividerItemDecoration;
-import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.dal.DataViewModel;
 import com.myapps.ron.family_recipes.model.Category;
 import com.myapps.ron.family_recipes.model.Recipe;
 import com.myapps.ron.family_recipes.recycler.RecipesAdapter;
-import com.myapps.ron.family_recipes.ui.MainActivity;
 import com.myapps.ron.family_recipes.ui.RecipeActivity;
 import com.myapps.ron.family_recipes.utils.Constants;
 import com.myapps.ron.searchfilter.adapter.FilterAdapter;
@@ -42,14 +31,13 @@ import com.myapps.ron.searchfilter.widget.FilterItem;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
-import static android.app.Activity.RESULT_OK;
+public class TestActivity extends AppCompatActivity implements RecipesAdapter.RecipesAdapterListener, FilterListener<Category> {
 
-public class AllRecipesFragment extends Fragment implements RecipesAdapter.RecipesAdapterListener, FilterListener<Category> {
-
-    private static final String TAG = AllRecipesFragment.class.getSimpleName();
-    private MainActivity activity;
+    private static final String TAG = TestActivity.class.getSimpleName();
 
     private int[] mColors;
     private String[] mTitles;
@@ -60,34 +48,29 @@ public class AllRecipesFragment extends Fragment implements RecipesAdapter.Recip
 
     private DataViewModel viewModel;
 
-    @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.content_main_recipes, container, false);
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        recyclerView = view.findViewById(R.id.recycler_view);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_test);
 
         initViewModel();
         initCategories();
         initRecycler();
 
-        // Associate searchable configuration with the SearchView
-        //setSearchView(activity.getMenu());
-        //setSortToggle(activity.getMenu());
-
-        activity.fetchRecipes(com.myapps.ron.family_recipes.dal.Constants.SORT_RECENT);
+        fetchRecipes(com.myapps.ron.family_recipes.dal.Constants.SORT_RECENT);
     }
+
+    public void fetchRecipes(String orderBy) {
+        viewModel.loadRecipes(this, orderBy);
+    }
+
 
     private void initCategories() {
         mColors = getResources().getIntArray(R.array.colors);
         mTitles = getResources().getStringArray(R.array.job_titles);
 
-        mFilter = activity.findViewById(R.id.content_main_filters);
-        mFilter.setAdapter(new Adapter(getCategories()));
+        mFilter = findViewById(R.id.filter);
+        mFilter.setAdapter(new TestActivity.Adapter(getCategories()));
         mFilter.setListener(this);
 
         //the text to show when there's no selected items
@@ -97,7 +80,7 @@ public class AllRecipesFragment extends Fragment implements RecipesAdapter.Recip
     }
 
     private void initViewModel() {
-        viewModel =  ViewModelProviders.of(activity).get(DataViewModel.class);
+        viewModel =  ViewModelProviders.of(this).get(DataViewModel.class);
         viewModel.getRecipes().observe(this, new Observer<List<Recipe>>() {
             @Override
             public void onChanged(@Nullable List<Recipe> recipes) {
@@ -108,58 +91,16 @@ public class AllRecipesFragment extends Fragment implements RecipesAdapter.Recip
     }
 
     private void initRecycler() {
+        recyclerView = findViewById(R.id.list);
         List<Recipe> recipeList = new ArrayList<>();
-        mAdapter = new RecipesAdapter(activity, recipeList, this);
+        mAdapter = new RecipesAdapter(this, recipeList, this);
 
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(activity.getApplicationContext());
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this.getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.addItemDecoration(new MyDividerItemDecoration(activity, DividerItemDecoration.VERTICAL, 36));
+        recyclerView.addItemDecoration(new MyDividerItemDecoration(this, DividerItemDecoration.VERTICAL, 36));
         recyclerView.setAdapter(mAdapter);
         recyclerView.setItemAnimator(new FiltersListItemAnimator());
-    }
-
-    private void setSearchView(Menu menu) {
-        //MenuItem searchMenuItem = menu.findItem(R.id.action_search);
-        SearchManager searchManager = (SearchManager) activity.getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView = (SearchView) menu.findItem(R.id.action_search)
-                .getActionView();
-        searchView.setSearchableInfo(searchManager
-                .getSearchableInfo(activity.getComponentName()));
-        searchView.setMaxWidth(Integer.MAX_VALUE);
-
-        // listening to search query text change
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                // filter recycler view when query submitted
-                MenuItem searchMenuItem = activity.getSearchMenuItem();
-                if (searchMenuItem != null) {
-                    searchMenuItem.collapseActionView();
-                }
-                Toast.makeText(activity, "Submitted" , Toast.LENGTH_SHORT).show();
-                mAdapter.getFilter().filter(query);
-                return true;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String query) {
-                // filter recycler view when text is changed
-                mAdapter.getFilter().filter(query);
-                return false;
-            }
-        });
-    }
-
-    private void setSortToggle(Menu menu) {
-        ToggleButton toggleButton = menu.findItem(R.id.action_sort).getActionView().findViewById(R.id.toolbar_toggle_sort);
-        toggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                String order = isChecked ? com.myapps.ron.family_recipes.dal.Constants.SORT_RECENT : com.myapps.ron.family_recipes.dal.Constants.SORT_POPULAR;
-                viewModel.loadLocalRecipes(activity, order);
-            }
-        });
     }
 
 
@@ -173,10 +114,10 @@ public class AllRecipesFragment extends Fragment implements RecipesAdapter.Recip
 
         switch (itemId) {
             case R.id.action_search:
-                Toast.makeText(activity, "search clicked (" + TAG + ")", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "search clicked (" + TAG + ")", Toast.LENGTH_SHORT).show();
                 return true;
             case R.id.action_filter:
-                Toast.makeText(activity, "filter clicked (" + TAG + ")", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "filter clicked (" + TAG + ")", Toast.LENGTH_SHORT).show();
                 return true;
         }
         /*
@@ -189,15 +130,8 @@ public class AllRecipesFragment extends Fragment implements RecipesAdapter.Recip
     }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        activity = (MainActivity)getActivity();
-    }
-
-    @Override
     public void onItemSelected(Recipe recipe) {
-        Intent intent = new Intent(activity, RecipeActivity.class);
+        Intent intent = new Intent(this, RecipeActivity.class);
         intent.putExtra(Constants.RECIPE, recipe);
         startActivityForResult(intent, Constants.RECIPE_ACTIVITY_CODE);
     }
@@ -216,12 +150,29 @@ public class AllRecipesFragment extends Fragment implements RecipesAdapter.Recip
 
     private List<Category> getCategories() {
         List<Category> tags = new ArrayList<>();
+        List<String> subs = new ArrayList<>(Arrays.asList(mTitles));
 
         for (int i = 0; i < mTitles.length; ++i) {
-            tags.add(new Category(mTitles[i], mColors[i]));
+            tags.add(new Category(mTitles[i], mColors[i], pickTwo(i, subs)));
         }
+        Log.e(TAG, tags.toString());
 
         return tags;
+    }
+
+    private List<String> pickTwo(int i,List<String> list) {
+        List<String> result = new ArrayList<>();
+        result.add(pickOne(list) + i);
+        result.add(pickOne(list) + i);
+       /* Random rand = new Random();
+        result.add(list.get(rand.nextInt(list.size())));
+        result.add(list.get(rand.nextInt(list.size())));*/
+        return result;
+    }
+
+    private <T> T pickOne(List<T> list) {
+        Random rand = new Random();
+        return list.get(rand.nextInt(list.size()));
     }
 
     @Override
@@ -238,7 +189,7 @@ public class AllRecipesFragment extends Fragment implements RecipesAdapter.Recip
     }
 
     @Override
-    public void onFiltersSelected(ArrayList<Category> arrayList) {
+    public void onFiltersSelected(@NonNull ArrayList<Category> arrayList) {
 
     }
 
@@ -256,13 +207,15 @@ public class AllRecipesFragment extends Fragment implements RecipesAdapter.Recip
         @NotNull
         @Override
         public FilterItem createView(int position, Category item) {
-            FilterItem filterItem = new FilterItem(activity);
+            FilterItem filterItem = new FilterItem(TestActivity.this);
 
+            if (item.getText().equals(mTitles[0]))
+                filterItem.setHeader(true);
             filterItem.setStrokeColor(mColors[0]);
             filterItem.setTextColor(mColors[0]);
             filterItem.setCornerRadius(14);
-            filterItem.setCheckedTextColor(ContextCompat.getColor(activity, android.R.color.white));
-            filterItem.setColor(ContextCompat.getColor(activity, android.R.color.white));
+            filterItem.setCheckedTextColor(ContextCompat.getColor(TestActivity.this, android.R.color.white));
+            filterItem.setColor(ContextCompat.getColor(TestActivity.this, android.R.color.white));
             filterItem.setCheckedColor(mColors[position]);
             filterItem.setText(item.getText());
             filterItem.deselect();
@@ -273,7 +226,27 @@ public class AllRecipesFragment extends Fragment implements RecipesAdapter.Recip
         @NotNull
         @Override
         public FilterItem createSubCategory(int position, Category item, @NonNull FilterItem parent) {
-            return null;
+            /*Integer[] color = new Integer[mColors.length];
+            for (int i = 0; i < mColors.length; i++) {
+                color[i] = mColors[i];
+            }
+
+            List<Integer> cols = new ArrayList<>(Arrays.asList(color));
+            int one = pickOne(cols);*/
+
+            FilterItem filterItem = new FilterItem(TestActivity.this);
+
+            filterItem.setContainer(true);
+            filterItem.setStrokeColor(parent.getCheckedColor());
+            filterItem.setTextColor(parent.getCheckedColor());
+            filterItem.setCornerRadius(20);
+            filterItem.setCheckedTextColor(ContextCompat.getColor(TestActivity.this, android.R.color.white));
+            filterItem.setColor(ContextCompat.getColor(TestActivity.this, android.R.color.white));
+            filterItem.setCheckedColor(item.getColor());
+            filterItem.setText(item.getCategories().get(position));
+            filterItem.deselect();
+
+            return filterItem;
         }
     }
 }

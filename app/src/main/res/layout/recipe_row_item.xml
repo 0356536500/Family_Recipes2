@@ -15,7 +15,8 @@
         android:layout_width="@dimen/thumbnail"
         android:layout_height="@dimen/thumbnail"
         android:layout_centerVertical="true"
-        android:layout_marginEnd="@dimen/row_padding" />
+        android:layout_marginEnd="@dimen/row_padding"
+        android:src="@mipmap/ic_logo_foreground"/>
 
     <TextView
         android:id="@+id/name"
@@ -24,6 +25,7 @@
         android:layout_toEndOf="@id/thumbnail"
         android:fontFamily="sans-serif-medium"
         android:textColor="@color/contact_name"
+        android:text="@string/nav_main_all_recipes"
         android:textSize="@dimen/contact_name" />
 
     <TextView
@@ -33,6 +35,7 @@
         android:layout_below="@id/name"
         android:layout_toEndOf="@id/thumbnail"
         android:textColor="@color/contact_number"
+        android:text="@string/app_main_desc"
         android:textSize="@dimen/contact_number" />
 
 </RelativeLayout>
