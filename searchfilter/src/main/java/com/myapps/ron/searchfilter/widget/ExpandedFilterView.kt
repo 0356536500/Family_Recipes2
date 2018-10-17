@@ -93,13 +93,13 @@ class ExpandedFilterView : ViewGroup {
     fun refreshView() {
         filters.clear()
         mPrevItem = null
-        calculateDesiredHeight()
         measure(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
     }
 
     fun addAllViews(views: MutableList<View>) {
         removeAllViews()
         views.forEach { view ->
+            (view as FilterItem).removeFromParent()
             addView(view)
         }
     }

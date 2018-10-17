@@ -10,9 +10,7 @@ import android.support.v7.widget.SimpleItemAnimator
 import android.view.View
 import java.util.*
 
-/**
- * Created by irinagalata on 9/22/16.
- */
+
 class FiltersListItemAnimator : SimpleItemAnimator() {
 
     override fun isRunning(): Boolean {
@@ -82,7 +80,7 @@ class FiltersListItemAnimator : SimpleItemAnimator() {
             }
             if (removalsPending) {
                 val view = moves[0].holder.itemView
-                ViewCompat.postOnAnimationDelayed(view, mover, getRemoveDuration())
+                ViewCompat.postOnAnimationDelayed(view, mover, removeDuration)
             } else {
                 mover.run()
             }

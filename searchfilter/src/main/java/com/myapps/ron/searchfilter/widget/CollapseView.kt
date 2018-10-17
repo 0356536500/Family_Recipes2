@@ -8,9 +8,7 @@ import android.widget.FrameLayout
 import com.myapps.ron.searchfilter.R
 import kotlinx.android.synthetic.main.view_collapse.view.*
 
-/**
- * Created by galata on 20.09.16.
- */
+
 class CollapseView : FrameLayout {
 
     constructor(context: Context?) : this(context, null)

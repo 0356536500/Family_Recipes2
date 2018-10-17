@@ -2,7 +2,6 @@ package com.myapps.ron.searchfilter.widget
 
 import android.content.Context
 import android.content.res.ColorStateList
-import android.graphics.Canvas
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
 import android.support.annotation.ColorInt
@@ -24,6 +23,7 @@ import java.io.Serializable
 
 class FilterItem : FrameLayout, Serializable {
 
+    var isHidden: Boolean = false
     var isContainer: Boolean = false
     var isHeader: Boolean = false
     var subFilters: MutableList<FilterItem> = mutableListOf()
@@ -144,6 +144,9 @@ class FilterItem : FrameLayout, Serializable {
         listener?.onItemRemoved(this)
     }
 
+    /**
+     * turn the expanded item to rectangle with cancel button
+     */
     fun decrease(ratio: Float) {
         textView.scaleX = 1 - 0.2f * ratio
         textView.alpha = 1 - ratio
@@ -164,6 +167,9 @@ class FilterItem : FrameLayout, Serializable {
         isIncreased = false
     }
 
+    /**
+     * turn the collapsed item to text
+     */
     fun increase(ratio: Float) {
         textView.scaleX = 1f
         textView.alpha = ratio
@@ -198,7 +204,8 @@ class FilterItem : FrameLayout, Serializable {
         color = removeAlpha(color)
         val strokeColor = if (isFilterSelected) color else removeAlpha(strokeColor)
 
-        val drawable: GradientDrawable = GradientDrawable()
+        //ResourcesCompat.getDrawable(resources, R.drawable.item_shape, null)
+        val drawable = GradientDrawable()
         drawable.cornerRadius = cornerRadius
 
         if (color != null) {
@@ -215,8 +222,9 @@ class FilterItem : FrameLayout, Serializable {
             bottomStroke.setBackgroundColor(strokeColor)
         }
 
-        viewLeft.setBackgroundDrawable(drawable)
-        viewRight.setBackgroundDrawable(drawable)
+        drawable.cornerRadius = 100f
+        viewLeft.background = drawable
+        viewRight.background = drawable
 
     }
 

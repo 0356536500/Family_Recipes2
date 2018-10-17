@@ -20,9 +20,7 @@ import kotlinx.android.synthetic.main.collapsed_container.view.*
 import kotlinx.android.synthetic.main.filter.view.*
 import java.io.Serializable
 import java.util.*
-import android.content.res.TypedArray
 import android.graphics.Color
-import android.support.annotation.ColorInt
 
 
 class Filter<T : FilterModel<T>> : FrameLayout, FilterItemListener, CollapseListener {
@@ -67,6 +65,7 @@ class Filter<T : FilterModel<T>> : FrameLayout, FilterItemListener, CollapseList
     private val STATE_REMOVED = "state_removed"
     private val STATE_COLLAPSED = "state_collapsed"
 
+    private var mNothingSelectedItem: FilterItem? = null
     private val mSelectedFilters: LinkedHashMap<FilterItem, Coord> = LinkedHashMap()
     private val mRemovedFilters: LinkedHashMap<FilterItem, Coord> = LinkedHashMap()
     private val mItems: LinkedHashMap<FilterItem, T> = LinkedHashMap()
@@ -99,26 +98,33 @@ class Filter<T : FilterModel<T>> : FrameLayout, FilterItemListener, CollapseList
         expandedFilter.post {
             val mainItems: MutableList<FilterItem> = mutableListOf()
             adapter?.items?.forEachIndexed { i, item ->
+                //add the group header to the main View
                 val view: FilterItem = adapter?.createView(i, item)!!
                 view.listener = this
                 view.isContainer = true
                 mainItems.add(i, view)
                 expandedFilter.addView(view)
                 mItems.put(view, item)
+                if(view.text == noSelectedItemText) {
+                    view.select()
+                    mNothingSelectedItem = view
+                }
             }
             val subList: MutableList<FilterItem> = mutableListOf()
             val subItems: MutableList<T> = mutableListOf()
+            //var runningIndex = 0
+            //add all its sub filters to View and make them invisible
             adapter?.items?.forEachIndexed { index, item ->
                 if(index > 0) {
                     for ((indexInParent, subItem) in item.getSubs().withIndex()) {
-                        val view: FilterItem = adapter?.createSubCategory(indexInParent, item, mainItems.get(index))!!
-                        view.listener = this
-                        view.isContainer = false
-                        //view.visibility = View.GONE
-                        subList.add(indexInParent, view)
+                        val subView: FilterItem = adapter?.createSubCategory(indexInParent, item, mainItems.get(index))!!
+                        subView.listener = this
+                        subView.isContainer = false
+                        subView.isHidden = true
+                        subList.add(indexInParent, subView)
                         subItems.add(indexInParent, subItem)
-                        //expandedFilter.addView(view)
-                        //mItems.put(view, subItem)
+                        //expandedFilter.addView(subView)
+                        mItems.put(subView, subItem)
                     }
                     mainItems.get(index).subFilters.addAll(subList)
                     mainItems.get(index).subItems.addAll(subItems)
@@ -224,6 +230,7 @@ class Filter<T : FilterModel<T>> : FrameLayout, FilterItemListener, CollapseList
                 collapseView.turnIntoOkButton(ratio)
 
                 mSelectedFilters.keys.forEachIndexed { index, filterItem ->
+
                     val x = mSelectedFilters[filterItem]?.x
                     val y = mSelectedFilters[filterItem]?.y
 
@@ -239,7 +246,8 @@ class Filter<T : FilterModel<T>> : FrameLayout, FilterItemListener, CollapseList
 
                     if (ratio == 1f) {
                         filterItem.removeFromParent()
-                        expandedFilter.addView(filterItem)
+                        if(!filterItem.isHidden)
+                            expandedFilter.addView(filterItem)
                         filterItem.translationX = 0f
                         filterItem.translationY = 0f
                     }
@@ -249,7 +257,8 @@ class Filter<T : FilterModel<T>> : FrameLayout, FilterItemListener, CollapseList
                     filterItem.alpha = ratio
 
                     filterItem.removeFromParent()
-                    expandedFilter.addView(filterItem)
+                    if(!filterItem.isHidden)
+                        expandedFilter.addView(filterItem)
                     filterItem.translationX = mRemovedFilters[filterItem]?.x!! * (1 - ratio)
                     filterItem.translationY = mRemovedFilters[filterItem]?.y!! * (1 - ratio)
                 }
@@ -309,7 +318,7 @@ class Filter<T : FilterModel<T>> : FrameLayout, FilterItemListener, CollapseList
             //and refresh its measures
             if(item.isContainer && !item.isHeader) {
                 val expandedChildren: MutableList<View> = mutableListOf()
-                for (index in 0..expandedFilter.childCount - 1) {
+                for (index in 0..(expandedFilter.childCount - 1)) {
                     if(expandedFilter.getChildAt(index) != null)
                         expandedChildren.add(expandedFilter.getChildAt(index))
 
@@ -319,35 +328,39 @@ class Filter<T : FilterModel<T>> : FrameLayout, FilterItemListener, CollapseList
                     if (expandedFilter.indexOfChild(subView) >= 0)
                         expandedFilter.removeView(subView)
 
+                    subView.isHidden = false
+                    //add a subView right after its parent
                     expandedChildren.add(parentIndex + i + 1, subView)
-
-                    mItems.put(subView, item.subItems[i] as T)
                 }
                 expandedFilter.addAllViews(expandedChildren)
                 expandedFilter.refreshView()
             }
         }
 
+        mSelectedFilters.put(item, Coord(item.x.toInt(), item.y.toInt()))
         if(!item.isContainer || item.isHeader) {
-            mSelectedFilters.put(item, Coord(item.x.toInt(), item.y.toInt()))
             listener?.onFilterSelected(filter)
         }
     }
 
+    /**
+     * item deselected in ExpandedFilterView
+     */
     override fun onItemDeselected(item: FilterItem) {
         val filter = mItems[item]!!
         if (mItems.contains(item)) {
             mSelectedItems.remove(filter)
             if(item.isContainer) {
-                item.subFilters.forEachIndexed { i, subView ->
+                item.subFilters.forEach{ subView ->
                     expandedFilter.removeView(subView)
-                    mItems.remove(subView)
+                    subView.isHidden = true
                 }
                 expandedFilter.refreshView()
             }
         }
+
+        mSelectedFilters.remove(item)
         if(!item.isContainer) {
-            mSelectedFilters.remove(item)
             listener?.onFilterDeselected(filter)
         }
     }
@@ -392,7 +405,7 @@ class Filter<T : FilterModel<T>> : FrameLayout, FilterItemListener, CollapseList
         mSelectedFilters.keys.forEach { filter ->
             val item: T? = mItems[filter]
 
-            if (item != null) {
+            if (item != null && !filter.isContainer) {
                 items.add(item)
             }
         }
@@ -401,13 +414,16 @@ class Filter<T : FilterModel<T>> : FrameLayout, FilterItemListener, CollapseList
     }
 
     fun deselectAll() {
+        mSelectedFilters.keys.forEach { item -> item.deselect(false) }
         mSelectedFilters.keys.forEach{ item ->
-            if(!item.isContainer) {
-                expandedFilter.removeView(item)
-                mItems.remove(item)
+            if(item.isContainer) {
+                item.subFilters.forEach{ subView ->
+                    expandedFilter.removeView(subView)
+                    subView.isHidden = true
+                }
             }
         }
-        mSelectedFilters.keys.forEach { item -> item.deselect(false) }
+        expandedFilter.refreshView()
         mSelectedFilters.clear()
         mSelectedItems.clear()
         listener?.onNothingSelected()

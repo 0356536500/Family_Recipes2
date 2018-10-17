@@ -190,7 +190,9 @@ public class TestActivity extends AppCompatActivity implements RecipesAdapter.Re
 
     @Override
     public void onFiltersSelected(@NonNull ArrayList<Category> arrayList) {
-
+        for(Category cat: arrayList) {
+            Log.e(TAG, cat.getText());
+        }
     }
 
     @Override
