@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.myapps.ron.family_recipes.model.Category;
 import com.myapps.ron.family_recipes.model.Recipe;
 
 import java.util.HashMap;
@@ -144,6 +145,35 @@ public class APICallsHandler {
             @Override
             public void onFailure(@NonNull Call<Recipe> call, @NonNull Throwable t) {
                 Log.e(TAG, "error patching recipe. message: " + t.getMessage());
+                //Toast.makeText(MainActivity.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    public static void getAllCategories(String date, String token, final MyCallback<List<Category>> callback) {
+        RecipeInterface service = getRetrofitInstance().create(RecipeInterface.class);
+        Call<List<Category>> call = service.getAllCategories(token, "0");
+
+        call.enqueue(new Callback<List<Category>>() {
+            @Override
+            public void onResponse(@NonNull Call<List<Category>> call, @NonNull Response<List<Category>> response) {
+                String body = response.body() != null ? response.body().toString() : "null";
+
+                if (response.code() == STATUS_OK) {
+                    Log.i(TAG, body);
+                    List<Category> list = response.body();
+                    callback.onFinished(list);
+                }
+                else {
+                    Log.e(TAG, "error getAllCategories, code = " + response.code() + "\n body: " + body);
+                }
+
+                //generateDataList(response.body());
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<List<Category>> call, @NonNull Throwable t) {
+                Log.e(TAG, "error getting all recipes. message: " + t.getMessage());
                 //Toast.makeText(MainActivity.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
             }
         });

@@ -222,7 +222,7 @@ class FilterItem : FrameLayout, Serializable {
             bottomStroke.setBackgroundColor(strokeColor)
         }
 
-        drawable.cornerRadius = 100f
+        //drawable.cornerRadius = 100f
         viewLeft.background = drawable
         viewRight.background = drawable
 

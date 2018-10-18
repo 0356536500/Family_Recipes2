@@ -7,7 +7,9 @@ import android.arch.lifecycle.ViewModel;
 import android.content.Context;
 import android.os.AsyncTask;
 
+import com.myapps.ron.family_recipes.dal.db.CategoriesDBHelper;
 import com.myapps.ron.family_recipes.dal.db.RecipesDBHelper;
+import com.myapps.ron.family_recipes.model.Category;
 import com.myapps.ron.family_recipes.model.Recipe;
 import com.myapps.ron.family_recipes.network.APICallsHandler;
 import com.myapps.ron.family_recipes.network.MiddleWareForNetwork;
@@ -23,9 +25,10 @@ import java.util.List;
  */
 public class DataViewModel extends ViewModel {
     private MutableLiveData<List<Recipe>> recipeList = new MutableLiveData<>(); // list of recipes from api
+    private MutableLiveData<List<Category>> categoryList = new MutableLiveData<>(); // list of categories from api
 
-
-    public void setRecipes(List<Recipe> items) {
+    //region recipes
+    private void setRecipes(List<Recipe> items) {
         recipeList.setValue(items);
     }
 
@@ -56,7 +59,7 @@ public class DataViewModel extends ViewModel {
         loadLocalRecipes(context,orderBy);
     }
 
-    public void loadLocalRecipes(final Context context, final String orderBy) {
+    private void loadLocalRecipes(final Context context, final String orderBy) {
         RecipesDBHelper dbHelper = new RecipesDBHelper(context);
         setRecipes(dbHelper.getAllRecipes(orderBy));
     }
@@ -92,4 +95,75 @@ public class DataViewModel extends ViewModel {
                 setRecipes(dbHelper.getAllRecipes(orderBy));
         }
     }
+    //endregion
+
+    //region categories
+    public LiveData<List<Category>> getCategories() {
+        return categoryList;
+    }
+
+    private void setCategories(List<Category> items) {
+        categoryList.setValue(items);
+    }
+
+    public void loadCategories(final Context context) {
+        if(MiddleWareForNetwork.checkInternetConnection(context)) {
+            if (DateUtil.shouldUpdateCategories(context)) {
+                final String time = DateUtil.getUTCTime();
+                APICallsHandler.getAllCategories(DateUtil.getLastUpdateTime(context), AppHelper.getAccessToken(), new MyCallback<List<Category>>() {
+                    @Override
+                    public void onFinished(List<Category> result) {
+                        //HandleServerDataService.startActionUpdateRecipes(context, new ArrayList<>(result), time);
+                        if (result != null) {
+                            DateUtil.updateCategoriesServerTime(context, time);
+                            new MyAsyncCategoriesUpdate(context, result).execute();
+                        }
+                    }
+                });
+            }
+            //don't need to check the categories every time
+            else
+                loadLocalCategories(context);
+        }
+        //no internet connection
+        else {
+            loadLocalCategories(context);
+        }
+    }
+
+    private void loadLocalCategories(final Context context) {
+        CategoriesDBHelper dbHelper = new CategoriesDBHelper(context);
+        setCategories(dbHelper.getAllCategories());
+    }
+
+    @SuppressLint("StaticFieldLeak")
+    class MyAsyncCategoriesUpdate extends AsyncTask<Void, Void, Boolean> {
+
+        private List<Category> categories;
+        private CategoriesDBHelper dbHelper;
+
+        MyAsyncCategoriesUpdate(Context context, List<Category> categories) {
+            this.dbHelper = new CategoriesDBHelper(context);
+            this.categories = categories;
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... voids) {
+            for (Category item : categories) {
+               /* if(dbHelper.categoryExists(item.getName()))
+                    dbHelper.updateCategoryServerChanges(item);
+                else*/
+                    dbHelper.insertCategory(item);
+            }
+            return true;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean aBoolean) {
+            super.onPostExecute(aBoolean);
+            if(aBoolean)
+                setCategories(dbHelper.getAllCategories());
+        }
+    }
+    //endregion
 }

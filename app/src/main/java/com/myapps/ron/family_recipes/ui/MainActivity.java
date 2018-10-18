@@ -152,6 +152,10 @@ public class MainActivity extends AppCompatActivity {
         viewModel.loadRecipes(this, orderBy);
     }
 
+    public void fetchCategories() {
+        viewModel.loadCategories(this);
+    }
+
     public Menu getMenu() {
         return menu;
     }

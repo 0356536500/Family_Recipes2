@@ -14,20 +14,20 @@ import java.util.List;
 import javax.xml.parsers.FactoryConfigurationError;
 
 
-public class RecipesDBHelper extends SQLiteOpenHelper{
+public class RecipesDBHelper extends MyDBHelper{
     private static final int FALSE = 0;
     private static final int TRUE = 1;
     // All Static variables
     // Database Version
-    private static final int DATABASE_VERSION = 1;
+   /* private static final int DATABASE_VERSION = 1;
 
     // Database Name
     private static final String DATABASE_NAME = "records.db";
 
-    // Contacts table name
+    // Recipes table name
     private static final String TABLE_NAME = "recipes";
 
-    // Contacts Table Columns names
+    // Recipes Table Columns names
     private static final String KEY_ID = "id";
     private static final String KEY_NAME = "name";
     private static final String KEY_DESC = "description";
@@ -40,11 +40,11 @@ public class RecipesDBHelper extends SQLiteOpenHelper{
     private static final String KEY_FOOD = "foodFiles";
     private static final String KEY_LIKES = "likes";
     private static final String KEY_ME_LIKE = "meLike";
-
+*/
     public static final String SORT_POPULAR = KEY_LIKES;
     public static final String SORT_RECENT = KEY_CREATED;
 
-    private static final String CREATE_EXEC = "CREATE TABLE " + TABLE_NAME + "("
+    /*private static final String CREATE_EXEC = "CREATE TABLE " + TABLE_NAME + "("
             + KEY_ID + " TEXT PRIMARY KEY,"
             + KEY_NAME + " TEXT,"
             + KEY_DESC + " TEXT,"
@@ -56,24 +56,24 @@ public class RecipesDBHelper extends SQLiteOpenHelper{
             + KEY_COMMENTS + " TEXT,"
             + KEY_FOOD + " TEXT,"
             + KEY_LIKES + " INTEGER,"
-            + KEY_ME_LIKE + " INTEGER " + ")";
+            + KEY_ME_LIKE + " INTEGER " + ")";*/
 
     public RecipesDBHelper(Context context) {
-        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        super(context);
     }
 
     //region Override From SQLite
     //creating Tables
-    @Override
+    /*@Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_EXEC);
-    }
+    }*/
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
         // Drop older table if existed
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_RECIPES);
 
         // Create tables again
         onCreate(db);
@@ -104,14 +104,14 @@ public class RecipesDBHelper extends SQLiteOpenHelper{
         values.put(KEY_ME_LIKE, recipe.getMeLike() ? TRUE : FALSE);
 
         // Inserting Row
-        db.insert(TABLE_NAME, null, values);
+        db.insert(TABLE_RECIPES, null, values);
         db.close(); // Closing database connection
     }
 
     public Recipe getRecipe(String id){
         SQLiteDatabase db = this.getReadableDatabase();
-        //                                  new String[]{KEY_ID,KEY_NAME}
-        Cursor cursor = db.query(TABLE_NAME, null,KEY_ID+"=?",
+        //                                  new String[]{CAT_KEY_ID,KEY_NAME}
+        Cursor cursor = db.query(TABLE_RECIPES, null,KEY_ID+"=?",
                 new String[]{String.valueOf(id)},null,null,null,null);
         if(cursor != null) {
             cursor.moveToFirst();
@@ -170,7 +170,7 @@ public class RecipesDBHelper extends SQLiteOpenHelper{
             return null;
 
         // Select All Query
-        String selectQuery = "SELECT  * FROM " + TABLE_NAME + " ORDER BY " + orderedBy + " DESC";
+        String selectQuery = "SELECT  * FROM " + TABLE_RECIPES + " ORDER BY " + orderedBy + " DESC";
 
         return getAllRecipesFromQuery(selectQuery);
     }
@@ -187,7 +187,7 @@ public class RecipesDBHelper extends SQLiteOpenHelper{
         values.put(KEY_LIKES, recipe.getLikes());
 
         // updating row
-        return db.update(TABLE_NAME, values, KEY_ID + " = ?",
+        return db.update(TABLE_RECIPES, values, KEY_ID + " = ?",
                 new String[]{String.valueOf(recipe.getId())});
     }
 
@@ -204,13 +204,13 @@ public class RecipesDBHelper extends SQLiteOpenHelper{
         values.put(KEY_ME_LIKE, recipe.getMeLike() ? TRUE : FALSE);
 
         // updating row
-        return db.update(TABLE_NAME, values, KEY_ID + " = ?",
+        return db.update(TABLE_RECIPES, values, KEY_ID + " = ?",
                 new String[]{String.valueOf(recipe.getId())});
     }
 
     public void deleteRecipe(String id){
         SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(TABLE_NAME, KEY_ID + "=" + id, null);
+        db.delete(TABLE_RECIPES, KEY_ID + "=" + id, null);
         db.close();
     }
 
@@ -218,7 +218,7 @@ public class RecipesDBHelper extends SQLiteOpenHelper{
 
 
     public int getRecipesCount() {
-        String countQuery = "SELECT  * FROM " + TABLE_NAME;
+        String countQuery = "SELECT  * FROM " + TABLE_RECIPES;
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(countQuery, null);
 
@@ -231,7 +231,7 @@ public class RecipesDBHelper extends SQLiteOpenHelper{
 
     public boolean recipeExists(String id) {
         SQLiteDatabase db = this.getReadableDatabase();
-        String query = "SELECT id FROM "+ TABLE_NAME + " WHERE id=" + id;
+        String query = "SELECT id FROM "+ TABLE_RECIPES + " WHERE id=" + id;
         Cursor cursor = db.rawQuery(query, null);
         boolean result = cursor.getCount() > 0;
         cursor.close();

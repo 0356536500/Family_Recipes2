@@ -2,14 +2,13 @@ package com.myapps.ron.family_recipes.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 import com.myapps.ron.searchfilter.model.FilterModel;
-
-import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -25,6 +24,9 @@ public class Category implements FilterModel<Category>, Parcelable {
 
     private static final Gson gson = new Gson();
 
+    public Category() {
+    }
+
     public Category(String text, int color) {
         this.name = text;
         this.color = color;
@@ -37,7 +39,7 @@ public class Category implements FilterModel<Category>, Parcelable {
         this.categories = categories;
     }
 
-    public Category(String text, int color, String categories) {
+    public Category(String text, String categories, int color) {
         this.name = text;
         this.color = color;
         setStringCategories(categories);
@@ -105,13 +107,13 @@ public class Category implements FilterModel<Category>, Parcelable {
         return result;
     }
 
-    @NotNull
+    @NonNull
     @Override
     public String getText() {
         return getName();
     }
 
-    @NotNull
+    @NonNull
     @Override
     public List<Category> getSubs() {
         List<Category> subs = new ArrayList<>();

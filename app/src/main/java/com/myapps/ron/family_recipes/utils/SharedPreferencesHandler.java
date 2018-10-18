@@ -45,7 +45,7 @@ public class SharedPreferencesHandler {
 
     public static String getString(Context ctx, String key) {
         SharedPreferences sharedPref = ctx.getSharedPreferences(ctx.getString(R.string.sharedPreferences), Context.MODE_PRIVATE);
-        return sharedPref.getString(key, "");
+        return sharedPref.getString(key, null);
     }
 
     public static String getString(Context ctx, String key, String defValue) {

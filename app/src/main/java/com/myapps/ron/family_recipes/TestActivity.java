@@ -28,8 +28,6 @@ import com.myapps.ron.searchfilter.listener.FilterListener;
 import com.myapps.ron.searchfilter.widget.Filter;
 import com.myapps.ron.searchfilter.widget.FilterItem;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -189,7 +187,7 @@ public class TestActivity extends AppCompatActivity implements RecipesAdapter.Re
     }
 
     @Override
-    public void onFiltersSelected(@NonNull ArrayList<Category> arrayList) {
+    public void onFiltersSelected(ArrayList<Category> arrayList) {
         for(Category cat: arrayList) {
             Log.e(TAG, cat.getText());
         }
@@ -202,11 +200,11 @@ public class TestActivity extends AppCompatActivity implements RecipesAdapter.Re
 
     class Adapter extends FilterAdapter<Category> {
 
-        Adapter(@NotNull List<? extends Category> items) {
+        Adapter(@NonNull List<? extends Category> items) {
             super(items);
         }
 
-        @NotNull
+        @NonNull
         @Override
         public FilterItem createView(int position, Category item) {
             FilterItem filterItem = new FilterItem(TestActivity.this);
@@ -215,7 +213,7 @@ public class TestActivity extends AppCompatActivity implements RecipesAdapter.Re
                 filterItem.setHeader(true);
             filterItem.setStrokeColor(mColors[0]);
             filterItem.setTextColor(mColors[0]);
-            filterItem.setCornerRadius(14);
+            filterItem.setCornerRadius(75f);
             filterItem.setCheckedTextColor(ContextCompat.getColor(TestActivity.this, android.R.color.white));
             filterItem.setColor(ContextCompat.getColor(TestActivity.this, android.R.color.white));
             filterItem.setCheckedColor(mColors[position]);
@@ -225,7 +223,7 @@ public class TestActivity extends AppCompatActivity implements RecipesAdapter.Re
             return filterItem;
         }
 
-        @NotNull
+        @NonNull
         @Override
         public FilterItem createSubCategory(int position, Category item, @NonNull FilterItem parent) {
             /*Integer[] color = new Integer[mColors.length];
@@ -241,7 +239,7 @@ public class TestActivity extends AppCompatActivity implements RecipesAdapter.Re
             filterItem.setContainer(true);
             filterItem.setStrokeColor(parent.getCheckedColor());
             filterItem.setTextColor(parent.getCheckedColor());
-            filterItem.setCornerRadius(20);
+            filterItem.setCornerRadius(100f);
             filterItem.setCheckedTextColor(ContextCompat.getColor(TestActivity.this, android.R.color.white));
             filterItem.setColor(ContextCompat.getColor(TestActivity.this, android.R.color.white));
             filterItem.setCheckedColor(item.getColor());

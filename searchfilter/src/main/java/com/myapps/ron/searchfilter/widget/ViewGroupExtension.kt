@@ -4,9 +4,6 @@ import android.util.DisplayMetrics
 import android.view.View
 import android.view.ViewGroup
 
-/**
- * Created by galata on 13.09.16.
- */
 
 internal fun calculateSize(measureSpec: Int, desiredSize: Int): Int {
     val mode = View.MeasureSpec.getMode(measureSpec)
