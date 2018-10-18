@@ -103,10 +103,10 @@ public class AllRecipesFragment extends Fragment implements RecipesAdapter.Recip
             @Override
             public void onChanged(@Nullable List<Recipe> recipes) {
                 //Toast.makeText(activity, "get recipes from DAL", Toast.LENGTH_SHORT).show();
-                String log = "null";
+                /*String log = "null";
                 if(recipes != null)
                     log = recipes.toString();
-                Log.e(TAG, "getAllRecipes from db.\n" + log);
+                Log.e(TAG, "getAllRecipes from db.\n" + log);*/
                 mAdapter.updateRecipes(recipes);
             }
         });
@@ -276,11 +276,8 @@ public class AllRecipesFragment extends Fragment implements RecipesAdapter.Recip
         public FilterItem createView(int position, Category item) {
             FilterItem filterItem = new FilterItem(activity);
 
-            if (item.getText().equals(tags.get(0).getText())) {
+            if (item.getText().equals(tags.get(0).getText()))
                 filterItem.setHeader(true);
-                Log.e(TAG, "got a header");
-            }
-
             filterItem.setStrokeColor(mColors[0]);
             filterItem.setTextColor(mColors[0]);
             filterItem.setCornerRadius(75f);

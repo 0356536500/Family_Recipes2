@@ -36,7 +36,7 @@ public class DataViewModel extends ViewModel {
         return recipeList;
     }
 
-    /*public void loadRecipes(final Context context, final String orderBy) {
+    public void loadRecipes(final Context context, final String orderBy) {
         if(MiddleWareForNetwork.checkInternetConnection(context)) {
             final String time = DateUtil.getUTCTime();
             APICallsHandler.getAllRecipes(DateUtil.getLastUpdateTime(context), AppHelper.getAccessToken(), new MyCallback<List<Recipe>>() {
@@ -53,11 +53,11 @@ public class DataViewModel extends ViewModel {
         else {
             loadLocalRecipes(context, orderBy);
         }
-    }*/
-
-    public void loadRecipes(final Context context, final String orderBy) {
-        loadLocalRecipes(context,orderBy);
     }
+
+    /*public void loadRecipes(final Context context, final String orderBy) {
+        loadLocalRecipes(context,orderBy);
+    }*/
 
     private void loadLocalRecipes(final Context context, final String orderBy) {
         RecipesDBHelper dbHelper = new RecipesDBHelper(context);

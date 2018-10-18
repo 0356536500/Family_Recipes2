@@ -82,10 +82,10 @@ class S3Helper {
 
     /**
      * the file is located in bucket/{@param key}
-     * @param key
-     * @param rootPath
+     * @param key - file path in bucket and dir/fileName in local storage
+     * @param rootPath - root path of current application
      * @param dir - directory in bucket and in local storage
-     * @param callback
+     * @param callback - passed callback
      */
     void downloadFile(String key, final String rootPath, String dir, final MyCallback<String> callback) {
 
@@ -95,8 +95,9 @@ class S3Helper {
                         new File("/path/to/file/localFile.txt"));*/
 
         key = dir + "/" + key;
-        final String path = rootPath + "/" + dir + "/" + key;
-        File file = new File(path);
+        final String path = rootPath + "/" + key;
+        //final String path = rootPath + "/" + dir + "/" + key;
+        final File file = new File(path);
         if(!file.exists()) {
             try {
                 if(!file.createNewFile())
@@ -105,7 +106,7 @@ class S3Helper {
                 e.printStackTrace();
             }
         }
-        Log.e(TAG, "before downloading, key = " + key + " local path = " + path);
+        //Log.e(TAG, "before downloading, key = " + key + " local path = " + path);
         TransferObserver downloadObserver = transferUtility.download(key, file);
 
         // Attach a listener to the observer to get state update and progress notifications

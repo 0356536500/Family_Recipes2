@@ -11,7 +11,7 @@ public class ExternalStorageHelper {
         String path = dir + "/" + filePath;
         //check whether file is in cache directory
 
-        //Log.e("ExternalStorage", "path - " + context.getExternalFilesDir(null).getAbsolutePath().concat("/" + path));
+        //Log.e("ExternalStorage", "before path - " + context.getExternalFilesDir(null).getAbsolutePath().concat("/" + path));
         File cacheRoot = context.getExternalCacheDir();
         if(cacheRoot != null) {
             String cachePath = cacheRoot.getAbsolutePath() + "/" + path;
@@ -26,6 +26,7 @@ public class ExternalStorageHelper {
             return null;
 
         String pathStr = root.getAbsolutePath().concat("/" + path); //context.getExternalFilesDir(null).getAbsolutePath();
+        //Log.e("ExternalStorage", "after path - " + pathStr);
         File file = new File(pathStr);
         if(file.exists())
             return pathStr;
