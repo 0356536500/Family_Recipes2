@@ -36,6 +36,9 @@
         android:layout_toEndOf="@id/thumbnail"
         android:textColor="@color/contact_number"
         android:text="@string/app_main_desc"
-        android:textSize="@dimen/contact_number" />
+        android:textSize="@dimen/contact_number"
+        android:paddingEnd="@dimen/margin"
+        android:maxLines="1"
+        android:ellipsize="end"/>
 
 </RelativeLayout>

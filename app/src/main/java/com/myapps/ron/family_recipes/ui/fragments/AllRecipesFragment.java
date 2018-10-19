@@ -10,6 +10,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -77,7 +78,7 @@ public class AllRecipesFragment extends Fragment implements RecipesAdapter.Recip
         initRecycler();
 
         // Associate searchable configuration with the SearchView
-        //setSearchView(activity.getMenu());
+        setSearchView(activity.getMenu());
         //setSortToggle(activity.getMenu());
 
         activity.fetchCategories();
@@ -133,6 +134,30 @@ public class AllRecipesFragment extends Fragment implements RecipesAdapter.Recip
         recyclerView.addItemDecoration(new MyDividerItemDecoration(activity, DividerItemDecoration.VERTICAL, 36));
         recyclerView.setAdapter(mAdapter);
         recyclerView.setItemAnimator(new FiltersListItemAnimator());
+    }
+
+    private void calculateDiff(final List<Recipe> oldList, final List<Recipe> newList) {
+        DiffUtil.calculateDiff(new DiffUtil.Callback() {
+            @Override
+            public int getOldListSize() {
+                return oldList.size();
+            }
+
+            @Override
+            public int getNewListSize() {
+                return newList.size();
+            }
+
+            @Override
+            public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+                return oldList.get(oldItemPosition).equals(newList.get(newItemPosition));
+            }
+
+            @Override
+            public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+                return oldList.get(oldItemPosition).equals(newList.get(newItemPosition));
+            }
+        }).dispatchUpdatesTo(mAdapter);
     }
 
     private void setSearchView(Menu menu) {
@@ -242,6 +267,14 @@ public class AllRecipesFragment extends Fragment implements RecipesAdapter.Recip
         //return tags;
     }
 
+    private List<String> convertCategoriesToString(ArrayList<Category> arrayList) {
+        List<String> results = new ArrayList<>();
+        for (Category cat: arrayList) {
+            results.add(cat.getText());
+        }
+        return results;
+    }
+
     @Override
     public void onFilterDeselected(Category category) {
 
@@ -257,12 +290,13 @@ public class AllRecipesFragment extends Fragment implements RecipesAdapter.Recip
 
     @Override
     public void onFiltersSelected(ArrayList<Category> arrayList) {
-
+        List<String> newTags = convertCategoriesToString(arrayList);
+        mAdapter.updateTags(newTags);
     }
 
     @Override
     public void onNothingSelected() {
-
+        mAdapter.updateTags(null);
     }
 
     class Adapter extends FilterAdapter<Category> {

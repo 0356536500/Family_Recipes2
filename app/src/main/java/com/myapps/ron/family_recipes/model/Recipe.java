@@ -285,6 +285,13 @@ public class Recipe implements Parcelable{
         this.meLike = meLike;
     }
 
+    public boolean hasTags(List<String> tags) {
+        if (tags != null && !tags.isEmpty())
+            return categories.containsAll(tags);
+        else
+            return true;
+    }
+
     @Override
     public String toString() {
         return "Recipe{" +

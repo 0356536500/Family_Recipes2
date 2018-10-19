@@ -175,6 +175,22 @@ public class RecipesDBHelper extends MyDBHelper{
         return getAllRecipesFromQuery(selectQuery);
     }
 
+    // Getting All Records
+    public List<Recipe> getFavoriteRecipes(String orderedBy) {
+        // Default is by creation date
+        if(orderedBy == null)
+            orderedBy = KEY_CREATED;
+        // Check if valid parameter
+        if(!orderedBy.equals(KEY_CREATED) && !orderedBy.equals(KEY_LIKES))
+            return null;
+
+        // Select All Query
+        String selectQuery = "SELECT  * FROM " + TABLE_RECIPES + " WHERE " + KEY_ME_LIKE + "=" + TRUE
+                + " ORDER BY " + orderedBy + " DESC";
+
+        return getAllRecipesFromQuery(selectQuery);
+    }
+
     public int updateRecipeServerChanges(Recipe recipe) {
         SQLiteDatabase db = this.getWritableDatabase();
 

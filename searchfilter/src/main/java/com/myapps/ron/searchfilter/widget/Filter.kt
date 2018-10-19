@@ -414,18 +414,20 @@ class Filter<T : FilterModel<T>> : FrameLayout, FilterItemListener, CollapseList
     }
 
     fun deselectAll() {
-        mSelectedFilters.keys.forEach { item -> item.deselect(false) }
-        mSelectedFilters.keys.forEach{ item ->
-            if(item.isContainer) {
-                item.subFilters.forEach{ subView ->
-                    expandedFilter.removeView(subView)
-                    subView.isHidden = true
+        if(mSelectedFilters.isNotEmpty()) {
+            mSelectedFilters.keys.forEach { item -> item.deselect(false) }
+            mSelectedFilters.keys.forEach { item ->
+                if (item.isContainer) {
+                    item.subFilters.forEach { subView ->
+                        expandedFilter.removeView(subView)
+                        subView.isHidden = true
+                    }
                 }
             }
+            expandedFilter.refreshView()
+            mSelectedFilters.clear()
+            mSelectedItems.clear()
         }
-        expandedFilter.refreshView()
-        mSelectedFilters.clear()
-        mSelectedItems.clear()
         listener?.onNothingSelected()
     }
 
@@ -453,7 +455,11 @@ class Filter<T : FilterModel<T>> : FrameLayout, FilterItemListener, CollapseList
         val superState = super.onSaveInstanceState()
         return Bundle().apply {
             putParcelable(STATE_SUPER, superState)
-            putBoolean(STATE_COLLAPSED, isCollapsed!!)
+            var collapsed: Boolean? = isCollapsed
+            if(collapsed == null)
+                collapsed = false
+            putBoolean(STATE_COLLAPSED, collapsed)
+            //putBoolean(STATE_COLLAPSED, isCollapsed!!)
             val selected = mSelectedItems
             val removed = mRemovedItems
             if (selected is Serializable) {

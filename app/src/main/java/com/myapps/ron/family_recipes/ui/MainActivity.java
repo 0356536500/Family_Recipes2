@@ -93,18 +93,18 @@ public class MainActivity extends AppCompatActivity {
 
         // toolbar fancy stuff
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(R.string.toolbar_title);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_action_menu_black);
+        //getSupportActionBar().setDisplayShowHomeEnabled(true);
         //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     private void configureNavigationDrawer() {
         // Set navigation drawer for this screen
         setNavDrawer();
-        ActionBarDrawerToggle mDrawerToggle = new ActionBarDrawerToggle(this, mDrawer, toolbar, R.string.nav_drawer_open, R.string.nav_drawer_close);
-        mDrawer.addDrawerListener(mDrawerToggle);
-        mDrawerToggle.syncState();
+        ActionBarDrawerToggle drawerToggle = new ActionBarDrawerToggle(this, mDrawer, toolbar, R.string.nav_drawer_open, R.string.nav_drawer_close);
+        mDrawer.addDrawerListener(drawerToggle);
+        drawerToggle.syncState();
 
         View navigationHeader = navDrawer.getHeaderView(0);
         TextView navHeaderSubTitle = navigationHeader.findViewById(R.id.textViewNavUserSub);

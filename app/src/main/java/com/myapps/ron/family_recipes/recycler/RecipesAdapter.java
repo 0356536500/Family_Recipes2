@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.dal.storage.StorageWrapper;
+import com.myapps.ron.family_recipes.model.Category;
 import com.myapps.ron.family_recipes.model.Recipe;
 import com.myapps.ron.family_recipes.network.Constants;
 import com.myapps.ron.family_recipes.network.MyCallback;
@@ -25,15 +26,15 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by ravi on 16/11/17.
- */
 
 public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHolder>
         implements Filterable {
     private Context context;
-    private List<Recipe> recipeList;
+    public List<Recipe> recipeList;
     private List<Recipe> recipeListFiltered;
+    private List<String> tags; // filters the user chose
+
+    private String mLastQuery = "";
     private RecipesAdapterListener listener;
     private StorageWrapper storageWrapper;
 
@@ -63,6 +64,7 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
         this.listener = listener;
         this.recipeList = recipeList;
         this.recipeListFiltered = recipeList;
+        this.tags = new ArrayList<>();
         this.storageWrapper = StorageWrapper.getInstance(context);
     }
 
@@ -154,8 +156,12 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
         return new Filter() {
             @Override
             protected FilterResults performFiltering(CharSequence charSequence) {
-                String charString = charSequence.toString();
-                if (charString.isEmpty()) {
+                String charString = mLastQuery;
+                if(charSequence != null){
+                    charString = charSequence.toString();
+                    mLastQuery = charString;
+                }
+                if (charString.isEmpty() && tags.isEmpty()) {
                     recipeListFiltered = recipeList;
                 } else {
                     List<Recipe> filteredList = new ArrayList<>();
@@ -163,7 +169,9 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
 
                         // name match condition. this might differ depending on your requirement
                         // here we are looking for name or description number match
-                        if (row.getName().toLowerCase().contains(charString.toLowerCase()) || row.getDescription().contains(charSequence)) {
+                        if ((row.getName().toLowerCase().contains(charString.toLowerCase())
+                                || row.getDescription().contains(charString))
+                                && row.hasTags(tags)) {
                             filteredList.add(row);
                         }
                     }
@@ -182,6 +190,13 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
                 notifyDataSetChanged();
             }
         };
+    }
+
+    public void updateTags(List<String> newTags) {
+        tags.clear();
+        if (newTags != null)
+            tags.addAll(newTags);
+        getFilter().filter(null);
     }
 
     public void updateRecipes(List<Recipe> list) {
