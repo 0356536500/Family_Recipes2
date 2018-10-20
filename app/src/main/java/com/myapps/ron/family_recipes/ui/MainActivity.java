@@ -6,14 +6,24 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.ColorFilter;
+import android.graphics.LinearGradient;
+import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.PixelFormat;
+import android.graphics.Rect;
+import android.graphics.RectF;
+import android.graphics.Shader;
+import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
-import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -33,9 +43,8 @@ import com.myapps.ron.family_recipes.network.MiddleWareForNetwork;
 import com.myapps.ron.family_recipes.network.cognito.AppHelper;
 import com.myapps.ron.family_recipes.ui.fragments.AllRecipesFragment;
 import com.myapps.ron.family_recipes.utils.Constants;
+import com.myapps.ron.family_recipes.utils.MyFragment;
 import com.myapps.ron.family_recipes.utils.SharedPreferencesHandler;
-
-import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -43,18 +52,16 @@ public class MainActivity extends AppCompatActivity {
     private NavigationView navDrawer;
     private DrawerLayout mDrawer;
     private Toolbar toolbar;
+    private int drawerCurrentWidth;
+    private Paint backgroundPaint;
 
-/*    private RecyclerView recyclerView;
-    private List<Recipe> recipeList;
-    private RecipesAdapter mAdapter;*/
     //private SearchView searchView;
 
     public Menu menu;
     public MenuItem searchMenuItem;
-    public MenuItem filterMenuItem;
-    public MenuItem sortMenuItem;
+    //public MenuItem sortMenuItem;
 
-    private Fragment currentFragment;
+    private MyFragment currentFragment;
     private DataViewModel viewModel;
 
     private CognitoUser user;
@@ -67,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         bindUI();
+        setToolbarBackground();
         configureToolbar();
         configureNavigationDrawer();
 
@@ -84,25 +92,49 @@ public class MainActivity extends AppCompatActivity {
         //whiteNotificationBar(recyclerView);
 
         //initViewModel();
-
-        //fetchRecipes();
     }
 
+    //region Init Methods
     private void configureToolbar() {
         setSupportActionBar(toolbar);
 
         // toolbar fancy stuff
-        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle(R.string.toolbar_title);
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_action_menu_black);
+        if(getSupportActionBar() != null) {
+            getSupportActionBar().setTitle(R.string.toolbar_title);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_action_menu_black);
+        }
         //getSupportActionBar().setDisplayShowHomeEnabled(true);
-        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     private void configureNavigationDrawer() {
         // Set navigation drawer for this screen
         setNavDrawer();
-        ActionBarDrawerToggle drawerToggle = new ActionBarDrawerToggle(this, mDrawer, toolbar, R.string.nav_drawer_open, R.string.nav_drawer_close);
+        ActionBarDrawerToggle drawerToggle = new ActionBarDrawerToggle(this, mDrawer, toolbar, R.string.nav_drawer_open, R.string.nav_drawer_close) {
+            @Override
+            public void onDrawerSlide(View drawerView, float slideOffset) {
+                super.onDrawerSlide(drawerView, slideOffset);
+
+                drawerCurrentWidth = (int) (drawerView.getWidth() * slideOffset);
+                toolbar.requestLayout();
+            }
+
+            @Override
+            public void onDrawerStateChanged(int newState) {
+                super.onDrawerStateChanged(newState);
+                //if the user currently sliding the drawer
+                if(newState == DrawerLayout.STATE_DRAGGING)
+                    getMenu().findItem(R.id.action_search).setVisible(false);
+
+                //if the drawer is not moving
+                if(newState == DrawerLayout.STATE_IDLE) {
+                    if(mDrawer.isDrawerOpen(navDrawer))
+                        getMenu().findItem(R.id.action_search).setVisible(false);
+                    else
+                        getMenu().findItem(R.id.action_search).setVisible(true);
+                }
+            }
+        };
         mDrawer.addDrawerListener(drawerToggle);
         drawerToggle.syncState();
 
@@ -114,29 +146,72 @@ public class MainActivity extends AppCompatActivity {
     private void init() {
         user = AppHelper.getPool().getUser(SharedPreferencesHandler.getString(getApplicationContext(), com.myapps.ron.family_recipes.network.Constants.USERNAME));
 
-        //initRecycler();
-
         filter = new IntentFilter();
         filter.addAction (ConnectivityManager.CONNECTIVITY_ACTION);
+    }
+
+    private void setToolbarBackground() {
+        backgroundPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        toolbar.setLayerType(View.LAYER_TYPE_SOFTWARE, backgroundPaint);
+
+        Drawable toolbarBackground = new Drawable() {
+            @Override
+            public void draw(@NonNull Canvas canvas) {
+                // get drawable dimensions
+                Rect bounds = getBounds();
+
+                int width = bounds.right - bounds.left;
+                int height = bounds.bottom - bounds.top;
+
+                // draw background gradient
+                //int barWidth = width / drawerCurrentWidth;
+                int barWidth = drawerCurrentWidth;
+
+                //int barWidthRemainder = width % drawerCurrentWidth;
+
+                backgroundPaint.setColor(getResources().getColor(R.color.logo_background_darker));
+                canvas.drawRect(new RectF(0, 0, barWidth, height), backgroundPaint);
+
+                backgroundPaint.setColor(Color.WHITE);
+                canvas.drawRect(new RectF(barWidth, 0, width, height), backgroundPaint);
+
+                /*backgroundPaint.setColor(Color.BLACK);
+                canvas.drawRoundRect(new RectF(0, height, width, height - 10), 3, 3, backgroundPaint);*/
+
+                // draw remainder, if exists
+                /*if (barWidthRemainder > 0) {
+                    canvas.drawRect(themeColors.length * barWidth, 0, themeColors.length * barWidth + barWidthRemainder, height, backgroundPaint);
+                }*/
+
+            }
+
+            @Override
+            public void setAlpha(int alpha) {
+
+            }
+
+            @Override
+            public void setColorFilter(@Nullable ColorFilter colorFilter) {
+
+            }
+
+            @Override
+            public int getOpacity() {
+                return PixelFormat.OPAQUE;
+            }
+        };
+
+        toolbar.setBackground(toolbarBackground);
+        /*if(getSupportActionBar() != null){
+
+        }*/
     }
 
     private void bindUI() {
         toolbar = findViewById(R.id.main_toolbar);
         mDrawer = findViewById(R.id.main_drawer_layout);
         navDrawer = findViewById(R.id.nav_view);
-        //recyclerView = findViewById(R.id.recycler_view);
     }
-
-    /*private void initRecycler() {
-        recipeList = new ArrayList<>();
-        mAdapter = new RecipesAdapter(this, recipeList, this);
-
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
-        recyclerView.setLayoutManager(mLayoutManager);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.addItemDecoration(new MyDividerItemDecoration(this, DividerItemDecoration.VERTICAL, 36));
-        recyclerView.setAdapter(mAdapter);
-    }*/
 
     /*private void initViewModel() {
         viewModel =  ViewModelProviders.of(this).get(DataViewModel.class);
@@ -147,6 +222,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }*/
+
+    //endregion
 
     public void fetchRecipes(String orderBy) {
         viewModel.loadRecipes(this, orderBy);
@@ -198,9 +275,9 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             case R.id.action_search:
                 return true;
-            case R.id.action_filter:
+            /*case R.id.action_filter:
                 currentFragment.onOptionsItemSelected(item);
-                return true;
+                return true;*/
         }
         /*
         //noinspection SimplifiableIfStatement
@@ -226,42 +303,11 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-   /* private void setSearchView(Menu menu) {
-        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        searchView = (SearchView) menu.findItem(R.id.action_search)
-                .getActionView();
-        searchView.setSearchableInfo(searchManager
-                .getSearchableInfo(getComponentName()));
-        searchView.setMaxWidth(Integer.MAX_VALUE);
-
-        // listening to search query text change
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                // filter recycler view when query submitted
-                MenuItem searchMenuItem = getSearchMenuItem();
-                if (searchMenuItem != null) {
-                    searchMenuItem.collapseActionView();
-                }
-                Toast.makeText(getApplicationContext(), "Submitted" , Toast.LENGTH_SHORT).show();
-                mAdapter.getFilter().filter(query);
-                return true;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String query) {
-                // filter recycler view when text is changed
-                mAdapter.getFilter().filter(query);
-                return false;
-            }
-        });
-    }*/
-
     // Perform the action for the selected navigation item
     private void performAction(MenuItem item) {
 /*        // Close the navigation drawer
         mDrawer.closeDrawers();*/
-        Fragment fragment = null;
+        MyFragment fragment = null;
         // Find which item was selected
         switch(item.getItemId()) {
             case R.id.nav_main_all_recipes:
@@ -305,6 +351,8 @@ public class MainActivity extends AppCompatActivity {
     // Sign out user
     private void signOut() {
         user.signOut();
+        SharedPreferencesHandler.removeString(this, com.myapps.ron.family_recipes.network.Constants.USERNAME);
+        SharedPreferencesHandler.removeString(this, com.myapps.ron.family_recipes.network.Constants.PASSWORD);
         exit();
     }
 
@@ -325,7 +373,12 @@ public class MainActivity extends AppCompatActivity {
             searchView.setIconified(true);
             return;
         }*/
-        super.onBackPressed();
+        if(mDrawer.isDrawerOpen(navDrawer)) {
+            mDrawer.closeDrawers();
+            return;
+        }
+        if(!currentFragment.onBackPressed())
+            super.onBackPressed();
     }
 
 /*    private void whiteNotificationBar(View view) {
@@ -335,13 +388,6 @@ public class MainActivity extends AppCompatActivity {
             view.setSystemUiVisibility(flags);
             getWindow().setStatusBarColor(Color.WHITE);
         }
-    }*/
-
-/*    public void onItemSelected(Recipe recipe) {
-        //Toast.makeText(getApplicationContext(), "Selected: " + recipe.getName() + ", " + recipe.getDescription(), Toast.LENGTH_LONG).show();
-        Intent intent = new Intent(MainActivity.this, RecipeActivity.class);
-        intent.putExtra(Constants.RECIPE, recipe);
-        startActivityForResult(intent, Constants.RECIPE_ACTIVITY_CODE);
     }*/
 
     @Override

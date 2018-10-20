@@ -146,6 +146,10 @@ class Filter<T : FilterModel<T>> : FrameLayout, FilterItemListener, CollapseList
         collapse(Constant.ANIMATION_DURATION)
     }
 
+    fun isCollapsed(): Boolean {
+        return isCollapsed!!
+    }
+
     private fun collapse(duration: Long) {
         if (mIsBusy || collapsedFilter.isBusy) return
         mIsBusy = true

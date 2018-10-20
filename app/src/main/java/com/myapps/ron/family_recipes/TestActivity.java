@@ -114,9 +114,9 @@ public class TestActivity extends AppCompatActivity implements RecipesAdapter.Re
             case R.id.action_search:
                 Toast.makeText(this, "search clicked (" + TAG + ")", Toast.LENGTH_SHORT).show();
                 return true;
-            case R.id.action_filter:
+            /*case R.id.action_filter:
                 Toast.makeText(this, "filter clicked (" + TAG + ")", Toast.LENGTH_SHORT).show();
-                return true;
+                return true;*/
         }
         /*
         //noinspection SimplifiableIfStatement

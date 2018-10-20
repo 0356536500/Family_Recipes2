@@ -52,4 +52,11 @@ public class SharedPreferencesHandler {
         SharedPreferences sharedPref = ctx.getSharedPreferences(ctx.getString(R.string.sharedPreferences), Context.MODE_PRIVATE);
         return sharedPref.getString(key, defValue);
     }
+
+    public static void removeString(Context ctx, String key) {
+        SharedPreferences sharedPref = ctx.getSharedPreferences(ctx.getString(R.string.sharedPreferences), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.remove(key);
+        editor.apply();
+    }
 }

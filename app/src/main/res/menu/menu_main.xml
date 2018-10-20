@@ -11,17 +11,17 @@
         app:showAsAction="always|collapseActionView"
         app:actionViewClass="android.support.v7.widget.SearchView" />
 
-    <item
+    <!--<item
         android:id="@+id/action_filter"
         android:icon="@drawable/ic_filter_black_24dp"
         android:menuCategory="container"
         android:title="@string/action_filter"
         app:showAsAction="ifRoom" />
-
+-->
     <item
         android:id="@+id/action_sort"
         android:title="@string/action_sort_toggle"
-        app:showAsAction="always"
+        app:showAsAction="ifRoom"
         android:visible="false"
         android:menuCategory="alternative"/>
 </menu>

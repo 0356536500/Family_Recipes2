@@ -17,6 +17,8 @@
         <item name="colorSwitchThumbNormal">@color/grey_300</item>
         <!-- Inactive track color(30% transparency) -->
         <item name="android:colorForeground">@color/grey_600</item>
+
+        <item name="drawerArrowStyle">@style/MyDrawerArrowToggle</item>
     </style>
 
     <style name="MyAppTheme" parent="@style/AppTheme">
@@ -48,6 +50,10 @@
 
     <style name="switchTheme" parent="ThemeOverlay.AppCompat.Dark">
         <item name="colorControlNormal">@color/cardview_dark_background</item>
+    </style>
+
+    <style name="MyDrawerArrowToggle" parent="Widget.AppCompat.DrawerArrowToggle">
+        <item name="color">@color/black</item>
     </style>
 
 </resources>

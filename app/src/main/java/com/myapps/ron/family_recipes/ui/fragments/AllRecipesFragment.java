@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -16,7 +15,6 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -35,6 +33,7 @@ import com.myapps.ron.family_recipes.recycler.RecipesAdapter;
 import com.myapps.ron.family_recipes.ui.MainActivity;
 import com.myapps.ron.family_recipes.ui.RecipeActivity;
 import com.myapps.ron.family_recipes.utils.Constants;
+import com.myapps.ron.family_recipes.utils.MyFragment;
 import com.myapps.ron.searchfilter.adapter.FilterAdapter;
 import com.myapps.ron.searchfilter.animator.FiltersListItemAnimator;
 import com.myapps.ron.searchfilter.listener.FilterListener;
@@ -46,7 +45,7 @@ import java.util.List;
 
 import static android.app.Activity.RESULT_OK;
 
-public class AllRecipesFragment extends Fragment implements RecipesAdapter.RecipesAdapterListener, FilterListener<Category> {
+public class AllRecipesFragment extends MyFragment implements RecipesAdapter.RecipesAdapterListener, FilterListener<Category> {
 
     private static final String TAG = AllRecipesFragment.class.getSimpleName();
     private MainActivity activity;
@@ -163,33 +162,35 @@ public class AllRecipesFragment extends Fragment implements RecipesAdapter.Recip
     private void setSearchView(Menu menu) {
         //MenuItem searchMenuItem = menu.findItem(R.id.action_search);
         SearchManager searchManager = (SearchManager) activity.getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView = (SearchView) menu.findItem(R.id.action_search)
-                .getActionView();
-        searchView.setSearchableInfo(searchManager
-                .getSearchableInfo(activity.getComponentName()));
-        searchView.setMaxWidth(Integer.MAX_VALUE);
+        if(menu != null && searchManager != null) {
+            SearchView searchView = (SearchView) menu.findItem(R.id.action_search)
+                    .getActionView();
+            searchView.setSearchableInfo(searchManager
+                    .getSearchableInfo(activity.getComponentName()));
+            searchView.setMaxWidth(Integer.MAX_VALUE);
 
-        // listening to search query text change
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                // filter recycler view when query submitted
-                MenuItem searchMenuItem = activity.getSearchMenuItem();
-                if (searchMenuItem != null) {
-                    searchMenuItem.collapseActionView();
+            // listening to search query text change
+            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(String query) {
+                    // filter recycler view when query submitted
+                    MenuItem searchMenuItem = activity.getSearchMenuItem();
+                    if (searchMenuItem != null) {
+                        searchMenuItem.collapseActionView();
+                    }
+                    Toast.makeText(activity, "Submitted", Toast.LENGTH_SHORT).show();
+                    mAdapter.getFilter().filter(query);
+                    return true;
                 }
-                Toast.makeText(activity, "Submitted" , Toast.LENGTH_SHORT).show();
-                mAdapter.getFilter().filter(query);
-                return true;
-            }
 
-            @Override
-            public boolean onQueryTextChange(String query) {
-                // filter recycler view when text is changed
-                mAdapter.getFilter().filter(query);
-                return false;
-            }
-        });
+                @Override
+                public boolean onQueryTextChange(String query) {
+                    // filter recycler view when text is changed
+                    mAdapter.getFilter().filter(query);
+                    return false;
+                }
+            });
+        }
     }
 
     private void setSortToggle(Menu menu) {
@@ -216,9 +217,9 @@ public class AllRecipesFragment extends Fragment implements RecipesAdapter.Recip
             case R.id.action_search:
                 Toast.makeText(activity, "search clicked (" + TAG + ")", Toast.LENGTH_SHORT).show();
                 return true;
-            case R.id.action_filter:
+            /*case R.id.action_filter:
                 Toast.makeText(activity, "filter clicked (" + TAG + ")", Toast.LENGTH_SHORT).show();
-                return true;
+                return true;*/
         }
         /*
         //noinspection SimplifiableIfStatement
@@ -234,6 +235,15 @@ public class AllRecipesFragment extends Fragment implements RecipesAdapter.Recip
         super.onCreate(savedInstanceState);
 
         activity = (MainActivity)getActivity();
+    }
+
+    @Override
+    public boolean onBackPressed() {
+        if (!mFilter.isCollapsed()) {
+            mFilter.collapse();
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -290,14 +300,17 @@ public class AllRecipesFragment extends Fragment implements RecipesAdapter.Recip
 
     @Override
     public void onFiltersSelected(ArrayList<Category> arrayList) {
+        List<Recipe> oldList = new ArrayList<>(mAdapter.getCurrentList());
         List<String> newTags = convertCategoriesToString(arrayList);
         mAdapter.updateTags(newTags);
+        calculateDiff(oldList, mAdapter.getCurrentList());
     }
 
     @Override
     public void onNothingSelected() {
         mAdapter.updateTags(null);
     }
+
 
     class Adapter extends FilterAdapter<Category> {
 

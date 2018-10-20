@@ -16,7 +16,6 @@ import android.widget.TextView;
 
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.dal.storage.StorageWrapper;
-import com.myapps.ron.family_recipes.model.Category;
 import com.myapps.ron.family_recipes.model.Recipe;
 import com.myapps.ron.family_recipes.network.Constants;
 import com.myapps.ron.family_recipes.network.MyCallback;
@@ -30,7 +29,7 @@ import java.util.List;
 public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHolder>
         implements Filterable {
     private Context context;
-    public List<Recipe> recipeList;
+    private List<Recipe> recipeList;
     private List<Recipe> recipeListFiltered;
     private List<String> tags; // filters the user chose
 
@@ -192,6 +191,9 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
         };
     }
 
+    public List<Recipe> getCurrentList() {
+        return recipeListFiltered;
+    }
     public void updateTags(List<String> newTags) {
         tags.clear();
         if (newTags != null)
