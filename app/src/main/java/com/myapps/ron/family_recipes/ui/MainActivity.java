@@ -124,14 +124,14 @@ public class MainActivity extends AppCompatActivity {
                 super.onDrawerStateChanged(newState);
                 //if the user currently sliding the drawer
                 if(newState == DrawerLayout.STATE_DRAGGING)
-                    getMenu().findItem(R.id.action_search).setVisible(false);
+                    changeMenuItemsVisibility(false);
 
                 //if the drawer is not moving
                 if(newState == DrawerLayout.STATE_IDLE) {
                     if(mDrawer.isDrawerOpen(navDrawer))
-                        getMenu().findItem(R.id.action_search).setVisible(false);
+                        changeMenuItemsVisibility(false);
                     else
-                        getMenu().findItem(R.id.action_search).setVisible(true);
+                        changeMenuItemsVisibility(true);
                 }
             }
         };
@@ -141,6 +141,11 @@ public class MainActivity extends AppCompatActivity {
         View navigationHeader = navDrawer.getHeaderView(0);
         TextView navHeaderSubTitle = navigationHeader.findViewById(R.id.textViewNavUserSub);
         navHeaderSubTitle.setText(AppHelper.getCurrUser());
+    }
+
+    private void changeMenuItemsVisibility(boolean show) {
+        getMenu().findItem(R.id.action_search).setVisible(show);
+        getMenu().findItem(R.id.action_refresh).setVisible(show);
     }
 
     private void init() {
