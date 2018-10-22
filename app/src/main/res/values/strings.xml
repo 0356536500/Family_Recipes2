@@ -39,7 +39,7 @@
     <!-- AllRecipes Fragment -->
     <string name="str_all_selected">All categories</string>
     <string name="refresh_error_message">can refresh once every minute</string>
-    <string name="message_from_fetch_recipes">added %1$d recipes and %2$d were modified</string>
+    <string name="message_from_fetch_recipes">%1$d added, %2$d modified</string>
     <string name="message_from_fetch_categories">added %1$d categories</string>
 
     <string-array name="job_titles">
