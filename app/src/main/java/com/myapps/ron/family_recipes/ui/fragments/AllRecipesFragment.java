@@ -162,6 +162,7 @@ public class AllRecipesFragment extends MyFragment implements RecipesAdapter.Rec
             public void onRefresh() {
                 if(mayRefresh) {
                     activity.fetchRecipes(orderBy);
+                    mayRefresh = false;
                     new Handler().postDelayed(new Runnable() {
                         @Override
                         public void run() {
@@ -170,6 +171,7 @@ public class AllRecipesFragment extends MyFragment implements RecipesAdapter.Rec
                     }, Constants.REFRESH_DELAY);
                 } else {
                     Toast.makeText(activity, R.string.refresh_error_message, Toast.LENGTH_SHORT).show();
+                    swipeRefreshLayout.setRefreshing(false);
                 }
             }
         });
