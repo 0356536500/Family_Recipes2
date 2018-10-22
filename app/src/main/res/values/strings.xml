@@ -1,10 +1,12 @@
 <resources>
     <string name="app_name">Family Recipes</string>
+    <!-- Menu and Navigation drawer-->
     <string name="action_settings">Settings</string>
     <string name="toolbar_title">Recipes</string>
     <string name="action_search">Search</string>
     <string name="action_filter">Filter</string>
     <string name="action_share">Share</string>
+    <string name="action_refresh">Refresh</string>
     <string name="action_sort_toggle">Sort By</string>
     <string name="search_hint">Type name…</string>
 
@@ -34,7 +36,11 @@
     <string name="Username">Username</string>
     <string name="Password">Password</string>
 
+    <!-- AllRecipes Fragment -->
     <string name="str_all_selected">All categories</string>
+    <string name="refresh_error_message">can refresh once every minute</string>
+    <string name="message_from_fetch_recipes">added %1$d recipes and %2$d were modified</string>
+    <string name="message_from_fetch_categories">added %1$d categories</string>
 
     <string-array name="job_titles">
         <item>All categories</item>

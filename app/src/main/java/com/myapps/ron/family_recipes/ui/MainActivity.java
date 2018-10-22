@@ -275,9 +275,9 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             case R.id.action_search:
                 return true;
-            /*case R.id.action_filter:
+            case R.id.action_refresh:
                 currentFragment.onOptionsItemSelected(item);
-                return true;*/
+                return true;
         }
         /*
         //noinspection SimplifiableIfStatement

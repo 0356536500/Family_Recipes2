@@ -7,6 +7,7 @@ import android.arch.lifecycle.ViewModel;
 import android.content.Context;
 import android.os.AsyncTask;
 
+import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.dal.db.CategoriesDBHelper;
 import com.myapps.ron.family_recipes.dal.db.RecipesDBHelper;
 import com.myapps.ron.family_recipes.model.Category;
@@ -26,6 +27,17 @@ import java.util.List;
 public class DataViewModel extends ViewModel {
     private MutableLiveData<List<Recipe>> recipeList = new MutableLiveData<>(); // list of recipes from api
     private MutableLiveData<List<Category>> categoryList = new MutableLiveData<>(); // list of categories from api
+
+    private MutableLiveData<String> infoFromLastFetch = new MutableLiveData<>(); // info about new or modified data from last fetch from api
+
+
+    private void setInfoFromLastFetch(String item) {
+        infoFromLastFetch.setValue(item);
+    }
+
+    public LiveData<String> getInfoFromLastFetch() {
+        return infoFromLastFetch;
+    }
 
     //region recipes
     private void setRecipes(List<Recipe> items) {
@@ -66,24 +78,31 @@ public class DataViewModel extends ViewModel {
 
     @SuppressLint("StaticFieldLeak")
     class MyAsyncRecipeUpdate extends AsyncTask<Void, Void, Boolean> {
-
+        private int newRecipes, modifiedRecipes;
+        private Context context;
         private String orderBy;
         private List<Recipe> recipes;
         private RecipesDBHelper dbHelper;
 
         MyAsyncRecipeUpdate(Context context, List<Recipe> recipes, String orderBy) {
+            this.context = context;
             this.dbHelper = new RecipesDBHelper(context);
             this.recipes = recipes;
             this.orderBy = orderBy;
+            this.newRecipes = 0;
+            this.modifiedRecipes = 0;
         }
 
         @Override
         protected Boolean doInBackground(Void... voids) {
             for (Recipe item : recipes) {
-                if(dbHelper.recipeExists(item.getId()))
+                if(dbHelper.recipeExists(item.getId())) {
                     dbHelper.updateRecipeServerChanges(item);
-                else
+                    modifiedRecipes++;
+                } else {
                     dbHelper.insertRecipe(item);
+                    newRecipes++;
+                }
             }
             return true;
         }
@@ -91,8 +110,10 @@ public class DataViewModel extends ViewModel {
         @Override
         protected void onPostExecute(Boolean aBoolean) {
             super.onPostExecute(aBoolean);
-            if(aBoolean)
+            if(aBoolean) {
                 setRecipes(dbHelper.getAllRecipes(orderBy));
+                setInfoFromLastFetch(context.getString(R.string.message_from_fetch_recipes, newRecipes, modifiedRecipes));
+            }
         }
     }
     //endregion
@@ -139,16 +160,23 @@ public class DataViewModel extends ViewModel {
     @SuppressLint("StaticFieldLeak")
     class MyAsyncCategoriesUpdate extends AsyncTask<Void, Void, Boolean> {
 
+        private Context context;
         private List<Category> categories;
         private CategoriesDBHelper dbHelper;
+        private int numberOfOldCategories, numberOfNewCategories;
 
         MyAsyncCategoriesUpdate(Context context, List<Category> categories) {
+            this.context = context;
             this.dbHelper = new CategoriesDBHelper(context);
             this.categories = categories;
+            this.numberOfOldCategories = 0;
+            this.numberOfNewCategories = 0;
         }
 
         @Override
         protected Boolean doInBackground(Void... voids) {
+            numberOfOldCategories = dbHelper.getCategoriesCount();
+            numberOfNewCategories = categories.size();
             for (Category item : categories) {
                /* if(dbHelper.categoryExists(item.getName()))
                     dbHelper.updateCategoryServerChanges(item);
@@ -161,8 +189,10 @@ public class DataViewModel extends ViewModel {
         @Override
         protected void onPostExecute(Boolean aBoolean) {
             super.onPostExecute(aBoolean);
-            if(aBoolean)
+            if(aBoolean) {
                 setCategories(dbHelper.getAllCategories());
+                setInfoFromLastFetch(context.getString(R.string.message_from_fetch_categories, numberOfNewCategories - numberOfOldCategories));
+            }
         }
     }
     //endregion

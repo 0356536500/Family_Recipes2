@@ -6,9 +6,11 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
@@ -55,10 +57,13 @@ public class AllRecipesFragment extends MyFragment implements RecipesAdapter.Rec
     private Filter<Category> mFilter;
     private List<Category> tags;
 
+    private SwipeRefreshLayout swipeRefreshLayout;
     private RecyclerView recyclerView;
     private RecipesAdapter mAdapter;
 
     private DataViewModel viewModel;
+    private String orderBy;
+    private boolean mayRefresh;
 
     @Nullable
     @Override
@@ -69,20 +74,27 @@ public class AllRecipesFragment extends MyFragment implements RecipesAdapter.Rec
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        swipeRefreshLayout = view.findViewById(R.id.content_main_refresh);
         recyclerView = view.findViewById(R.id.recycler_view);
 
         mColors = getResources().getIntArray(R.array.colors);
+
+        orderBy = com.myapps.ron.family_recipes.dal.Constants.SORT_RECENT;
+        mayRefresh = true;
+
         initViewModel();
         //initCategories();
         initRecycler();
 
         // Associate searchable configuration with the SearchView
         setSearchView(activity.getMenu());
+        setRefreshLayout();
         //setSortToggle(activity.getMenu());
 
         activity.fetchCategories();
-        activity.fetchRecipes(com.myapps.ron.family_recipes.dal.Constants.SORT_RECENT);
+        activity.fetchRecipes(orderBy);
     }
+
 
     private void initCategories() {
         //mTitles = getResources().getStringArray(R.array.job_titles);
@@ -107,6 +119,7 @@ public class AllRecipesFragment extends MyFragment implements RecipesAdapter.Rec
                 if(recipes != null)
                     log = recipes.toString();
                 Log.e(TAG, "getAllRecipes from db.\n" + log);*/
+                swipeRefreshLayout.setRefreshing(false);
                 mAdapter.updateRecipes(recipes);
             }
         });
@@ -121,6 +134,13 @@ public class AllRecipesFragment extends MyFragment implements RecipesAdapter.Rec
                 }
             }
         });
+        viewModel.getInfoFromLastFetch().observe(this, new Observer<String>() {
+            @Override
+            public void onChanged(@Nullable String s) {
+                if (s != null)
+                    Toast.makeText(activity, s, Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     private void initRecycler() {
@@ -133,6 +153,26 @@ public class AllRecipesFragment extends MyFragment implements RecipesAdapter.Rec
         recyclerView.addItemDecoration(new MyDividerItemDecoration(activity, DividerItemDecoration.VERTICAL, 36));
         recyclerView.setAdapter(mAdapter);
         recyclerView.setItemAnimator(new FiltersListItemAnimator());
+    }
+
+    private void setRefreshLayout() {
+        swipeRefreshLayout.setColorSchemeColors(mColors);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                if(mayRefresh) {
+                    activity.fetchRecipes(orderBy);
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            mayRefresh = true;
+                        }
+                    }, Constants.REFRESH_DELAY);
+                } else {
+                    Toast.makeText(activity, R.string.refresh_error_message, Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     private void calculateDiff(final List<Recipe> oldList, final List<Recipe> newList) {
@@ -214,8 +254,11 @@ public class AllRecipesFragment extends MyFragment implements RecipesAdapter.Rec
         int itemId = item.getItemId();
 
         switch (itemId) {
-            case R.id.action_search:
+            /*case R.id.action_search:
                 Toast.makeText(activity, "search clicked (" + TAG + ")", Toast.LENGTH_SHORT).show();
+                return true;*/
+            case R.id.action_refresh:
+                activity.fetchRecipes(orderBy);
                 return true;
             /*case R.id.action_filter:
                 Toast.makeText(activity, "filter clicked (" + TAG + ")", Toast.LENGTH_SHORT).show();
