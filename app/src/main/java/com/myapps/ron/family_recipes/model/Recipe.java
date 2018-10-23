@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
+import com.myapps.ron.family_recipes.utils.Constants;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -159,6 +160,20 @@ public class Recipe implements Parcelable{
         return Objects.hash(id, name, description, createdAt, lastModifiedAt, recipeFile, uploader, categories, comments, foodFiles, likes, meLike);
     }
 
+    /**
+     * check all attributes
+     * @param other - other recipe
+     * @return whether or not current and second recipes are exactly the same
+     */
+    public boolean identical(Recipe other) {
+        return getId().equals(other.getId()) && getName().equals(other.getName()) && getDescription().equals(other.getDescription())
+                && getUploader().equals(other.getUploader()) && getCategories().equals(other.getCategories())
+                && getCreatedAt().equals(other.getCreatedAt()) && getLastModifiedAt().equals(other.getLastModifiedAt())
+                && getRecipeFile().equals(other.getRecipeFile()) && getComments().equals(other.getComments())
+                && getFoodFiles().equals(other.getFoodFiles()) && getLikes() == other.getLikes()
+                && getMeLike() == other.getMeLike();
+    }
+
     public String getStringCategories() {
         return gson.toJson(getCategories());
     }
@@ -198,7 +213,9 @@ public class Recipe implements Parcelable{
     }
 
     public String getName() {
-        return name;
+        if(name != null)
+            return name;
+        return Constants.DEFAULT_RECIPE_NAME;
     }
 
     public void setName(String name) {
@@ -206,7 +223,9 @@ public class Recipe implements Parcelable{
     }
 
     public String getDescription() {
-        return description;
+        if(description != null)
+            return description;
+        return Constants.DEFAULT_RECIPE_DESC;
     }
 
     public void setDescription(String description) {
@@ -214,7 +233,9 @@ public class Recipe implements Parcelable{
     }
 
     public String getCreatedAt() {
-        return createdAt;
+        if(createdAt != null)
+            return createdAt;
+        return com.myapps.ron.family_recipes.network.Constants.DEFAULT_UPDATED_TIME;
     }
 
     public void setCreatedAt(String createdAt) {
@@ -238,7 +259,9 @@ public class Recipe implements Parcelable{
     }
 
     public String getUploader() {
-        return uploader;
+        if(uploader != null)
+            return uploader;
+        return Constants.DEFAULT_RECIPE_UPLOADER;
     }
 
     public void setUploader(String uploader) {

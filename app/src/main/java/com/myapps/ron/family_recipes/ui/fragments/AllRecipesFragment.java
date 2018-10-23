@@ -17,6 +17,7 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -58,12 +59,14 @@ public class AllRecipesFragment extends MyFragment implements RecipesAdapter.Rec
     private List<Category> tags;
 
     private SwipeRefreshLayout swipeRefreshLayout;
+    private SwipeRefreshLayout.OnRefreshListener onRefreshListener;
     private RecyclerView recyclerView;
     private RecipesAdapter mAdapter;
 
     private DataViewModel viewModel;
     private String orderBy;
     private boolean mayRefresh;
+    private String lastQuery = "";
 
     @Nullable
     @Override
@@ -115,11 +118,12 @@ public class AllRecipesFragment extends MyFragment implements RecipesAdapter.Rec
             @Override
             public void onChanged(@Nullable List<Recipe> recipes) {
                 //Toast.makeText(activity, "get recipes from DAL", Toast.LENGTH_SHORT).show();
-                /*String log = "null";
+                String log = "null";
                 if(recipes != null)
                     log = recipes.toString();
-                Log.e(TAG, "getAllRecipes from db.\n" + log);*/
+                Log.e(TAG, "getAllRecipes from db.\n" + log);
                 swipeRefreshLayout.setRefreshing(false);
+                Log.e(TAG, "update from fragment");
                 mAdapter.updateRecipes(recipes);
             }
         });
@@ -144,7 +148,7 @@ public class AllRecipesFragment extends MyFragment implements RecipesAdapter.Rec
     }
 
     private void initRecycler() {
-        List<Recipe> recipeList = new ArrayList<>();
+        List<Recipe> recipeList = new ArrayList<>(viewModel.loadLocalRecipes(activity));
         mAdapter = new RecipesAdapter(activity, recipeList, this);
 
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(activity.getApplicationContext());
@@ -156,8 +160,7 @@ public class AllRecipesFragment extends MyFragment implements RecipesAdapter.Rec
     }
 
     private void setRefreshLayout() {
-        swipeRefreshLayout.setColorSchemeColors(mColors);
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+        onRefreshListener = new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 if(mayRefresh) {
@@ -174,10 +177,12 @@ public class AllRecipesFragment extends MyFragment implements RecipesAdapter.Rec
                     swipeRefreshLayout.setRefreshing(false);
                 }
             }
-        });
+        };
+        swipeRefreshLayout.setOnRefreshListener(onRefreshListener);
+        swipeRefreshLayout.setColorSchemeColors(mColors);
     }
 
-    private void calculateDiff(final List<Recipe> oldList, final List<Recipe> newList) {
+    /*private void calculateDiff(final List<Recipe> oldList, final List<Recipe> newList) {
         DiffUtil.calculateDiff(new DiffUtil.Callback() {
             @Override
             public int getOldListSize() {
@@ -196,20 +201,33 @@ public class AllRecipesFragment extends MyFragment implements RecipesAdapter.Rec
 
             @Override
             public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-                return oldList.get(oldItemPosition).equals(newList.get(newItemPosition));
+                return oldList.get(oldItemPosition).identical(newList.get(newItemPosition));
             }
         }).dispatchUpdatesTo(mAdapter);
-    }
+    }*/
 
     private void setSearchView(Menu menu) {
         //MenuItem searchMenuItem = menu.findItem(R.id.action_search);
         SearchManager searchManager = (SearchManager) activity.getSystemService(Context.SEARCH_SERVICE);
         if(menu != null && searchManager != null) {
-            SearchView searchView = (SearchView) menu.findItem(R.id.action_search)
+            final SearchView searchView = (SearchView) menu.findItem(R.id.action_search)
                     .getActionView();
             searchView.setSearchableInfo(searchManager
                     .getSearchableInfo(activity.getComponentName()));
             searchView.setMaxWidth(Integer.MAX_VALUE);
+            menu.findItem(R.id.action_search).setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
+                @Override
+                public boolean onMenuItemActionExpand(MenuItem item) {
+                    Log.e(TAG, "expanded, query: " + lastQuery);
+                    searchView.setQuery(lastQuery, false);
+                    return true;
+                }
+
+                @Override
+                public boolean onMenuItemActionCollapse(MenuItem item) {
+                    return true;
+                }
+            });
 
             // listening to search query text change
             searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -220,7 +238,8 @@ public class AllRecipesFragment extends MyFragment implements RecipesAdapter.Rec
                     if (searchMenuItem != null) {
                         searchMenuItem.collapseActionView();
                     }
-                    Toast.makeText(activity, "Submitted", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(activity, "Submitted, " + query, Toast.LENGTH_SHORT).show();
+                    lastQuery = query;
                     mAdapter.getFilter().filter(query);
                     return true;
                 }
@@ -260,7 +279,8 @@ public class AllRecipesFragment extends MyFragment implements RecipesAdapter.Rec
                 Toast.makeText(activity, "search clicked (" + TAG + ")", Toast.LENGTH_SHORT).show();
                 return true;*/
             case R.id.action_refresh:
-                activity.fetchRecipes(orderBy);
+                swipeRefreshLayout.setRefreshing(true);
+                onRefreshListener.onRefresh();
                 return true;
             /*case R.id.action_filter:
                 Toast.makeText(activity, "filter clicked (" + TAG + ")", Toast.LENGTH_SHORT).show();
@@ -345,10 +365,16 @@ public class AllRecipesFragment extends MyFragment implements RecipesAdapter.Rec
 
     @Override
     public void onFiltersSelected(ArrayList<Category> arrayList) {
-        List<Recipe> oldList = new ArrayList<>(mAdapter.getCurrentList());
-        List<String> newTags = convertCategoriesToString(arrayList);
-        mAdapter.updateTags(newTags);
-        calculateDiff(oldList, mAdapter.getCurrentList());
+        //List<Recipe> oldList = new ArrayList<>(mAdapter.getCurrentList());
+        final List<String> newTags = convertCategoriesToString(arrayList);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mAdapter.updateTags(newTags);
+            }
+        }, 500);
+
+        //calculateDiff(oldList, mAdapter.getCurrentList());
     }
 
     @Override

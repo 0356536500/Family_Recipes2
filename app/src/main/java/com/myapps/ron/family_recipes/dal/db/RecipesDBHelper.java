@@ -43,6 +43,7 @@ public class RecipesDBHelper extends MyDBHelper{
 */
     public static final String SORT_POPULAR = KEY_LIKES;
     public static final String SORT_RECENT = KEY_CREATED;
+    public static final String SORT_MODIFIED = KEY_MODIFIED;
 
     /*private static final String CREATE_EXEC = "CREATE TABLE " + TABLE_NAME + "("
             + KEY_ID + " TEXT PRIMARY KEY,"

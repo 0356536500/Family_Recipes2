@@ -141,7 +141,7 @@ public class TestActivity extends AppCompatActivity implements RecipesAdapter.Re
             if(resultCode == RESULT_OK) {
                 //mAdapter.updateRecipes(new RecipesDBHelper(this).getAllRecipes());
                 Recipe updatedRecipe = data.getParcelableExtra(Constants.RECIPE);
-                mAdapter.updateOneRecipe(updatedRecipe);
+                //mAdapter.updateOneRecipe(updatedRecipe);
             }
         }
     }

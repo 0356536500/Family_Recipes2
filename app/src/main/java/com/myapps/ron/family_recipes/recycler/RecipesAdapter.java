@@ -2,16 +2,25 @@ package com.myapps.ron.family_recipes.recycler;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.widget.CircularProgressDrawable;
+import android.support.v7.util.DiffUtil;
+import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Filter;
 import android.widget.Filterable;
-import android.widget.ImageView;
+import android.widget.HorizontalScrollView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.myapps.ron.family_recipes.R;
@@ -24,10 +33,13 @@ import com.myapps.ron.family_recipes.utils.GlideApp;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 
 public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHolder>
         implements Filterable {
+    private int[] colors;
+    private Random random;
     private Context context;
     private List<Recipe> recipeList;
     private List<Recipe> recipeListFiltered;
@@ -38,14 +50,18 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
     private StorageWrapper storageWrapper;
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
-        public TextView name, description;
-        public ImageView thumbnail;
+        public TextView name, description, uploader, numberOfLikes;
+        public AppCompatImageView thumbnail;
+        public HorizontalScrollView horizontalScrollView;
 
         MyViewHolder(View view) {
             super(view);
             name = view.findViewById(R.id.name);
             description = view.findViewById(R.id.description);
             thumbnail = view.findViewById(R.id.thumbnail);
+            uploader = view.findViewById(R.id.uploader);
+            numberOfLikes = view.findViewById(R.id.number_of_likes);
+            horizontalScrollView = view.findViewById(R.id.categories_scroll_container);
 
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -65,6 +81,8 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
         this.recipeListFiltered = recipeList;
         this.tags = new ArrayList<>();
         this.storageWrapper = StorageWrapper.getInstance(context);
+        this.colors = context.getResources().getIntArray(R.array.colors);
+        this.random = new Random();
     }
 
     @NonNull
@@ -80,8 +98,61 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
     @Override
     public void onBindViewHolder(@NonNull final MyViewHolder holder, final int position) {
         final Recipe recipe = recipeListFiltered.get(position);
-        holder.name.setText(recipe.getName());
-        holder.description.setText(recipe.getDescription());
+
+        if (recipe.getName() != null)
+            holder.name.setText(recipe.getName());
+        else
+            holder.name.setText(com.myapps.ron.family_recipes.utils.Constants.DEFAULT_RECIPE_NAME);
+
+        if (recipe.getDescription() != null)
+            holder.description.setText(recipe.getDescription());
+        else
+            holder.description.setText(com.myapps.ron.family_recipes.utils.Constants.DEFAULT_RECIPE_DESC);
+
+        if (recipe.getUploader() != null)
+            holder.uploader.setText(recipe.getUploader());
+        else
+            holder.uploader.setText(com.myapps.ron.family_recipes.utils.Constants.DEFAULT_RECIPE_UPLOADER);
+
+        holder.numberOfLikes.setText(String.valueOf(recipe.getLikes()));
+
+        //inflate categories
+        if (recipe.getCategories() != null && !recipe.getCategories().isEmpty()) {
+            /*LinearLayout internalWrapper = new LinearLayout(context);
+            internalWrapper.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+            internalWrapper.setOrientation(LinearLayout.HORIZONTAL);
+            internalWrapper.setGravity(Gravity.CENTER);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                internalWrapper.setForegroundGravity(Gravity.CENTER);
+            }*/
+
+            //only child of the scroll view is a linear layout containing all the views
+            LinearLayout internalWrapper = holder.horizontalScrollView.findViewById(R.id.categories_layout_container);
+
+            //margins of every view in linear layout
+            ViewGroup.MarginLayoutParams marginLayoutParams = new ViewGroup.MarginLayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            marginLayoutParams.setMarginStart(6);
+            marginLayoutParams.setMarginEnd(6);
+
+            for (String category: recipe.getCategories()) {
+                View view = LayoutInflater.from(context).inflate(R.layout.category_item_layout, internalWrapper, false);
+                //view.setLayoutParams(marginLayoutParams);
+                ((TextView) view.findViewById(R.id.category_text)).setText(category);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    view.setForegroundGravity(Gravity.CENTER);
+                }
+                int color = pickColor();
+                view.getBackground().setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+                ((GradientDrawable)view.getBackground()).setStroke(5, Color.BLACK);
+                //((GradientDrawable)view.getBackground()).setStroke(5, color);
+                //((TextView) view.findViewById(R.id.category_text)).setTextColor(color);
+                internalWrapper.addView(view, marginLayoutParams);
+            }
+
+            holder.horizontalScrollView.removeAllViews();
+            holder.horizontalScrollView.addView(internalWrapper);
+        }
 
         /*final RequestOptions requestOptions = new RequestOptions();
         requestOptions.placeholder(circularProgressDrawable);
@@ -116,6 +187,10 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
         }
         //storageWrapper.getFoodFile(context, recipeListFiltered.get(position), );
 
+    }
+
+    private int pickColor() {
+        return colors[random.nextInt(colors.length)];
     }
 
     private void loadDefaultImage(Recipe recipe, final MyViewHolder holder) {
@@ -155,15 +230,16 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
         return new Filter() {
             @Override
             protected FilterResults performFiltering(CharSequence charSequence) {
+                List<Recipe> filteredList;
                 String charString = mLastQuery;
                 if(charSequence != null){
                     charString = charSequence.toString();
                     mLastQuery = charString;
                 }
-                if (charString.isEmpty() && tags.isEmpty()) {
-                    recipeListFiltered = recipeList;
+                if (charString.isEmpty() && (tags == null || tags.isEmpty())) {
+                    filteredList = new ArrayList<>(recipeList);
                 } else {
-                    List<Recipe> filteredList = new ArrayList<>();
+                    filteredList = new ArrayList<>();
                     for (Recipe row : recipeList) {
 
                         // name match condition. this might differ depending on your requirement
@@ -175,18 +251,20 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
                         }
                     }
 
-                    recipeListFiltered = filteredList;
+                    //recipeListFiltered = filteredList;
                 }
 
                 FilterResults filterResults = new FilterResults();
-                filterResults.values = recipeListFiltered;
+                filterResults.values = filteredList;
                 return filterResults;
             }
 
             @Override
             protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
-                recipeListFiltered = (ArrayList<Recipe>) filterResults.values;
-                notifyDataSetChanged();
+                Log.e("adapter", "update from filter");
+                if(filterResults.values != null)
+                    updateRecipes((ArrayList<Recipe>) filterResults.values);
+                //notifyDataSetChanged();
             }
         };
     }
@@ -195,23 +273,43 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
         return recipeListFiltered;
     }
     public void updateTags(List<String> newTags) {
-        tags.clear();
+        //tags.clear();
         if (newTags != null)
-            tags.addAll(newTags);
+            tags = new ArrayList<>(newTags);
+        else
+            tags = null;
+            //tags.addAll(newTags);
         getFilter().filter(null);
+        /*List<Recipe> filteredList = new ArrayList<>();
+        for (Recipe row : recipeListFiltered) {
+            if (row.hasTags(tags)) {
+                filteredList.add(row);
+            }
+        }
+        updateRecipes(filteredList);*/
     }
 
     public void updateRecipes(List<Recipe> list) {
+        if(this.recipeListFiltered == null || this.recipeListFiltered.isEmpty()){
+            this.recipeListFiltered = new ArrayList<>(list);
+            notifyDataSetChanged();
+        }
+        else {
+            List<Recipe> oldTemp = recipeListFiltered;
+            recipeListFiltered = list;
+            DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new MyDiffCallback(oldTemp, list));
+            diffResult.dispatchUpdatesTo(this);
+        }
         //boolean changed = false;
-        for(Recipe item : list) {
+        /*for(Recipe item : list) {
             int index = recipeList.indexOf(item);
-            if(index >= 0)// && item.hashCode() != recipeList.get(index).hashCode()) {
+            if(index >= 0)// && item.hashCode() == recipeList.get(index).hashCode() && item.identical(recipeList.get(index)))
                 recipeList.set(index, item);
             else
                 recipeList.add(recipeList.size(), item);
-        }
+        }*/
 
-        notifyDataSetChanged();
+        //notifyDataSetChanged();
     }
 
     public void updateOneRecipe(Recipe recipe) {

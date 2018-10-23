@@ -10,6 +10,12 @@
     <string name="action_sort_toggle">Sort By</string>
     <string name="search_hint">Type name…</string>
 
+    <!-- Item in recycler -->
+    <string name="recycler_item_name">A recipe</string>
+    <string name="recycler_item_description">A sample app to showcase Cognito Identity and the SDK for Android.</string>
+    <string name="recycler_item_uploader">uploader</string>
+    <string name="recycler_item_number_of_likes">12</string>
+
     <string name="sort_toggle_text_on">recent</string>
     <string name="sort_toggle_text_off">popular</string>
 

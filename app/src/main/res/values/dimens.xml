@@ -1,7 +1,7 @@
 <resources>
     <!--<dimen name="fab_margin">16dp</dimen>-->
     <dimen name="activity_margin">16dp</dimen>
-    <dimen name="thumbnail">50dp</dimen>
+    <dimen name="thumbnail">100dp</dimen>
     <dimen name="row_padding">10dp</dimen>
     <dimen name="contact_name">15sp</dimen>
     <dimen name="contact_number">12sp</dimen>
@@ -11,4 +11,12 @@
     <dimen name="app_bar_height1">150dp</dimen>
     <dimen name="app_bar_height">256dp</dimen>
     <dimen name="text_margin">16dp</dimen>
+
+    <!-- Item in recycler -->
+    <dimen name="item_name_text_size">20sp</dimen>
+    <dimen name="item_desc_text_size">15sp</dimen>
+    <dimen name="item_uploader_text_size">16sp</dimen>
+    <dimen name="item_likes_text_size">16sp</dimen>
+
+    <dimen name="item_more_info_bottom_margin">4dp</dimen>
 </resources>

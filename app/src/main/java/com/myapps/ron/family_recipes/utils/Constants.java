@@ -12,4 +12,8 @@ public class Constants {
     public static final long FADE_ANIMATION_DURATION = 200;
 
     public static final long REFRESH_DELAY = 60000; // 60 seconds
+
+    public static final String DEFAULT_RECIPE_NAME = "anonymous";
+    public static final String DEFAULT_RECIPE_DESC = "A sample app to showcase Cognito Identity and the SDK for Android.";
+    public static final String DEFAULT_RECIPE_UPLOADER = "unknown";
 }

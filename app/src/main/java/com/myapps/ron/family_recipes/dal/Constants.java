@@ -6,4 +6,5 @@ public class Constants {
     // Sort options from SQLite DB
     public static final String SORT_POPULAR = RecipesDBHelper.SORT_POPULAR;
     public static final String SORT_RECENT = RecipesDBHelper.SORT_RECENT;
+    public static final String SORT_MODIFIED = RecipesDBHelper.SORT_MODIFIED;
 }

@@ -10,6 +10,12 @@
     <string name="action_refresh">רענן</string>
     <string name="search_hint">הקלד/י לחיפוש…</string>
 
+    <!-- Item in recycler -->
+    <string name="recycler_item_name">שם מתכון</string>
+    <string name="recycler_item_description">תיאור מעולה שמתאר את המתכון בקצרה במשפט או שניים כדי שהקורא יקבל רושם ראשוני על המתכון.</string>
+    <string name="recycler_item_uploader">מעלה המתכון</string>
+    <string name="recycler_item_number_of_likes">12</string>
+
     <string name="sort_toggle_text_on">חדשים</string>
     <string name="sort_toggle_text_off">פופלריים</string>
 

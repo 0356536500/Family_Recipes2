@@ -422,9 +422,10 @@ class FiltersListItemAnimator : SimpleItemAnimator() {
         dispatchFinishedWhenDone()
     }
 
-    @SuppressLint("RestrictedApi")
+    //@SuppressLint("RestrictedApi")
     private fun resetAnimation(holder: RecyclerView.ViewHolder) {
-        AnimatorCompatHelper.clearInterpolator(holder.itemView)
+        //AnimatorCompatHelper.clearInterpolator(holder.itemView)
+        holder.itemView.animation = null
         endAnimation(holder)
     }
 
