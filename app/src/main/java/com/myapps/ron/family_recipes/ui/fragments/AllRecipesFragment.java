@@ -118,13 +118,13 @@ public class AllRecipesFragment extends MyFragment implements RecipesAdapter.Rec
             @Override
             public void onChanged(@Nullable List<Recipe> recipes) {
                 //Toast.makeText(activity, "get recipes from DAL", Toast.LENGTH_SHORT).show();
-                String log = "null";
+                /*String log = "null";
                 if(recipes != null)
                     log = recipes.toString();
-                Log.e(TAG, "getAllRecipes from db.\n" + log);
+                Log.e(TAG, "getAllRecipes from db.\n" + log);*/
                 swipeRefreshLayout.setRefreshing(false);
                 Log.e(TAG, "update from fragment");
-                mAdapter.updateRecipes(recipes);
+                mAdapter.updateRecipes(recipes, recipes != null && !recipes.isEmpty());
             }
         });
         viewModel.getCategories().observe(this, new Observer<List<Category>>() {
@@ -181,30 +181,6 @@ public class AllRecipesFragment extends MyFragment implements RecipesAdapter.Rec
         swipeRefreshLayout.setOnRefreshListener(onRefreshListener);
         swipeRefreshLayout.setColorSchemeColors(mColors);
     }
-
-    /*private void calculateDiff(final List<Recipe> oldList, final List<Recipe> newList) {
-        DiffUtil.calculateDiff(new DiffUtil.Callback() {
-            @Override
-            public int getOldListSize() {
-                return oldList.size();
-            }
-
-            @Override
-            public int getNewListSize() {
-                return newList.size();
-            }
-
-            @Override
-            public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
-                return oldList.get(oldItemPosition).equals(newList.get(newItemPosition));
-            }
-
-            @Override
-            public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-                return oldList.get(oldItemPosition).identical(newList.get(newItemPosition));
-            }
-        }).dispatchUpdatesTo(mAdapter);
-    }*/
 
     private void setSearchView(Menu menu) {
         //MenuItem searchMenuItem = menu.findItem(R.id.action_search);

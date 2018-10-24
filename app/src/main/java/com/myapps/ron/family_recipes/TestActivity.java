@@ -83,7 +83,7 @@ public class TestActivity extends AppCompatActivity implements RecipesAdapter.Re
             @Override
             public void onChanged(@Nullable List<Recipe> recipes) {
                 //Toast.makeText(activity, "get recipes from DAL", Toast.LENGTH_SHORT).show();
-                mAdapter.updateRecipes(recipes);
+                mAdapter.updateRecipes(recipes, true);
             }
         });
     }

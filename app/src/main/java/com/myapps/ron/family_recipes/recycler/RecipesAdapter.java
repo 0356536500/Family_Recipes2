@@ -49,10 +49,10 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
     private RecipesAdapterListener listener;
     private StorageWrapper storageWrapper;
 
-    public class MyViewHolder extends RecyclerView.ViewHolder {
-        public TextView name, description, uploader, numberOfLikes;
-        public AppCompatImageView thumbnail;
-        public HorizontalScrollView horizontalScrollView;
+    class MyViewHolder extends RecyclerView.ViewHolder {
+        TextView name, description, uploader, numberOfLikes;
+        AppCompatImageView thumbnail;
+        HorizontalScrollView horizontalScrollView;
 
         MyViewHolder(View view) {
             super(view);
@@ -96,7 +96,7 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
 
     @SuppressLint("CheckResult")
     @Override
-    public void onBindViewHolder(@NonNull final MyViewHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull MyViewHolder holder, final int position) {
         final Recipe recipe = recipeListFiltered.get(position);
 
         if (recipe.getName() != null)
@@ -117,17 +117,27 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
         holder.numberOfLikes.setText(String.valueOf(recipe.getLikes()));
 
         //inflate categories
+        inflateCategories(holder, recipe);
+
+        //load image of the food or default if not exists
+        loadImage(holder, recipe);
+
+
+        /*final RequestOptions requestOptions = new RequestOptions();
+        requestOptions.placeholder(circularProgressDrawable);
+        //requestOptions.placeholder(android.R.drawable.progress_indeterminate_horizontal);// R.drawable.ic_placeholder);
+        requestOptions.error(android.R.drawable.stat_notify_error);// ic_error);*/
+    }
+
+    private void inflateCategories(MyViewHolder holder, Recipe recipe) {
         if (recipe.getCategories() != null && !recipe.getCategories().isEmpty()) {
             /*LinearLayout internalWrapper = new LinearLayout(context);
             internalWrapper.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
-            internalWrapper.setOrientation(LinearLayout.HORIZONTAL);
-            internalWrapper.setGravity(Gravity.CENTER);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                internalWrapper.setForegroundGravity(Gravity.CENTER);
-            }*/
+            internalWrapper.setOrientation(LinearLayout.HORIZONTAL);*/
 
             //only child of the scroll view is a linear layout containing all the views
             LinearLayout internalWrapper = holder.horizontalScrollView.findViewById(R.id.categories_layout_container);
+            internalWrapper.removeAllViews();
 
             //margins of every view in linear layout
             ViewGroup.MarginLayoutParams marginLayoutParams = new ViewGroup.MarginLayoutParams(
@@ -142,10 +152,8 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     view.setForegroundGravity(Gravity.CENTER);
                 }
-                int color = pickColor();
-                view.getBackground().setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+                view.getBackground().setColorFilter(pickColor(), PorterDuff.Mode.SRC_ATOP);
                 ((GradientDrawable)view.getBackground()).setStroke(5, Color.BLACK);
-                //((GradientDrawable)view.getBackground()).setStroke(5, color);
                 //((TextView) view.findViewById(R.id.category_text)).setTextColor(color);
                 internalWrapper.addView(view, marginLayoutParams);
             }
@@ -153,40 +161,34 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
             holder.horizontalScrollView.removeAllViews();
             holder.horizontalScrollView.addView(internalWrapper);
         }
+    }
 
-        /*final RequestOptions requestOptions = new RequestOptions();
-        requestOptions.placeholder(circularProgressDrawable);
-        //requestOptions.placeholder(android.R.drawable.progress_indeterminate_horizontal);// R.drawable.ic_placeholder);
-        requestOptions.error(android.R.drawable.stat_notify_error);// ic_error);*/
-
-
+    private void loadImage(final MyViewHolder holder, final Recipe recipe) {
         if(recipe.getFoodFiles() != null && recipe.getFoodFiles().size() > 0) {
             storageWrapper.getFoodFile(context, recipe, Constants.FOOD_DIR, new MyCallback<String>() {
-            @Override
-            public void onFinished(String path) {
-                if(path != null) {
-                    CircularProgressDrawable circularProgressDrawable = new CircularProgressDrawable(context);
-                    circularProgressDrawable.setStrokeWidth(5f);
-                    circularProgressDrawable.setCenterRadius(35f);
-                    circularProgressDrawable.start();
+                @Override
+                public void onFinished(String path) {
+                    if(path != null) {
+                        CircularProgressDrawable circularProgressDrawable = new CircularProgressDrawable(context);
+                        circularProgressDrawable.setStrokeWidth(5f);
+                        circularProgressDrawable.setCenterRadius(35f);
+                        circularProgressDrawable.start();
 
-                    GlideApp.with(context)
-                            .load(Uri.fromFile(new File(path)))
-                            .placeholder(circularProgressDrawable)
-                            //.apply(requestOptions)
-                            .into(holder.thumbnail);
+                        GlideApp.with(context)
+                                .load(Uri.fromFile(new File(path)))
+                                .placeholder(circularProgressDrawable)
+                                //.apply(requestOptions)
+                                .into(holder.thumbnail);
+                    }
+                    else
+                        loadDefaultImage(recipe, holder);
                 }
-                else
-                    loadDefaultImage(recipe, holder);
-            }
-            //.apply(RequestOptions.circleCropTransform())
-        });
+                //.apply(RequestOptions.circleCropTransform())
+            });
         }
         else {
             loadDefaultImage(recipe, holder);
         }
-        //storageWrapper.getFoodFile(context, recipeListFiltered.get(position), );
-
     }
 
     private int pickColor() {
@@ -263,15 +265,18 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
             protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
                 Log.e("adapter", "update from filter");
                 if(filterResults.values != null)
-                    updateRecipes((ArrayList<Recipe>) filterResults.values);
+                    updateRecipes((ArrayList<Recipe>) filterResults.values, false);
                 //notifyDataSetChanged();
             }
         };
     }
 
+/*
     public List<Recipe> getCurrentList() {
         return recipeListFiltered;
     }
+*/
+
     public void updateTags(List<String> newTags) {
         //tags.clear();
         if (newTags != null)
@@ -289,16 +294,28 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
         updateRecipes(filteredList);*/
     }
 
-    public void updateRecipes(List<Recipe> list) {
-        if(this.recipeListFiltered == null || this.recipeListFiltered.isEmpty()){
+    public void updateRecipes(List<Recipe> list, boolean addedRecipes) {
+        if (this.recipeListFiltered == null || this.recipeListFiltered.isEmpty()){
             this.recipeListFiltered = new ArrayList<>(list);
             notifyDataSetChanged();
         }
         else {
-            List<Recipe> oldTemp = recipeListFiltered;
-            recipeListFiltered = list;
+            List<Recipe> oldTemp;
+            if (addedRecipes) {
+                oldTemp = recipeList;
+                recipeList = list;
+                recipeListFiltered = recipeList;
+
+            } else {
+                oldTemp = recipeListFiltered;
+                recipeListFiltered = list;
+            }
+
             DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new MyDiffCallback(oldTemp, list));
             diffResult.dispatchUpdatesTo(this);
+
+            if (addedRecipes)
+                getFilter().filter(null);
         }
         //boolean changed = false;
         /*for(Recipe item : list) {

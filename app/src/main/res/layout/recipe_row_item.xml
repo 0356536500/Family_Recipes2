@@ -8,7 +8,10 @@
     android:backgroundTint="@color/white"
     android:clickable="true"
     android:focusable="true"
-    android:padding="@dimen/row_padding">
+    android:paddingTop="7dp"
+    android:paddingStart="@dimen/row_padding"
+    android:paddingEnd="@dimen/row_padding"
+    android:paddingBottom="@dimen/row_padding">
 
     <android.support.v7.widget.AppCompatImageView
         android:id="@+id/thumbnail"
@@ -57,9 +60,8 @@
     <HorizontalScrollView
         android:id="@+id/categories_scroll_container"
         android:layout_width="0dp"
-        android:layout_height="45dp"
+        android:layout_height="35dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginBottom="1dp"
         android:scrollbars="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

@@ -157,7 +157,7 @@ class Filter<T : FilterModel<T>> : FrameLayout, FilterItemListener, CollapseList
 
         isCollapsed = true
 
-        removeItemsFromParent()
+        //removeItemsFromParent()
         container.bringToFront()
         container.requestFocus()
 
@@ -168,7 +168,7 @@ class Filter<T : FilterModel<T>> : FrameLayout, FilterItemListener, CollapseList
                 collapseView.rotateArrow(180 * (1 - ratio))
                 collapseView.turnIntoArrow(ratio)
 
-                mSelectedFilters.keys.forEachIndexed { index, filterItem ->
+                /*mSelectedFilters.keys.forEachIndexed { index, filterItem ->
                     val x = calculateX(index, collapsedFilterScroll.measuredWidth, margin, filterItem.collapsedSize)
 
                     filterItem.decrease(ratio)
@@ -190,7 +190,7 @@ class Filter<T : FilterModel<T>> : FrameLayout, FilterItemListener, CollapseList
                         filterItem.alpha = 1f
                         filterItem.bringToFront()
                     }
-                }
+                }*/
 
                 collapsedContainer.translationY = ratio * (-measuredHeight + collapsedContainer.height)
                 dividerTop.alpha = 1 - 2 * ratio
@@ -222,7 +222,7 @@ class Filter<T : FilterModel<T>> : FrameLayout, FilterItemListener, CollapseList
 
         isCollapsed = false
 
-        removeItemsFromParent()
+        //removeItemsFromParent()
         container.bringToFront()
         container.requestFocus()
 
@@ -233,7 +233,7 @@ class Filter<T : FilterModel<T>> : FrameLayout, FilterItemListener, CollapseList
                 collapseView.rotateArrow(180 * ratio)
                 collapseView.turnIntoOkButton(ratio)
 
-                mSelectedFilters.keys.forEachIndexed { index, filterItem ->
+                /*mSelectedFilters.keys.forEachIndexed { index, filterItem ->
 
                     val x = mSelectedFilters[filterItem]?.x
                     val y = mSelectedFilters[filterItem]?.y
@@ -265,7 +265,7 @@ class Filter<T : FilterModel<T>> : FrameLayout, FilterItemListener, CollapseList
                         expandedFilter.addView(filterItem)
                     filterItem.translationX = mRemovedFilters[filterItem]?.x!! * (1 - ratio)
                     filterItem.translationY = mRemovedFilters[filterItem]?.y!! * (1 - ratio)
-                }
+                }*/
                 collapsedText.alpha = 1 - ratio
                 dividerTop.alpha = 2 * ratio
                 collapsedContainer.translationY = -container.height.toFloat() * (1 - ratio)
