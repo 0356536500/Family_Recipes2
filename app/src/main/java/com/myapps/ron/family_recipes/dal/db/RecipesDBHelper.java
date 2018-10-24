@@ -167,7 +167,7 @@ public class RecipesDBHelper extends MyDBHelper{
         if(orderedBy == null)
             orderedBy = KEY_CREATED;
         // Check if valid parameter
-        if(!orderedBy.equals(KEY_CREATED) && !orderedBy.equals(KEY_LIKES))
+        if(!orderedBy.equals(KEY_CREATED) && !orderedBy.equals(KEY_LIKES) && !orderedBy.equals(KEY_MODIFIED))
             return null;
 
         // Select All Query

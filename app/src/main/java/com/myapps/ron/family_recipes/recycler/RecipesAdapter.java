@@ -263,7 +263,7 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
 
             @Override
             protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
-                Log.e("adapter", "update from filter");
+                //Log.e("adapter", "update from filter");
                 if(filterResults.values != null)
                     updateRecipes((ArrayList<Recipe>) filterResults.values, false);
                 //notifyDataSetChanged();
@@ -327,6 +327,23 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
         }*/
 
         //notifyDataSetChanged();
+    }
+
+    public void updateRecipesOrder(List<Recipe> list) {
+        if (this.recipeListFiltered == null || this.recipeListFiltered.isEmpty()){
+            this.recipeListFiltered = new ArrayList<>(list);
+            notifyDataSetChanged();
+        }
+        else {
+            List<Recipe> oldTemp = recipeList;
+            recipeList = list;
+            recipeListFiltered = recipeList;
+
+            DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new MyDiffCallback(oldTemp, list));
+            diffResult.dispatchUpdatesTo(this);
+
+            getFilter().filter(null);
+        }
     }
 
     public void updateOneRecipe(Recipe recipe) {

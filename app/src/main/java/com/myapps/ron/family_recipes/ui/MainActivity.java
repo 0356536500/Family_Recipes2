@@ -9,13 +9,10 @@ import android.content.pm.ActivityInfo;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.ColorFilter;
-import android.graphics.LinearGradient;
 import android.graphics.Paint;
-import android.graphics.Path;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.graphics.Shader;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -146,6 +143,7 @@ public class MainActivity extends AppCompatActivity {
     private void changeMenuItemsVisibility(boolean show) {
         getMenu().findItem(R.id.action_search).setVisible(show);
         getMenu().findItem(R.id.action_refresh).setVisible(show);
+        getMenu().findItem(R.id.action_sort).setVisible(show);
     }
 
     private void init() {
@@ -252,7 +250,7 @@ public class MainActivity extends AppCompatActivity {
         this.menu = menu;
         searchMenuItem = menu.findItem(R.id.action_search);
 
-        setToggle(menu);
+        //setToggle(menu);
         //filterMenuItem = menu.findItem(R.id.action_filter);
         //sortMenuItem = menu.findItem(R.id.action_sort);
 
@@ -261,11 +259,11 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    private void setToggle(Menu menu) {
+    /*private void setToggle(Menu menu) {
         MenuItem toggleItem = menu.findItem(R.id.action_sort);
         toggleItem.setActionView(R.layout.toggle_toolbar_layout);
         toggleItem.setChecked(true);
-    }
+    }*/
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -280,16 +278,14 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             case R.id.action_search:
                 return true;
+            case R.id.action_sort:
+                currentFragment.onOptionsItemSelected(item);
+                return true;
             case R.id.action_refresh:
                 currentFragment.onOptionsItemSelected(item);
                 return true;
         }
-        /*
-        //noinspection SimplifiableIfStatement
-        if (itemId == R.id.action_search) {
-            return true;
-        }
-        */
+
         return super.onOptionsItemSelected(item);
     }
 

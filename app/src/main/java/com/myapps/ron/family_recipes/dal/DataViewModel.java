@@ -67,9 +67,9 @@ public class DataViewModel extends ViewModel {
         }
     }
 
-    public List<Recipe> loadLocalRecipes(final Context context) {
+    public List<Recipe> loadLocalRecipesOrdered(final Context context, String orderBy) {
         RecipesDBHelper dbHelper = new RecipesDBHelper(context);
-        return dbHelper.getAllRecipes(null);
+        return dbHelper.getAllRecipes(orderBy);
     }
 
     private void loadLocalRecipes(final Context context, final String orderBy) {

@@ -11,10 +11,10 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
@@ -23,9 +23,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CompoundButton;
 import android.widget.Toast;
-import android.widget.ToggleButton;
 
 import com.myapps.ron.family_recipes.MyDividerItemDecoration;
 import com.myapps.ron.family_recipes.R;
@@ -107,7 +105,7 @@ public class AllRecipesFragment extends MyFragment implements RecipesAdapter.Rec
         mFilter.setListener(this);
 
         //the text to show when there's no selected items
-        mFilter.setNoSelectedItemText(getString(R.string.str_all_selected));
+        mFilter.setCustomTextView(getString(R.string.str_all_selected));
         mFilter.build();
 
     }
@@ -123,9 +121,9 @@ public class AllRecipesFragment extends MyFragment implements RecipesAdapter.Rec
                     log = recipes.toString();
                 Log.e(TAG, "getAllRecipes from db.\n" + log);*/
                 if (mFilter != null && recipes != null)
-                    mFilter.setNoSelectedItemText(getString(R.string.number_of_recipes_indicator, recipes.size()));
+                    mFilter.setCustomTextView(getString(R.string.number_of_recipes_indicator, recipes.size()));
                 swipeRefreshLayout.setRefreshing(false);
-                Log.e(TAG, "update from fragment");
+                //Log.e(TAG, "update from fragment");
                 mAdapter.updateRecipes(recipes, recipes != null && !recipes.isEmpty());
             }
         });
@@ -150,7 +148,7 @@ public class AllRecipesFragment extends MyFragment implements RecipesAdapter.Rec
     }
 
     private void initRecycler() {
-        List<Recipe> recipeList = new ArrayList<>(viewModel.loadLocalRecipes(activity));
+        List<Recipe> recipeList = new ArrayList<>(viewModel.loadLocalRecipesOrdered(activity, com.myapps.ron.family_recipes.dal.Constants.SORT_RECENT));
         mAdapter = new RecipesAdapter(activity, recipeList, this);
 
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(activity.getApplicationContext());
@@ -232,8 +230,8 @@ public class AllRecipesFragment extends MyFragment implements RecipesAdapter.Rec
         }
     }
 
-    private void setSortToggle(Menu menu) {
-        ToggleButton toggleButton = menu.findItem(R.id.action_sort).getActionView().findViewById(R.id.toolbar_toggle_sort);
+    /*private void setSortToggle(Menu menu) {
+        MenuItem sortItem = menu.findItem(R.id.action_sort).getActionView().findViewById(R.id.toolbar_toggle_sort);
         toggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -241,8 +239,7 @@ public class AllRecipesFragment extends MyFragment implements RecipesAdapter.Rec
                 viewModel.loadRecipes(activity, order);
             }
         });
-    }
-
+    }*/
 
 
     @Override
@@ -260,17 +257,44 @@ public class AllRecipesFragment extends MyFragment implements RecipesAdapter.Rec
                 swipeRefreshLayout.setRefreshing(true);
                 onRefreshListener.onRefresh();
                 return true;
-            /*case R.id.action_filter:
-                Toast.makeText(activity, "filter clicked (" + TAG + ")", Toast.LENGTH_SHORT).show();
-                return true;*/
+            case R.id.action_sort:
+                showPopupSortMenu();
+                return true;
         }
-        /*
-        //noinspection SimplifiableIfStatement
-        if (itemId == R.id.action_search) {
-            return true;
-        }
-        */
         return super.onOptionsItemSelected(item);
+    }
+
+    private void showPopupSortMenu() {
+
+        final PopupMenu popup = new PopupMenu(activity, activity.findViewById(R.id.action_sort));
+
+        // This activity implements OnMenuItemClickListener
+        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                String mPrevOrder = orderBy;
+                orderBy = null;
+                switch (item.getItemId()) {
+                    case R.id.sort_action_recent:
+                        orderBy = com.myapps.ron.family_recipes.dal.Constants.SORT_RECENT;
+                        break;
+                    case R.id.sort_action_popular:
+                        orderBy = com.myapps.ron.family_recipes.dal.Constants.SORT_POPULAR;
+                        break;
+                    case R.id.sort_action_last_modified:
+                        orderBy = com.myapps.ron.family_recipes.dal.Constants.SORT_MODIFIED;
+                        break;
+                }
+                if (orderBy != null) {
+                    if (!orderBy.equals(mPrevOrder)) {
+                        mAdapter.updateRecipesOrder(viewModel.loadLocalRecipesOrdered(activity, orderBy));
+                    }
+                }
+                return true;
+            }
+        });
+        popup.inflate(R.menu.sort_menu);
+        popup.show();
     }
 
     @Override

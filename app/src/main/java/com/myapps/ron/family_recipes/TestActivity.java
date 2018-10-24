@@ -72,7 +72,7 @@ public class TestActivity extends AppCompatActivity implements RecipesAdapter.Re
         mFilter.setListener(this);
 
         //the text to show when there's no selected items
-        mFilter.setNoSelectedItemText(getString(R.string.str_all_selected));
+        mFilter.setCustomTextView(getString(R.string.str_all_selected));
         mFilter.build();
 
     }

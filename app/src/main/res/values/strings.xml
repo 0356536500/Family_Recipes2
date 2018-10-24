@@ -10,6 +10,12 @@
     <string name="action_sort_toggle">Sort By</string>
     <string name="search_hint">Type name…</string>
 
+    <!-- Sort Menu in MainActivity -->
+    <string name="sort_action_recent">Recent</string>
+    <string name="sort_action_popular">Popular</string>
+    <string name="sort_action_recent_modified">Last Modified</string>
+
+
     <!-- Item in recycler -->
     <string name="recycler_item_name">A recipe</string>
     <string name="recycler_item_description">A sample app to showcase Cognito Identity and the SDK for Android.</string>

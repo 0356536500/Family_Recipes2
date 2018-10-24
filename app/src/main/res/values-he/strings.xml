@@ -10,6 +10,11 @@
     <string name="action_refresh">רענן</string>
     <string name="search_hint">הקלד/י לחיפוש…</string>
 
+    <!-- Sort Menu in MainActivity -->
+    <string name="sort_action_recent">אחרונים</string>
+    <string name="sort_action_popular">פופולריים</string>
+    <string name="sort_action_recent_modified">השתנו לאחרונה</string>
+
     <!-- Item in recycler -->
     <string name="recycler_item_name">שם מתכון</string>
     <string name="recycler_item_description">תיאור מעולה שמתאר את המתכון בקצרה במשפט או שניים כדי שהקורא יקבל רושם ראשוני על המתכון.</string>

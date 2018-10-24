@@ -28,7 +28,7 @@ class Filter<T : FilterModel<T>> : FrameLayout, FilterItemListener, CollapseList
     var adapter: FilterAdapter<T>? = null
     var listener: FilterListener<T>? = null
     var margin = dpToPx(getDimen(R.dimen.margin))
-    var noSelectedItemText: String = ""
+    var customTextView: String = ""
         set(value) {
             collapsedText.text = value
         }
@@ -108,7 +108,7 @@ class Filter<T : FilterModel<T>> : FrameLayout, FilterItemListener, CollapseList
                 firstExpandList.add(view)
                 //expandedFilter.addView(view)
                 mItems.put(view, item)
-                if(view.text == noSelectedItemText) {
+                if(view.text == customTextView) {
                     view.select()
                     mNothingSelectedItem = view
                 }
