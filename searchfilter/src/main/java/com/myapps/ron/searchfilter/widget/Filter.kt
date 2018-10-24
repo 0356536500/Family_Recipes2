@@ -56,6 +56,8 @@ class Filter<T : FilterModel<T>> : FrameLayout, FilterItemListener, CollapseList
             expandedFilter.invalidate()
         }
 
+    private val firstExpandList: MutableList<FilterItem> = mutableListOf()
+    private var firstExpand: Boolean = true
     private var mIsBusy = false
 
     private var isCollapsed: Boolean? = null
@@ -103,7 +105,8 @@ class Filter<T : FilterModel<T>> : FrameLayout, FilterItemListener, CollapseList
                 view.listener = this
                 view.isContainer = true
                 mainItems.add(i, view)
-                expandedFilter.addView(view)
+                firstExpandList.add(view)
+                //expandedFilter.addView(view)
                 mItems.put(view, item)
                 if(view.text == noSelectedItemText) {
                     view.select()
@@ -196,13 +199,16 @@ class Filter<T : FilterModel<T>> : FrameLayout, FilterItemListener, CollapseList
                 dividerTop.alpha = 1 - 2 * ratio
                 expandedFilterScroll.translationY = ratio * (-measuredHeight + collapsedContainer.height)
 
-                if (mSelectedFilters.isEmpty()) {
+                /*if (mSelectedFilters.isEmpty()) {
                     collapsedText.visibility = View.VISIBLE
                     collapsedText.alpha = ratio
                 } else {
                     collapsedText.visibility = View.GONE
                     collapsedText.alpha = 1 - ratio
-                }
+                }*/
+
+                collapsedText.visibility = View.VISIBLE
+                collapsedText.alpha = ratio
 
                 if (ratio == 1f) {
                     collapsedContainer.bringToFront()
@@ -225,6 +231,14 @@ class Filter<T : FilterModel<T>> : FrameLayout, FilterItemListener, CollapseList
         //removeItemsFromParent()
         container.bringToFront()
         container.requestFocus()
+
+        if (firstExpand) {
+            firstExpand = false
+            firstExpandList.forEach { view ->
+                expandedFilter.addView(view)
+            }
+            firstExpandList.clear()
+        }
 
         ValueAnimator.ofFloat(0f, Constant.ANIMATION_DURATION.toFloat()).setDuration(Constant.ANIMATION_DURATION).apply {
             addUpdateListener {

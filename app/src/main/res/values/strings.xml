@@ -47,6 +47,7 @@
     <string name="refresh_error_message">can refresh once every minute</string>
     <string name="message_from_fetch_recipes">%1$d added, %2$d modified</string>
     <string name="message_from_fetch_categories">added %1$d categories</string>
+    <string name="number_of_recipes_indicator">%1$d recipes</string>
 
     <string-array name="job_titles">
         <item>All categories</item>

@@ -122,6 +122,8 @@ public class AllRecipesFragment extends MyFragment implements RecipesAdapter.Rec
                 if(recipes != null)
                     log = recipes.toString();
                 Log.e(TAG, "getAllRecipes from db.\n" + log);*/
+                if (mFilter != null && recipes != null)
+                    mFilter.setNoSelectedItemText(getString(R.string.number_of_recipes_indicator, recipes.size()));
                 swipeRefreshLayout.setRefreshing(false);
                 Log.e(TAG, "update from fragment");
                 mAdapter.updateRecipes(recipes, recipes != null && !recipes.isEmpty());
