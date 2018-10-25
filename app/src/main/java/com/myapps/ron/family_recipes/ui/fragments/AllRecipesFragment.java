@@ -9,6 +9,10 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -315,9 +319,20 @@ public class AllRecipesFragment extends MyFragment implements RecipesAdapter.Rec
 
     @Override
     public void onItemSelected(Recipe recipe) {
-        Intent intent = new Intent(activity, RecipeActivity.class);
+        /*Intent intent = new Intent(activity, RecipeActivity.class);
         intent.putExtra(Constants.RECIPE, recipe);
-        startActivityForResult(intent, Constants.RECIPE_ACTIVITY_CODE);
+        startActivityForResult(intent, Constants.RECIPE_ACTIVITY_CODE);*/
+
+        FragmentTransaction ft = activity.getSupportFragmentManager().beginTransaction();
+        Fragment prev = activity.getSupportFragmentManager().findFragmentByTag("dialog");
+        if (prev != null) {
+            ft.remove(prev);
+        }
+        ft.addToBackStack(null);
+
+        // Create and show the dialog.
+        DialogFragment newFragment = new PagerDialogFragment();
+        newFragment.show(ft, "dialog");
     }
 
     @Override

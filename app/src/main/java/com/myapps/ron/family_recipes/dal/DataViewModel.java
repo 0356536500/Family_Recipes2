@@ -179,9 +179,9 @@ public class DataViewModel extends ViewModel {
             numberOfOldCategories = dbHelper.getCategoriesCount();
             numberOfNewCategories = categories.size();
             for (Category item : categories) {
-               /* if(dbHelper.categoryExists(item.getName()))
+                if(dbHelper.categoryExists(item.getName()))
                     dbHelper.updateCategoryServerChanges(item);
-                else*/
+                else
                     dbHelper.insertCategory(item);
             }
             return true;
