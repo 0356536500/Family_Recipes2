@@ -120,10 +120,10 @@ public class AllRecipesFragment extends MyFragment implements RecipesAdapter.Rec
             @Override
             public void onChanged(@Nullable List<Recipe> recipes) {
                 //Toast.makeText(activity, "get recipes from DAL", Toast.LENGTH_SHORT).show();
-                /*String log = "null";
+                String log = "null";
                 if(recipes != null)
                     log = recipes.toString();
-                Log.e(TAG, "getAllRecipes from db.\n" + log);*/
+                Log.e(TAG, "getAllRecipes from db.\n" + log);
                 if (mFilter != null && recipes != null)
                     mFilter.setCustomTextView(getString(R.string.number_of_recipes_indicator, recipes.size()));
                 swipeRefreshLayout.setRefreshing(false);
@@ -331,7 +331,7 @@ public class AllRecipesFragment extends MyFragment implements RecipesAdapter.Rec
         ft.addToBackStack(null);
 
         // Create and show the dialog.
-        DialogFragment newFragment = new PagerDialogFragment();
+        DialogFragment newFragment = new PagerDialogFragment(recipe);
         newFragment.show(ft, "dialog");
     }
 

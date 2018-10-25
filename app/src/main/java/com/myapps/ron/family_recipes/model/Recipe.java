@@ -17,7 +17,7 @@ import java.util.Objects;
 public class Recipe implements Parcelable{
     private static final int FALSE = 0;
     private static final int TRUE = 1;
-    public String image = "https://api.androidhive.info/json/images/keanu.jpg";
+    public static String image = "https://api.androidhive.info/json/images/keanu.jpg";
 
     @SerializedName("id")
     private String id;

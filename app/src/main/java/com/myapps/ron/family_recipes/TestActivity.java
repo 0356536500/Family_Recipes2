@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Window;
 import android.view.WindowManager;
 
+import com.myapps.ron.family_recipes.model.Recipe;
 import com.myapps.ron.family_recipes.ui.MyPagerAdapter;
 import com.myapps.ron.family_recipes.ui.ZoomOutPageTransformer;
 import com.tbuonomo.viewpagerdotsindicator.DotsIndicator;
@@ -26,7 +27,7 @@ public class TestActivity extends AppCompatActivity {
         WormDotsIndicator wormDotsIndicator = findViewById(R.id.worm_dots_indicator);
 
         ViewPager viewPager = findViewById(R.id.view_pager);
-        MyPagerAdapter adapter = new MyPagerAdapter();
+        MyPagerAdapter adapter = new MyPagerAdapter(this, new Recipe());
         viewPager.setAdapter(adapter);
         viewPager.setPageTransformer(true, new ZoomOutPageTransformer());
 

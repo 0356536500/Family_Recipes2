@@ -165,7 +165,7 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
 
     private void loadImage(final MyViewHolder holder, final Recipe recipe) {
         if(recipe.getFoodFiles() != null && recipe.getFoodFiles().size() > 0) {
-            storageWrapper.getFoodFile(context, recipe, Constants.FOOD_DIR, new MyCallback<String>() {
+            storageWrapper.getFoodFile(context, recipe, 0, Constants.FOOD_DIR, new MyCallback<String>() {
                 @Override
                 public void onFinished(String path) {
                     if(path != null) {
@@ -181,13 +181,13 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
                                 .into(holder.thumbnail);
                     }
                     else
-                        loadDefaultImage(recipe, holder);
+                        loadDefaultImage(holder);
                 }
                 //.apply(RequestOptions.circleCropTransform())
             });
         }
         else {
-            loadDefaultImage(recipe, holder);
+            loadDefaultImage(holder);
         }
     }
 
@@ -195,14 +195,14 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
         return colors[random.nextInt(colors.length)];
     }
 
-    private void loadDefaultImage(Recipe recipe, final MyViewHolder holder) {
+    private void loadDefaultImage(final MyViewHolder holder) {
         CircularProgressDrawable circularProgressDrawable = new CircularProgressDrawable(context);
         circularProgressDrawable.setStrokeWidth(5f);
         circularProgressDrawable.setCenterRadius(35f);
         circularProgressDrawable.start();
 
         GlideApp.with(context)
-                .load(recipe.image)
+                .load(Recipe.image)
                 .placeholder(circularProgressDrawable)
                 /*.listener(new RequestListener<Drawable>() {
                     @Override

@@ -17,10 +17,12 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.myapps.ron.family_recipes.R;
+import com.myapps.ron.family_recipes.model.Recipe;
 import com.myapps.ron.family_recipes.ui.DepthPageTransformer;
 import com.myapps.ron.family_recipes.ui.MainActivity;
 import com.myapps.ron.family_recipes.ui.MyPagerAdapter;
 import com.myapps.ron.family_recipes.ui.ZoomOutPageTransformer;
+import com.myapps.ron.family_recipes.utils.Constants;
 import com.tbuonomo.viewpagerdotsindicator.DotsIndicator;
 import com.tbuonomo.viewpagerdotsindicator.SpringDotsIndicator;
 import com.tbuonomo.viewpagerdotsindicator.WormDotsIndicator;
@@ -30,6 +32,7 @@ import com.tbuonomo.viewpagerdotsindicator.WormDotsIndicator;
  */
 public class PagerDialogFragment extends DialogFragment {
     int mNum;
+    private Recipe recipe;
 
     /**
      * Create a new instance of MyDialogFragment, providing "num"
@@ -48,9 +51,17 @@ public class PagerDialogFragment extends DialogFragment {
     }
 */
 
+    public PagerDialogFragment(Recipe recipe) {
+
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (getArguments() != null) {
+            recipe = getArguments().getParcelable(Constants.RECIPE);
+        }
 /*        mNum = 4;
         if (getArguments() != null) {
             mNum = getArguments().getInt("num");
@@ -128,7 +139,7 @@ public class PagerDialogFragment extends DialogFragment {
         WormDotsIndicator wormDotsIndicator = view.findViewById(R.id.worm_dots_indicator);
 
         ViewPager viewPager = view.findViewById(R.id.view_pager);
-        MyPagerAdapter adapter = new MyPagerAdapter();
+        MyPagerAdapter adapter = new MyPagerAdapter(getContext(), recipe);
         viewPager.setAdapter(adapter);
         viewPager.setPageTransformer(true, new DepthPageTransformer());
 
