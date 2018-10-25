@@ -7,10 +7,8 @@ import android.view.Window;
 import android.view.WindowManager;
 
 import com.myapps.ron.family_recipes.model.Recipe;
-import com.myapps.ron.family_recipes.ui.MyPagerAdapter;
-import com.myapps.ron.family_recipes.ui.ZoomOutPageTransformer;
-import com.tbuonomo.viewpagerdotsindicator.DotsIndicator;
-import com.tbuonomo.viewpagerdotsindicator.SpringDotsIndicator;
+import com.myapps.ron.family_recipes.adapters.MyPagerAdapter;
+import com.myapps.ron.family_recipes.utils.ZoomOutPageTransformer;
 import com.tbuonomo.viewpagerdotsindicator.WormDotsIndicator;
 
 public class TestActivity extends AppCompatActivity {
@@ -22,8 +20,8 @@ public class TestActivity extends AppCompatActivity {
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.sliding_images_layout);
 
-        DotsIndicator dotsIndicator = findViewById(R.id.dots_indicator);
-        SpringDotsIndicator springDotsIndicator = findViewById(R.id.spring_dots_indicator);
+        //DotsIndicator dotsIndicator = findViewById(R.id.dots_indicator);
+        //SpringDotsIndicator springDotsIndicator = findViewById(R.id.spring_dots_indicator);
         WormDotsIndicator wormDotsIndicator = findViewById(R.id.worm_dots_indicator);
 
         ViewPager viewPager = findViewById(R.id.view_pager);
@@ -31,8 +29,8 @@ public class TestActivity extends AppCompatActivity {
         viewPager.setAdapter(adapter);
         viewPager.setPageTransformer(true, new ZoomOutPageTransformer());
 
-        dotsIndicator.setViewPager(viewPager);
-        springDotsIndicator.setViewPager(viewPager);
+        //dotsIndicator.setViewPager(viewPager);
+        //springDotsIndicator.setViewPager(viewPager);
         wormDotsIndicator.setViewPager(viewPager);
     }
 }

@@ -51,6 +51,7 @@ class S3Helper {
     }
 
     static void uploadFile(String url, String localPath, String contentType, final MyCallback<Boolean> callback) {
+        Log.e(TAG, "uploadFile, " + url);
         File file = new File(localPath);    // create new file on device
         RequestBody requestFile = RequestBody.create(MediaType.parse(contentType), file);
 
@@ -88,7 +89,7 @@ class S3Helper {
      * @param callback - passed callback
      */
     void downloadFile(String key, final String rootPath, String dir, final MyCallback<String> callback) {
-
+        Log.e(TAG, "downloadFile, " + key);
         /*TransferObserver downloadObserver =
                 transferUtility.download(
                         "public/s3Key.txt",

@@ -10,9 +10,9 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.widget.CircularProgressDrawable;
 import android.support.v7.util.DiffUtil;
+import android.support.v7.widget.AppCompatImageButton;
 import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -63,6 +63,8 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
             numberOfLikes = view.findViewById(R.id.number_of_likes);
             horizontalScrollView = view.findViewById(R.id.categories_scroll_container);
 
+            itemView.setTag(this);
+
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -70,6 +72,14 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
                     listener.onItemSelected(recipeListFiltered.get(getAdapterPosition()));
                 }
             });
+
+            thumbnail.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    listener.onImageClicked(recipeListFiltered.get(getAdapterPosition()));
+                }
+            });
+
         }
     }
 
@@ -361,5 +371,6 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
 
     public interface RecipesAdapterListener {
         void onItemSelected(Recipe recipe);
+        void onImageClicked(Recipe recipe);
     }
 }

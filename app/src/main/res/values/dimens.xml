@@ -19,4 +19,7 @@
     <dimen name="item_likes_text_size">16sp</dimen>
 
     <dimen name="item_more_info_bottom_margin">4dp</dimen>
+
+    <!-- Pager Adapter -->
+    <dimen name="pager_close_button_size">45dp</dimen>
 </resources>

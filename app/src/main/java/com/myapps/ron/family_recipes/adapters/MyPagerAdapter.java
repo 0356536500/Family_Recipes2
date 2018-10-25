@@ -1,4 +1,4 @@
-package com.myapps.ron.family_recipes.ui;
+package com.myapps.ron.family_recipes.adapters;
 
 import android.content.Context;
 import android.net.Uri;
@@ -15,12 +15,9 @@ import com.myapps.ron.family_recipes.dal.storage.StorageWrapper;
 import com.myapps.ron.family_recipes.model.Recipe;
 import com.myapps.ron.family_recipes.network.Constants;
 import com.myapps.ron.family_recipes.network.MyCallback;
-import com.myapps.ron.family_recipes.recycler.RecipesAdapter;
 import com.myapps.ron.family_recipes.utils.GlideApp;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * Created by ronginat on 24/10/2018.
@@ -37,10 +34,6 @@ public class MyPagerAdapter extends PagerAdapter {
         this.storageWrapper = StorageWrapper.getInstance(context);
     }
 
-    private static final List<Item> items =
-            Arrays.asList(new Item(R.color.md_indigo_500), new Item(R.color.md_green_500),
-                    new Item(R.color.md_red_500), new Item(R.color.md_orange_500),
-                    new Item(R.color.md_purple_500));
 
     @NonNull @Override public Object instantiateItem(@NonNull ViewGroup container, int position) {
         View item = LayoutInflater.from(container.getContext())
@@ -48,11 +41,8 @@ public class MyPagerAdapter extends PagerAdapter {
 
         AppCompatImageView imageView = item.findViewById(R.id.item_image);
 
-        loadImage(imageView , position);
+        loadImage(imageView, position);
 
-        //CardView cardView = item.findViewById(R.id.card_view);
-        //cardView.setCardBackgroundColor(
-        //    ContextCompat.getColor(container.getContext(), (items.get(position).color)));
         container.addView(item);
         return item;
     }
@@ -61,7 +51,6 @@ public class MyPagerAdapter extends PagerAdapter {
         if(recipe!= null && recipe.getFoodFiles() != null)
             return recipe.getFoodFiles().size();
         return 0;
-
     }
 
     @Override public boolean isViewFromObject(@NonNull View view, @NonNull Object object) {
@@ -73,26 +62,19 @@ public class MyPagerAdapter extends PagerAdapter {
         container.removeView((View) object);
     }
 
-    private static class Item {
-        private final int color;
-
-        private Item(int color) {
-            this.color = color;
-        }
-    }
 
     private void loadImage(final AppCompatImageView view, int position) {
         if (recipe != null && recipe.getFoodFiles() != null && recipe.getFoodFiles().size() > position) {
-            final CircularProgressDrawable circularProgressDrawable = new CircularProgressDrawable(context);
-            circularProgressDrawable.setStrokeWidth(5f);
-            circularProgressDrawable.setCenterRadius(35f);
-            circularProgressDrawable.start();
-            view.setImageDrawable(circularProgressDrawable);
 
             storageWrapper.getFoodFile(context, recipe, position, Constants.FOOD_DIR, new MyCallback<String>() {
                 @Override
                 public void onFinished(String path) {
                     if(path != null) {
+                        CircularProgressDrawable circularProgressDrawable = new CircularProgressDrawable(context);
+                        circularProgressDrawable.setStrokeWidth(5f);
+                        circularProgressDrawable.setCenterRadius(35f);
+                        circularProgressDrawable.start();
+
                         GlideApp.with(context)
                                 .load(Uri.fromFile(new File(path)))
                                 .placeholder(circularProgressDrawable)

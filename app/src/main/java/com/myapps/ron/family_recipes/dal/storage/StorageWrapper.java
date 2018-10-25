@@ -32,7 +32,7 @@ public class StorageWrapper {
         if(path != null)
             callback.onFinished(path);
         else {
-            OnlineStorageWrapper.downloadFoodFile(context, recipe.getFoodFiles().get(0), callback);
+            OnlineStorageWrapper.downloadFoodFile(context, recipe.getFoodFiles().get(index), callback);
         }
     }
 
