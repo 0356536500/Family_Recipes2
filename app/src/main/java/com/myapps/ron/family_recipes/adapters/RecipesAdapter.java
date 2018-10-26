@@ -1,4 +1,4 @@
-package com.myapps.ron.family_recipes.recycler;
+package com.myapps.ron.family_recipes.adapters;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -10,7 +10,6 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.widget.CircularProgressDrawable;
 import android.support.v7.util.DiffUtil;
-import android.support.v7.widget.AppCompatImageButton;
 import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
@@ -28,6 +27,7 @@ import com.myapps.ron.family_recipes.dal.storage.StorageWrapper;
 import com.myapps.ron.family_recipes.model.Recipe;
 import com.myapps.ron.family_recipes.network.Constants;
 import com.myapps.ron.family_recipes.network.MyCallback;
+import com.myapps.ron.family_recipes.recycler.MyDiffCallback;
 import com.myapps.ron.family_recipes.utils.GlideApp;
 
 import java.io.File;

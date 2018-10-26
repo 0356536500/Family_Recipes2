@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.myapps.ron.family_recipes.recycler;
+package com.myapps.ron.family_recipes.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -29,13 +29,13 @@ import com.myapps.ron.family_recipes.network.cognito.AppHelper;
 import com.myapps.ron.family_recipes.network.cognito.ItemToDisplay;
 
 public class FirstTimeLoginAttributesDisplayAdapter extends BaseAdapter {
-    private String TAG = "FirstTimeLoginDetails";
-    private Context context;
+    //private String TAG = "FirstTimeLoginDetails";
+    //private Context context;
     private int count;
     private static LayoutInflater layoutInflater;
 
     public FirstTimeLoginAttributesDisplayAdapter(Context context) {
-        this.context = context;
+        //this.context = context;
 
         count = AppHelper.getFirstTimeLogInItemsCount();
 
@@ -61,11 +61,11 @@ public class FirstTimeLoginAttributesDisplayAdapter extends BaseAdapter {
         Holder holder;
 
         if(convertView == null) {
-            convertView = layoutInflater.inflate(R.layout.fields_generic, null);
+            convertView = layoutInflater.inflate(R.layout.fields_generic, parent);
             holder = new Holder();
-            holder.label = (TextView) convertView.findViewById(R.id.textViewUserDetailLabel);
-            holder.data = (TextView) convertView.findViewById(R.id.editTextUserDetailInput);
-            holder.message = (TextView) convertView.findViewById(R.id.textViewUserDetailMessage);
+            holder.label = convertView.findViewById(R.id.textViewUserDetailLabel);
+            holder.data = convertView.findViewById(R.id.editTextUserDetailInput);
+            holder.message = convertView.findViewById(R.id.textViewUserDetailMessage);
 
             convertView.setTag(holder);
         }

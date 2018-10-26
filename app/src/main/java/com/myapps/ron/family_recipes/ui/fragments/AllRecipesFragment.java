@@ -33,7 +33,7 @@ import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.dal.DataViewModel;
 import com.myapps.ron.family_recipes.model.Category;
 import com.myapps.ron.family_recipes.model.Recipe;
-import com.myapps.ron.family_recipes.recycler.RecipesAdapter;
+import com.myapps.ron.family_recipes.adapters.RecipesAdapter;
 import com.myapps.ron.family_recipes.ui.MainActivity;
 import com.myapps.ron.family_recipes.ui.RecipeActivity;
 import com.myapps.ron.family_recipes.utils.Constants;
