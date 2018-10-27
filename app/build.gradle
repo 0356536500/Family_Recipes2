@@ -54,6 +54,8 @@ dependencies {
 
     //view pager with dots indicator
     implementation 'com.tbuonomo.andrui:viewpagerdotsindicator:2.1.2'
+
+    implementation 'com.jaredrummler:html-builder:1.0.0'
     /*implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"*/
     /*implementation 'com.github.Yalantis:SearchFilter:v1.0.4'*/
 }

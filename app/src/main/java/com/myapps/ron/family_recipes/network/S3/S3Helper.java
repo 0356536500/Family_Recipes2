@@ -27,6 +27,7 @@ class S3Helper {
     private static final String TAG = S3Helper.class.getSimpleName();
 
     static final String CONTENT_IMAGE = "image/jpeg";
+    static final String CONTENT_TEXT = "text/html";
 
     private static final String BASE_URL = "http://www.dummy.com/";
 
@@ -104,7 +105,8 @@ class S3Helper {
                 if(!file.createNewFile())
                     Log.e(TAG, "couldn't create the file in " + path);
             } catch (IOException e) {
-                e.printStackTrace();
+                Log.e(TAG, e.getMessage());
+                //e.printStackTrace();
             }
         }
         //Log.e(TAG, "before downloading, key = " + key + " local path = " + path);

@@ -169,7 +169,7 @@ public class Recipe implements Parcelable{
         return getId().equals(other.getId()) && getName().equals(other.getName()) && getDescription().equals(other.getDescription())
                 && getUploader().equals(other.getUploader()) && getCategories().equals(other.getCategories())
                 && getCreatedAt().equals(other.getCreatedAt()) && getLastModifiedAt().equals(other.getLastModifiedAt())
-                && getRecipeFile().equals(other.getRecipeFile()) && getComments().equals(other.getComments())
+                //&& getRecipeFile().equals(other.getRecipeFile()) && getComments().equals(other.getComments())
                 && getFoodFiles().equals(other.getFoodFiles()) && getLikes() == other.getLikes()
                 && getMeLike() == other.getMeLike();
     }

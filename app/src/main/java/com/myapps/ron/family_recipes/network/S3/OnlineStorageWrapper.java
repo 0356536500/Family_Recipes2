@@ -10,9 +10,23 @@ public class OnlineStorageWrapper {
 
     //private static final String TAG = OnlineStorageWrapper.class.getSimpleName();
 
-    public static void uploadFile(String url, String localPath, MyCallback<Boolean> callback) {
-        S3Helper.uploadFile(url, localPath, S3Helper.CONTENT_IMAGE, callback);
+    //region uploads
+
+    public static void uploadFoodFile(String url, String localPath, MyCallback<Boolean> callback) {
+        uploadFile(url, localPath, S3Helper.CONTENT_IMAGE, callback);
     }
+
+    public static void uploadRecipeFile(String url, String localPath, MyCallback<Boolean> callback) {
+        uploadFile(url, localPath, S3Helper.CONTENT_TEXT, callback);
+    }
+
+    private static void uploadFile(String url, String localPath, String mimeType, MyCallback<Boolean> callback) {
+        S3Helper.uploadFile(url, localPath, mimeType, callback);
+    }
+
+    //endregion
+
+    //region downloads
 
     private static void downloadFile(Context context, String key, String rootPath, String dir, final MyCallback<String> callback) {
         S3Helper s3 = S3Helper.getInstance(context);
@@ -20,12 +34,14 @@ public class OnlineStorageWrapper {
     }
 
     public static void downloadFoodFile(Context context, String key, final MyCallback<String> callback) {
-        downloadFile(context, key, ExternalStorageHelper.getFilesRootPath(context),Constants.FOOD_DIR, callback);
+        downloadFile(context, key, ExternalStorageHelper.getFilesRootPath(context), Constants.FOOD_DIR, callback);
     }
 
     public static void downloadRecipeFile(Context context, String key, final MyCallback<String> callback) {
-        downloadFile(context, key, ExternalStorageHelper.getFilesRootPath(context),Constants.RECIPES_DIR, callback);
+        downloadFile(context, key, ExternalStorageHelper.getFilesRootPath(context), Constants.RECIPES_DIR, callback);
     }
+
+    //endregion
 
     /*static class MyAsyncUploader extends AsyncTask<Void, Integer, String> {
         private MyCallback<Boolean> callback;

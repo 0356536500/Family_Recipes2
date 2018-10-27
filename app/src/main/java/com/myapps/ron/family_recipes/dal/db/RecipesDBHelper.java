@@ -198,6 +198,7 @@ public class RecipesDBHelper extends MyDBHelper{
         ContentValues values = new ContentValues();
         values.put(KEY_DESC, recipe.getDescription());
         values.put(KEY_MODIFIED, recipe.getLastModifiedAt());
+        values.put(KEY_FILE, recipe.getRecipeFile());
         values.put(KEY_CATEGORIES, recipe.getStringCategories());
         values.put(KEY_COMMENTS, recipe.getStringComments());
         values.put(KEY_FOOD, recipe.getStringFoodFiles());

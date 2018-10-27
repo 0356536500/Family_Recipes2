@@ -14,8 +14,16 @@
         android:orientation="vertical"
         android:layout_margin="@dimen/text_margin">
 
+        <android.support.v4.widget.ContentLoadingProgressBar
+            android:id="@+id/recipe_content_progressBar"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:visibility="visible"
+            android:layout_gravity="center"
+            style="@style/Widget.AppCompat.ProgressBar" />
+
         <WebView
-            android:id="@+id/recipe_content_view"
+            android:id="@+id/recipe_content_webView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
         </WebView>

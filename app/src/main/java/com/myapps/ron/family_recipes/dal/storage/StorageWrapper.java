@@ -1,11 +1,18 @@
 package com.myapps.ron.family_recipes.dal.storage;
 
 import android.content.Context;
+import android.text.Html;
+import android.text.Spanned;
 import android.util.Log;
 
 import com.myapps.ron.family_recipes.model.Recipe;
+import com.myapps.ron.family_recipes.network.Constants;
 import com.myapps.ron.family_recipes.network.MyCallback;
 import com.myapps.ron.family_recipes.network.S3.OnlineStorageWrapper;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 public class StorageWrapper {
 
@@ -26,14 +33,62 @@ public class StorageWrapper {
         /*dbHelper = new RecipesDBHelper(context)*/;
     }
 
-    public void getFoodFile(Context context, Recipe recipe, int index, String fileDir, MyCallback<String> callback) {
-        String path = ExternalStorageHelper.getFileAbsolutePath(context, recipe.getFoodFiles().get(index), fileDir);
+    public static void getFoodFile(Context context, String fileName, MyCallback<String> callback) {
+        if(fileName == null || fileName.equals(""))
+            return;
+        String path = ExternalStorageHelper.getFileAbsolutePath(context, fileName, Constants.FOOD_DIR);
         //Log.e("StorageWrapper", "get local path - " + path);
         if(path != null)
             callback.onFinished(path);
         else {
-            OnlineStorageWrapper.downloadFoodFile(context, recipe.getFoodFiles().get(index), callback);
+            OnlineStorageWrapper.downloadFoodFile(context, fileName, callback);
         }
+    }
+
+    public static void getRecipeFile(Context context, String fileName, MyCallback<String> callback) {
+        if(fileName == null || fileName.equals(""))
+            return;
+        String path = ExternalStorageHelper.getFileAbsolutePath(context, fileName, Constants.RECIPES_DIR);
+        //Log.e("StorageWrapper", "get local path - " + path);
+        if(path != null)
+            callback.onFinished(path);
+        else {
+            OnlineStorageWrapper.downloadRecipeFile(context, fileName, callback);
+        }
+    }
+
+    public File createHtmlFile(Context context, String fileName, Spanned spanned) {
+        //String path = Environment.getExternalStorageDirectory().getPath();
+        //String fileName = DateFormat.format("dd_MM_yyyy_hh_mm_ss", System.currentTimeMillis()).toString();
+        //fileName = fileName + ".html";
+        //String path = ExternalStorageHelper.getFileAbsolutePath(context, fileName, com.myapps.ron.family_recipes.network.Constants.RECIPES_DIR);
+        String path = context.getFilesDir().getPath();
+        Log.e("StorageWrapper", "path is " + path);
+        File file = new File(path, fileName);
+        if(file.exists()) {
+            try {
+                file.delete();
+                file.createNewFile();
+            } catch (IOException e) {
+                Log.e("StorageWrapper", e.getMessage());
+            }
+        }
+        //String html = "<html><head><title>Title</title></head><body>This is random text.</body></html>";
+
+        try {
+            FileOutputStream out = new FileOutputStream(file);
+            byte[] data = Html.toHtml(spanned).getBytes();
+            out.write(data);
+            out.close();
+            Log.e("StorageWrapper", "createHtml File Saved : " + file.getPath());
+        }/* catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }*/ catch (IOException e) {
+            Log.e("StorageWrapper", "createHtml error: " + e.getMessage());
+            return null;
+        }
+
+        return file;
     }
 
 /*    private void showChoosingFile() {

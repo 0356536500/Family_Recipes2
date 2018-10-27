@@ -66,7 +66,7 @@ public class MyPagerAdapter extends PagerAdapter {
     private void loadImage(final AppCompatImageView view, int position) {
         if (recipe != null && recipe.getFoodFiles() != null && recipe.getFoodFiles().size() > position) {
 
-            storageWrapper.getFoodFile(context, recipe, position, Constants.FOOD_DIR, new MyCallback<String>() {
+            storageWrapper.getFoodFile(context, recipe.getFoodFiles().get(position), new MyCallback<String>() {
                 @Override
                 public void onFinished(String path) {
                     if(path != null) {

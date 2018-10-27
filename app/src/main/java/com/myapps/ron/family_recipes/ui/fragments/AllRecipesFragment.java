@@ -233,17 +233,6 @@ public class AllRecipesFragment extends MyFragment implements RecipesAdapter.Rec
         }
     }
 
-    /*private void setSortToggle(Menu menu) {
-        MenuItem sortItem = menu.findItem(R.id.action_sort).getActionView().findViewById(R.id.toolbar_toggle_sort);
-        toggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                String order = isChecked ? com.myapps.ron.family_recipes.dal.Constants.SORT_RECENT : com.myapps.ron.family_recipes.dal.Constants.SORT_POPULAR;
-                viewModel.loadRecipes(activity, order);
-            }
-        });
-    }*/
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

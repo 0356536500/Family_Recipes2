@@ -7,7 +7,13 @@ import java.io.File;
 
 public class ExternalStorageHelper {
 
-    public static String getFileAbsolutePath(Context context, String filePath, String dir){
+    /**
+     * @param context - context of application
+     * @param filePath - path of file to check
+     * @param dir - dir of file to check
+     * @return path of requested file from cache if available or from app root storage. null if file not exists
+     */
+    static String getFileAbsolutePath(Context context, String filePath, String dir){
         String path = dir + "/" + filePath;
         //check whether file is in cache directory
 
@@ -34,6 +40,10 @@ public class ExternalStorageHelper {
             return null;
     }
 
+    /**
+     * @param context - context of application
+     * @return path for app storage root
+     */
     public static String getFilesRootPath(Context context) {
         File root = context.getExternalFilesDir(null);
         if(root == null)

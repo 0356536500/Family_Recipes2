@@ -1,76 +1,86 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="?attr/selectableItemBackground"
     android:backgroundTint="@color/white"
     android:clickable="true"
     android:focusable="true"
-    android:paddingTop="7dp"
     android:paddingStart="@dimen/row_padding"
+    android:paddingTop="7dp"
     android:paddingEnd="@dimen/row_padding"
-    android:paddingBottom="@dimen/row_padding">
+    android:paddingBottom="@dimen/row_padding"
+    tools:layout_editor_absoluteY="25dp">
 
     <android.support.v7.widget.AppCompatImageView
         android:id="@+id/thumbnail"
         android:layout_width="@dimen/thumbnail"
         android:layout_height="@dimen/thumbnail"
         android:layout_alignParentStart="true"
-        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/uploader"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/number_of_likes"
         app:srcCompat="@mipmap/ic_logo_foreground" />
 
     <TextView
         android:id="@+id/name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:fontFamily="@font/open_sans_semibold"
+        android:layout_marginEnd="8dp"
+        android:fontFamily="@font/open_sans_bold"
         android:text="@string/recycler_item_name"
         android:textColor="@color/contact_name"
         android:textSize="@dimen/item_name_text_size"
-        app:layout_constraintStart_toEndOf="@+id/thumbnail"
+        app:layout_constraintEnd_toStartOf="@+id/thumbnail"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/description"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="8dp"
+        android:ellipsize="end"
+        android:fontFamily="@font/open_sans_semibold"
+        android:maxLines="2"
         android:paddingStart="0dp"
         android:paddingEnd="1dp"
-        android:layout_marginTop="8dp"
-        android:ellipsize="end"
-        android:maxLines="2"
         android:text="@string/recycler_item_description"
-        android:fontFamily="@font/open_sans"
         android:textColor="@color/contact_number"
         android:textSize="@dimen/item_desc_text_size"
-        app:layout_constraintStart_toEndOf="@+id/thumbnail"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/name" />
+        app:layout_constraintEnd_toStartOf="@+id/thumbnail"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/name"
+        tools:fontFamily="@font/open_sans_bold" />
 
     <HorizontalScrollView
         android:id="@+id/categories_scroll_container"
         android:layout_width="0dp"
         android:layout_height="35dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
         android:scrollbars="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/thumbnail">
+        app:layout_constraintEnd_toStartOf="@+id/thumbnail"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/uploader">
 
         <LinearLayout
             android:id="@+id/categories_layout_container"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_gravity="center"
+            android:layout_gravity="start|center"
             android:orientation="horizontal">
 
         </LinearLayout>
@@ -81,16 +91,14 @@
         android:id="@+id/uploader"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
         android:alpha="0.85"
-        android:fontFamily="@font/open_sans_light"
+        android:fontFamily="@font/open_sans"
         android:text="@string/recycler_item_uploader"
         android:textSize="@dimen/item_uploader_text_size"
-        app:layout_constraintBottom_toTopOf="@+id/categories_scroll_container"
-        app:layout_constraintEnd_toStartOf="@+id/number_of_likes"
-        app:layout_constraintTop_toBottomOf="@+id/description"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         tools:fontFamily="@font/open_sans" />
 
     <TextView
@@ -99,26 +107,22 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="2dp"
-        android:layout_marginBottom="8dp"
         android:alpha="0.9"
         android:fontFamily="@font/open_sans_light"
         android:text="@string/recycler_item_number_of_likes"
         android:textSize="@dimen/item_likes_text_size"
-        app:layout_constraintBottom_toTopOf="@+id/categories_scroll_container"
         app:layout_constraintEnd_toStartOf="@+id/heart_image"
-        app:layout_constraintTop_toBottomOf="@+id/description" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <android.support.v7.widget.AppCompatImageView
         android:id="@+id/heart_image"
         android:layout_width="20dp"
         android:layout_height="20dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="10dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
         android:alpha="0.85"
-        app:layout_constraintBottom_toTopOf="@+id/categories_scroll_container"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/description"
+        app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_heart" />
 
 </android.support.constraint.ConstraintLayout>

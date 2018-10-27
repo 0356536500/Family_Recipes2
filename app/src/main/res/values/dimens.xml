@@ -13,8 +13,8 @@
     <dimen name="text_margin">16dp</dimen>
 
     <!-- Item in recycler -->
-    <dimen name="item_name_text_size">20sp</dimen>
-    <dimen name="item_desc_text_size">15sp</dimen>
+    <dimen name="item_name_text_size">22sp</dimen>
+    <dimen name="item_desc_text_size">16sp</dimen>
     <dimen name="item_uploader_text_size">16sp</dimen>
     <dimen name="item_likes_text_size">16sp</dimen>
 

@@ -149,6 +149,7 @@ public class DataViewModel extends ViewModel {
         }
         //no internet connection
         else {
+            setInfoFromLastFetch(context.getString(R.string.no_internet_message));
             loadLocalCategories(context);
         }
     }
