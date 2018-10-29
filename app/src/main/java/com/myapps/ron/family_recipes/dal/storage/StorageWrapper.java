@@ -57,13 +57,13 @@ public class StorageWrapper {
         }
     }
 
-    public File createHtmlFile(Context context, String fileName, Spanned spanned) {
+    public static File createHtmlFile(Context context, String fileName, Spanned spanned) {
         //String path = Environment.getExternalStorageDirectory().getPath();
         //String fileName = DateFormat.format("dd_MM_yyyy_hh_mm_ss", System.currentTimeMillis()).toString();
         //fileName = fileName + ".html";
         //String path = ExternalStorageHelper.getFileAbsolutePath(context, fileName, com.myapps.ron.family_recipes.network.Constants.RECIPES_DIR);
         String path = context.getFilesDir().getPath();
-        Log.e("StorageWrapper", "path is " + path);
+        //Log.e("StorageWrapper", "path is " + path);
         File file = new File(path, fileName);
         if(file.exists()) {
             try {

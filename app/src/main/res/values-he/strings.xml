@@ -65,8 +65,9 @@
     <string name="create_recipe_field_required">שדה חובה</string>
     <string name="create_recipe_tags_required">לבחור לפחות %1$d קטגוריות</string>
     <string name="create_recipe_hint">הקלד כאן</string>
-    <string name="create_recipe_advanced_step_hr">קו הפרדה מתחת</string>
+    <string name="create_recipe_advanced_step_hr">קו הפרדה</string>
     <string name="create_recipe_advanced_step_bold">טקסט מודגש</string>
+    <string name="create_recipe_advanced_step_under_score">קו תחתון</string>
     <string name="create_recipe_advanced_step_preview">תצוגה מקדימה</string>
 
     <string name="large_text">

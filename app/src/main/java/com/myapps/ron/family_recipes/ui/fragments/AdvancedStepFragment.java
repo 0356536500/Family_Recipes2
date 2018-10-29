@@ -5,24 +5,35 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.AppCompatEditText;
-import android.text.Layout;
+import android.text.Editable;
+import android.text.Html;
 import android.text.Spanned;
+import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 
+import static j2html.TagCreator.*;
 import com.jaredrummler.android.util.HtmlBuilder;
 import com.myapps.ron.family_recipes.R;
+import com.myapps.ron.family_recipes.dal.storage.StorageWrapper;
 import com.myapps.ron.family_recipes.ui.CreateRecipeActivity;
+import com.myapps.ron.family_recipes.utils.Constants;
 import com.myapps.ron.family_recipes.utils.MyFragment;
 import com.myapps.ron.family_recipes.viewmodels.CreateRecipeViewModel;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,11 +42,14 @@ import java.util.List;
  */
 public class AdvancedStepFragment extends MyFragment {
 
-    private List<FlexibleHtmlStructureView> elements;
+    private final String TAG = getClass().getSimpleName();
+    private List<FlexibleHtmlStructure> elements;
     private LinearLayout layout;
 
     private CreateRecipeActivity activity;
     private CreateRecipeViewModel viewModel;
+
+    private Button preview;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -59,26 +73,83 @@ public class AdvancedStepFragment extends MyFragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-
         layout = view.findViewById(R.id.advanced_step_container);
+        preview = view.findViewById(R.id.advanced_step_preview_button);
+
         View element = getLayoutInflater().inflate(R.layout.flexible_html_structure, layout, false);
-        elements.add(new FlexibleHtmlStructureView(element));
+        layout.addView(element);
+        elements.add(new FlexibleHtmlStructure(element));
 
         viewModel =  ViewModelProviders.of(activity).get(CreateRecipeViewModel.class);
+
+        setListeners();
+    }
+
+    private void setListeners() {
+        preview.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //String str = Html.toHtml(generateSpanned());
+                //Log.e(TAG, str);
+                activity.showMyDialog(generateHtml());
+               /* Spanned spanned = generateSpanned();
+                //Log.e(TAG, Html.toHtml(spanned));
+                if (spanned != null) {
+                    File file = StorageWrapper.createHtmlFile(activity, "demo.html", spanned);
+                    if (file != null) {
+                        activity.showMyDialog(file.getAbsolutePath());
+                    }
+                }*/
+            }
+        });
+    }
+
+    private String generateHtml() {
+        return html(
+                body(
+                        main(
+                                h2("header2!!!!"),
+                                hr()
+                        )
+                )
+        ).render();
+    }
+
+    private Spanned generateSpanned() {
+        HtmlBuilder html = new HtmlBuilder();
+        html.open("html");
+        html.open("body");
+        html.close();
+        html.close();
+        if (!elements.get(0).isElementHasContent())
+            return null;
+        for (FlexibleHtmlStructure element : elements) {
+            if (element.isElementHasContent())
+                html = element.buildHtmlFromElement(html);
+        }
+        return html.build();
+    }
+
+    void addElementToScreen() {
+        View element = getLayoutInflater().inflate(R.layout.flexible_html_structure, layout, false);
+        layout.addView(element);
+        elements.add(new FlexibleHtmlStructure(element));
     }
 
 
-    class FlexibleHtmlStructureView {
+    class FlexibleHtmlStructure {
         private final int UNORDERED_LIST_POS = 3;
         private final int ORDERED_LIST_POS = 4;
         private final String LIST_ROW = "li";
+        private final String HORIZONTAL_RULE = "<hr>";
 
         private Spinner spinner;
-        private CheckBox checkBoxDivider, checkBoxBold ;
+        private CheckBox checkBoxDivider, checkBoxBold, checkBoxUnderScore ;
         private AppCompatEditText editText;
 
         private String stringElement;
         private int elementPos = 0;
+        private boolean hasUserTypedInEditText;
 
         private AdapterView.OnItemSelectedListener spinnerListener =
                 new AdapterView.OnItemSelectedListener() {
@@ -95,12 +166,34 @@ public class AdvancedStepFragment extends MyFragment {
                     }
                 };
 
-        FlexibleHtmlStructureView(View view) {
+        private TextWatcher textWatcher = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                if (!hasUserTypedInEditText && !editable.toString().isEmpty()) {
+                    hasUserTypedInEditText = true;
+                    addElementToScreen();
+                }
+            }
+        };
+
+        FlexibleHtmlStructure(View view) {
             spinner = view.findViewById(R.id.advanced_step_choose_type);
             checkBoxDivider = view.findViewById(R.id.advanced_step_horizontal_divider);
             checkBoxBold = view.findViewById(R.id.advanced_step_bold_checkBox);
+            checkBoxUnderScore = view.findViewById(R.id.advanced_step_under_score_checkBox);
             editText = view.findViewById(R.id.advanced_step_details_editText);
 
+            hasUserTypedInEditText = false;
             initUI();
         }
 
@@ -112,8 +205,12 @@ public class AdvancedStepFragment extends MyFragment {
             spinner.setAdapter(adapter);
 
             spinner.setOnItemSelectedListener(spinnerListener);
+            editText.addTextChangedListener(textWatcher);
 
+        }
 
+        public boolean isElementHasContent() {
+            return editText.getText() != null && editText.getText().toString().length() > 0;
         }
 
         public Spanned buildHtmlFromElement() {
@@ -125,32 +222,81 @@ public class AdvancedStepFragment extends MyFragment {
                 String htmlElement = getResources().getStringArray(R.array.html_elements_types)[elementPos];
 
                 html.open(htmlElement);
+                if (checkBoxBold.isChecked())
+                    html.b();
+
+                if (checkBoxUnderScore.isChecked())
+                    html.u();
 
                 if (elementPos != UNORDERED_LIST_POS && elementPos != ORDERED_LIST_POS) {
                     // header or paragraph
-                    if(checkBoxBold.isChecked())
-                        html.b(fromEditTest);
-                    else
-                        html.append(fromEditTest);
 
+                    html.append(fromEditTest);
                 } else {
                     //list separated by \n
-                    if (checkBoxBold.isChecked())
-                        html.b();
+
                     String[] rows = fromEditTest.split("\\r?\\n");
                     for (String row : rows) {
                         html.open(LIST_ROW, row);
                     }
-                    if (checkBoxBold.isChecked())
-                        html.close(); // close bold
-
-                    //html.open(htmlElement);
                 }
+
+                if (checkBoxUnderScore.isChecked())
+                    html.close(); // close under score
+
+                if (checkBoxBold.isChecked())
+                    html.close(); // close bold
 
                 html.close(htmlElement);
             }
-            
+
+            if (checkBoxDivider.isChecked())
+                html.append(HORIZONTAL_RULE);
+
             return html.build();
+        }
+
+        public HtmlBuilder buildHtmlFromElement(HtmlBuilder html) {
+            if (editText.getText() == null || editText.getText().toString().isEmpty())
+                return html;
+            String fromEditTest = editText.getText().toString();
+
+            if (stringElement != null && elementPos >= 0) {
+                String htmlElement = getResources().getStringArray(R.array.html_elements_types)[elementPos];
+
+                html.open(htmlElement);
+                if (checkBoxBold.isChecked())
+                    html.b();
+
+                if (checkBoxUnderScore.isChecked())
+                    html.u();
+
+                if (elementPos != UNORDERED_LIST_POS && elementPos != ORDERED_LIST_POS) {
+                    // header or paragraph
+
+                    html.append(fromEditTest);
+                } else {
+                    //list separated by \n
+
+                    String[] rows = fromEditTest.split("\\r?\\n");
+                    for (String row : rows) {
+                        html.open(LIST_ROW, row);
+                    }
+                }
+
+                if (checkBoxUnderScore.isChecked())
+                    html.close(); // close under score
+
+                if (checkBoxBold.isChecked())
+                    html.close(); // close bold
+
+                html.close(); // close element
+            }
+
+            if (checkBoxDivider.isChecked())
+                html.append(HORIZONTAL_RULE);
+
+            return html;
         }
 
         private Spanned buildHtmlFromElement11() {

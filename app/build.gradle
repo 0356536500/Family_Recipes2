@@ -20,6 +20,10 @@ android {
         disable 'GoogleAppIndexingWarning'
         baseline file("lint-baseline.xml") // your choice of filename/path here
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
@@ -56,6 +60,7 @@ dependencies {
     implementation 'com.tbuonomo.andrui:viewpagerdotsindicator:2.1.2'
 
     implementation 'com.jaredrummler:html-builder:1.0.0'
+    implementation 'com.j2html:j2html:1.3.0'
     /*implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"*/
     /*implementation 'com.github.Yalantis:SearchFilter:v1.0.4'*/
 }

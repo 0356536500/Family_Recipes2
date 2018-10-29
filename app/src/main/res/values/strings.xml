@@ -68,8 +68,9 @@
     <string name="create_recipe_field_required">Field is required</string>
     <string name="create_recipe_tags_required">must choose at least %1$d categories</string>
     <string name="create_recipe_hint">Type here</string>
-    <string name="create_recipe_advanced_step_hr">horizontal line below</string>
-    <string name="create_recipe_advanced_step_bold">bold</string>
+    <string name="create_recipe_advanced_step_hr">divider</string>
+    <string name="create_recipe_advanced_step_bold">Bold</string>
+    <string name="create_recipe_advanced_step_under_score">Underscore</string>
     <string name="create_recipe_advanced_step_preview">preview</string>
 
     <string-array name="html_elements">
@@ -81,8 +82,8 @@
     </string-array>
 
     <string-array name="html_elements_types">
-        <item>h3</item>
-        <item>h5</item>
+        <item>h2</item>
+        <item>h4</item>
         <item>p</item>
         <item>ul</item>
         <item>ol</item>

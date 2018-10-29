@@ -3,6 +3,7 @@ package com.myapps.ron.family_recipes.ui;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
@@ -10,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.ui.fragments.AdvancedStepFragment;
 import com.myapps.ron.family_recipes.ui.fragments.FirstStepFragment;
+import com.myapps.ron.family_recipes.ui.fragments.PreviewDialogFragment;
 import com.myapps.ron.family_recipes.utils.MyFragment;
 import com.myapps.ron.family_recipes.viewmodels.CreateRecipeViewModel;
 
@@ -24,6 +26,7 @@ public class CreateRecipeActivity extends AppCompatActivity {
     private CreateRecipeViewModel viewModel;
     private List<MyFragment> fragments;
     private int currentIndex = 0;
+    private boolean inPreview = false;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,8 +39,9 @@ public class CreateRecipeActivity extends AppCompatActivity {
 
     private void setFragments() {
         fragments = new ArrayList<>();
-        fragments.add(new FirstStepFragment());
         fragments.add(new AdvancedStepFragment());
+        fragments.add(new FirstStepFragment());
+
         /*fragments.add(new PickPhotosFragment());*/
 
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -49,7 +53,7 @@ public class CreateRecipeActivity extends AppCompatActivity {
     public void nextFragment() {
         if (currentIndex < 1) {//fragments.size() - 1) {
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            transaction.replace(R.id.create_fragment_container, fragments.get(0));
+            transaction.add(R.id.create_fragment_container, fragments.get(0));
             transaction.addToBackStack(null);
             transaction.commit();
             currentIndex++;
@@ -67,7 +71,25 @@ public class CreateRecipeActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if(!fragments.get(currentIndex).onBackPressed())
+        if (inPreview) {
             super.onBackPressed();
+            inPreview = false;
+        }
+        else if(!fragments.get(currentIndex).onBackPressed())
+            super.onBackPressed();
+    }
+
+    public void showMyDialog(String path) {
+        Fragment newFragment = new PreviewDialogFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString("html", path);
+        newFragment.setArguments(bundle);
+
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.add(R.id.create_fragment_container, newFragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
+
+        inPreview = true;
     }
 }

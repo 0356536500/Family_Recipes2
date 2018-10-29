@@ -6,35 +6,61 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <Spinner
-        android:id="@+id/advanced_step_choose_type"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/attributes_container1"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-    </Spinner>
+        android:orientation="horizontal">
 
-    <CheckBox
-        android:id="@+id/advanced_step_bold_checkBox"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:text="@string/create_recipe_advanced_step_bold"
-        app:layout_constraintEnd_toStartOf="@+id/advanced_step_choose_type"
-        app:layout_constraintTop_toTopOf="parent" />
+        <CheckBox
+            android:id="@+id/advanced_step_horizontal_divider"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.2"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:text="@string/create_recipe_advanced_step_hr" />
 
-    <CheckBox
-        android:id="@+id/advanced_step_horizontal_divider"
-        android:layout_width="wrap_content"
+        <Spinner
+            android:id="@+id/advanced_step_choose_type"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.7"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp" />
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/attributes_container2"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:text="@string/create_recipe_advanced_step_hr"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:orientation="horizontal"
+        app:layout_constraintTop_toBottomOf="@id/attributes_container1">
+
+        <CheckBox
+            android:id="@+id/advanced_step_bold_checkBox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:text="@string/create_recipe_advanced_step_bold" />
+
+
+        <CheckBox
+            android:id="@+id/advanced_step_under_score_checkBox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:text="@string/create_recipe_advanced_step_under_score" />
+
+    </LinearLayout>
+
 
     <android.support.v7.widget.AppCompatEditText
         android:id="@+id/advanced_step_details_editText"
@@ -57,7 +83,7 @@
         app:layout_constraintBottom_toTopOf="@id/advanced_step_space"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/advanced_step_horizontal_divider" />
+        app:layout_constraintTop_toBottomOf="@+id/attributes_container2" />
 
     <android.widget.Space
         android:id="@+id/advanced_step_space"
