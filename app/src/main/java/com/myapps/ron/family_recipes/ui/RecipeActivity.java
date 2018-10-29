@@ -33,7 +33,7 @@ import com.bumptech.glide.request.target.CustomViewTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.jaredrummler.android.util.HtmlBuilder;
 import com.myapps.ron.family_recipes.R;
-import com.myapps.ron.family_recipes.dal.RecipeViewModel;
+import com.myapps.ron.family_recipes.viewmodels.RecipeViewModel;
 import com.myapps.ron.family_recipes.dal.storage.StorageWrapper;
 import com.myapps.ron.family_recipes.model.Recipe;
 import com.myapps.ron.family_recipes.network.MiddleWareForNetwork;

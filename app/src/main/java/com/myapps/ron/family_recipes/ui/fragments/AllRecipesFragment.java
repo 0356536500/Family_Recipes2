@@ -30,7 +30,7 @@ import android.widget.Toast;
 
 import com.myapps.ron.family_recipes.MyDividerItemDecoration;
 import com.myapps.ron.family_recipes.R;
-import com.myapps.ron.family_recipes.dal.DataViewModel;
+import com.myapps.ron.family_recipes.viewmodels.DataViewModel;
 import com.myapps.ron.family_recipes.model.Category;
 import com.myapps.ron.family_recipes.model.Recipe;
 import com.myapps.ron.family_recipes.adapters.RecipesAdapter;

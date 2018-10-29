@@ -26,6 +26,7 @@
 
     <string name="sharedPreferences">com.myapps.ron.family_recipes</string>
     <string name="title_activity_recipe">RecipeActivity</string>
+    <string name="title_activity_create_recipe">מתכון חדש</string>
     <string name="title_activity_new_password">NewPassword</string>
     <string name="title_activity_login">Sign in</string>
 
@@ -56,6 +57,17 @@
     <string name="recipe_content_not_found">המתכון לא נמצא</string>
     <string name="recipe_not_in_server">המתכון לא קיים בשרת</string>
     <string name="no_internet_message">אין חיבור לרשת</string>
+
+    <!-- CreateRecipe Activity -->
+    <string name="create_recipe_name">שם המתכון</string>
+    <string name="create_recipe_description">תיאור המתכון</string>
+    <string name="create_recipe_next">הבא</string>
+    <string name="create_recipe_field_required">שדה חובה</string>
+    <string name="create_recipe_tags_required">לבחור לפחות %1$d קטגוריות</string>
+    <string name="create_recipe_hint">הקלד כאן</string>
+    <string name="create_recipe_advanced_step_hr">קו הפרדה מתחת</string>
+    <string name="create_recipe_advanced_step_bold">טקסט מודגש</string>
+    <string name="create_recipe_advanced_step_preview">תצוגה מקדימה</string>
 
     <string name="large_text">
         "Material is the metaphor.\n\n"

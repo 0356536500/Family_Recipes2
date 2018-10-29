@@ -35,7 +35,7 @@ import android.widget.TextView;
 
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUser;
 import com.myapps.ron.family_recipes.R;
-import com.myapps.ron.family_recipes.dal.DataViewModel;
+import com.myapps.ron.family_recipes.viewmodels.DataViewModel;
 import com.myapps.ron.family_recipes.network.MiddleWareForNetwork;
 import com.myapps.ron.family_recipes.network.cognito.AppHelper;
 import com.myapps.ron.family_recipes.ui.fragments.AllRecipesFragment;

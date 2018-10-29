@@ -1,4 +1,4 @@
-package com.myapps.ron.family_recipes.dal;
+package com.myapps.ron.family_recipes.viewmodels;
 
 import android.annotation.SuppressLint;
 import android.arch.lifecycle.LiveData;

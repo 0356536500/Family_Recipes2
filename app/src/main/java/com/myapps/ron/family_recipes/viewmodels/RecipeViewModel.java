@@ -1,4 +1,4 @@
-package com.myapps.ron.family_recipes.dal;
+package com.myapps.ron.family_recipes.viewmodels;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
@@ -20,8 +20,6 @@ import com.myapps.ron.family_recipes.network.cognito.AppHelper;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
-
-import static android.support.constraint.Constraints.TAG;
 
 /**
  * class for use by RecipeActivity.

@@ -28,13 +28,13 @@ import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.Authentic
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.network.Constants;
 import com.myapps.ron.family_recipes.network.cognito.AppHelper;
+import com.myapps.ron.family_recipes.utils.SharedPreferencesHandler;
 
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
 public class LoginActivity extends AppCompatActivity {
-    private final String TAG="MainActivity";
+    private final String TAG = getClass().getSimpleName();
 
     //private NavigationView nDrawer;
     //private DrawerLayout mDrawer;
@@ -228,8 +228,8 @@ public class LoginActivity extends AppCompatActivity {
     private void signInUser() {
         username = inUsername.getText().toString();
         if(username == null || username.length() < 1) {
-            TextView label = (TextView) findViewById(R.id.textViewUserIdMessage);
-            label.setText(inUsername.getHint()+" cannot be empty");
+            TextView label = findViewById(R.id.textViewUserIdMessage);
+            label.setText(inUsername.getHint().toString().concat(" cannot be empty"));
             inUsername.setBackground(getDrawable(R.drawable.text_border_error));
             return;
         }
@@ -238,8 +238,8 @@ public class LoginActivity extends AppCompatActivity {
 
         password = inPassword.getText().toString();
         if(password == null || password.length() < 1) {
-            TextView label = (TextView) findViewById(R.id.textViewUserPasswordMessage);
-            label.setText(inPassword.getHint()+" cannot be empty");
+            TextView label = findViewById(R.id.textViewUserPasswordMessage);
+            label.setText(inPassword.getHint().toString().concat(" cannot be empty"));
             inPassword.setBackground(getDrawable(R.drawable.text_border_error));
             return;
         }
@@ -313,11 +313,11 @@ public class LoginActivity extends AppCompatActivity {
             newPasswordContinuation.continueTask();
         } catch (Exception e) {
             closeWaitDialog();
-            TextView label = (TextView) findViewById(R.id.textViewUserIdMessage);
+            TextView label = findViewById(R.id.textViewUserIdMessage);
             label.setText("Sign-in failed");
             inPassword.setBackground(getDrawable(R.drawable.text_border_error));
 
-            label = (TextView) findViewById(R.id.textViewUserIdMessage);
+            label = findViewById(R.id.textViewUserIdMessage);
             label.setText("Sign-in failed");
             inUsername.setBackground(getDrawable(R.drawable.text_border_error));
 
@@ -357,15 +357,15 @@ public class LoginActivity extends AppCompatActivity {
             inUsername.setText(username);
             password = inPassword.getText().toString();
             if(password == null) {
-                TextView label = (TextView) findViewById(R.id.textViewUserPasswordMessage);
-                label.setText(inPassword.getHint()+" enter password");
+                TextView label = findViewById(R.id.textViewUserPasswordMessage);
+                label.setText(inPassword.getHint().toString().concat(" enter password"));
                 inPassword.setBackground(getDrawable(R.drawable.text_border_error));
                 return;
             }
 
             if(password.length() < 1) {
-                TextView label = (TextView) findViewById(R.id.textViewUserPasswordMessage);
-                label.setText(inPassword.getHint()+" enter password");
+                TextView label = findViewById(R.id.textViewUserPasswordMessage);
+                label.setText(inPassword.getHint().toString().concat(" enter password"));
                 inPassword.setBackground(getDrawable(R.drawable.text_border_error));
                 return;
             }
@@ -467,6 +467,7 @@ public class LoginActivity extends AppCompatActivity {
             AppHelper.setIdentityProvider(getApplicationContext(), cognitoUserSession);
 
             closeWaitDialog();
+            writeCredentialsToSharedPref();
             launchUser();
         }
 
@@ -565,5 +566,11 @@ public class LoginActivity extends AppCompatActivity {
         catch (Exception e) {
             //
         }
+    }
+
+    private void writeCredentialsToSharedPref() {
+        SharedPreferencesHandler.writeString(getApplicationContext(), "username", username);
+        SharedPreferencesHandler.writeString(getApplicationContext(), "password", password);
+        SharedPreferencesHandler.writeBoolean(getApplication(), "rememberMe", true);
     }
 }

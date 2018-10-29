@@ -68,7 +68,7 @@
         android:layout_below="@+id/space2"
         android:layout_centerHorizontal="true" />
 
-    <EditText
+    <android.support.v7.widget.AppCompatEditText
         android:layout_width="match_parent"
         android:layout_height="@dimen/activity_text_height"
         android:paddingLeft="@dimen/activity_text_padding"
@@ -100,7 +100,7 @@
         android:layout_centerHorizontal="true"
         android:layout_below="@+id/textViewUserIdMessage" />
 
-    <EditText
+    <android.support.v7.widget.AppCompatEditText
         android:layout_width="match_parent"
         android:layout_height="@dimen/activity_text_height"
         android:paddingLeft="@dimen/activity_text_padding"

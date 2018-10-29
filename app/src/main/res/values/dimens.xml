@@ -22,4 +22,10 @@
 
     <!-- Pager Adapter -->
     <dimen name="pager_close_button_size">45dp</dimen>
+
+    <!-- CreateRecipe Activity -->
+    <dimen name="label_horizontal_margin">20dp</dimen>
+    <dimen name="edit_text_horizontal_margin">15dp</dimen>
+    <dimen name="label_text_size">18sp</dimen>
+    <dimen name="edit_text_text_size">16sp</dimen>
 </resources>
