@@ -80,6 +80,7 @@ public class FirstStepFragment extends MyFragment implements FilterListener<Cate
         initViewModel();
         setListeners();
 
+        activity.setTitle("post 1/3");
         viewModel.loadCategories(activity);
     }
 

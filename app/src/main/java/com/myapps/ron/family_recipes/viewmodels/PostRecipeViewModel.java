@@ -4,6 +4,7 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 import android.content.Context;
+import android.net.Uri;
 
 import com.myapps.ron.family_recipes.dal.db.CategoriesDBHelper;
 import com.myapps.ron.family_recipes.dal.storage.StorageWrapper;
@@ -11,6 +12,8 @@ import com.myapps.ron.family_recipes.model.Category;
 import com.myapps.ron.family_recipes.model.Recipe;
 
 import java.io.File;
+import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -21,6 +24,7 @@ public class PostRecipeViewModel extends ViewModel {
     private MutableLiveData<List<Category>> categoryList = new MutableLiveData<>(); // list of categories from local db
 
     private File recipeFile;
+    public List<Uri> imagesUris = new ArrayList<>();
     public Recipe recipe = new Recipe();
 
     private void setRecipePath(String item) {
@@ -43,6 +47,10 @@ public class PostRecipeViewModel extends ViewModel {
     public void loadCategories(final Context context) {
         CategoriesDBHelper dbHelper = new CategoriesDBHelper(context);
         setCategories(dbHelper.getAllCategories());
+    }
+
+    public File getRecipeFile() {
+        return recipeFile;
     }
 
     public void setRecipeFile(Context context, String html) {

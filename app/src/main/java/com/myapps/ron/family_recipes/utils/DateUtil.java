@@ -20,7 +20,7 @@ public class DateUtil {
     private static final String UPDATED_CATS_KEY = "last_updated_categories";
     private static final String DATE_TEMPLATE = "yyyy-MM-dd HH:mm:ss";
 
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat(DATE_TEMPLATE, Locale.ENGLISH);
+    public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat(DATE_TEMPLATE, Locale.ENGLISH);
 
     public static String getUTCTime() {
         DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC"));

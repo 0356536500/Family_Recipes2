@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatButton;
 import android.util.Log;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.ui.fragments.AdvancedStepFragment;
@@ -44,9 +45,10 @@ public class PostRecipeActivity extends AppCompatActivity {
 
     private void setFragments() {
         fragments = new ArrayList<>();
-        fragments.add(new PickPhotosFragment());
-        fragments.add(new AdvancedStepFragment());
+
         fragments.add(new FirstStepFragment());
+        fragments.add(new AdvancedStepFragment());
+        fragments.add(new PickPhotosFragment());
 
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.add(R.id.create_fragment_container, fragments.get(0));
@@ -56,9 +58,9 @@ public class PostRecipeActivity extends AppCompatActivity {
 
     public void nextFragment() {
         Log.e(getClass().getSimpleName(), "current index = " + currentIndex);
-        if (currentIndex < 1) {//fragments.size() - 1) {
+        if (currentIndex < fragments.size() - 1) {
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            transaction.add(R.id.create_fragment_container, fragments.get(++currentIndex));
+            transaction.replace(R.id.create_fragment_container, fragments.get(++currentIndex));
             transaction.addToBackStack(null);
             transaction.commit();
         }
@@ -67,9 +69,8 @@ public class PostRecipeActivity extends AppCompatActivity {
     public void previousFragment() {
         if (currentIndex > 0) {
             currentIndex--;
+            super.onBackPressed();
         }
-
-        super.onBackPressed();
     }
 
 
@@ -111,5 +112,9 @@ public class PostRecipeActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayShowHomeEnabled(true);
         }
         inPreview = true;
+    }
+
+    public void postRecipe() {
+        Toast.makeText(this, "posting the recipe...", Toast.LENGTH_SHORT).show();
     }
 }

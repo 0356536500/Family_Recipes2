@@ -1,6 +1,7 @@
 package com.myapps.ron.family_recipes.dal.storage;
 
 import android.content.Context;
+import android.os.Environment;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.Log;
@@ -9,10 +10,16 @@ import com.myapps.ron.family_recipes.model.Recipe;
 import com.myapps.ron.family_recipes.network.Constants;
 import com.myapps.ron.family_recipes.network.MyCallback;
 import com.myapps.ron.family_recipes.network.S3.OnlineStorageWrapper;
+import com.myapps.ron.family_recipes.utils.DateUtil;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
 
 public class StorageWrapper {
 
@@ -89,6 +96,26 @@ public class StorageWrapper {
         }
 
         return file;
+    }
+
+    public static File createImageFile(Context context) throws IOException {
+        // Create an image file name
+        DateFormat dateFormat = DateUtil.DATE_FORMAT;
+        dateFormat.setTimeZone(TimeZone.getDefault());
+        String timeStamp = dateFormat.format(new Date());
+        //String timeStamp = SimpleDateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.FULL, Locale.getDefault()).format(new Date());//"yyyyMMdd_HHmmss").format(new Date());
+        //String imageFileName = "JPEG_" + timeStamp + "_";
+        //File storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        return File.createTempFile(
+                timeStamp,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+
+        // Save a file: path for use with ACTION_VIEW intents
+        //mCurrentPhotoPath = image.getAbsolutePath();
+        //return image;
     }
 
 /*    private void showChoosingFile() {

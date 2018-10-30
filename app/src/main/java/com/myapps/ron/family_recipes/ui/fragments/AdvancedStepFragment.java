@@ -74,7 +74,8 @@ public class AdvancedStepFragment extends MyFragment {
 
         viewModel =  ViewModelProviders.of(activity).get(PostRecipeViewModel.class);
 
-        activity.setTitle("create 2/3");
+        Log.e(TAG, "onViewCreated");
+        activity.setTitle("post 2/3");
         setListeners();
     }
 
@@ -89,12 +90,27 @@ public class AdvancedStepFragment extends MyFragment {
         activity.nextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String html = generateHtml();
-                Log.e(TAG, html);
-                viewModel.setRecipeFile(activity, html);
-                activity.nextFragment();
+                if(checkValidInput()) {
+                    String html = generateHtml();
+                    Log.e(TAG, html);
+                    viewModel.setRecipeFile(activity, html);
+                    activity.nextFragment();
+                } else {
+                    Toast.makeText(activity, getString(R.string.post_recipe_advanced_step_validation_message, 2), Toast.LENGTH_SHORT).show();
+                }
             }
         });
+    }
+
+    private boolean checkValidInput() {
+        if(elements.size() <= 1)
+            return false;
+        for (int i = 0; i < elements.size(); i++) {
+            //check if any element is not valid except for the last one
+            if (!elements.get(i).isElementHasContent() && i < elements.size() - 1)
+                return false;
+        }
+        return true;
     }
 
     private String generateHtml() {
@@ -138,9 +154,7 @@ public class AdvancedStepFragment extends MyFragment {
                         elementPos = i;
 
                         if (elementPos >= UNORDERED_LIST_POS && elementPos <= ORDERED_LIST_POS) {
-                            Toast toast = new Toast(activity);
-                            toast.setText(R.string.post_recipe_advanced_step_list_message);
-                            toast.setDuration(Toast.LENGTH_LONG);
+                            Toast toast = Toast.makeText(activity, R.string.post_recipe_advanced_step_list_message, Toast.LENGTH_LONG);
                             toast.setGravity(Gravity.CENTER, 0, 0);
                             toast.show();
                         }
