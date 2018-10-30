@@ -21,7 +21,6 @@ import android.support.v4.widget.CircularProgressDrawable;
 import android.support.v4.widget.ContentLoadingProgressBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.Spanned;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -31,9 +30,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.request.target.CustomViewTarget;
 import com.bumptech.glide.request.transition.Transition;
-import com.jaredrummler.android.util.HtmlBuilder;
 import com.myapps.ron.family_recipes.R;
-import com.myapps.ron.family_recipes.viewmodels.RecipeViewModel;
 import com.myapps.ron.family_recipes.dal.storage.StorageWrapper;
 import com.myapps.ron.family_recipes.model.Recipe;
 import com.myapps.ron.family_recipes.network.MiddleWareForNetwork;
@@ -41,6 +38,7 @@ import com.myapps.ron.family_recipes.network.MyCallback;
 import com.myapps.ron.family_recipes.ui.fragments.PagerDialogFragment;
 import com.myapps.ron.family_recipes.utils.Constants;
 import com.myapps.ron.family_recipes.utils.GlideApp;
+import com.myapps.ron.family_recipes.viewmodels.RecipeViewModel;
 
 import java.io.File;
 
@@ -311,87 +309,6 @@ public class RecipeActivity extends AppCompatActivity {
             });
         }
     }
-
-    private Spanned buildDemoHtml() {
-        HtmlBuilder html = new HtmlBuilder();
-        html.h1("Example Usage");
-
-        html.h3().font("cursive", "Code:").close();
-        html.font(0xFFCAE682, "HtmlBuilder")
-                .append(' ')
-                .font(0xFFD4C4A9, "html")
-                .append(' ')
-                .font(0xFF888888, "=")
-                .append(" ")
-                .font(0xFF33B5E5, "new")
-                .append(" ")
-                .font(0xFFCAE682, "HtmlBuilder")
-                .append("()")
-                .br();
-        html.font(0xFFD4C4A9, "html")
-                .append(".strong(")
-                .font(0xFF95E454, "\"Strong text\"")
-                .append(").br();")
-                .br();
-        html.font(0xFFD4C4A9, "html")
-                .append(".font(")
-                .font(0xFFCAE682, "Color")
-                .append('.')
-                .font(0xFF53DCCD, "RED")
-                .append(", ")
-                .font(0xFF95E454, "\"This will be red text\"")
-                .append(");")
-                .br();
-        html.font(0xFFCAE682, "textView")
-                .append(".setText(")
-                .font(0xFFD4C4A9, "html")
-                .append(".build());")
-                .close()
-                .br();
-
-        html.h3().font("cursive", "Result:").close();
-        html.strong("Strong text").br().font(Color.RED, "This will be red text");
-
-        html.h1("Supported Tags");
-        html.append("&lt;a href=&quot;...&quot;&gt;").br();
-        html.append("&lt;b&gt;").br();
-        html.append("&lt;big&gt;").br();
-        html.append("&lt;blockquote&gt;").br();
-        html.append("&lt;br&gt;").br();
-        html.append("&lt;cite&gt;").br();
-        html.append("&lt;dfn&gt;").br();
-        html.append("&lt;div align=&quot;...&quot;&gt;").br();
-        html.append("&lt;em&gt;").br();
-        html.append("&lt;font color=&quot;...&quot; face=&quot;...&quot;&gt;").br();
-        html.append("&lt;h1&gt;").br();
-        html.append("&lt;h2&gt;").br();
-        html.append("&lt;h3&gt;").br();
-        html.append("&lt;h4&gt;").br();
-        html.append("&lt;h5&gt;").br();
-        html.append("&lt;h6&gt;").br();
-        html.append("&lt;i&gt;").br();
-        html.append("&lt;img src=&quot;...&quot;&gt;").br();
-        html.append("&lt;p&gt;").br();
-        html.append("&lt;small&gt;").br();
-        html.append("&lt;strike&gt;").br();
-        html.append("&lt;strong&gt;").br();
-        html.append("&lt;sub&gt;").br();
-        html.append("&lt;sup&gt;").br();
-        html.append("&lt;tt&gt;").br();
-        html.append("&lt;u&gt;").br();
-        html.append("&ul;u&gt;").br();
-        html.append("&li;u&gt;").br();
-
-        html.h1("Links");
-        html.p()
-                .strong().a("https://twitter.com/jaredrummler", "Twitter").close()
-                .append("&nbsp;&nbsp;|&nbsp;&nbsp;")
-                .strong().a("https://github.com/jaredrummler", "GitHub").close()
-                .close();
-
-        return html.build();
-    }
-
 
     public void doLike(View view) {
         //recipe.setMeLike(!recipe.getMeLike());

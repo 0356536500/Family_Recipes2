@@ -52,9 +52,9 @@
             android:label="@string/title_activity_recipe"
             android:theme="@style/AppTheme" />
         <activity
-            android:name=".ui.CreateRecipeActivity"
+            android:name=".ui.PostRecipeActivity"
             android:label="@string/title_activity_create_recipe"
-            android:theme="@style/AppTheme"
+            android:theme="@style/AppThemeWithActionBar"
             android:windowSoftInputMode="adjustPan">
 
         <intent-filter>

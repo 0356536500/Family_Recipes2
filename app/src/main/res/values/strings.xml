@@ -62,28 +62,30 @@
     <string name="no_internet_message">Not connected to internet</string>
 
     <!-- CreateRecipe Activity -->
-    <string name="create_recipe_name">Recipe name</string>
-    <string name="create_recipe_description">Recipe description</string>
-    <string name="create_recipe_next">next</string>
-    <string name="create_recipe_field_required">Field is required</string>
-    <string name="create_recipe_tags_required">must choose at least %1$d categories</string>
-    <string name="create_recipe_hint">Type here</string>
-    <string name="create_recipe_advanced_step_hr">divider</string>
-    <string name="create_recipe_advanced_step_bold">Bold</string>
-    <string name="create_recipe_advanced_step_under_score">Underscore</string>
-    <string name="create_recipe_advanced_step_preview">preview</string>
+    <string name="post_recipe_name">Recipe name</string>
+    <string name="post_recipe_description">Recipe description</string>
+    <string name="post_recipe_next">next</string>
+    <string name="post_recipe_field_required">Field is required</string>
+    <string name="post_recipe_tags_required">must choose at least %1$d categories</string>
+    <string name="post_recipe_hint">Type here</string>
+    <string name="post_recipe_advanced_step_hr">divider</string>
+    <string name="post_recipe_advanced_step_bold">Bold</string>
+    <string name="post_recipe_advanced_step_under_score">Underscore</string>
+    <string name="post_recipe_advanced_step_preview">preview</string>
+    <string name="post_recipe_advanced_step_list_message">Press ENTER to create list item</string>
+    <string name="post_recipe_pick_photos_button">choose</string>
 
     <string-array name="html_elements">
         <item>Header</item>
         <item>Sub Header</item>
         <item>Plain Text</item>
         <item>Unordered list</item>
-        <item>Order list</item>
+        <item>Ordered list</item>
     </string-array>
 
     <string-array name="html_elements_types">
         <item>h2</item>
-        <item>h4</item>
+        <item>h3</item>
         <item>p</item>
         <item>ul</item>
         <item>ol</item>

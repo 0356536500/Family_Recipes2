@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.AppCompatEditText;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -19,9 +18,9 @@ import android.widget.Toast;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.model.Category;
 import com.myapps.ron.family_recipes.network.Constants;
-import com.myapps.ron.family_recipes.ui.CreateRecipeActivity;
+import com.myapps.ron.family_recipes.ui.PostRecipeActivity;
 import com.myapps.ron.family_recipes.utils.MyFragment;
-import com.myapps.ron.family_recipes.viewmodels.CreateRecipeViewModel;
+import com.myapps.ron.family_recipes.viewmodels.PostRecipeViewModel;
 import com.myapps.ron.searchfilter.adapter.FilterAdapter;
 import com.myapps.ron.searchfilter.listener.FilterListener;
 import com.myapps.ron.searchfilter.widget.Filter;
@@ -36,21 +35,20 @@ import java.util.List;
 public class FirstStepFragment extends MyFragment implements FilterListener<Category> {
 
     private AppCompatEditText editTextName, editTextDesc;
-    private AppCompatButton buttonNext;
     private Filter<Category> mFilter;
     private List<Category> allTags;
     private List<String> tags;
     private int[] mColors;
     private String name, desc;
 
-    private CreateRecipeViewModel viewModel;
-    private CreateRecipeActivity activity;
+    private PostRecipeViewModel viewModel;
+    private PostRecipeActivity activity;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        activity = (CreateRecipeActivity)getActivity();
+        activity = (PostRecipeActivity)getActivity();
     }
 
     @Override
@@ -66,7 +64,7 @@ public class FirstStepFragment extends MyFragment implements FilterListener<Cate
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         //return super.onCreateView(inflater, container, savedInstanceState);
-        return inflater.inflate(R.layout.content_creation_first_step, container,false);
+        return inflater.inflate(R.layout.content_post_first_step, container,false);
     }
 
     @Override
@@ -75,7 +73,6 @@ public class FirstStepFragment extends MyFragment implements FilterListener<Cate
 
         editTextName = view.findViewById(R.id.recipe_name_editText);
         editTextDesc = view.findViewById(R.id.recipe_desc_editText);
-        buttonNext = view.findViewById(R.id.first_step_next);
         mFilter = view.findViewById(R.id.first_step_filter);
 
         mColors = getResources().getIntArray(R.array.colors);
@@ -87,7 +84,7 @@ public class FirstStepFragment extends MyFragment implements FilterListener<Cate
     }
 
     private void initViewModel() {
-        viewModel =  ViewModelProviders.of(activity).get(CreateRecipeViewModel.class);
+        viewModel =  ViewModelProviders.of(activity).get(PostRecipeViewModel.class);
         viewModel.getCategories().observe(this, new Observer<List<Category>>() {
             @Override
             public void onChanged(@Nullable List<Category> categories) {
@@ -127,7 +124,7 @@ public class FirstStepFragment extends MyFragment implements FilterListener<Cate
     }
 
     private void setListeners() {
-        buttonNext.setOnClickListener(new View.OnClickListener() {
+        activity.nextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (checkValidation()) {
@@ -184,17 +181,17 @@ public class FirstStepFragment extends MyFragment implements FilterListener<Cate
         boolean valid = true;
         if (editTextName.getText() == null || editTextName.getText().toString().isEmpty()) {
             valid = false;
-            editTextName.setError(getString(R.string.create_recipe_field_required));
+            editTextName.setError(getString(R.string.post_recipe_field_required));
             editTextName.getBackground().setTint(Color.RED);
         }
         if (editTextDesc.getText() == null || editTextDesc.getText().toString().isEmpty()) {
             valid = false;
-            editTextDesc.setError(getString(R.string.create_recipe_field_required));
+            editTextDesc.setError(getString(R.string.post_recipe_field_required));
             editTextDesc.getBackground().setTint(Color.RED);
         }
         if (tags == null || tags.size() < Constants.MIN_TAGS) {
             if (valid)
-                Toast.makeText(activity, getString(R.string.create_recipe_tags_required, Constants.MIN_TAGS), Toast.LENGTH_SHORT).show();
+                Toast.makeText(activity, getString(R.string.post_recipe_tags_required, Constants.MIN_TAGS), Toast.LENGTH_SHORT).show();
             valid = false;
         }
         return valid;

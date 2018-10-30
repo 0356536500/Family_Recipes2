@@ -20,7 +20,7 @@ import com.myapps.ron.family_recipes.R;
  */
 public class PreviewDialogFragment extends Fragment {
 
-    private String html, path;
+    private String html;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {

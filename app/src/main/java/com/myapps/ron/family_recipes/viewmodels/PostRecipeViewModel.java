@@ -6,19 +6,21 @@ import android.arch.lifecycle.ViewModel;
 import android.content.Context;
 
 import com.myapps.ron.family_recipes.dal.db.CategoriesDBHelper;
-import com.myapps.ron.family_recipes.dal.db.RecipesDBHelper;
+import com.myapps.ron.family_recipes.dal.storage.StorageWrapper;
 import com.myapps.ron.family_recipes.model.Category;
 import com.myapps.ron.family_recipes.model.Recipe;
 
+import java.io.File;
 import java.util.List;
 
 /**
  * Created by ronginat on 29/10/2018.
  */
-public class CreateRecipeViewModel extends ViewModel {
+public class PostRecipeViewModel extends ViewModel {
     private MutableLiveData<String> recipePath = new MutableLiveData<>();
     private MutableLiveData<List<Category>> categoryList = new MutableLiveData<>(); // list of categories from local db
 
+    private File recipeFile;
     public Recipe recipe = new Recipe();
 
     private void setRecipePath(String item) {
@@ -41,6 +43,10 @@ public class CreateRecipeViewModel extends ViewModel {
     public void loadCategories(final Context context) {
         CategoriesDBHelper dbHelper = new CategoriesDBHelper(context);
         setCategories(dbHelper.getAllCategories());
+    }
+
+    public void setRecipeFile(Context context, String html) {
+        recipeFile = StorageWrapper.createHtmlFile(context,recipe.getName().concat(".html"), html);
     }
 
 

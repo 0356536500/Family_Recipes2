@@ -57,7 +57,7 @@ public class StorageWrapper {
         }
     }
 
-    public static File createHtmlFile(Context context, String fileName, Spanned spanned) {
+    public static File createHtmlFile(Context context, String fileName, String html) {
         //String path = Environment.getExternalStorageDirectory().getPath();
         //String fileName = DateFormat.format("dd_MM_yyyy_hh_mm_ss", System.currentTimeMillis()).toString();
         //fileName = fileName + ".html";
@@ -77,7 +77,7 @@ public class StorageWrapper {
 
         try {
             FileOutputStream out = new FileOutputStream(file);
-            byte[] data = Html.toHtml(spanned).getBytes();
+            byte[] data = html.getBytes();
             out.write(data);
             out.close();
             Log.e("StorageWrapper", "createHtml File Saved : " + file.getPath());

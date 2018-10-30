@@ -1,19 +1,14 @@
 package com.myapps.ron.family_recipes.ui.fragments;
 
 import android.arch.lifecycle.ViewModelProviders;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.AppCompatEditText;
 import android.text.Editable;
-import android.text.Html;
-import android.text.Spanned;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,17 +18,14 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.Toast;
 
-import static j2html.TagCreator.*;
-import com.jaredrummler.android.util.HtmlBuilder;
 import com.myapps.ron.family_recipes.R;
-import com.myapps.ron.family_recipes.dal.storage.StorageWrapper;
-import com.myapps.ron.family_recipes.ui.CreateRecipeActivity;
-import com.myapps.ron.family_recipes.utils.Constants;
+import com.myapps.ron.family_recipes.ui.PostRecipeActivity;
+import com.myapps.ron.family_recipes.utils.HtmlHelper;
 import com.myapps.ron.family_recipes.utils.MyFragment;
-import com.myapps.ron.family_recipes.viewmodels.CreateRecipeViewModel;
+import com.myapps.ron.family_recipes.viewmodels.PostRecipeViewModel;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,8 +38,8 @@ public class AdvancedStepFragment extends MyFragment {
     private List<FlexibleHtmlStructure> elements;
     private LinearLayout layout;
 
-    private CreateRecipeActivity activity;
-    private CreateRecipeViewModel viewModel;
+    private PostRecipeActivity activity;
+    private PostRecipeViewModel viewModel;
 
     private Button preview;
 
@@ -56,7 +48,7 @@ public class AdvancedStepFragment extends MyFragment {
         super.onCreate(savedInstanceState);
 
         elements = new ArrayList<>();
-        activity = (CreateRecipeActivity)getActivity();
+        activity = (PostRecipeActivity)getActivity();
     }
 
     @Override
@@ -68,7 +60,7 @@ public class AdvancedStepFragment extends MyFragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.content_creation_advanced_step, container, false);
+        return inflater.inflate(R.layout.content_post_advanced_step, container, false);
     }
 
     @Override
@@ -80,8 +72,9 @@ public class AdvancedStepFragment extends MyFragment {
         layout.addView(element);
         elements.add(new FlexibleHtmlStructure(element));
 
-        viewModel =  ViewModelProviders.of(activity).get(CreateRecipeViewModel.class);
+        viewModel =  ViewModelProviders.of(activity).get(PostRecipeViewModel.class);
 
+        activity.setTitle("create 2/3");
         setListeners();
     }
 
@@ -89,45 +82,33 @@ public class AdvancedStepFragment extends MyFragment {
         preview.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //String str = Html.toHtml(generateSpanned());
-                //Log.e(TAG, str);
                 activity.showMyDialog(generateHtml());
-               /* Spanned spanned = generateSpanned();
-                //Log.e(TAG, Html.toHtml(spanned));
-                if (spanned != null) {
-                    File file = StorageWrapper.createHtmlFile(activity, "demo.html", spanned);
-                    if (file != null) {
-                        activity.showMyDialog(file.getAbsolutePath());
-                    }
-                }*/
+            }
+        });
+
+        activity.nextButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String html = generateHtml();
+                Log.e(TAG, html);
+                viewModel.setRecipeFile(activity, html);
+                activity.nextFragment();
             }
         });
     }
 
     private String generateHtml() {
-        return html(
-                body(
-                        main(
-                                h2("header2!!!!"),
-                                hr()
-                        )
-                )
-        ).render();
-    }
+        HtmlHelper helper = new HtmlHelper();
+        helper.openStaticElements();
 
-    private Spanned generateSpanned() {
-        HtmlBuilder html = new HtmlBuilder();
-        html.open("html");
-        html.open("body");
-        html.close();
-        html.close();
-        if (!elements.get(0).isElementHasContent())
-            return null;
         for (FlexibleHtmlStructure element : elements) {
             if (element.isElementHasContent())
-                html = element.buildHtmlFromElement(html);
+                helper = element.buildHtmlFromElement(helper);
         }
-        return html.build();
+
+        helper.closeStaticElements();
+
+        return helper.toString();
     }
 
     void addElementToScreen() {
@@ -140,8 +121,6 @@ public class AdvancedStepFragment extends MyFragment {
     class FlexibleHtmlStructure {
         private final int UNORDERED_LIST_POS = 3;
         private final int ORDERED_LIST_POS = 4;
-        private final String LIST_ROW = "li";
-        private final String HORIZONTAL_RULE = "<hr>";
 
         private Spinner spinner;
         private CheckBox checkBoxDivider, checkBoxBold, checkBoxUnderScore ;
@@ -157,6 +136,14 @@ public class AdvancedStepFragment extends MyFragment {
                     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                         stringElement = (String) adapterView.getItemAtPosition(i);
                         elementPos = i;
+
+                        if (elementPos >= UNORDERED_LIST_POS && elementPos <= ORDERED_LIST_POS) {
+                            Toast toast = new Toast(activity);
+                            toast.setText(R.string.post_recipe_advanced_step_list_message);
+                            toast.setDuration(Toast.LENGTH_LONG);
+                            toast.setGravity(Gravity.CENTER, 0, 0);
+                            toast.show();
+                        }
                     }
 
                     @Override
@@ -209,176 +196,57 @@ public class AdvancedStepFragment extends MyFragment {
 
         }
 
-        public boolean isElementHasContent() {
+        boolean isElementHasContent() {
             return editText.getText() != null && editText.getText().toString().length() > 0;
         }
 
-        public Spanned buildHtmlFromElement() {
+        HtmlHelper buildHtmlFromElement(HtmlHelper helper) {
             if (editText.getText() == null || editText.getText().toString().isEmpty())
-                return null;
-            String fromEditTest = editText.getText().toString();
-            HtmlBuilder html = new HtmlBuilder();
-            if (stringElement != null && elementPos >= 0) {
-                String htmlElement = getResources().getStringArray(R.array.html_elements_types)[elementPos];
-
-                html.open(htmlElement);
-                if (checkBoxBold.isChecked())
-                    html.b();
-
-                if (checkBoxUnderScore.isChecked())
-                    html.u();
-
-                if (elementPos != UNORDERED_LIST_POS && elementPos != ORDERED_LIST_POS) {
-                    // header or paragraph
-
-                    html.append(fromEditTest);
-                } else {
-                    //list separated by \n
-
-                    String[] rows = fromEditTest.split("\\r?\\n");
-                    for (String row : rows) {
-                        html.open(LIST_ROW, row);
-                    }
-                }
-
-                if (checkBoxUnderScore.isChecked())
-                    html.close(); // close under score
-
-                if (checkBoxBold.isChecked())
-                    html.close(); // close bold
-
-                html.close(htmlElement);
-            }
-
-            if (checkBoxDivider.isChecked())
-                html.append(HORIZONTAL_RULE);
-
-            return html.build();
-        }
-
-        public HtmlBuilder buildHtmlFromElement(HtmlBuilder html) {
-            if (editText.getText() == null || editText.getText().toString().isEmpty())
-                return html;
-            String fromEditTest = editText.getText().toString();
+                return helper;
+            String fromEditText = editText.getText().toString();
 
             if (stringElement != null && elementPos >= 0) {
                 String htmlElement = getResources().getStringArray(R.array.html_elements_types)[elementPos];
 
-                html.open(htmlElement);
+                helper.openElement(htmlElement); // can be list/header/paragraph
+
                 if (checkBoxBold.isChecked())
-                    html.b();
+                    helper.openElement("b");
 
                 if (checkBoxUnderScore.isChecked())
-                    html.u();
+                    helper.openElement("ins");
 
                 if (elementPos != UNORDERED_LIST_POS && elementPos != ORDERED_LIST_POS) {
                     // header or paragraph
 
-                    html.append(fromEditTest);
+                    //split the paragraph to rows
+                    if (htmlElement.equals(HtmlHelper.PARAGRAPH))
+                        helper.append(fromEditText.split("\\.\\r?\\n"));
+                    //write the header as one string
+                    else
+                        helper.append(fromEditText);
+
                 } else {
                     //list separated by \n
-
-                    String[] rows = fromEditTest.split("\\r?\\n");
+                    String[] rows = fromEditText.split("\\r?\\n");
                     for (String row : rows) {
-                        html.open(LIST_ROW, row);
+                        helper.openElement(HtmlHelper.LIST_ROW, row);
                     }
                 }
 
                 if (checkBoxUnderScore.isChecked())
-                    html.close(); // close under score
+                    helper.closeElement(); // close under score
 
                 if (checkBoxBold.isChecked())
-                    html.close(); // close bold
+                    helper.closeElement(); // close bold
 
-                html.close(); // close element
+                helper.closeElement(); // close main element of this view
             }
 
             if (checkBoxDivider.isChecked())
-                html.append(HORIZONTAL_RULE);
+                helper.addTagToBuilder(HtmlHelper.HORIZONTAL_RULE);
 
-            return html;
-        }
-
-        private Spanned buildHtmlFromElement11() {
-            HtmlBuilder html = new HtmlBuilder();
-            html.h1("Example Usage");
-
-            html.h3().font("cursive", "Code:").close();
-            html.font(0xFFCAE682, "HtmlBuilder")
-                    .append(' ')
-                    .font(0xFFD4C4A9, "html")
-                    .append(' ')
-                    .font(0xFF888888, "=")
-                    .append(" ")
-                    .font(0xFF33B5E5, "new")
-                    .append(" ")
-                    .font(0xFFCAE682, "HtmlBuilder")
-                    .append("()")
-                    .br();
-            html.font(0xFFD4C4A9, "html")
-                    .append(".strong(")
-                    .font(0xFF95E454, "\"Strong text\"")
-                    .append(").br();")
-                    .br();
-            html.font(0xFFD4C4A9, "html")
-                    .append(".font(")
-                    .font(0xFFCAE682, "Color")
-                    .append('.')
-                    .font(0xFF53DCCD, "RED")
-                    .append(", ")
-                    .font(0xFF95E454, "\"This will be red text\"")
-                    .append(");")
-                    .br();
-            html.font(0xFFCAE682, "textView")
-                    .append(".setText(")
-                    .font(0xFFD4C4A9, "html")
-                    .append(".build());")
-                    .close()
-                    .br();
-
-            html.h3().font("cursive", "Result:").close();
-            html.strong("Strong text").br().font(Color.RED, "This will be red text");
-
-            html.h1("Supported Tags");
-            html.append("&lt;a href=&quot;...&quot;&gt;").br();
-            html.append("&lt;b&gt;").br();
-            html.append("&lt;big&gt;").br();
-            html.append("&lt;blockquote&gt;").br();
-            html.append("&lt;br&gt;").br();
-            html.append("&lt;cite&gt;").br();
-            html.append("&lt;dfn&gt;").br();
-            html.append("&lt;div align=&quot;...&quot;&gt;").br();
-            html.append("&lt;em&gt;").br();
-            html.append("&lt;font color=&quot;...&quot; face=&quot;...&quot;&gt;").br();
-            html.append("&lt;h1&gt;").br();
-            html.append("&lt;h2&gt;").br();
-            html.append("&lt;h3&gt;").br();
-            html.append("&lt;h4&gt;").br();
-            html.append("&lt;h5&gt;").br();
-            html.append("&lt;h6&gt;").br();
-            html.append("&lt;i&gt;").br();
-            html.append("&lt;img src=&quot;...&quot;&gt;").br();
-            html.append("&lt;p&gt;").br();
-            html.append("&lt;small&gt;").br();
-            html.append("&lt;strike&gt;").br();
-            html.append("&lt;strong&gt;").br();
-            html.append("&lt;sub&gt;").br();
-            html.append("&lt;sup&gt;").br();
-            html.append("&lt;tt&gt;").br();
-            html.append("&lt;u&gt;").br();
-            html.append("&ul;u&gt;").br();
-            html.append("&li;u&gt;").br();
-
-            html.h1("Links");
-            html.p()
-                    .strong().a("https://twitter.com/jaredrummler", "Twitter").close()
-                    .append("&nbsp;&nbsp;|&nbsp;&nbsp;")
-                    .strong().a("https://github.com/jaredrummler", "GitHub").close()
-                    .close();
-
-            return html.build();
+            return helper;
         }
     }
-
-
 }
