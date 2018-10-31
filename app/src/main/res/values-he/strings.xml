@@ -31,6 +31,8 @@
     <string name="title_activity_login">Sign in</string>
 
     <!-- strings for navigation drawer -->
+    <string name="nav_main_post">תרומה לקהילה</string>
+    <string name="nav_main_post_recipe">מתכון חדש</string>
     <string name="nav_main_all_recipes">כל המתכונים</string>
     <string name="nav_main_favorites">מועדפים</string>
     <string name="nav_main_settings">הגדרות</string>

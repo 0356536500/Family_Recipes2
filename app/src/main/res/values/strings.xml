@@ -34,6 +34,8 @@
     <string name="support_email" translatable="false">mail.support@provider.com</string>
 
     <!-- strings for navigation drawer -->
+    <string name="nav_main_post">Upload</string>
+    <string name="nav_main_post_recipe">New Recipe</string>
     <string name="nav_main_all_recipes">All recipes</string>
     <string name="nav_main_favorites">Favorites</string>
     <string name="nav_main_settings">Settings</string>
@@ -74,7 +76,7 @@
     <string name="post_recipe_advanced_step_under_score">Underscore</string>
     <string name="post_recipe_advanced_step_preview">preview</string>
     <string name="post_recipe_advanced_step_list_message">Press ENTER to separate between items</string>
-    <string name="post_recipe_advanced_step_validation_message">Need at least %1$d not empty elements</string>
+    <string name="post_recipe_advanced_step_validation_message">Need at least %1$d non empty elements</string>
     <string name="post_recipe_pick_photos_button">browse</string>
     <string name="post_recipe_shoot_photos_button">camera</string>
     <string name="post_recipe_reset_photos_button">reset</string>

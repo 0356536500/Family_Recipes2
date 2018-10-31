@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+
     <group android:checkableBehavior="single">
 
         <item android:id="@+id/nav_main_all_recipes"
@@ -21,6 +22,17 @@
         <item android:id="@+id/nav_main_about"
             android:title="@string/nav_main_about"
             android:icon="@drawable/ic_action_about_black" />
+
+        <item android:id="@+id/nav_main_sub_header"
+            android:title="@string/nav_main_post">
+
+            <menu>
+                <item android:id="@+id/nav_main_post_recipe"
+                    android:title="@string/nav_main_post_recipe"
+                    android:icon="@drawable/ic_action_post_black" />
+            </menu>
+
+        </item>
 
     </group>
 </menu>

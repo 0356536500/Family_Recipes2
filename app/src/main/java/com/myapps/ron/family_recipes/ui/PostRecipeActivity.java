@@ -4,7 +4,9 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatButton;
 import android.util.Log;
@@ -54,44 +56,75 @@ public class PostRecipeActivity extends AppCompatActivity {
         transaction.add(R.id.create_fragment_container, fragments.get(0));
         transaction.addToBackStack(null);
         transaction.commit();
+        Log.e(getClass().getSimpleName(), "current index = " + currentIndex);
     }
 
     public void nextFragment() {
-        Log.e(getClass().getSimpleName(), "current index = " + currentIndex);
         if (currentIndex < fragments.size() - 1) {
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            getSupportFragmentManager()
+            .beginTransaction()
+            .setCustomAnimations(
+                    R.anim.fragment_slide_left_enter,
+                    R.anim.fragment_slide_left_exit,
+                    R.anim.fragment_slide_right_enter,
+                    R.anim.fragment_slide_right_exit)
+            .replace(R.id.create_fragment_container, fragments.get(++currentIndex))
+            .addToBackStack(null)
+            .commit();
+            Log.e(getClass().getSimpleName(), "current index = " + currentIndex);
+            /*FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             transaction.replace(R.id.create_fragment_container, fragments.get(++currentIndex));
             transaction.addToBackStack(null);
-            transaction.commit();
+            transaction.commit();*/
         }
     }
 
     public void previousFragment() {
         if (currentIndex > 0) {
             currentIndex--;
-            super.onBackPressed();
+            FragmentManager manager = getSupportFragmentManager();
+            manager.popBackStack();
         }
+        else
+            super.onBackPressed();
     }
 
 
     @Override
     public void onBackPressed() {
+        Log.e(getClass().getSimpleName(), "backPressed");
         if (inPreview) {
-            super.onBackPressed();
+            FragmentManager manager = getSupportFragmentManager();
+            manager.popBackStack();
             inPreview = false;
-            if(getSupportActionBar() != null) {
+            return;
+            /*if(getSupportActionBar() != null) {
                 getSupportActionBar().setDisplayHomeAsUpEnabled(false);
                 getSupportActionBar().setDisplayShowHomeEnabled(false);
-            }
+            }*/
         }
-        else if(!fragments.get(currentIndex).onBackPressed())
-            super.onBackPressed();
+        if(!fragments.get(currentIndex).onBackPressed()) {
+            NavUtils.navigateUpFromSameTask(this);
+        }
+        //finish();
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
-            onBackPressed();
+            Log.e("PostActivity", "home clicked");
+            if (inPreview) {
+                FragmentManager manager = getSupportFragmentManager();
+                manager.popBackStack();
+                inPreview = false;
+                return true;
+            }
+            if (currentIndex > 0) {
+                previousFragment();
+                return true;
+            }
+            else
+                NavUtils.navigateUpFromSameTask(this);
         }
         return super.onOptionsItemSelected(item);
     }
@@ -107,10 +140,10 @@ public class PostRecipeActivity extends AppCompatActivity {
         transaction.addToBackStack(null);
         transaction.commit();
 
-        if(getSupportActionBar() != null) {
+        /*if(getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowHomeEnabled(true);
-        }
+        }*/
         inPreview = true;
     }
 

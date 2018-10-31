@@ -80,6 +80,7 @@ public class AllRecipesFragment extends MyFragment implements RecipesAdapter.Rec
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         swipeRefreshLayout = view.findViewById(R.id.content_main_refresh);
         recyclerView = view.findViewById(R.id.recycler_view);
+        mFilter = activity.findViewById(R.id.content_main_filters);
 
         mColors = getResources().getIntArray(R.array.colors);
 
@@ -103,7 +104,6 @@ public class AllRecipesFragment extends MyFragment implements RecipesAdapter.Rec
     private void initCategories() {
         //mTitles = getResources().getStringArray(R.array.job_titles);
 
-        mFilter = activity.findViewById(R.id.content_main_filters);
         mFilter.setAdapter(new Adapter(tags));
         mFilter.setListener(this);
 

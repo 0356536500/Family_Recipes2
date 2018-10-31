@@ -16,4 +16,7 @@ public class Constants {
     public static final String DEFAULT_RECIPE_NAME = "anonymous";
     public static final String DEFAULT_RECIPE_DESC = "A sample app to showcase Cognito Identity and the SDK for Android.";
     public static final String DEFAULT_RECIPE_UPLOADER = "unknown";
+
+    //PostRecipeActivity
+    public static final int MIN_NUMBER_OF_HTML_ELEMENTS = 2;
 }

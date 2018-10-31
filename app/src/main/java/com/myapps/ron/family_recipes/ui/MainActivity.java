@@ -331,6 +331,9 @@ public class MainActivity extends AppCompatActivity {
                 /*Intent aboutAppActivity = new Intent(this, AboutApp.class);
                 startActivity(aboutAppActivity);*/
                 break;
+            case R.id.nav_main_post_recipe:
+                Intent intent = new Intent(MainActivity.this, PostRecipeActivity.class);
+                startActivity(intent);
         }
 
         if(fragment != null) {

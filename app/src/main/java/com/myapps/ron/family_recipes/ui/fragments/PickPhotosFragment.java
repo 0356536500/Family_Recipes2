@@ -81,7 +81,7 @@ public class PickPhotosFragment extends MyFragment {
         takeButton = view.findViewById(R.id.pick_photos_take_photo_button);
         resetButton = view.findViewById(R.id.pick_photos_reset_button);
 
-        activity.setTitle("post 3/3");
+        activity.setTitle(getString(R.string.nav_main_post_recipe) + " 3/3");
         layoutParams = new LinearLayout.LayoutParams(750, 750);
         layoutParams.setMargins(10, 10, 10, 10);
         initViewModel();
@@ -209,7 +209,7 @@ public class PickPhotosFragment extends MyFragment {
                     if (resultCode == RESULT_OK && null != data && data.getData() != null) {
                         //single image
                         Log.e(TAG, data.getData().getPath());
-                        imagesContainer.removeAllViews();
+                        //imagesContainer.removeAllViews();
 
                         ImageView productImageView = new ImageView(getActivity());
 

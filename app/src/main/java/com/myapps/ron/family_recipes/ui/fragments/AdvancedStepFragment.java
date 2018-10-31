@@ -1,6 +1,7 @@
 package com.myapps.ron.family_recipes.ui.fragments;
 
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -22,6 +23,7 @@ import android.widget.Toast;
 
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.ui.PostRecipeActivity;
+import com.myapps.ron.family_recipes.utils.Constants;
 import com.myapps.ron.family_recipes.utils.HtmlHelper;
 import com.myapps.ron.family_recipes.utils.MyFragment;
 import com.myapps.ron.family_recipes.viewmodels.PostRecipeViewModel;
@@ -52,6 +54,24 @@ public class AdvancedStepFragment extends MyFragment {
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+        elements.clear();
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        Log.e(TAG, "on attach");
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        Log.e(TAG, "on detach");
+    }
+
+    @Override
     public boolean onBackPressed() {
         activity.previousFragment();
         return true;
@@ -74,8 +94,7 @@ public class AdvancedStepFragment extends MyFragment {
 
         viewModel =  ViewModelProviders.of(activity).get(PostRecipeViewModel.class);
 
-        Log.e(TAG, "onViewCreated");
-        activity.setTitle("post 2/3");
+        activity.setTitle(getString(R.string.nav_main_post_recipe) + " 2/3");
         setListeners();
     }
 
@@ -96,21 +115,23 @@ public class AdvancedStepFragment extends MyFragment {
                     viewModel.setRecipeFile(activity, html);
                     activity.nextFragment();
                 } else {
-                    Toast.makeText(activity, getString(R.string.post_recipe_advanced_step_validation_message, 2), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(activity, getString(R.string.post_recipe_advanced_step_validation_message, Constants.MIN_NUMBER_OF_HTML_ELEMENTS), Toast.LENGTH_SHORT).show();
                 }
             }
         });
     }
 
     private boolean checkValidInput() {
+        int numberOfValidElements = 0;
         if(elements.size() <= 1)
             return false;
         for (int i = 0; i < elements.size(); i++) {
             //check if any element is not valid except for the last one
             if (!elements.get(i).isElementHasContent() && i < elements.size() - 1)
                 return false;
+            numberOfValidElements++;
         }
-        return true;
+        return numberOfValidElements > Constants.MIN_NUMBER_OF_HTML_ELEMENTS;
     }
 
     private String generateHtml() {
@@ -143,8 +164,9 @@ public class AdvancedStepFragment extends MyFragment {
         private AppCompatEditText editText;
 
         private String stringElement;
-        private int elementPos = 0;
+
         private boolean hasUserTypedInEditText;
+        int elementPos = 0;
 
         private AdapterView.OnItemSelectedListener spinnerListener =
                 new AdapterView.OnItemSelectedListener() {
@@ -207,7 +229,6 @@ public class AdvancedStepFragment extends MyFragment {
 
             spinner.setOnItemSelectedListener(spinnerListener);
             editText.addTextChangedListener(textWatcher);
-
         }
 
         boolean isElementHasContent() {

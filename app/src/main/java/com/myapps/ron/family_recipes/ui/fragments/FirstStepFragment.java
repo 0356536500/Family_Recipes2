@@ -2,6 +2,7 @@ package com.myapps.ron.family_recipes.ui.fragments;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -10,9 +11,14 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.AppCompatEditText;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.myapps.ron.family_recipes.R;
@@ -34,6 +40,9 @@ import java.util.List;
  */
 public class FirstStepFragment extends MyFragment implements FilterListener<Category> {
 
+    private View view;
+    private FrameLayout parent;
+    private RelativeLayout floater;
     private AppCompatEditText editTextName, editTextDesc;
     private Filter<Category> mFilter;
     private List<Category> allTags;
@@ -60,28 +69,77 @@ public class FirstStepFragment extends MyFragment implements FilterListener<Cate
         return false;
     }
 
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        setRetainInstance(true);
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        Log.e(getClass().getSimpleName(), "on attach");
+        if (parent != null){
+            parent.addView(mFilter);
+            parent.addView(floater);
+        }
+    }
+
+    @Override
+    public void onDetach(){
+        super.onDetach();
+        Log.e(getClass().getSimpleName(), "on detach");
+        mFilter = view.findViewById(R.id.first_step_filter);
+        floater = parent.findViewById(R.id.create_recipe_first_step_layout);
+        parent.removeView(floater);
+        parent.removeView(mFilter);
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        //return super.onCreateView(inflater, container, savedInstanceState);
-        return inflater.inflate(R.layout.content_post_first_step, container,false);
+        if (mFilter == null) {
+            view = inflater.inflate(R.layout.content_post_first_step, container,false);
+            parent = (FrameLayout) view;
+
+            mFilter = view.findViewById(R.id.first_step_filter);
+            //editTextName = view.findViewById(R.id.recipe_name_editText);
+            //editTextDesc = view.findViewById(R.id.recipe_desc_editText);
+
+            mColors = getResources().getIntArray(R.array.colors);
+            activity.setTitle(getString(R.string.nav_main_post_recipe) + " 1/3");
+            //setListeners();
+
+            initViewModel();
+            viewModel.loadCategories(activity);
+        }
+        return view;
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        Log.e(getClass().getSimpleName(), "on view created");
 
         editTextName = view.findViewById(R.id.recipe_name_editText);
         editTextDesc = view.findViewById(R.id.recipe_desc_editText);
-        mFilter = view.findViewById(R.id.first_step_filter);
+
+        setListeners();
+
+        /*editTextDesc = view.findViewById(R.id.recipe_desc_editText);
+        editTextName = view.findViewById(R.id.recipe_name_editText);
 
         mColors = getResources().getIntArray(R.array.colors);
 
         initViewModel();
         setListeners();
 
-        activity.setTitle("post 1/3");
-        viewModel.loadCategories(activity);
+        activity.setTitle(getString(R.string.nav_main_post_recipe) + " 1/3");
+
+        if (mFilter == null) {
+            mFilter = view.findViewById(R.id.first_step_filter);
+            viewModel.loadCategories(activity);
+        }*/
     }
 
     private void initViewModel() {
@@ -107,14 +165,13 @@ public class FirstStepFragment extends MyFragment implements FilterListener<Cate
     }
 
     private void initCategories() {
-
-        mFilter.setAdapter(new FirstStepFragment.Adapter(allTags));
+        Log.e(getClass().getSimpleName(), "init categories");
+        mFilter.setAdapter(new Adapter(allTags));
         mFilter.setListener(this);
 
         //the text to show when there's no selected items
         mFilter.setCustomTextView(getString(R.string.str_all_selected));
         mFilter.build();
-
     }
 
     private void setCategories() {

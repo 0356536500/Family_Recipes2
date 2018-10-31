@@ -1,5 +1,6 @@
 package com.myapps.ron.searchfilter.widget
 
+import android.animation.Animator
 import android.animation.ValueAnimator
 import android.content.Context
 import android.os.Bundle
@@ -21,6 +22,9 @@ import kotlinx.android.synthetic.main.filter.view.*
 import java.io.Serializable
 import java.util.*
 import android.graphics.Color
+import android.util.Log
+import android.view.animation.AlphaAnimation
+import android.view.animation.Animation
 
 
 class Filter<T : FilterModel<T>> : FrameLayout, FilterItemListener, CollapseListener {
@@ -56,8 +60,8 @@ class Filter<T : FilterModel<T>> : FrameLayout, FilterItemListener, CollapseList
             expandedFilter.invalidate()
         }
 
-    private val firstExpandList: MutableList<FilterItem> = mutableListOf()
-    private var firstExpand: Boolean = true
+    //private val firstExpandList: MutableList<FilterItem> = mutableListOf()
+    //private var firstExpand: Boolean = true
     private var mIsBusy = false
 
     private var isCollapsed: Boolean? = null
@@ -78,6 +82,7 @@ class Filter<T : FilterModel<T>> : FrameLayout, FilterItemListener, CollapseList
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
     constructor(context: Context, attrs: AttributeSet?, defStyleRes: Int) : super(context, attrs, defStyleRes) {
         LayoutInflater.from(context).inflate(R.layout.filter, this, true)
+        visibility = View.INVISIBLE
         collapseView.setOnClickListener { toggle() }
         collapsedFilter.scrollListener = this
         collapsedContainer.listener = this
@@ -105,8 +110,8 @@ class Filter<T : FilterModel<T>> : FrameLayout, FilterItemListener, CollapseList
                 view.listener = this
                 view.isContainer = true
                 mainItems.add(i, view)
-                firstExpandList.add(view)
-                //expandedFilter.addView(view)
+                //firstExpandList.add(view)
+                expandedFilter.addView(view)
                 mItems.put(view, item)
                 if(view.text == customTextView) {
                     view.select()
@@ -137,6 +142,22 @@ class Filter<T : FilterModel<T>> : FrameLayout, FilterItemListener, CollapseList
 
             if (isCollapsed == null) {
                 collapse(1)
+                val animation = AlphaAnimation(0f, 1f)
+                animation.duration = Constant.ANIMATION_DURATION
+                animation.setAnimationListener(object : Animation.AnimationListener {
+                    override fun onAnimationRepeat(animation: Animation?) {
+                        // actually, I don't need this method but I have to implement this.
+                    }
+
+                    override fun onAnimationEnd(animation: Animation?) {
+                        visibility = View.VISIBLE
+                    }
+
+                    override fun onAnimationStart(animation: Animation?) {
+                        // actually, I don't need this method but I have to implement this.
+                    }
+                })
+                startAnimation(animation)
             }
         }
         expandedFilter.margin = margin
@@ -232,13 +253,13 @@ class Filter<T : FilterModel<T>> : FrameLayout, FilterItemListener, CollapseList
         container.bringToFront()
         container.requestFocus()
 
-        if (firstExpand) {
+        /*if (firstExpand) {
             firstExpand = false
             firstExpandList.forEach { view ->
                 expandedFilter.addView(view)
             }
             firstExpandList.clear()
-        }
+        }*/
 
         ValueAnimator.ofFloat(0f, Constant.ANIMATION_DURATION.toFloat()).setDuration(Constant.ANIMATION_DURATION).apply {
             addUpdateListener {

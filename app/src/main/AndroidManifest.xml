@@ -24,11 +24,11 @@
         <activity
             android:name=".ui.SplashActivity"
             android:theme="@style/AppTheme.NoActionBar">
-            <!--<intent-filter>
+            <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>-->
+            </intent-filter>
         </activity>
         <activity
             android:name=".ui.MainActivity"
@@ -55,13 +55,14 @@
             android:name=".ui.PostRecipeActivity"
             android:label="@string/title_activity_create_recipe"
             android:theme="@style/AppThemeWithActionBar"
-            android:windowSoftInputMode="adjustPan">
+            android:windowSoftInputMode="adjustPan"
+            android:parentActivityName=".ui.MainActivity">
 
-        <intent-filter>
+        <!--<intent-filter>
             <action android:name="android.intent.action.MAIN" />
 
             <category android:name="android.intent.category.LAUNCHER" />
-        </intent-filter>
+        </intent-filter>-->
         </activity>
         <activity
             android:name=".ui.LoginActivity"
