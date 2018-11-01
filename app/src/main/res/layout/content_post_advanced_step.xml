@@ -4,23 +4,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:layout_marginTop="8dp"
     android:layout_marginBottom="4dp">
 
-    <ScrollView
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/advanced_step_recycler"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="0.9"
-        android:scrollbars="vertical">
+        android:scrollbars="vertical"
+        android:theme="@style/RecyclerTheme">
 
-        <LinearLayout
-            android:id="@+id/advanced_step_container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical" >
-        </LinearLayout>
-
-    </ScrollView>
+    </android.support.v7.widget.RecyclerView>
 
     <Button
         android:id="@+id/advanced_step_preview_button"

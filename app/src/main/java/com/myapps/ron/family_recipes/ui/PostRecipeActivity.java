@@ -48,9 +48,11 @@ public class PostRecipeActivity extends AppCompatActivity {
     private void setFragments() {
         fragments = new ArrayList<>();
 
-        fragments.add(new FirstStepFragment());
         fragments.add(new AdvancedStepFragment());
         fragments.add(new PickPhotosFragment());
+        //fragments.add(new FirstStepFragment());
+
+
 
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.add(R.id.create_fragment_container, fragments.get(0));
@@ -112,7 +114,6 @@ public class PostRecipeActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
-            Log.e("PostActivity", "home clicked");
             if (inPreview) {
                 FragmentManager manager = getSupportFragmentManager();
                 manager.popBackStack();

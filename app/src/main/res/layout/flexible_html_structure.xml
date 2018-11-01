@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
 
     <LinearLayout
         android:id="@+id/attributes_container1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal" >
 
         <CheckBox
             android:id="@+id/advanced_step_horizontal_divider"
@@ -38,8 +39,7 @@
         android:id="@+id/attributes_container2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@id/attributes_container1">
+        android:orientation="horizontal" >
 
         <CheckBox
             android:id="@+id/advanced_step_bold_checkBox"
@@ -80,16 +80,11 @@
         android:scrollbarStyle="insideInset"
         android:scrollbars="vertical"
         android:scrollHorizontally="false"
-        android:textSize="@dimen/edit_text_text_size"
-        app:layout_constraintBottom_toTopOf="@id/advanced_step_space"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/attributes_container2" />
+        android:textSize="@dimen/edit_text_text_size" />
 
     <android.widget.Space
         android:id="@+id/advanced_step_space"
         android:layout_width="match_parent"
-        android:layout_height="25dp"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        android:layout_height="25dp" />
 
-</android.support.constraint.ConstraintLayout>
+</LinearLayout>

@@ -1,6 +1,5 @@
 package com.myapps.ron.family_recipes.adapters;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -25,7 +24,6 @@ import android.widget.TextView;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.dal.storage.StorageWrapper;
 import com.myapps.ron.family_recipes.model.Recipe;
-import com.myapps.ron.family_recipes.network.Constants;
 import com.myapps.ron.family_recipes.network.MyCallback;
 import com.myapps.ron.family_recipes.recycler.MyDiffCallback;
 import com.myapps.ron.family_recipes.utils.GlideApp;
@@ -47,7 +45,7 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
 
     private String mLastQuery = "";
     private RecipesAdapterListener listener;
-    private StorageWrapper storageWrapper;
+    //private StorageWrapper storageWrapper;
 
     class MyViewHolder extends RecyclerView.ViewHolder {
         TextView name, description, uploader, numberOfLikes;
@@ -90,7 +88,7 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
         this.recipeList = recipeList;
         this.recipeListFiltered = recipeList;
         this.tags = new ArrayList<>();
-        this.storageWrapper = StorageWrapper.getInstance(context);
+        //this.storageWrapper = StorageWrapper.getInstance(context);
         this.colors = context.getResources().getIntArray(R.array.colors);
         this.random = new Random();
     }
@@ -104,7 +102,6 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
         return new MyViewHolder(itemView);
     }
 
-    @SuppressLint("CheckResult")
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, final int position) {
         final Recipe recipe = recipeListFiltered.get(position);

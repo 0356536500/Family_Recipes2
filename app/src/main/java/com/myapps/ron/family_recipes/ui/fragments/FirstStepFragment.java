@@ -107,7 +107,7 @@ public class FirstStepFragment extends MyFragment implements FilterListener<Cate
             //editTextDesc = view.findViewById(R.id.recipe_desc_editText);
 
             mColors = getResources().getIntArray(R.array.colors);
-            activity.setTitle(getString(R.string.nav_main_post_recipe) + " 1/3");
+
             //setListeners();
 
             initViewModel();
@@ -120,6 +120,7 @@ public class FirstStepFragment extends MyFragment implements FilterListener<Cate
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         Log.e(getClass().getSimpleName(), "on view created");
+        activity.setTitle(getString(R.string.nav_main_post_recipe) + " 1/3");
 
         editTextName = view.findViewById(R.id.recipe_name_editText);
         editTextDesc = view.findViewById(R.id.recipe_desc_editText);

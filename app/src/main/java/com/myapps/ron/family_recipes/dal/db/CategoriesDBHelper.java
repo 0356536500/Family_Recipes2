@@ -166,7 +166,7 @@ public class CategoriesDBHelper extends MyDBHelper{
 
     public boolean categoryExists(String id) {
         SQLiteDatabase db = this.getReadableDatabase();
-        String query = "SELECT id FROM "+ TABLE_CATEGORIES + " WHERE name=" + id;
+        String query = "SELECT " + CAT_KEY_ID + " FROM "+ TABLE_CATEGORIES + " WHERE " + CAT_KEY_ID + "=" + id;
         Cursor cursor = db.rawQuery(query, null);
         boolean result = cursor.getCount() > 0;
         cursor.close();
