@@ -84,10 +84,12 @@ public class RecipeViewModel extends ViewModel {
                 StorageWrapper.getRecipeFile(context, recipe.getRecipeFile(), new MyCallback<String>() {
                     @Override
                     public void onFinished(String path) {
+                        Log.e(getClass().getSimpleName(), "return from getRecipeFile");
                         if(path != null) {
+                            Log.e(getClass().getSimpleName(), "path != null");
                             File file = new File(path);
                             if (file.exists()) {
-                                //Log.e(TAG, "file exists");
+                                Log.e(getClass().getSimpleName(), "file exists");
                                 setRecipePath(Constants.FILE_PREFIX + file.getAbsolutePath());
                             }
                         }

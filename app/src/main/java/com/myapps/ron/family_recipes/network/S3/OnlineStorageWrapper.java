@@ -12,6 +12,18 @@ public class OnlineStorageWrapper {
 
     //region uploads
 
+    public static boolean uploadFoodFileSync(String url, String localPath) {
+        return uploadFileSync(url, localPath, S3Helper.CONTENT_IMAGE);
+    }
+
+    public static boolean uploadRecipeFileSync(String url, String localPath) {
+        return uploadFileSync(url, localPath, S3Helper.CONTENT_TEXT);
+    }
+
+    private static boolean uploadFileSync(String url, String localPath, String mimeType) {
+        return S3Helper.uploadFileSync(url, localPath, mimeType);
+    }
+
     public static void uploadFoodFile(String url, String localPath, MyCallback<Boolean> callback) {
         uploadFile(url, localPath, S3Helper.CONTENT_IMAGE, callback);
     }

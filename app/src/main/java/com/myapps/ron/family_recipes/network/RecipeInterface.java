@@ -39,7 +39,7 @@ public interface RecipeInterface {
     @POST(recipes)
     Call<JsonObject> postPendRecipe(
             @HeaderMap Map<String, String> headers,
-            @Body Map<String, String> body
+            @Body Map<String, Object> body
     );
 
     @PATCH(recipes)
@@ -62,8 +62,9 @@ public interface RecipeInterface {
 
     //region food
     @PUT(food)
-    Call<JsonObject> putFoodPictures(
-            @HeaderMap Map<String, String> headers,
+    Call<List<String>> requestFoodUrls(
+            @Header(Constants.AUTHORIZATION) String auth,
+            @Query(Constants.ID_QUERY) String id,
             @Body Map<String, String> body
     );
 

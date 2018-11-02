@@ -1,6 +1,7 @@
 package com.myapps.ron.family_recipes.network.S3;
 
 import android.content.Context;
+import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -17,6 +18,7 @@ import java.io.File;
 import java.io.IOException;
 
 import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -26,6 +28,7 @@ import retrofit2.Retrofit;
 class S3Helper {
     private static final String TAG = S3Helper.class.getSimpleName();
 
+    private static final int STATUS_OK = 200;
     static final String CONTENT_IMAGE = "image/jpeg";
     static final String CONTENT_TEXT = "text/html";
 
@@ -54,7 +57,10 @@ class S3Helper {
     static void uploadFile(String url, String localPath, String contentType, final MyCallback<Boolean> callback) {
         Log.e(TAG, "uploadFile, " + url);
         File file = new File(localPath);    // create new file on device
-        RequestBody requestFile = RequestBody.create(MediaType.parse(contentType), file);
+        //RequestBody requestFile = RequestBody.create(MediaType.parse(contentType), file);
+
+        RequestBody requestBody = RequestBody.create(MediaType.parse(contentType),file);
+        //MultipartBody.Part filePart = MultipartBody.Part.createFormData("file", file.getName(), requestBody);
 
         /* since the pre-signed URL from S3 contains a host, this dummy URL will
          * be replaced completely by the pre-signed URL.  (I'm using baseURl(String) here
@@ -66,11 +72,13 @@ class S3Helper {
 
         S3Interface s3Interface = retrofit.create(S3Interface.class);
         // imageUrl is the String as received from AWS S3
-        Call<Void> call = s3Interface.uploadImage(url, requestFile);
+        Call<Void> call = s3Interface.uploadImage(url, requestBody);
 
         call.enqueue(new Callback<Void>() {
             @Override
             public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
+                Log.e(TAG, "upload code = " + response.code());
+                Log.e(TAG, "upload message = " + response.message());
                 callback.onFinished(true);
             }
 
@@ -79,6 +87,40 @@ class S3Helper {
                 callback.onFinished(false);
             }
         });
+    }
+
+    static boolean uploadFileSync(String url, String localPath, String contentType) {
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+                .permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+        Log.e(TAG, "uploadFile, " + url);
+        File file = new File(localPath);    // create new file on device
+        //RequestBody requestFile = RequestBody.create(MediaType.parse(contentType), file);
+
+        RequestBody requestBody = RequestBody.create(MediaType.parse(contentType),file);
+        //MultipartBody.Part filePart = MultipartBody.Part.createFormData("file", file.getName(), requestBody);
+
+        /* since the pre-signed URL from S3 contains a host, this dummy URL will
+         * be replaced completely by the pre-signed URL.  (I'm using baseURl(String) here
+         * but see baseUrl(okHttp3.HttpUrl) in Javadoc for how base URLs are handled
+         */
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(BASE_URL)
+                .build();
+
+        S3Interface s3Interface = retrofit.create(S3Interface.class);
+        // imageUrl is the String as received from AWS S3
+        Call<Void> call = s3Interface.uploadImage(url, requestBody);
+        Response<Void> response;
+        try {
+            response = call.execute();
+            Log.e(TAG, "upload code = " + response.code());
+            Log.e(TAG, "upload message = " + response.message());
+            return response.code() == STATUS_OK;
+        } catch (IOException e) {
+            Log.e(TAG, "error in " + localPath + ", " + e.getMessage());
+        }
+        return false;
     }
 
 
@@ -90,14 +132,16 @@ class S3Helper {
      * @param callback - passed callback
      */
     void downloadFile(String key, final String rootPath, String dir, final MyCallback<String> callback) {
-        Log.e(TAG, "downloadFile, " + key);
+        //Log.e(TAG, "downloadFile, " + key);
         /*TransferObserver downloadObserver =
                 transferUtility.download(
                         "public/s3Key.txt",
                         new File("/path/to/file/localFile.txt"));*/
 
         key = dir + "/" + key;
+        Log.e(TAG, "downloadFile, " + key);
         final String path = rootPath + "/" + key;
+        Log.e(TAG, "downloadFile, " + path);
         //final String path = rootPath + "/" + dir + "/" + key;
         final File file = new File(path);
         if(!file.exists()) {
@@ -117,6 +161,7 @@ class S3Helper {
 
             @Override
             public void onStateChanged(int id, TransferState state) {
+                Log.e(TAG, "state changed, " + state.name());
                 if (TransferState.COMPLETED == state) {
                     // Handle a completed upload.
                     callback.onFinished(path);

@@ -54,7 +54,7 @@ public class DataViewModel extends ViewModel {
             APICallsHandler.getAllRecipes(DateUtil.getLastUpdateTime(context), AppHelper.getAccessToken(), new MyCallback<List<Recipe>>() {
                 @Override
                 public void onFinished(List<Recipe> result) {
-                    //HandleServerDataService.startActionUpdateRecipes(context, new ArrayList<>(result), time);
+                    //PostRecipeToServerService.startActionPostRecipe(context, new ArrayList<>(result), time);
                     if(result != null) {
                         DateUtil.updateServerTime(context, time);
                         new MyAsyncRecipeUpdate(context, result, orderBy).execute();
@@ -97,10 +97,13 @@ public class DataViewModel extends ViewModel {
         @Override
         protected Boolean doInBackground(Void... voids) {
             for (Recipe item : recipes) {
+                //Log.e(getClass().getSimpleName(), "item: " + item.getId());
                 if(dbHelper.recipeExists(item.getId())) {
+                    //Log.e(getClass().getSimpleName(), "\t exists");
                     dbHelper.updateRecipeServerChanges(item);
                     modifiedRecipes++;
                 } else {
+                    //Log.e(getClass().getSimpleName(), "\t not exists");
                     dbHelper.insertRecipe(item);
                     newRecipes++;
                 }
@@ -135,7 +138,7 @@ public class DataViewModel extends ViewModel {
                 APICallsHandler.getAllCategories(DateUtil.getLastUpdateTime(context), AppHelper.getAccessToken(), new MyCallback<List<Category>>() {
                     @Override
                     public void onFinished(List<Category> result) {
-                        //HandleServerDataService.startActionUpdateRecipes(context, new ArrayList<>(result), time);
+                        //PostRecipeToServerService.startActionPostRecipe(context, new ArrayList<>(result), time);
                         if (result != null) {
                             DateUtil.updateCategoriesServerTime(context, time);
                             new MyAsyncCategoriesUpdate(context, result).execute();

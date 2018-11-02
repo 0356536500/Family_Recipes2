@@ -178,7 +178,7 @@ public class StorageWrapper {
         APICallsHandler.getAllRecipes(DateUtil.getLastUpdateTime(context), CognitoHelper.getToken(), new MyCallback<List<Recipe>>() {
             @Override
             public void onFinished(List<Recipe> result) {
-                HandleServerDataService.startActionUpdateRecipes(context, new ArrayList<>(result), time);
+                PostRecipeToServerService.startActionPostRecipe(context, new ArrayList<>(result), time);
             }
         });
         dbHelper.getAllRecipes();

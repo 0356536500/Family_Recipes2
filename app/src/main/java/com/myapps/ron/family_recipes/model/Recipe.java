@@ -166,12 +166,58 @@ public class Recipe implements Parcelable{
      * @return whether or not current and second recipes are exactly the same
      */
     public boolean identical(Recipe other) {
-        return getId().equals(other.getId()) && getName().equals(other.getName()) && getDescription().equals(other.getDescription())
+        boolean ids = getId() == null && other.getId() == null;
+        if (id != null && other.getId() != null)
+            ids = getId().equals(other.getId());
+
+        boolean names = getName() == null && other.getName() == null;
+        if (getName() != null && other.getName() != null)
+            names = getName().equals(other.getName());
+
+        boolean descriptions = description == null && other.getDescription() == null;
+        if (description != null && other.getDescription() != null)
+            descriptions = description.equals(other.description);
+
+        boolean uploaders = getUploader() == null && other.getUploader() == null;
+        if (getUploader() != null && other.getUploader() != null)
+            uploaders = getUploader().equals(other.getUploader());
+
+        boolean cats = categories == null && other.getCategories() == null;
+        if (categories != null && other.getCategories() != null)
+            cats = getStringCategories().equals(other.getStringCategories());
+
+        boolean created = getCreatedAt() == null && other.getCreatedAt() == null;
+        if (getCreatedAt() != null && other.getCreatedAt() != null)
+            created = getCreatedAt().equals(other.getCreatedAt());
+
+        boolean modified = getLastModifiedAt() == null && other.getLastModifiedAt() == null;
+        if (getLastModifiedAt() != null && other.getLastModifiedAt() != null)
+            modified = getLastModifiedAt().equals(other.getLastModifiedAt());
+
+        boolean file = getRecipeFile() == null && other.getRecipeFile() == null;
+        if (getRecipeFile() != null && other.getRecipeFile() != null)
+            file = getRecipeFile().equals(other.getRecipeFile());
+
+        boolean images = getFoodFiles() == null && other.getFoodFiles() == null;
+        if (getFoodFiles() != null && other.getFoodFiles() != null)
+            images = getStringFoodFiles().equals(other.getStringFoodFiles());
+
+        boolean comments = getComments() == null && other.getComments() == null;
+        if (getComments() != null && other.getComments() != null)
+            comments = getStringComments().equals(other.getStringComments());
+
+        boolean likes = getLikes() == other.getLikes();
+        boolean meLikes = getMeLike() == other.getMeLike();
+
+        return ids && names && descriptions && uploaders && cats && created && modified
+                && file && images && comments && likes && meLikes;
+
+        /*return getId().equals(other.getId()) && getName().equals(other.getName()) && getDescription().equals(other.getDescription())
                 && getUploader().equals(other.getUploader()) && getCategories().equals(other.getCategories())
                 && getCreatedAt().equals(other.getCreatedAt()) && getLastModifiedAt().equals(other.getLastModifiedAt())
                 //&& getRecipeFile().equals(other.getRecipeFile()) && getComments().equals(other.getComments())
                 && getFoodFiles().equals(other.getFoodFiles()) && getLikes() == other.getLikes()
-                && getMeLike() == other.getMeLike();
+                && getMeLike() == other.getMeLike();*/
     }
 
     public String getStringCategories() {

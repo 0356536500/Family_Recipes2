@@ -249,7 +249,7 @@ public class RecipesDBHelper extends MyDBHelper{
 
     public boolean recipeExists(String id) {
         SQLiteDatabase db = this.getReadableDatabase();
-        String query = "SELECT id FROM "+ TABLE_RECIPES + " WHERE id=" + id;
+        String query = "SELECT * FROM "+ TABLE_RECIPES + " WHERE " + KEY_ID + "='" + id + "'";
         Cursor cursor = db.rawQuery(query, null);
         boolean result = cursor.getCount() > 0;
         cursor.close();

@@ -12,7 +12,6 @@ import com.myapps.ron.family_recipes.model.Category;
 import com.myapps.ron.family_recipes.model.Recipe;
 
 import java.io.File;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +23,7 @@ public class PostRecipeViewModel extends ViewModel {
     private MutableLiveData<List<Category>> categoryList = new MutableLiveData<>(); // list of categories from local db
 
     private File recipeFile;
-    public List<Uri> imagesUris = new ArrayList<>();
+    //private List<Uri> imagesUris = new ArrayList<>();
     public Recipe recipe = new Recipe();
 
     private void setRecipePath(String item) {
@@ -55,8 +54,20 @@ public class PostRecipeViewModel extends ViewModel {
 
     public void setRecipeFile(Context context, String html) {
         recipeFile = StorageWrapper.createHtmlFile(context,recipe.getName().concat(".html"), html);
+        if (recipeFile != null)
+            recipe.setRecipeFile(recipeFile.getAbsolutePath());
     }
 
+    public void setImagesUris(List<String> imagesUris) {
+        if (imagesUris != null) {
+            List<String> paths = new ArrayList<>(imagesUris);
+            /*if (!imagesUris.isEmpty()) {
+                for (Uri uri : imagesUris)
+                    paths.add(uri.getPath());
+            }*/
+            recipe.setFoodFiles(paths);
+        }
+    }
 
     /*public boolean checkNameValid(final Context context, String name) {
         RecipesDBHelper dbHelper = new RecipesDBHelper(context);

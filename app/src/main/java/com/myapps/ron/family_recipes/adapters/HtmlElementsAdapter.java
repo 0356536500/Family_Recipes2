@@ -6,6 +6,7 @@ import android.support.v7.widget.AppCompatEditText;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -166,6 +167,7 @@ public class HtmlElementsAdapter extends RecyclerView.Adapter<HtmlElementsAdapte
 
     @Override
     public void onBindViewHolder(@NonNull FlexibleHtmlStructureHolder holder, int position) {
+        Log.e(getClass().getSimpleName(), "bind view position = " + position);
         holder.setModel(elements.get(position));
     }
 

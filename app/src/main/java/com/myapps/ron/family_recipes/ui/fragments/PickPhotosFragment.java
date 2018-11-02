@@ -2,14 +2,21 @@ package com.myapps.ron.family_recipes.ui.fragments;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.ClipData;
+import android.content.ContentUris;
+import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.StrictMode;
+import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.CursorLoader;
 import android.support.v4.widget.CircularProgressDrawable;
 import android.support.v7.widget.AppCompatButton;
 import android.util.Log;
@@ -31,6 +38,8 @@ import com.myapps.ron.family_recipes.viewmodels.PostRecipeViewModel;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,7 +60,7 @@ public class PickPhotosFragment extends MyFragment {
     private PostRecipeActivity activity;
 
     private LinearLayout.LayoutParams layoutParams;
-    private List<Uri> imagesUris = new ArrayList<>();
+    private List<String> imagesUris = new ArrayList<>();
     private Uri imageUri;
 
     @Override
@@ -118,9 +127,10 @@ public class PickPhotosFragment extends MyFragment {
         resetButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(viewModel.imagesUris != null) {
-                    viewModel.imagesUris.clear();
-                }
+                /*if(viewModel.getImagesUris() != null) {
+                    viewModel.setImagesUris(new ArrayList<Uri>());
+                }*/
+                imagesUris.clear();
                 imagesContainer.removeAllViews();
             }
         });
@@ -129,7 +139,7 @@ public class PickPhotosFragment extends MyFragment {
         activity.nextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                viewModel.imagesUris.addAll(imagesUris);
+                viewModel.setImagesUris(imagesUris);
                 activity.postRecipe();
             }
         });
@@ -153,7 +163,7 @@ public class PickPhotosFragment extends MyFragment {
     }
 
     private void openGallery() {
-        Intent filesIntent = new Intent(Intent.ACTION_GET_CONTENT);
+        /*Intent filesIntent = new Intent(Intent.ACTION_GET_CONTENT);
         filesIntent.setType("image/*");
         filesIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
 
@@ -167,7 +177,12 @@ public class PickPhotosFragment extends MyFragment {
         Intent chooserIntent = Intent.createChooser(pickIntent, "Select Image");
         chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[] {filesIntent});
 
-        startActivityForResult(chooserIntent, GALLERY_REQUEST);
+        startActivityForResult(chooserIntent, GALLERY_REQUEST);*/
+        Intent intent = new Intent(Intent.ACTION_PICK,
+                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        intent.setDataAndType(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
+
+        startActivityForResult(intent, GALLERY_REQUEST);
     }
 
    /* private void showChoosingFile() {
@@ -209,6 +224,7 @@ public class PickPhotosFragment extends MyFragment {
                     if (resultCode == RESULT_OK && null != data && data.getData() != null) {
                         //single image
                         Log.e(TAG, data.getData().getPath());
+                        Log.e(TAG, getRealPathFromURI(data.getData()));
                         //imagesContainer.removeAllViews();
 
                         ImageView productImageView = new ImageView(getActivity());
@@ -220,7 +236,8 @@ public class PickPhotosFragment extends MyFragment {
                         imagesContainer.addView(productImageView);
 
                         productImageView.setImageURI(data.getData());
-                        imagesUris.add(data.getData());
+
+                        imagesUris.add(getRealPathFromURI(data.getData()));
                     } else if(data != null && null != data.getClipData()) {
                         //multiple images
                         Log.e(TAG, String.valueOf(data.getClipData().getItemCount()));
@@ -244,7 +261,7 @@ public class PickPhotosFragment extends MyFragment {
                             imagesContainer.addView(productImageView);
 
                             productImageView.setImageURI(mClipData.getItemAt(pickedImageCount).getUri());
-                            imagesUris.add(mClipData.getItemAt(pickedImageCount).getUri());
+                            imagesUris.add(getRealPathFromURI(mClipData.getItemAt(pickedImageCount).getUri()));
                         }
                     } else {
                         Toast.makeText(getActivity(), "You haven't picked any Image",
@@ -253,7 +270,7 @@ public class PickPhotosFragment extends MyFragment {
                     break;
                 case CAMERA_REQUEST:
                     if (resultCode == RESULT_OK) {
-                        Uri selectedImage = imageUri;
+                        String selectedImage = imageUri.getPath();
                         final ImageView imageView = new ImageView(getActivity());
 
                         imageView.setAdjustViewBounds(true);
@@ -288,7 +305,7 @@ public class PickPhotosFragment extends MyFragment {
                                     }
                                 });
                         //imageView.setImageURI(selectedImage);
-                        imagesUris.add(imageUri);
+                        imagesUris.add(selectedImage);
                     }
                     break;
 
@@ -297,5 +314,83 @@ public class PickPhotosFragment extends MyFragment {
             Toast.makeText(getActivity(), "Error: Something went wrong " + e.getMessage(), Toast.LENGTH_LONG)
                     .show();
         }
+    }
+
+    private String getRealPathFromURI(Uri contentUri) {
+        String[] proj = { MediaStore.Images.Media.DATA };
+        CursorLoader loader = new CursorLoader(activity, contentUri, proj, null, null, null);
+        Cursor cursor = loader.loadInBackground();
+        int column_index = 0;
+        if (cursor != null) {
+            column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            cursor.moveToFirst();
+            String result = cursor.getString(column_index);
+            cursor.close();
+            return result;
+        }
+
+        return contentUri.getPath();
+    }
+
+    public static String getFilePath(Context context, Uri uri) throws URISyntaxException {
+        String selection = null;
+        String[] selectionArgs = null;
+        // Uri is different in versions after KITKAT (Android 4.4), we need to
+        if (DocumentsContract.isDocumentUri(context.getApplicationContext(), uri)) {
+            if (isExternalStorageDocument(uri)) {
+                final String docId = DocumentsContract.getDocumentId(uri);
+                final String[] split = docId.split(":");
+                return Environment.getExternalStorageDirectory() + "/" + split[1];
+            } else if (isDownloadsDocument(uri)) {
+                final String id = DocumentsContract.getDocumentId(uri);
+                uri = ContentUris.withAppendedId(
+                        Uri.parse("content://downloads/public_downloads"), Long.valueOf(id));
+            } else if (isMediaDocument(uri)) {
+                final String docId = DocumentsContract.getDocumentId(uri);
+                final String[] split = docId.split(":");
+                final String type = split[0];
+                if ("image".equals(type)) {
+                    uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+                } else if ("video".equals(type)) {
+                    uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+                } else if ("audio".equals(type)) {
+                    uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+                }
+                selection = "_id=?";
+                selectionArgs = new String[]{
+                        split[1]
+                };
+            }
+        }
+        if ("content".equalsIgnoreCase(uri.getScheme())) {
+            String[] projection = {
+                    MediaStore.Images.Media.DATA
+            };
+            Cursor cursor = null;
+            try {
+                cursor = context.getContentResolver()
+                        .query(uri, projection, selection, selectionArgs, null);
+                int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+                if (cursor.moveToFirst()) {
+                    return cursor.getString(column_index);
+                }
+            } catch (Exception e) {
+            }
+        } else if ("file".equalsIgnoreCase(uri.getScheme())) {
+            return uri.getPath();
+        }
+        return null;
+    }
+
+    public static boolean isExternalStorageDocument(Uri uri) {
+        return "com.android.externalstorage.documents".equals(uri.getAuthority());
+    }
+
+    public static boolean isDownloadsDocument(Uri uri) {
+        return "com.android.providers.downloads.documents".equals(uri.getAuthority());
+    }
+
+    public static boolean isMediaDocument(Uri uri) {
+        return "com.android.providers.media.documents".equals(uri.getAuthority());
     }
 }

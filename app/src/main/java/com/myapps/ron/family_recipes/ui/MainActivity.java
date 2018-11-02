@@ -32,6 +32,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUser;
 import com.myapps.ron.family_recipes.R;
@@ -62,7 +63,8 @@ public class MainActivity extends AppCompatActivity {
     private DataViewModel viewModel;
 
     private CognitoUser user;
-    private IntentFilter filter;
+    private IntentFilter regularFilter, customFilter;
+    private String lastOrderBy;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -149,8 +151,12 @@ public class MainActivity extends AppCompatActivity {
     private void init() {
         user = AppHelper.getPool().getUser(SharedPreferencesHandler.getString(getApplicationContext(), com.myapps.ron.family_recipes.network.Constants.USERNAME));
 
-        filter = new IntentFilter();
-        filter.addAction (ConnectivityManager.CONNECTIVITY_ACTION);
+        regularFilter = new IntentFilter();
+        regularFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+
+        customFilter = new IntentFilter();
+        customFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        customFilter.addAction(Constants.ACTION_UPDATE_FROM_SERVICE);
     }
 
     private void setToolbarBackground() {
@@ -229,7 +235,12 @@ public class MainActivity extends AppCompatActivity {
     //endregion
 
     public void fetchRecipes(String orderBy) {
+        lastOrderBy = orderBy;
         viewModel.loadRecipes(this, orderBy);
+    }
+
+    public void fetchRecipes() {
+        viewModel.loadRecipes(this, lastOrderBy);
     }
 
     public void fetchCategories() {
@@ -250,7 +261,6 @@ public class MainActivity extends AppCompatActivity {
         this.menu = menu;
         searchMenuItem = menu.findItem(R.id.action_search);
 
-        //setToggle(menu);
         //filterMenuItem = menu.findItem(R.id.action_filter);
         //sortMenuItem = menu.findItem(R.id.action_sort);
 
@@ -258,12 +268,6 @@ public class MainActivity extends AppCompatActivity {
         //setSearchView(menu);
         return true;
     }
-
-    /*private void setToggle(Menu menu) {
-        MenuItem toggleItem = menu.findItem(R.id.action_sort);
-        toggleItem.setActionView(R.layout.toggle_toolbar_layout);
-        toggleItem.setChecked(true);
-    }*/
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -332,8 +336,10 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(aboutAppActivity);*/
                 break;
             case R.id.nav_main_post_recipe:
+                //unregisterReceiver(mReceiver);
+                //registerReceiver(mReceiver, customFilter);
                 Intent intent = new Intent(MainActivity.this, PostRecipeActivity.class);
-                startActivity(intent);
+                startActivityForResult(intent, Constants.POST_RECIPE_ACTIVITY_CODE);
         }
 
         if(fragment != null) {
@@ -397,20 +403,28 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == Constants.RECIPE_ACTIVITY_CODE) {
-            if(resultCode == RESULT_OK) {
-                Log.d(TAG, "results from RecipeActivity...");
-                //mAdapter.updateRecipes(new RecipesDBHelper(this).getAllRecipes());
-                /*Recipe updatedRecipe = data.getParcelableExtra(Constants.RECIPE);
-                mAdapter.updateOneRecipe(updatedRecipe);*/
-            }
+        switch (requestCode)  {
+            case Constants.RECIPE_ACTIVITY_CODE:
+                if(resultCode == RESULT_OK) {
+                    Log.d(TAG, "results from RecipeActivity...");
+                    //mAdapter.updateRecipes(new RecipesDBHelper(this).getAllRecipes());
+                    /*Recipe updatedRecipe = data.getParcelableExtra(Constants.RECIPE);
+                    mAdapter.updateOneRecipe(updatedRecipe);*/
+                }
+                break;
+            case Constants.POST_RECIPE_ACTIVITY_CODE:
+                if (resultCode != RESULT_OK) {
+                    //unregisterReceiver(mReceiver);
+                    //registerReceiver(mReceiver, regularFilter);
+                }
+                break;
         }
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        registerReceiver (mReceiver, filter);
+        registerReceiver(mReceiver, customFilter);
     }
 
     @Override
@@ -427,26 +441,39 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-            assert action != null;
-            if (action.equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
+            switch(action) {
                 // When network state changes
-
-                Log.d(TAG, "Network connectivity change");
-                if (intent.getExtras() != null) {
-                    final ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-                    if (connectivityManager != null) {
-                        NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
-                        MiddleWareForNetwork.setConnection(activeNetwork != null && activeNetwork.isConnected());
-                        //NetworkInfo ni = connectivityManager.getActiveNetworkInfo();
-                        if (activeNetwork != null && activeNetwork.isConnected()) {
-                            Log.i(TAG, "Network " + activeNetwork.getTypeName() + " connected");
-                        } else {// if (intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, Boolean.FALSE)) {
-                            Log.d(TAG, "There's no network connectivity");
+                case ConnectivityManager.CONNECTIVITY_ACTION:
+                    Log.d(TAG, "Network connectivity change");
+                    if (intent.getExtras() != null) {
+                        final ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+                        if (connectivityManager != null) {
+                            NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
+                            MiddleWareForNetwork.setConnection(activeNetwork != null && activeNetwork.isConnected());
+                            //NetworkInfo ni = connectivityManager.getActiveNetworkInfo();
+                            if (activeNetwork != null && activeNetwork.isConnected()) {
+                                Log.i(TAG, "Network " + activeNetwork.getTypeName() + " connected");
+                            } else {// if (intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, Boolean.FALSE)) {
+                                Log.d(TAG, "There's no network connectivity");
+                            }
                         }
+                        else
+                            MiddleWareForNetwork.setConnection(false);
                     }
-                    else
-                        MiddleWareForNetwork.setConnection(false);
-                }
+                    break;
+                case Constants.ACTION_UPDATE_FROM_SERVICE:
+                    Log.d(TAG, "Got an update from service");
+                    //unregisterReceiver(mReceiver);
+                    //registerReceiver(mReceiver, regularFilter);
+                    if (intent.getExtras() != null) {
+                        boolean update = intent.getBooleanExtra("update", false);
+                        Toast.makeText(MainActivity.this, intent.getStringExtra("message"), Toast.LENGTH_SHORT).show();
+                        if (update) {
+                            fetchRecipes();
+                            //Toast.makeText(MainActivity.this, "recipe uploaded successfully!", Toast.LENGTH_SHORT).show();
+                        } //else
+                            //Toast.makeText(MainActivity.this, "failed to post the recipe", Toast.LENGTH_SHORT).show();
+                    }
             }
         }
     };

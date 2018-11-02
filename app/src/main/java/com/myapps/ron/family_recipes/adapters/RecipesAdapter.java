@@ -354,14 +354,16 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
     }
 
     public void updateOneRecipe(Recipe recipe) {
-        int index1 = recipeList.indexOf(recipe);
-        if(index1 >= 0)
-            recipeList.set(index1, recipe);
+        List<Recipe> newList = new ArrayList<>(recipeList);
 
-        int index2 = recipeListFiltered.indexOf(recipe);
+        int index1 = newList.indexOf(recipe);
+        if(index1 >= 0)
+            newList.set(index1, recipe);
+
+        /*int index2 = recipeListFiltered.indexOf(recipe);
         if(index2 >= 0)
-            recipeListFiltered.set(index2, recipe);
-        notifyDataSetChanged();
+            newList.set(index2, recipe);*/
+        updateRecipes(newList, true);
 
         //return index1 >= 0 && index2 >= 0;
     }

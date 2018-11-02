@@ -310,7 +310,6 @@ public class AllRecipesFragment extends MyFragment implements RecipesAdapter.Rec
         Intent intent = new Intent(activity, RecipeActivity.class);
         intent.putExtra(Constants.RECIPE, recipe);
         startActivityForResult(intent, Constants.RECIPE_ACTIVITY_CODE);
-
     }
 
     @Override

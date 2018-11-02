@@ -2,6 +2,7 @@ package com.myapps.ron.family_recipes.ui;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -11,9 +12,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatButton;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.myapps.ron.family_recipes.R;
+import com.myapps.ron.family_recipes.model.Recipe;
+import com.myapps.ron.family_recipes.services.PostRecipeToServerService;
 import com.myapps.ron.family_recipes.ui.fragments.AdvancedStepFragment;
 import com.myapps.ron.family_recipes.ui.fragments.FirstStepFragment;
 import com.myapps.ron.family_recipes.ui.fragments.PickPhotosFragment;
@@ -21,6 +25,7 @@ import com.myapps.ron.family_recipes.ui.fragments.PreviewDialogFragment;
 import com.myapps.ron.family_recipes.utils.MyFragment;
 import com.myapps.ron.family_recipes.viewmodels.PostRecipeViewModel;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,22 +48,26 @@ public class PostRecipeActivity extends AppCompatActivity {
         nextButton = findViewById(R.id.create_recipe_next_button);
         viewModel =  ViewModelProviders.of(this).get(PostRecipeViewModel.class);
         setFragments();
+
+        /*nextButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                postRecipe();
+            }
+        });*/
     }
 
     private void setFragments() {
         fragments = new ArrayList<>();
 
+        fragments.add(new FirstStepFragment());
         fragments.add(new AdvancedStepFragment());
         fragments.add(new PickPhotosFragment());
-        //fragments.add(new FirstStepFragment());
-
-
 
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.add(R.id.create_fragment_container, fragments.get(0));
         transaction.addToBackStack(null);
         transaction.commit();
-        Log.e(getClass().getSimpleName(), "current index = " + currentIndex);
     }
 
     public void nextFragment() {
@@ -73,7 +82,7 @@ public class PostRecipeActivity extends AppCompatActivity {
             .replace(R.id.create_fragment_container, fragments.get(++currentIndex))
             .addToBackStack(null)
             .commit();
-            Log.e(getClass().getSimpleName(), "current index = " + currentIndex);
+            //Log.e(getClass().getSimpleName(), "current index = " + currentIndex);
             /*FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             transaction.replace(R.id.create_fragment_container, fragments.get(++currentIndex));
             transaction.addToBackStack(null);
@@ -100,10 +109,6 @@ public class PostRecipeActivity extends AppCompatActivity {
             manager.popBackStack();
             inPreview = false;
             return;
-            /*if(getSupportActionBar() != null) {
-                getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-                getSupportActionBar().setDisplayShowHomeEnabled(false);
-            }*/
         }
         if(!fragments.get(currentIndex).onBackPressed()) {
             NavUtils.navigateUpFromSameTask(this);
@@ -124,8 +129,10 @@ public class PostRecipeActivity extends AppCompatActivity {
                 previousFragment();
                 return true;
             }
-            else
+            else {
+                setResult(RESULT_CANCELED);
                 NavUtils.navigateUpFromSameTask(this);
+            }
         }
         return super.onOptionsItemSelected(item);
     }
@@ -141,14 +148,46 @@ public class PostRecipeActivity extends AppCompatActivity {
         transaction.addToBackStack(null);
         transaction.commit();
 
-        /*if(getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setDisplayShowHomeEnabled(true);
-        }*/
         inPreview = true;
     }
 
     public void postRecipe() {
         Toast.makeText(this, "posting the recipe...", Toast.LENGTH_SHORT).show();
+        PostRecipeToServerService.startActionPostRecipe(this, viewModel.recipe);
+        setResult(RESULT_OK);
+        finish();
+    }
+
+    public void postRecipe1() {
+        /*File dcim = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
+        Log.e(getClass().getSimpleName(), dcim.getAbsolutePath());
+        File file = new File(dcim, "Camera/20180926_160503.jpg");
+        Log.e(getClass().getSimpleName(), file.getAbsolutePath());*/
+        Toast.makeText(this, "posting the recipe...", Toast.LENGTH_SHORT).show();
+        ArrayList<String> images = new ArrayList<>();
+        images.add("/storage/emulated/0/DCIM/Camera/20180926_160503.jpg");
+        images.add("/storage/emulated/0/DCIM/Camera/20180929_141712.jpg");
+        PostRecipeToServerService.startActionPostImages(this,"kE5zymiS_wD_", images);
+        setResult(RESULT_OK);
+        finish();
+    }
+
+    private Recipe makeRecipe() {
+        Recipe recipe = new Recipe();
+        recipe.setName("פסטה פרמזן");
+        recipe.setDescription("פסטה עם גבינת פרמזן במיוחד בשביל גיא");
+
+        List<String> categories = new ArrayList<>();
+        categories.add("חלבי");
+        categories.add("פסטה");
+        recipe.setCategories(categories);
+
+        recipe.setRecipeFile("/data/user/0/com.myapps.ron.family_recipes/files/פסטה פרמזן.html");
+        List<String> images = new ArrayList<>();
+        images.add("/document/image:40876");
+        images.add("/document/image:38906");
+        recipe.setFoodFiles(images);
+
+        return recipe;
     }
 }

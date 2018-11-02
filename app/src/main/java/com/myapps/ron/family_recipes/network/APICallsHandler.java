@@ -1,5 +1,6 @@
 package com.myapps.ron.family_recipes.network;
 
+import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -8,6 +9,7 @@ import com.google.gson.JsonObject;
 import com.myapps.ron.family_recipes.model.Category;
 import com.myapps.ron.family_recipes.model.Recipe;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -90,21 +92,35 @@ public class APICallsHandler {
         });
     }
 
-    public void postRecipe(Recipe recipe, int numOfFiles, String token) {
+    public static void postRecipe(final Recipe recipe, final String token, final MyCallback<String> callback) {
+        Log.e(TAG, "start post recipe");
+
         Map<String, String> headers = new HashMap<>();
         headers.put(Constants.CONTENT_TYPE, "application/json");
         headers.put(Constants.AUTHORIZATION, token);
-        Map<String, String> body = new HashMap<>();
-        body.put(Constants.RECIPE_ITEM, gson.toJson(recipe));
-        body.put(Constants.NUM_FILES_TO_UPLOAD, String.valueOf(numOfFiles));
 
+        Map<String, Object> body = new HashMap<>();
+        //body.put(Constants.RECIPE_ITEM, gson.toJson(recipe));
+        body.put(Constants.RECIPE_ITEM, generatePostRecipeFields(recipe));
+        //body.put(Constants.NUM_FILES_TO_UPLOAD, String.valueOf(numOfFiles));
+
+        Log.e(TAG, "post body: \n" + body.toString());
         RecipeInterface service = getRetrofitInstance().create(RecipeInterface.class);
         Call<JsonObject> call = service.postPendRecipe(headers, body);
 
         call.enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(@NonNull Call<JsonObject> call, @NonNull Response<JsonObject> response) {
-                //generateDataList(response.body());
+                String url = "null";
+                if (response.body() != null && response.body().get("url") != null)
+                    url = response.body().get("url").getAsString();
+
+                Log.i(TAG, "response code = " + response.code() + ",\t" + url);
+
+                if (response.code() == STATUS_OK) {
+                    //Log.i(TAG, url);
+                    callback.onFinished(url);
+                }
             }
 
             @Override
@@ -115,6 +131,16 @@ public class APICallsHandler {
         });
     }
 
+    private static Map<String,Object> generatePostRecipeFields(Recipe recipe) {
+        Map<String, Object> fields = new HashMap<>();
+        fields.put(Constants.POSTED_NAME, recipe.getName());
+        fields.put(Constants.POSTED_DESCRIPTION, recipe.getDescription());
+        fields.put(Constants.POSTED_CATEGORIES, recipe.getCategories());
+
+        Log.e(TAG, "post body:\n" + fields.toString());
+
+        return fields;
+    }
 
     public static void patchRecipe(Map<String, String> attributes, String id, String token, final MyCallback<Recipe> callback) {
         Map<String, String> headers = new HashMap<>();
@@ -177,5 +203,58 @@ public class APICallsHandler {
                 //Toast.makeText(MainActivity.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    public static void requestUrlsForFoodPictures(String id, List<String> files, String token, final MyCallback<List<String>> callback) {
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put(Constants.NUM_FILES_TO_UPLOAD, String.valueOf(files.size()));
+        requestBody.put(Constants.PUT_FOOD_EXTENSION, "jpg");
+
+        RecipeInterface service = getRetrofitInstance().create(RecipeInterface.class);
+        Call<List<String>> call = service.requestFoodUrls(token, id, requestBody);
+
+        call.enqueue(new Callback<List<String>>() {
+            @Override
+            public void onResponse(@NonNull Call<List<String>> call, @NonNull Response<List<String>> response) {
+                String body = response.body() != null ? response.body().toString() : "null";
+
+                if (response.code() == STATUS_OK) {
+                    Log.i(TAG, "result from urls " + body);
+                    List<String> list = response.body();
+                    callback.onFinished(list);
+                } else {
+                    Log.e(TAG, "error requesting urls, code = " + response.code() + "\n body: " + body);
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<List<String>> call, @NonNull Throwable t) {
+                Log.e(TAG, "error getting all recipes. message: " + t.getMessage());
+                //Toast.makeText(MainActivity.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+    }
+
+    public static List<String> requestUrlsForFoodPicturesSync(String id, List<String> files, String token) {
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+                .permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put(Constants.NUM_FILES_TO_UPLOAD, String.valueOf(files.size()));
+        requestBody.put(Constants.PUT_FOOD_EXTENSION, "jpg");
+
+        RecipeInterface service = getRetrofitInstance().create(RecipeInterface.class);
+        Call<List<String>> call = service.requestFoodUrls(token, id, requestBody);
+        try {
+            Response<List<String>> response = call.execute();
+            Log.e(TAG, "response code for requesting urls, " + response.code());
+            Log.e(TAG, "response urls:\n" + response.body());
+            return response.body();
+        } catch (IOException e) {
+            Log.e(TAG, e.getMessage());
+            return null;
+        }
     }
 }
