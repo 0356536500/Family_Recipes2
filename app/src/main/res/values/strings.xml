@@ -80,6 +80,8 @@
     <string name="post_recipe_pick_photos_button">browse</string>
     <string name="post_recipe_shoot_photos_button">camera</string>
     <string name="post_recipe_reset_photos_button">reset</string>
+    <string name="post_recipe_pick_photos_browse_empty_message">You haven\'t picked any Image</string>
+    <string name="post_recipe_pick_photos_camera_empty_message">You haven\'t take a picture</string>
 
     <string-array name="html_elements">
         <item>Header</item>

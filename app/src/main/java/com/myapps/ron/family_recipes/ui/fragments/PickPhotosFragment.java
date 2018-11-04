@@ -1,21 +1,19 @@
 package com.myapps.ron.family_recipes.ui.fragments;
 
+import android.Manifest;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.ClipData;
-import android.content.ContentUris;
-import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.StrictMode;
-import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.widget.CircularProgressDrawable;
 import android.support.v7.widget.AppCompatButton;
@@ -38,8 +36,6 @@ import com.myapps.ron.family_recipes.viewmodels.PostRecipeViewModel;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,6 +45,7 @@ import static android.app.Activity.RESULT_OK;
  * Created by ronginat on 30/10/2018.
  */
 public class PickPhotosFragment extends MyFragment {
+    private static final int MY_PERMISSIONS_REQUEST_STORAGE = 11;
     private final String TAG = getClass().getSimpleName();
 
     protected static final int CAMERA_REQUEST = 0;
@@ -62,6 +59,11 @@ public class PickPhotosFragment extends MyFragment {
     private LinearLayout.LayoutParams layoutParams;
     private List<String> imagesUris = new ArrayList<>();
     private Uri imageUri;
+
+    private final int BROWSE_CODE = 1;
+    private final int CAMERA_CODE = -1;
+
+    private int storageRelatedButtonClicked = 0;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -99,28 +101,25 @@ public class PickPhotosFragment extends MyFragment {
 
     private void initViewModel() {
         viewModel =  ViewModelProviders.of(activity).get(PostRecipeViewModel.class);
-
-        /*viewModel.getInfoFromLastFetch().observe(this, new Observer<String>() {
-            @Override
-            public void onChanged(@Nullable String s) {
-                if (s != null)
-                    Toast.makeText(activity, s, Toast.LENGTH_LONG).show();
-            }
-        });*/
     }
 
     private void setListeners() {
+        storageRelatedButtonClicked = 0;
         browseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                openGallery();
+                storageRelatedButtonClicked = BROWSE_CODE;
+                checkStoragePermission();
+                //openGallery();
             }
         });
 
         takeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                openCamera();
+                storageRelatedButtonClicked = CAMERA_CODE;
+                checkStoragePermission();
+                //openCamera();
             }
         });
 
@@ -143,6 +142,66 @@ public class PickPhotosFragment extends MyFragment {
                 activity.postRecipe();
             }
         });
+    }
+
+    private void checkStoragePermission() {
+        if (ContextCompat.checkSelfPermission(activity,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            // Permission is not granted
+            // Should we show an explanation?
+            /*if (ActivityCompat.shouldShowRequestPermissionRationale(activity,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+
+            } else {*/
+                // No explanation needed; request the permission
+                requestPermissions(
+                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,
+                                Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        MY_PERMISSIONS_REQUEST_STORAGE);
+
+            //}
+        } else {
+            Log.e(TAG, "granted");
+            switch (storageRelatedButtonClicked) {
+                case BROWSE_CODE:
+                    openGallery();
+                    break;
+                case CAMERA_CODE:
+                    openCamera();
+                    break;
+            }
+            storageRelatedButtonClicked = 0;
+            // Permission has already been granted
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_STORAGE: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED
+                        && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+
+                    switch (storageRelatedButtonClicked) {
+                        case BROWSE_CODE:
+                            openGallery();
+                            break;
+                        case CAMERA_CODE:
+                            openCamera();
+                            break;
+                    }
+                    storageRelatedButtonClicked = 0;
+
+                } /*else {
+
+                }*/
+                break;
+            }
+        }
     }
 
     private void openCamera() {
@@ -244,15 +303,10 @@ public class PickPhotosFragment extends MyFragment {
 
                         ClipData mClipData = data.getClipData();
 
-                        /*Toast.makeText(getActivity(), "You picked " +
-                                        (mClipData.getItemCount() > 1 ? mClipData.getItemCount() + " Images" :
-                                                mClipData.getItemCount() + "Image"),
-                                Toast.LENGTH_LONG).show();*/
+                        int pickedImageCounter;
 
-                        int pickedImageCount;
-
-                        for (pickedImageCount = 0; pickedImageCount < mClipData.getItemCount(); pickedImageCount++) {
-                            Log.e(TAG, mClipData.getItemAt(pickedImageCount).getUri().getPath());
+                        for (pickedImageCounter = 0; pickedImageCounter < mClipData.getItemCount(); pickedImageCounter++) {
+                            Log.e(TAG, mClipData.getItemAt(pickedImageCounter).getUri().getPath());
 
                             ImageView productImageView = new ImageView(getActivity());
                             productImageView.setAdjustViewBounds(true);
@@ -260,12 +314,12 @@ public class PickPhotosFragment extends MyFragment {
                             productImageView.setLayoutParams(layoutParams);
                             imagesContainer.addView(productImageView);
 
-                            productImageView.setImageURI(mClipData.getItemAt(pickedImageCount).getUri());
-                            imagesUris.add(getRealPathFromURI(mClipData.getItemAt(pickedImageCount).getUri()));
+                            productImageView.setImageURI(mClipData.getItemAt(pickedImageCounter).getUri());
+                            imagesUris.add(getRealPathFromURI(mClipData.getItemAt(pickedImageCounter).getUri()));
                         }
                     } else {
-                        Toast.makeText(getActivity(), "You haven't picked any Image",
-                                Toast.LENGTH_LONG).show();
+                        Toast.makeText(getActivity(), R.string.post_recipe_pick_photos_browse_empty_message,
+                                Toast.LENGTH_SHORT).show();
                     }
                     break;
                 case CAMERA_REQUEST:
@@ -306,6 +360,10 @@ public class PickPhotosFragment extends MyFragment {
                                 });
                         //imageView.setImageURI(selectedImage);
                         imagesUris.add(selectedImage);
+                    } else {
+                        File file = new File(imageUri.getPath());
+                        if(file.delete())
+                            Toast.makeText(activity, R.string.post_recipe_pick_photos_camera_empty_message, Toast.LENGTH_SHORT).show();
                     }
                     break;
 
@@ -320,7 +378,7 @@ public class PickPhotosFragment extends MyFragment {
         String[] proj = { MediaStore.Images.Media.DATA };
         CursorLoader loader = new CursorLoader(activity, contentUri, proj, null, null, null);
         Cursor cursor = loader.loadInBackground();
-        int column_index = 0;
+        int column_index;
         if (cursor != null) {
             column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
             cursor.moveToFirst();
@@ -330,67 +388,5 @@ public class PickPhotosFragment extends MyFragment {
         }
 
         return contentUri.getPath();
-    }
-
-    public static String getFilePath(Context context, Uri uri) throws URISyntaxException {
-        String selection = null;
-        String[] selectionArgs = null;
-        // Uri is different in versions after KITKAT (Android 4.4), we need to
-        if (DocumentsContract.isDocumentUri(context.getApplicationContext(), uri)) {
-            if (isExternalStorageDocument(uri)) {
-                final String docId = DocumentsContract.getDocumentId(uri);
-                final String[] split = docId.split(":");
-                return Environment.getExternalStorageDirectory() + "/" + split[1];
-            } else if (isDownloadsDocument(uri)) {
-                final String id = DocumentsContract.getDocumentId(uri);
-                uri = ContentUris.withAppendedId(
-                        Uri.parse("content://downloads/public_downloads"), Long.valueOf(id));
-            } else if (isMediaDocument(uri)) {
-                final String docId = DocumentsContract.getDocumentId(uri);
-                final String[] split = docId.split(":");
-                final String type = split[0];
-                if ("image".equals(type)) {
-                    uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-                } else if ("video".equals(type)) {
-                    uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
-                } else if ("audio".equals(type)) {
-                    uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-                }
-                selection = "_id=?";
-                selectionArgs = new String[]{
-                        split[1]
-                };
-            }
-        }
-        if ("content".equalsIgnoreCase(uri.getScheme())) {
-            String[] projection = {
-                    MediaStore.Images.Media.DATA
-            };
-            Cursor cursor = null;
-            try {
-                cursor = context.getContentResolver()
-                        .query(uri, projection, selection, selectionArgs, null);
-                int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-                if (cursor.moveToFirst()) {
-                    return cursor.getString(column_index);
-                }
-            } catch (Exception e) {
-            }
-        } else if ("file".equalsIgnoreCase(uri.getScheme())) {
-            return uri.getPath();
-        }
-        return null;
-    }
-
-    public static boolean isExternalStorageDocument(Uri uri) {
-        return "com.android.externalstorage.documents".equals(uri.getAuthority());
-    }
-
-    public static boolean isDownloadsDocument(Uri uri) {
-        return "com.android.providers.downloads.documents".equals(uri.getAuthority());
-    }
-
-    public static boolean isMediaDocument(Uri uri) {
-        return "com.android.providers.media.documents".equals(uri.getAuthority());
     }
 }

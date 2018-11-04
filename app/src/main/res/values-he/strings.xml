@@ -77,6 +77,8 @@
     <string name="post_recipe_pick_photos_button">גלריה</string>
     <string name="post_recipe_shoot_photos_button">מצלמה</string>
     <string name="post_recipe_reset_photos_button">איפוס</string>
+    <string name="post_recipe_pick_photos_browse_empty_message">לא נבחרו תמונות</string>
+    <string name="post_recipe_pick_photos_camera_empty_message">לא צולמה תמונה</string>
 
     <string-array name="html_elements">
         <item>כותרת</item>

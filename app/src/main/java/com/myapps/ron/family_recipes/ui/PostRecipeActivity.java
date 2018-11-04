@@ -60,9 +60,10 @@ public class PostRecipeActivity extends AppCompatActivity {
     private void setFragments() {
         fragments = new ArrayList<>();
 
+        fragments.add(new PickPhotosFragment());
         fragments.add(new FirstStepFragment());
         fragments.add(new AdvancedStepFragment());
-        fragments.add(new PickPhotosFragment());
+
 
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.add(R.id.create_fragment_container, fragments.get(0));
