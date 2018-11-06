@@ -11,6 +11,7 @@ import android.support.v4.widget.CircularProgressDrawable;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -354,18 +355,15 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
     }
 
     public void updateOneRecipe(Recipe recipe) {
-        List<Recipe> newList = new ArrayList<>(recipeList);
+        //List<Recipe> newList = new ArrayList<>(recipeList);
 
-        int index1 = newList.indexOf(recipe);
-        if(index1 >= 0)
-            newList.set(index1, recipe);
+        int index = recipeList.indexOf(recipe);
+        if(index >= 0) {
+            recipeList.set(index, recipe);
 
-        /*int index2 = recipeListFiltered.indexOf(recipe);
-        if(index2 >= 0)
-            newList.set(index2, recipe);*/
-        updateRecipes(newList, true);
-
-        //return index1 >= 0 && index2 >= 0;
+            notifyItemChanged(index);
+        }
+        //updateRecipes(newList, true);
     }
 
     public interface RecipesAdapterListener {

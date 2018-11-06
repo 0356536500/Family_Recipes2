@@ -296,7 +296,7 @@ public class PickPhotosFragment extends MyFragment {
                             imagesContainer.addView(imageView);
                             loadFromPathToImageView(compressedPath, imageView);
                             //imageView.setImageURI(Uri.fromFile(compressedFile));
-                            
+
                             //compressedFile.deleteOnExit();
 
                             imagesUris.add(compressedPath);

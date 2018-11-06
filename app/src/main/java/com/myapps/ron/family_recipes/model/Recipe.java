@@ -182,9 +182,11 @@ public class Recipe implements Parcelable{
         if (getUploader() != null && other.getUploader() != null)
             uploaders = getUploader().equals(other.getUploader());
 
-        boolean cats = categories == null && other.getCategories() == null;
+        boolean cats = getStringCategories().equals(other.getStringCategories());
+
+        /*boolean cats = categories == null && other.getCategories() == null;
         if (categories != null && other.getCategories() != null)
-            cats = getStringCategories().equals(other.getStringCategories());
+            cats = getStringCategories().equals(other.getStringCategories());*/
 
         boolean created = getCreatedAt() == null && other.getCreatedAt() == null;
         if (getCreatedAt() != null && other.getCreatedAt() != null)
@@ -198,13 +200,17 @@ public class Recipe implements Parcelable{
         if (getRecipeFile() != null && other.getRecipeFile() != null)
             file = getRecipeFile().equals(other.getRecipeFile());
 
-        boolean images = getFoodFiles() == null && other.getFoodFiles() == null;
-        if (getFoodFiles() != null && other.getFoodFiles() != null)
-            images = getStringFoodFiles().equals(other.getStringFoodFiles());
+        boolean images = getStringFoodFiles().equals(other.getStringFoodFiles());
 
-        boolean comments = getComments() == null && other.getComments() == null;
+        /*boolean images = getFoodFiles() == null && other.getFoodFiles() == null;
+        if (getFoodFiles() != null && other.getFoodFiles() != null)
+            images = getStringFoodFiles().equals(other.getStringFoodFiles());*/
+
+        boolean comments = getStringComments().equals(other.getStringComments());
+
+        /*boolean comments = getComments() == null && other.getComments() == null;
         if (getComments() != null && other.getComments() != null)
-            comments = getStringComments().equals(other.getStringComments());
+            comments = getStringComments().equals(other.getStringComments());*/
 
         boolean likes = getLikes() == other.getLikes();
         boolean meLikes = getMeLike() == other.getMeLike();
@@ -221,7 +227,9 @@ public class Recipe implements Parcelable{
     }
 
     public String getStringCategories() {
-        return gson.toJson(getCategories());
+        if (getCategories() != null)
+            return gson.toJson(getCategories());
+        return "";
     }
 
     public void setStringCategories(String categories) {
@@ -231,7 +239,9 @@ public class Recipe implements Parcelable{
     }
 
     public String getStringComments() {
-        return gson.toJson(getComments());
+        if (getComments() != null)
+            return gson.toJson(getComments());
+        return "";
     }
 
     public void setStringComments(String comments) {
@@ -241,7 +251,9 @@ public class Recipe implements Parcelable{
     }
 
     public String getStringFoodFiles() {
-        return gson.toJson(getFoodFiles());
+        if (getFoodFiles() != null)
+            return gson.toJson(getFoodFiles());
+        return "";
     }
 
     public void setStringFoodFiles(String foodFiles) {
