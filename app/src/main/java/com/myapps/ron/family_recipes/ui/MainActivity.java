@@ -466,7 +466,7 @@ public class MainActivity extends AppCompatActivity {
                     //unregisterReceiver(mReceiver);
                     //registerReceiver(mReceiver, regularFilter);
                     if (intent.getExtras() != null) {
-                        boolean update = intent.getBooleanExtra("update", false);
+                        boolean update = intent.getBooleanExtra("refresh", false);
                         Toast.makeText(MainActivity.this, intent.getStringExtra("message"), Toast.LENGTH_SHORT).show();
                         if (update) {
                             fetchRecipes();

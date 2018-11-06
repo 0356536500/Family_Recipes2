@@ -14,7 +14,6 @@ import com.myapps.ron.family_recipes.network.S3.OnlineStorageWrapper;
 import com.myapps.ron.family_recipes.network.cognito.AppHelper;
 import com.myapps.ron.family_recipes.utils.Constants;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +25,7 @@ import java.util.List;
  * TODO: Customize class - update intent actions, extra parameters and static
  * helper methods.
  */
-public class PostRecipeToServerService extends IntentService {
+public class OldService extends IntentService {
     private static final String TAG = "service";
     // IntentService can perform, e.g. ACTION_FETCH_NEW_ITEMS
     private static final String ACTION_POST_RECIPE = "com.myapps.ron.family_recipes.services.action.POST_RECIPE";
@@ -37,8 +36,8 @@ public class PostRecipeToServerService extends IntentService {
     private static final String EXTRA_PARAM2 = "com.myapps.ron.family_recipes.services.extra.PARAM2";
 
 
-    public PostRecipeToServerService() {
-        super("PostRecipeToServerService");
+    public OldService() {
+        super("OldService");
     }
 
     /**
@@ -79,12 +78,7 @@ public class PostRecipeToServerService extends IntentService {
             if (ACTION_POST_RECIPE.equals(action)) {
                 final Recipe recipe = intent.getParcelableExtra(EXTRA_PARAM1);
                 //final String time = intent.getStringExtra(EXTRA_PARAM2);
-                handleActionPostRecipeSync(recipe);
-                //handleActionPostRecipe(recipe);
-            } else if (ACTION_POST_IMAGES.equals(action)) {
-                final List<String> files = intent.getStringArrayListExtra(EXTRA_PARAM1);
-                String id = intent.getStringExtra(EXTRA_PARAM2);
-                handleActionPostImagesSync(id, files);
+                handleActionPostRecipe(recipe);
             }
         }
     }
@@ -93,65 +87,76 @@ public class PostRecipeToServerService extends IntentService {
      * Handle action Foo in the provided background thread with the provided
      * parameters.
      */
-    private void handleActionPostRecipeSync(final Recipe recipe) {
-        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
-                .permitAll().build();
-        StrictMode.setThreadPolicy(policy);
-
+    private void handleActionPostRecipe(final Recipe recipe) {
+        this.recipe = recipe;
         Log.e(TAG, "handle action post recipe");
         //maybe open a new thread
         APICallsHandler.postRecipe(recipe, AppHelper.getAccessToken(), new MyCallback<String>() {
             @Override
-            public void onFinished(String urlForContent) {
-                Log.e(TAG, "finished post pend, got a url, " + urlForContent);
-                if (!"null".equals(urlForContent)) {
-                    boolean fileUploaded = OnlineStorageWrapper.uploadRecipeFileSync(urlForContent, recipe.getRecipeFile());
+            public void onFinished(String result) {
+                Log.e(TAG, "finished post pend, got a url, " + result);
+                if (!"null".equals(result)) {
+                    /*boolean fileUploaded = OnlineStorageWrapper.uploadRecipeFileSync(result, recipe.getRecipeFile());
                     if (fileUploaded) {
-                        //sendIntentToUser(false, "recipe uploaded");
+                        sendIntentToUser(true, "recipe uploaded");
                         if (recipe.getFoodFiles() != null) {
-                            uploadFoodFilesSync(recipe.getId(), recipe.getFoodFiles());
-                        } else {
-                            //no images to upload
-                            new Handler().postDelayed(new Runnable() {
-                                @Override
-                                public void run() {
-                                    sendIntentToUser(false, "recipe uploaded");
-                                }
-                            }, 2500);
+                            uploadFoodFiles(recipe);
                         }
                     }
                     else
-                        sendIntentToUser(false, "recipe wasn't uploaded");
+                        sendIntentToUser(false, "recipe wasn't uploaded");*/
+                    OnlineStorageWrapper.uploadRecipeFile(result, recipe.getRecipeFile(), new MyCallback<Boolean>() {
+                        @Override
+                        public void onFinished(Boolean result) {
+                            sendIntentToUser(result, "recipe uploaded");
+                            if (recipe.getFoodFiles() != null) {
+                                uploadFoodFiles(recipe);
+                            }
+                        }
+                    });
                 }
                 else
                     sendIntentToUser(false, "recipe wasn't uploaded");
             }
         });
-
-        deleteAllLocalFiles(recipe);
     }
 
 
-    private void uploadFoodFilesSync(String id, List<String> foodFiles) {
-        Log.e(TAG, "uploading images");
-        Log.e(TAG, "id = " + id + "\n files: " + foodFiles);
-        //Synchronous request with retrofit 2.0
-        List<String> urlsForFood = APICallsHandler.requestUrlsForFoodPicturesSync(id, foodFiles, AppHelper.getAccessToken());
-        if (urlsForFood != null) {
-            //upload the images to s3
-            Log.e(TAG, "urls: " + urlsForFood);
-            for (int i = 0; i < urlsForFood.size() && i < foodFiles.size(); i++) {
-                Log.e(TAG, "uploading file #" + i);
-                OnlineStorageWrapper.uploadFoodFileSync(urlsForFood.get(i), foodFiles.get(i));
+    private int picturesUploaded;
+    private Recipe recipe = null;
+    private List<String> urls;
+    private MyCallback<Boolean> myCallback = new MyCallback<Boolean>() {
+        @Override
+        public void onFinished(Boolean result) {
+            Log.e(TAG, "uploading file #" + picturesUploaded);
+            if (picturesUploaded < urls.size() - 1) {
+                picturesUploaded++;
+                uploadImage(urls.get(picturesUploaded - 1), recipe.getFoodFiles().get(picturesUploaded - 1));
             }
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    sendIntentToUser(true, "images uploaded");
-                }
-            }, 2500);
         }
-        Log.e(TAG, "urls are null");
+    };
+
+    private void uploadFoodFiles(final Recipe recipe) {
+        picturesUploaded = 0;
+        Log.e(TAG, "uploading images");
+        //Asynchronous request with retrofit 2.0
+        APICallsHandler.requestUrlsForFoodPictures(recipe.getId(), recipe.getFoodFiles(), AppHelper.getAccessToken(), new MyCallback<List<String>>() {
+            @Override
+            public void onFinished(final List<String> urlsForFood) {
+                if (urlsForFood != null) {
+                    urls = new ArrayList<>(urlsForFood);
+                    //upload the images to s3
+                    OnlineStorageWrapper.uploadFoodFile(urls.get(0), recipe.getFoodFiles().get(0), myCallback);
+                }
+                else
+                    Log.e(TAG, "urls are null");
+            }
+        });
+
+    }
+
+    private void uploadImage(String url, String localPath) {
+        OnlineStorageWrapper.uploadFoodFile(url, localPath, myCallback);
     }
 
     private void sendIntentToUser(boolean update, String message) {
@@ -163,20 +168,22 @@ public class PostRecipeToServerService extends IntentService {
     }
 
     private void deleteAllLocalFiles(Recipe recipe) {
-        if (recipe.getFoodFiles() != null && !recipe.getFoodFiles().isEmpty()) {
-            for (int i = 0; i < recipe.getFoodFiles().size(); i++) {
-                new File(recipe.getFoodFiles().get(i)).delete();
-            }
+
+    }
+
+    private MyCallback<Boolean> uploadRecipeCallback = new MyCallback<Boolean>() {
+        @Override
+        public void onFinished(Boolean result) {
+
         }
-        new File(recipe.getRecipeFile()).delete();
-    }
+    };
 
+    private MyCallback<Boolean> uploadImagesCalback = new MyCallback<Boolean>() {
+        @Override
+        public void onFinished(Boolean result) {
+            Log.e(TAG, "did file uploaded ? " + result);
+            sendIntentToUser(result, "images uploaded");
+        }
+    };
 
-    /**
-     * Handle action Baz in the provided background thread with the provided
-     * parameters.
-     */
-    private void handleActionPostImagesSync(String id, List<String> localPaths) {
-        uploadFoodFilesSync(id, localPaths);
-    }
 }

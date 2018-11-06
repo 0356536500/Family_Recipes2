@@ -56,7 +56,9 @@
             android:label="@string/title_activity_create_recipe"
             android:theme="@style/AppThemeWithActionBar"
             android:windowSoftInputMode="adjustPan"
-            android:parentActivityName=".ui.MainActivity">
+            android:parentActivityName=".ui.MainActivity"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait">
 
         <!--<intent-filter>
             <action android:name="android.intent.action.MAIN" />

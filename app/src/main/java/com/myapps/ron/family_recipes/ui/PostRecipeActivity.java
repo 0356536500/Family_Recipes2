@@ -2,7 +2,6 @@ package com.myapps.ron.family_recipes.ui;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -12,11 +11,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatButton;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Toast;
 
 import com.myapps.ron.family_recipes.R;
-import com.myapps.ron.family_recipes.model.Recipe;
 import com.myapps.ron.family_recipes.services.PostRecipeToServerService;
 import com.myapps.ron.family_recipes.ui.fragments.AdvancedStepFragment;
 import com.myapps.ron.family_recipes.ui.fragments.FirstStepFragment;
@@ -25,7 +22,6 @@ import com.myapps.ron.family_recipes.ui.fragments.PreviewDialogFragment;
 import com.myapps.ron.family_recipes.utils.MyFragment;
 import com.myapps.ron.family_recipes.viewmodels.PostRecipeViewModel;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,10 +56,9 @@ public class PostRecipeActivity extends AppCompatActivity {
     private void setFragments() {
         fragments = new ArrayList<>();
 
-        fragments.add(new PickPhotosFragment());
         fragments.add(new FirstStepFragment());
         fragments.add(new AdvancedStepFragment());
-
+        fragments.add(new PickPhotosFragment());
 
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.add(R.id.create_fragment_container, fragments.get(0));
@@ -159,11 +154,11 @@ public class PostRecipeActivity extends AppCompatActivity {
         finish();
     }
 
-    public void postRecipe1() {
-        /*File dcim = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
+    /*public void postRecipe1() {
+        *//*File dcim = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
         Log.e(getClass().getSimpleName(), dcim.getAbsolutePath());
         File file = new File(dcim, "Camera/20180926_160503.jpg");
-        Log.e(getClass().getSimpleName(), file.getAbsolutePath());*/
+        Log.e(getClass().getSimpleName(), file.getAbsolutePath());*//*
         Toast.makeText(this, "posting the recipe...", Toast.LENGTH_SHORT).show();
         ArrayList<String> images = new ArrayList<>();
         images.add("/storage/emulated/0/DCIM/Camera/20180926_160503.jpg");
@@ -190,5 +185,5 @@ public class PostRecipeActivity extends AppCompatActivity {
         recipe.setFoodFiles(images);
 
         return recipe;
-    }
+    }*/
 }

@@ -2,11 +2,11 @@ package com.myapps.ron.family_recipes.ui.fragments;
 
 import android.Manifest;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.ClipData;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.graphics.drawable.Drawable;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.StrictMode;
@@ -15,7 +15,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.CursorLoader;
-import android.support.v4.widget.CircularProgressDrawable;
 import android.support.v7.widget.AppCompatButton;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -25,8 +24,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.bumptech.glide.request.target.CustomViewTarget;
-import com.bumptech.glide.request.transition.Transition;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.dal.storage.StorageWrapper;
 import com.myapps.ron.family_recipes.ui.PostRecipeActivity;
@@ -35,6 +32,7 @@ import com.myapps.ron.family_recipes.utils.MyFragment;
 import com.myapps.ron.family_recipes.viewmodels.PostRecipeViewModel;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -163,7 +161,6 @@ public class PickPhotosFragment extends MyFragment {
 
             //}
         } else {
-            Log.e(TAG, "granted");
             switch (storageRelatedButtonClicked) {
                 case BROWSE_CODE:
                     openGallery();
@@ -286,18 +283,26 @@ public class PickPhotosFragment extends MyFragment {
                         Log.e(TAG, getRealPathFromURI(data.getData()));
                         //imagesContainer.removeAllViews();
 
-                        ImageView productImageView = new ImageView(getActivity());
+                        String compressedPath = compressFile(getRealPathFromURI(data.getData()));
+                        if (compressedPath != null) {
+                            File compressedFile = new File(compressedPath);
+                            Log.e(TAG, "compressed file bytes = " + compressedFile.length());
+                            ImageView imageView = new ImageView(getActivity());
 
-                        productImageView.setAdjustViewBounds(true);
-                        productImageView.setScaleType(ImageView.ScaleType.FIT_XY);
-                        productImageView.setLayoutParams(layoutParams);
+                            imageView.setAdjustViewBounds(true);
+                            imageView.setScaleType(ImageView.ScaleType.FIT_XY);
+                            imageView.setLayoutParams(layoutParams);
 
-                        imagesContainer.addView(productImageView);
+                            imagesContainer.addView(imageView);
+                            loadFromPathToImageView(compressedPath, imageView);
+                            //imageView.setImageURI(Uri.fromFile(compressedFile));
+                            
+                            //compressedFile.deleteOnExit();
 
-                        productImageView.setImageURI(data.getData());
+                            imagesUris.add(compressedPath);
+                        }
 
-                        imagesUris.add(getRealPathFromURI(data.getData()));
-                    } else if(data != null && null != data.getClipData()) {
+                    } /*else if(data != null && null != data.getClipData()) {
                         //multiple images
                         Log.e(TAG, String.valueOf(data.getClipData().getItemCount()));
 
@@ -317,14 +322,42 @@ public class PickPhotosFragment extends MyFragment {
                             productImageView.setImageURI(mClipData.getItemAt(pickedImageCounter).getUri());
                             imagesUris.add(getRealPathFromURI(mClipData.getItemAt(pickedImageCounter).getUri()));
                         }
-                    } else {
+                    }*/ else {
                         Toast.makeText(getActivity(), R.string.post_recipe_pick_photos_browse_empty_message,
                                 Toast.LENGTH_SHORT).show();
                     }
                     break;
                 case CAMERA_REQUEST:
                     if (resultCode == RESULT_OK) {
-                        String selectedImage = imageUri.getPath();
+                        File file = new File(imageUri.getPath());
+                        Log.e(TAG, "file bytes = " + file.length());
+
+                        String compressedPath = compressFile(imageUri.getPath());
+                        if (compressedPath != null) {
+                            File compressedFile = new File(compressedPath);
+                            Log.e(TAG, "compressed file bytes = " + compressedFile.length());
+                            ImageView imageView = new ImageView(getActivity());
+
+                            imageView.setAdjustViewBounds(true);
+                            imageView.setScaleType(ImageView.ScaleType.FIT_XY);
+                            imageView.setLayoutParams(layoutParams);
+
+                            imagesContainer.addView(imageView);
+                            loadFromPathToImageView(compressedPath, imageView);
+                            //imageView.setImageURI(Uri.fromFile(compressedFile));
+
+                            imagesUris.add(compressedFile.getAbsolutePath());
+                            //compressedFile.deleteOnExit();
+                            file.deleteOnExit();
+                        }
+
+                    } else {
+                        File file = new File(imageUri.getPath());
+                        if(file.delete())
+                            Toast.makeText(activity, R.string.post_recipe_pick_photos_camera_empty_message, Toast.LENGTH_SHORT).show();
+                    }
+
+                        /*String selectedImage = imageUri.getPath();
                         final ImageView imageView = new ImageView(getActivity());
 
                         imageView.setAdjustViewBounds(true);
@@ -364,7 +397,7 @@ public class PickPhotosFragment extends MyFragment {
                         File file = new File(imageUri.getPath());
                         if(file.delete())
                             Toast.makeText(activity, R.string.post_recipe_pick_photos_camera_empty_message, Toast.LENGTH_SHORT).show();
-                    }
+                    }*/
                     break;
 
             }
@@ -389,4 +422,58 @@ public class PickPhotosFragment extends MyFragment {
 
         return contentUri.getPath();
     }
+
+    private String compressFile(String path) {
+        if (path == null)
+            return null;
+        Bitmap bitmap = BitmapFactory.decodeFile(path);
+
+        FileOutputStream out;
+        String filename = null;
+        try {
+            File compressedFile = StorageWrapper.createImageFile(activity);
+            filename = compressedFile.getAbsolutePath();
+
+            out = new FileOutputStream(filename);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 50, out);
+            out.close();
+        } catch (IOException e) {
+            Log.e(TAG, e.getMessage());
+        }
+        return filename;
+    }
+
+    private void loadFromPathToImageView(String filePath, ImageView imageView) {
+        GlideApp.with(activity)
+                .load(filePath)
+                .into(imageView);
+    }
+
+    /*private void showWithProperRotation(String filePath, ImageView imageView) {
+        // check the rotation of the image and display it properly
+        Bitmap bitmap = BitmapFactory.decodeFile(filePath);
+        ExifInterface exif;
+        try {
+            exif = new ExifInterface(filePath);
+
+            int orientation = exif.getAttributeInt(
+                    ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+            Matrix matrix = new Matrix();
+            if (orientation == ExifInterface.ORIENTATION_ROTATE_90) {
+                matrix.postRotate(90);
+            } else if (orientation == ExifInterface.ORIENTATION_ROTATE_180) {
+                matrix.postRotate(180);
+            } else if (orientation == ExifInterface.ORIENTATION_ROTATE_270) {
+                matrix.postRotate(270);
+            }
+            Log.d("EXIF", "Exif: " + orientation);
+
+            bitmap = Bitmap.createBitmap(bitmap, 0, 0,
+                    bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+            imageView.setImageBitmap(bitmap);
+
+        } catch (IOException e) {
+            Log.e(TAG, e.getMessage());
+        }
+    }*/
 }
