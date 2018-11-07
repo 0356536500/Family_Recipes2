@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.myapps.ron.family_recipes.ui;
+package com.myapps.ron.family_recipes.ui.activities;
 
 import android.app.ProgressDialog;
 import android.content.DialogInterface;

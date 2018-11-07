@@ -1,4 +1,4 @@
-package com.myapps.ron.family_recipes.ui;
+package com.myapps.ron.family_recipes.ui.activities;
 
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -15,7 +15,6 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.amazonaws.auth.CognitoCachingCredentialsProvider;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoDevice;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUser;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserSession;
@@ -26,7 +25,6 @@ import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.Mult
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.NewPasswordContinuation;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.AuthenticationHandler;
 import com.myapps.ron.family_recipes.R;
-import com.myapps.ron.family_recipes.network.Constants;
 import com.myapps.ron.family_recipes.network.cognito.AppHelper;
 import com.myapps.ron.family_recipes.utils.SharedPreferencesHandler;
 

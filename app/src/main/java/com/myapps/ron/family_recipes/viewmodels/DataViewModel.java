@@ -77,6 +77,11 @@ public class DataViewModel extends ViewModel {
         setRecipes(dbHelper.getAllRecipes(orderBy));
     }
 
+    public List<Recipe> loadLocalFavoritesOrdered(final Context context, String orderBy) {
+        RecipesDBHelper dbHelper = new RecipesDBHelper(context);
+        return dbHelper.getFavoriteRecipes(orderBy);
+    }
+
     @SuppressLint("StaticFieldLeak")
     class MyAsyncRecipeUpdate extends AsyncTask<Void, Void, Boolean> {
         private int newRecipes, modifiedRecipes;

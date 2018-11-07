@@ -22,7 +22,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".ui.SplashActivity"
+            android:name=".ui.activities.SplashActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -31,7 +31,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.MainActivity"
+            android:name=".ui.activities.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/MyAppTheme">
             <intent-filter>
@@ -48,15 +48,15 @@
             android:exported="false" />
 
         <activity
-            android:name=".ui.RecipeActivity"
+            android:name=".ui.activities.RecipeActivity"
             android:label="@string/title_activity_recipe"
             android:theme="@style/AppTheme" />
         <activity
-            android:name=".ui.PostRecipeActivity"
+            android:name=".ui.activities.PostRecipeActivity"
             android:label="@string/title_activity_create_recipe"
             android:theme="@style/AppThemeWithActionBar"
             android:windowSoftInputMode="adjustPan"
-            android:parentActivityName=".ui.MainActivity"
+            android:parentActivityName=".ui.activities.MainActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait">
 
@@ -67,11 +67,11 @@
         </intent-filter>-->
         </activity>
         <activity
-            android:name=".ui.LoginActivity"
+            android:name=".ui.activities.LoginActivity"
             android:label="@string/title_activity_login"
             android:theme="@style/AppTheme" />
         <activity
-            android:name=".ui.NewPassword"
+            android:name=".ui.activities.NewPassword"
             android:label="@string/title_activity_new_password"
             android:theme="@style/AppTheme" />
         <activity android:name=".TestActivity"

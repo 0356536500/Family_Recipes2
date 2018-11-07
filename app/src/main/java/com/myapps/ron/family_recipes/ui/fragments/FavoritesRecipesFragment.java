@@ -13,7 +13,6 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -30,14 +29,14 @@ import android.widget.Toast;
 
 import com.myapps.ron.family_recipes.MyDividerItemDecoration;
 import com.myapps.ron.family_recipes.R;
-import com.myapps.ron.family_recipes.viewmodels.DataViewModel;
+import com.myapps.ron.family_recipes.adapters.RecipesAdapter;
 import com.myapps.ron.family_recipes.model.Category;
 import com.myapps.ron.family_recipes.model.Recipe;
-import com.myapps.ron.family_recipes.adapters.RecipesAdapter;
 import com.myapps.ron.family_recipes.ui.activities.MainActivity;
 import com.myapps.ron.family_recipes.ui.activities.RecipeActivity;
 import com.myapps.ron.family_recipes.utils.Constants;
 import com.myapps.ron.family_recipes.utils.MyFragment;
+import com.myapps.ron.family_recipes.viewmodels.DataViewModel;
 import com.myapps.ron.searchfilter.adapter.FilterAdapter;
 import com.myapps.ron.searchfilter.animator.FiltersListItemAnimator;
 import com.myapps.ron.searchfilter.listener.FilterListener;
@@ -49,7 +48,10 @@ import java.util.List;
 
 import static android.app.Activity.RESULT_OK;
 
-public class AllRecipesFragment extends MyFragment implements RecipesAdapter.RecipesAdapterListener, FilterListener<Category> {
+/**
+ * Created by ronginat on 07/11/2018.
+ */
+public class FavoritesRecipesFragment extends MyFragment implements RecipesAdapter.RecipesAdapterListener, FilterListener<Category> {
 
     private static final String TAG = AllRecipesFragment.class.getSimpleName();
     private MainActivity activity;
@@ -59,33 +61,43 @@ public class AllRecipesFragment extends MyFragment implements RecipesAdapter.Rec
     private Filter<Category> mFilter;
     private List<Category> tags;
 
-    private SwipeRefreshLayout swipeRefreshLayout;
-    private SwipeRefreshLayout.OnRefreshListener onRefreshListener;
     private RecyclerView recyclerView;
     private RecipesAdapter mAdapter;
 
     private DataViewModel viewModel;
     private String orderBy;
-    private boolean mayRefresh;
     private String lastQuery = "";
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        activity = (MainActivity)getActivity();
+    }
+
+    @Override
+    public boolean onBackPressed() {
+        if (!mFilter.isCollapsed()) {
+            mFilter.collapse();
+            return true;
+        }
+        return false;
+    }
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.content_main_recipes, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        swipeRefreshLayout = view.findViewById(R.id.content_main_refresh);
         recyclerView = view.findViewById(R.id.recycler_view);
         mFilter = view.findViewById(R.id.content_main_filters);
 
         mColors = getResources().getIntArray(R.array.colors);
 
         orderBy = com.myapps.ron.family_recipes.dal.Constants.SORT_RECENT;
-        mayRefresh = true;
 
         initViewModel();
         //initCategories();
@@ -93,19 +105,17 @@ public class AllRecipesFragment extends MyFragment implements RecipesAdapter.Rec
 
         // Associate searchable configuration with the SearchView
         setSearchView(activity.getMenu());
-        setRefreshLayout();
         //setSortToggle(activity.getMenu());
 
         activity.fetchCategories();
-        activity.fetchRecipes(orderBy);
-        activity.setTitle("Recipes");
-    }
 
+        activity.getSupportActionBar().setTitle("Favorites");
+    }
 
     private void initCategories() {
         //mTitles = getResources().getStringArray(R.array.job_titles);
 
-        mFilter.setAdapter(new Adapter(tags));
+        mFilter.setAdapter(new FavoritesRecipesFragment.Adapter(tags));
         mFilter.setListener(this);
 
         //the text to show when there's no selected items
@@ -126,7 +136,6 @@ public class AllRecipesFragment extends MyFragment implements RecipesAdapter.Rec
                 Log.e(TAG, "getAllRecipes from db.\n" + log);
                 if (mFilter != null && recipes != null)
                     mFilter.setCustomTextView(getString(R.string.number_of_recipes_indicator, recipes.size()));
-                swipeRefreshLayout.setRefreshing(false);
                 //Log.e(TAG, "update from fragment");
                 mAdapter.updateRecipes(recipes, recipes != null && !recipes.isEmpty());
             }
@@ -152,7 +161,7 @@ public class AllRecipesFragment extends MyFragment implements RecipesAdapter.Rec
     }
 
     private void initRecycler() {
-        List<Recipe> recipeList = new ArrayList<>(viewModel.loadLocalRecipesOrdered(activity, com.myapps.ron.family_recipes.dal.Constants.SORT_RECENT));
+        List<Recipe> recipeList = new ArrayList<>(viewModel.loadLocalFavoritesOrdered(activity, com.myapps.ron.family_recipes.dal.Constants.SORT_RECENT));
         mAdapter = new RecipesAdapter(activity, recipeList, this);
 
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(activity.getApplicationContext());
@@ -161,29 +170,6 @@ public class AllRecipesFragment extends MyFragment implements RecipesAdapter.Rec
         recyclerView.addItemDecoration(new MyDividerItemDecoration(activity, DividerItemDecoration.VERTICAL, 36));
         recyclerView.setAdapter(mAdapter);
         recyclerView.setItemAnimator(new FiltersListItemAnimator());
-    }
-
-    private void setRefreshLayout() {
-        onRefreshListener = new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                if(mayRefresh) {
-                    activity.fetchRecipes(orderBy);
-                    mayRefresh = false;
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            mayRefresh = true;
-                        }
-                    }, Constants.REFRESH_DELAY);
-                } else {
-                    Toast.makeText(activity, R.string.refresh_error_message, Toast.LENGTH_SHORT).show();
-                    swipeRefreshLayout.setRefreshing(false);
-                }
-            }
-        };
-        swipeRefreshLayout.setOnRefreshListener(onRefreshListener);
-        swipeRefreshLayout.setColorSchemeColors(mColors);
     }
 
     private void setSearchView(Menu menu) {
@@ -234,7 +220,6 @@ public class AllRecipesFragment extends MyFragment implements RecipesAdapter.Rec
         }
     }
 
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -247,8 +232,7 @@ public class AllRecipesFragment extends MyFragment implements RecipesAdapter.Rec
                 Toast.makeText(activity, "search clicked (" + TAG + ")", Toast.LENGTH_SHORT).show();
                 return true;*/
             case R.id.action_refresh:
-                swipeRefreshLayout.setRefreshing(true);
-                onRefreshListener.onRefresh();
+                //TODO hide this row
                 return true;
             case R.id.action_sort:
                 showPopupSortMenu();
@@ -288,22 +272,6 @@ public class AllRecipesFragment extends MyFragment implements RecipesAdapter.Rec
         });
         popup.inflate(R.menu.sort_menu);
         popup.show();
-    }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        activity = (MainActivity)getActivity();
-    }
-
-    @Override
-    public boolean onBackPressed() {
-        if (!mFilter.isCollapsed()) {
-            mFilter.collapse();
-            return true;
-        }
-        return false;
     }
 
     @Override
@@ -438,4 +406,6 @@ public class AllRecipesFragment extends MyFragment implements RecipesAdapter.Rec
             return filterItem;
         }
     }
+
+
 }

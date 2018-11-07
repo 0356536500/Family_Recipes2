@@ -26,7 +26,7 @@ import android.widget.Toast;
 
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.dal.storage.StorageWrapper;
-import com.myapps.ron.family_recipes.ui.PostRecipeActivity;
+import com.myapps.ron.family_recipes.ui.activities.PostRecipeActivity;
 import com.myapps.ron.family_recipes.utils.GlideApp;
 import com.myapps.ron.family_recipes.utils.MyFragment;
 import com.myapps.ron.family_recipes.viewmodels.PostRecipeViewModel;

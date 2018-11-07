@@ -1,4 +1,4 @@
-package com.myapps.ron.family_recipes.ui;
+package com.myapps.ron.family_recipes.ui.activities;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;

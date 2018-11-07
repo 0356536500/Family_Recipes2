@@ -1,4 +1,4 @@
-package com.myapps.ron.family_recipes.ui;
+package com.myapps.ron.family_recipes.ui.activities;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.BroadcastReceiver;
@@ -21,6 +21,7 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -36,6 +37,7 @@ import android.widget.Toast;
 
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUser;
 import com.myapps.ron.family_recipes.R;
+import com.myapps.ron.family_recipes.ui.fragments.FavoritesRecipesFragment;
 import com.myapps.ron.family_recipes.viewmodels.DataViewModel;
 import com.myapps.ron.family_recipes.network.MiddleWareForNetwork;
 import com.myapps.ron.family_recipes.network.cognito.AppHelper;
@@ -63,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
     private DataViewModel viewModel;
 
     private CognitoUser user;
-    private IntentFilter regularFilter, customFilter;
+    private IntentFilter customFilter;
     private String lastOrderBy;
 
     @Override
@@ -151,8 +153,8 @@ public class MainActivity extends AppCompatActivity {
     private void init() {
         user = AppHelper.getPool().getUser(SharedPreferencesHandler.getString(getApplicationContext(), com.myapps.ron.family_recipes.network.Constants.USERNAME));
 
-        regularFilter = new IntentFilter();
-        regularFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        /*regularFilter = new IntentFilter();
+        regularFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);*/
 
         customFilter = new IntentFilter();
         customFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
@@ -321,6 +323,7 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case R.id.nav_main_favorites:
                 // Add a new attribute
+                fragment = new FavoritesRecipesFragment();
                 break;
             case R.id.nav_main_settings:
                 // Show user settings
@@ -344,18 +347,25 @@ public class MainActivity extends AppCompatActivity {
 
         if(fragment != null) {
             currentFragment = fragment;
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.main_frame, fragment)
+                    .addToBackStack(null)
+                    .commit();
+            /*FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             transaction.replace(R.id.main_frame, fragment);
-            transaction.commit();
+            transaction.commit();*/
         }
     }
 
     private void startWithDefaultFragment() {
         currentFragment = new AllRecipesFragment();
         navDrawer.getMenu().getItem(0).setChecked(true);
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.add(R.id.main_frame, currentFragment);
-        transaction.commit();
+        getSupportFragmentManager()
+                .beginTransaction()
+                .add(R.id.main_frame, currentFragment)
+                .addToBackStack(null)
+                .commit();
     }
 
     // Sign out user
@@ -387,8 +397,13 @@ public class MainActivity extends AppCompatActivity {
             mDrawer.closeDrawers();
             return;
         }
-        if(!currentFragment.onBackPressed())
-            super.onBackPressed();
+        if(!currentFragment.onBackPressed()) {
+            FragmentManager manager = getSupportFragmentManager();
+            if (manager.getBackStackEntryCount() > 1)
+                manager.popBackStack();
+            else
+                super.onBackPressed();
+        }
     }
 
 /*    private void whiteNotificationBar(View view) {
