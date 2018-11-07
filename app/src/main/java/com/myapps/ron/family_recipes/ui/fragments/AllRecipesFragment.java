@@ -96,9 +96,16 @@ public class AllRecipesFragment extends MyFragment implements RecipesAdapter.Rec
         setRefreshLayout();
         //setSortToggle(activity.getMenu());
 
-        activity.fetchCategories();
-        activity.fetchRecipes(orderBy);
-        activity.setTitle("Recipes");
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                activity.fetchCategories();
+                activity.fetchRecipes(orderBy);
+            }
+        }, 500);
+
+        /*if (activity.getSupportActionBar() != null)
+            activity.getSupportActionBar().setTitle("Recipes");*/
     }
 
 
@@ -146,7 +153,7 @@ public class AllRecipesFragment extends MyFragment implements RecipesAdapter.Rec
             @Override
             public void onChanged(@Nullable String s) {
                 if (s != null)
-                    Toast.makeText(activity, s, Toast.LENGTH_LONG).show();
+                    Toast.makeText(activity, s, Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -258,7 +265,6 @@ public class AllRecipesFragment extends MyFragment implements RecipesAdapter.Rec
     }
 
     private void showPopupSortMenu() {
-
         final PopupMenu popup = new PopupMenu(activity, activity.findViewById(R.id.action_sort));
 
         // This activity implements OnMenuItemClickListener
@@ -266,7 +272,7 @@ public class AllRecipesFragment extends MyFragment implements RecipesAdapter.Rec
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 String mPrevOrder = orderBy;
-                orderBy = null;
+                orderBy = "";
                 switch (item.getItemId()) {
                     case R.id.sort_action_recent:
                         orderBy = com.myapps.ron.family_recipes.dal.Constants.SORT_RECENT;
@@ -285,9 +291,30 @@ public class AllRecipesFragment extends MyFragment implements RecipesAdapter.Rec
                 }
                 return true;
             }
+
         });
         popup.inflate(R.menu.sort_menu);
         popup.show();
+        setSortItemChecked(popup.getMenu());
+    }
+
+    private void setSortItemChecked(Menu menu) {
+        boolean[] sorts = new boolean[3];
+        switch (orderBy) {
+            case com.myapps.ron.family_recipes.dal.Constants.SORT_RECENT:
+                sorts[0] = true;
+                break;
+            case com.myapps.ron.family_recipes.dal.Constants.SORT_POPULAR:
+                sorts[1] = true;
+                break;
+            case com.myapps.ron.family_recipes.dal.Constants.SORT_MODIFIED:
+                sorts[2] = true;
+                break;
+        }
+
+        menu.findItem(R.id.sort_action_recent).setChecked(sorts[0]);
+        menu.findItem(R.id.sort_action_popular).setChecked(sorts[1]);
+        menu.findItem(R.id.sort_action_last_modified).setChecked(sorts[2]);
     }
 
     @Override

@@ -53,7 +53,7 @@ import static android.app.Activity.RESULT_OK;
  */
 public class FavoritesRecipesFragment extends MyFragment implements RecipesAdapter.RecipesAdapterListener, FilterListener<Category> {
 
-    private static final String TAG = AllRecipesFragment.class.getSimpleName();
+    private final String TAG = getClass().getSimpleName();
     private MainActivity activity;
 
     private int[] mColors;
@@ -100,19 +100,27 @@ public class FavoritesRecipesFragment extends MyFragment implements RecipesAdapt
         orderBy = com.myapps.ron.family_recipes.dal.Constants.SORT_RECENT;
 
         initViewModel();
-        //initCategories();
         initRecycler();
+        //initCategoriesContainer();
+
+        /*List<Category> categories = viewModel.loadFavoritesCategories(activity);
+        categoriesLoaded(categories);*/
 
         // Associate searchable configuration with the SearchView
         setSearchView(activity.getMenu());
-        //setSortToggle(activity.getMenu());
 
-        activity.fetchCategories();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                viewModel.loadLocalFavoritesOrdered(activity, com.myapps.ron.family_recipes.dal.Constants.SORT_RECENT);
+            }
+        }, 500);
 
-        activity.getSupportActionBar().setTitle("Favorites");
+        /*if (activity.getSupportActionBar() != null)
+            activity.getSupportActionBar().setTitle("Favorites");*/
     }
 
-    private void initCategories() {
+    private void initCategoriesContainer() {
         //mTitles = getResources().getStringArray(R.array.job_titles);
 
         mFilter.setAdapter(new FavoritesRecipesFragment.Adapter(tags));
@@ -126,43 +134,44 @@ public class FavoritesRecipesFragment extends MyFragment implements RecipesAdapt
 
     private void initViewModel() {
         viewModel =  ViewModelProviders.of(activity).get(DataViewModel.class);
-        viewModel.getRecipes().observe(this, new Observer<List<Recipe>>() {
+        viewModel.getFavorites().observe(this, new Observer<List<Recipe>>() {
             @Override
             public void onChanged(@Nullable List<Recipe> recipes) {
                 //Toast.makeText(activity, "get recipes from DAL", Toast.LENGTH_SHORT).show();
-                String log = "null";
-                if(recipes != null)
-                    log = recipes.toString();
-                Log.e(TAG, "getAllRecipes from db.\n" + log);
-                if (mFilter != null && recipes != null)
-                    mFilter.setCustomTextView(getString(R.string.number_of_recipes_indicator, recipes.size()));
-                //Log.e(TAG, "update from fragment");
-                mAdapter.updateRecipes(recipes, recipes != null && !recipes.isEmpty());
+                Log.e(TAG, "in favorite recipes observer");
+                if(recipes != null) {
+                    Log.e(TAG, recipes.toString());
+                    if (mFilter != null)
+                        mFilter.setCustomTextView(getString(R.string.number_of_recipes_indicator, recipes.size()));
+                    //Log.e(TAG, "update from fragment");
+                    mAdapter.updateRecipes(recipes, !recipes.isEmpty());
+                }
             }
         });
         viewModel.getCategories().observe(this, new Observer<List<Category>>() {
             @Override
             public void onChanged(@Nullable List<Category> categories) {
+                Log.e(TAG, "in categories observer");
                 if(categories != null) {
+                    Log.e(TAG, categories.toString());
                     tags = new ArrayList<>(categories);
                     tags.add(0, new Category(getString(R.string.str_all_selected), mColors[0]));
-                    setCategories();
-                    initCategories();
+                    setCategoriesLocalColors();
+                    initCategoriesContainer();
                 }
             }
         });
-        viewModel.getInfoFromLastFetch().observe(this, new Observer<String>() {
+        /*viewModel.getInfoFromLastFetch().observe(this, new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {
                 if (s != null)
                     Toast.makeText(activity, s, Toast.LENGTH_LONG).show();
             }
-        });
+        });*/
     }
 
     private void initRecycler() {
-        List<Recipe> recipeList = new ArrayList<>(viewModel.loadLocalFavoritesOrdered(activity, com.myapps.ron.family_recipes.dal.Constants.SORT_RECENT));
-        mAdapter = new RecipesAdapter(activity, recipeList, this);
+        mAdapter = new RecipesAdapter(activity, new ArrayList<Recipe>(), this);
 
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(activity.getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
@@ -242,7 +251,6 @@ public class FavoritesRecipesFragment extends MyFragment implements RecipesAdapt
     }
 
     private void showPopupSortMenu() {
-
         final PopupMenu popup = new PopupMenu(activity, activity.findViewById(R.id.action_sort));
 
         // This activity implements OnMenuItemClickListener
@@ -264,7 +272,8 @@ public class FavoritesRecipesFragment extends MyFragment implements RecipesAdapt
                 }
                 if (orderBy != null) {
                     if (!orderBy.equals(mPrevOrder)) {
-                        mAdapter.updateRecipesOrder(viewModel.loadLocalRecipesOrdered(activity, orderBy));
+                        viewModel.loadLocalFavoritesOrdered(activity, orderBy);
+                        //mAdapter.updateRecipesOrder(viewModel.loadLocalFavoritesOrdered(activity, orderBy));
                     }
                 }
                 return true;
@@ -272,6 +281,26 @@ public class FavoritesRecipesFragment extends MyFragment implements RecipesAdapt
         });
         popup.inflate(R.menu.sort_menu);
         popup.show();
+        setSortItemChecked(popup.getMenu());
+    }
+
+    private void setSortItemChecked(Menu menu) {
+        boolean[] sorts = new boolean[3];
+        switch (orderBy) {
+            case com.myapps.ron.family_recipes.dal.Constants.SORT_RECENT:
+                sorts[0] = true;
+                break;
+            case com.myapps.ron.family_recipes.dal.Constants.SORT_POPULAR:
+                sorts[1] = true;
+                break;
+            case com.myapps.ron.family_recipes.dal.Constants.SORT_MODIFIED:
+                sorts[2] = true;
+                break;
+        }
+
+        menu.findItem(R.id.sort_action_recent).setChecked(sorts[0]);
+        menu.findItem(R.id.sort_action_popular).setChecked(sorts[1]);
+        menu.findItem(R.id.sort_action_last_modified).setChecked(sorts[2]);
     }
 
     @Override
@@ -310,7 +339,16 @@ public class FavoritesRecipesFragment extends MyFragment implements RecipesAdapt
         }
     }
 
-    private void setCategories() {
+    private void categoriesLoaded(List<Category> categories) {
+        if(categories != null) {
+            tags = new ArrayList<>(categories);
+            tags.add(0, new Category(getString(R.string.str_all_selected), mColors[0]));
+            setCategoriesLocalColors();
+            initCategoriesContainer();
+        }
+    }
+
+    private void setCategoriesLocalColors() {
         //List<Category> tags = new ArrayList<>();
 
         for (int i = 0; i < tags.size(); ++i) {

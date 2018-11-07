@@ -299,12 +299,20 @@ public class MainActivity extends AppCompatActivity {
     private void setNavDrawer() {
         navDrawer.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+            public boolean onNavigationItemSelected(@NonNull final MenuItem item) {
                 // set item as selected to persist highlight
                 item.setChecked(true);
+                if (getSupportActionBar() != null)
+                    getSupportActionBar().setTitle(item.getTitle());
                 // close drawer when item is tapped
                 mDrawer.closeDrawers();
-                performAction(item);
+
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        performAction(item);
+                    }
+                }, 500);
                 return true;
             }
         });
@@ -350,7 +358,7 @@ public class MainActivity extends AppCompatActivity {
             getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.main_frame, fragment)
-                    .addToBackStack(null)
+                    //.addToBackStack(null)
                     .commit();
             /*FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             transaction.replace(R.id.main_frame, fragment);
@@ -364,7 +372,7 @@ public class MainActivity extends AppCompatActivity {
         getSupportFragmentManager()
                 .beginTransaction()
                 .add(R.id.main_frame, currentFragment)
-                .addToBackStack(null)
+                //.addToBackStack(null)
                 .commit();
     }
 
@@ -398,10 +406,10 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
         if(!currentFragment.onBackPressed()) {
-            FragmentManager manager = getSupportFragmentManager();
+            /*FragmentManager manager = getSupportFragmentManager();
             if (manager.getBackStackEntryCount() > 1)
                 manager.popBackStack();
-            else
+            else*/
                 super.onBackPressed();
         }
     }

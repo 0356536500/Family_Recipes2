@@ -26,6 +26,7 @@ import java.util.List;
  */
 public class DataViewModel extends ViewModel {
     private MutableLiveData<List<Recipe>> recipeList = new MutableLiveData<>(); // list of recipes from api
+    private MutableLiveData<List<Recipe>> favoriteList = new MutableLiveData<>(); // list of recipes local db
     private MutableLiveData<List<Category>> categoryList = new MutableLiveData<>(); // list of categories from api
 
     private MutableLiveData<String> infoFromLastFetch = new MutableLiveData<>(); // info about new or modified data from last fetch from api
@@ -75,11 +76,6 @@ public class DataViewModel extends ViewModel {
     private void loadLocalRecipes(final Context context, final String orderBy) {
         RecipesDBHelper dbHelper = new RecipesDBHelper(context);
         setRecipes(dbHelper.getAllRecipes(orderBy));
-    }
-
-    public List<Recipe> loadLocalFavoritesOrdered(final Context context, String orderBy) {
-        RecipesDBHelper dbHelper = new RecipesDBHelper(context);
-        return dbHelper.getFavoriteRecipes(orderBy);
     }
 
     @SuppressLint("StaticFieldLeak")
@@ -205,5 +201,28 @@ public class DataViewModel extends ViewModel {
             }
         }
     }
+    //endregion
+
+    //region favorites
+
+    private void setFavorites(List<Recipe> items) {
+        favoriteList.setValue(items);
+    }
+
+    public LiveData<List<Recipe>> getFavorites() {
+        return favoriteList;
+    }
+
+    public void loadLocalFavoritesOrdered(final Context context, String orderBy) {
+        RecipesDBHelper dbHelper = new RecipesDBHelper(context);
+        setFavorites(dbHelper.getFavoriteRecipes(orderBy));
+    }
+
+    public List<Category> loadFavoritesCategories(final Context context) {
+        CategoriesDBHelper dbHelper = new CategoriesDBHelper(context);
+        return dbHelper.getAllCategories();
+    }
+
+
     //endregion
 }

@@ -2,11 +2,14 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item android:id="@+id/sort_action_recent"
-        android:title="@string/sort_action_recent" />
+        android:title="@string/sort_action_recent"
+        android:checkable="true"/>
 
     <item android:id="@+id/sort_action_popular"
-        android:title="@string/sort_action_popular" />
+        android:title="@string/sort_action_popular"
+        android:checkable="true"/>
 
     <item android:id="@+id/sort_action_last_modified"
-        android:title="@string/sort_action_recent_modified" />
+        android:title="@string/sort_action_recent_modified"
+        android:checkable="true"/>
 </menu>

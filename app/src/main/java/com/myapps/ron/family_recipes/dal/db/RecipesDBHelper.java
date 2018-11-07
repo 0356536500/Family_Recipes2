@@ -4,71 +4,26 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 
 import com.myapps.ron.family_recipes.model.Recipe;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.parsers.FactoryConfigurationError;
-
 
 public class RecipesDBHelper extends MyDBHelper{
+    // All Static variables
     private static final int FALSE = 0;
     private static final int TRUE = 1;
-    // All Static variables
-    // Database Version
-   /* private static final int DATABASE_VERSION = 1;
 
-    // Database Name
-    private static final String DATABASE_NAME = "records.db";
-
-    // Recipes table name
-    private static final String TABLE_NAME = "recipes";
-
-    // Recipes Table Columns names
-    private static final String KEY_ID = "id";
-    private static final String KEY_NAME = "name";
-    private static final String KEY_DESC = "description";
-    private static final String KEY_CREATED = "createdAt";
-    private static final String KEY_MODIFIED = "lastModifiedAt";
-    private static final String KEY_FILE = "recipeFile";
-    private static final String KEY_UPLOADER = "uploader";
-    private static final String KEY_CATEGORIES = "categories";
-    private static final String KEY_COMMENTS = "comments";
-    private static final String KEY_FOOD = "foodFiles";
-    private static final String KEY_LIKES = "likes";
-    private static final String KEY_ME_LIKE = "meLike";
-*/
     public static final String SORT_POPULAR = KEY_LIKES;
     public static final String SORT_RECENT = KEY_CREATED;
     public static final String SORT_MODIFIED = KEY_MODIFIED;
-
-    /*private static final String CREATE_EXEC = "CREATE TABLE " + TABLE_NAME + "("
-            + KEY_ID + " TEXT PRIMARY KEY,"
-            + KEY_NAME + " TEXT,"
-            + KEY_DESC + " TEXT,"
-            + KEY_CREATED + " TEXT,"
-            + KEY_MODIFIED + " TEXT,"
-            + KEY_FILE + " TEXT,"
-            + KEY_UPLOADER + " TEXT,"
-            + KEY_CATEGORIES + " TEXT,"
-            + KEY_COMMENTS + " TEXT,"
-            + KEY_FOOD + " TEXT,"
-            + KEY_LIKES + " INTEGER,"
-            + KEY_ME_LIKE + " INTEGER " + ")";*/
 
     public RecipesDBHelper(Context context) {
         super(context);
     }
 
-    //region Override From SQLite
-    //creating Tables
-    /*@Override
-    public void onCreate(SQLiteDatabase db) {
-        db.execSQL(CREATE_EXEC);
-    }*/
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {

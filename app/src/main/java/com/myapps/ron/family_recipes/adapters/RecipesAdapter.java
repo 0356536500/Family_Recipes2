@@ -303,6 +303,8 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
     }
 
     public void updateRecipes(List<Recipe> list, boolean addedRecipes) {
+        if (list == null)
+            return;
         if (this.recipeListFiltered == null || this.recipeListFiltered.isEmpty()){
             this.recipeListFiltered = new ArrayList<>(list);
             notifyDataSetChanged();
@@ -338,6 +340,8 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
     }
 
     public void updateRecipesOrder(List<Recipe> list) {
+        if (list == null)
+            return;
         if (this.recipeListFiltered == null || this.recipeListFiltered.isEmpty()){
             this.recipeListFiltered = new ArrayList<>(list);
             notifyDataSetChanged();
