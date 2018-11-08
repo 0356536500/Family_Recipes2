@@ -305,11 +305,12 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
     public void updateRecipes(List<Recipe> list, boolean addedRecipes) {
         if (list == null)
             return;
+        Log.e(getClass().getSimpleName(), "update recipes, added = " + addedRecipes +"\n " + list.toString());
         if (this.recipeListFiltered == null || this.recipeListFiltered.isEmpty()){
             this.recipeListFiltered = new ArrayList<>(list);
             notifyDataSetChanged();
-        }
-        else {
+
+        } else {
             List<Recipe> oldTemp;
             if (addedRecipes) {
                 oldTemp = recipeList;
@@ -327,16 +328,6 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
             if (addedRecipes)
                 getFilter().filter(null);
         }
-        //boolean changed = false;
-        /*for(Recipe item : list) {
-            int index = recipeList.indexOf(item);
-            if(index >= 0)// && item.hashCode() == recipeList.get(index).hashCode() && item.identical(recipeList.get(index)))
-                recipeList.set(index, item);
-            else
-                recipeList.add(recipeList.size(), item);
-        }*/
-
-        //notifyDataSetChanged();
     }
 
     public void updateRecipesOrder(List<Recipe> list) {

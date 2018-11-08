@@ -26,6 +26,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.myapps.ron.family_recipes.MyDividerItemDecoration;
@@ -54,6 +55,9 @@ public class AllRecipesFragment extends MyFragment implements RecipesAdapter.Rec
     private static final String TAG = AllRecipesFragment.class.getSimpleName();
     private MainActivity activity;
 
+    private View view;
+    private FrameLayout parent;
+
     private int[] mColors;
     //private String[] mTitles;
     private Filter<Category> mFilter;
@@ -69,40 +73,80 @@ public class AllRecipesFragment extends MyFragment implements RecipesAdapter.Rec
     private boolean mayRefresh;
     private String lastQuery = "";
 
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        activity = (MainActivity)getActivity();
+    }
+
+    @Override
+    public boolean onBackPressed() {
+        if (!mFilter.isCollapsed()) {
+            mFilter.collapse();
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        Log.e(TAG, "on attach");
+        super.onAttach(context);
+        if (parent != null) {
+            parent.addView(swipeRefreshLayout);
+            parent.addView(mFilter);
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        Log.e(TAG, "on detach");
+        super.onDetach();
+        parent.removeAllViews();
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.content_main_recipes, container, false);
+        if (mFilter == null) {
+            view = inflater.inflate(R.layout.content_main_recipes, container, false);
+            parent = (FrameLayout) view;
+        }
+        return view;
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        swipeRefreshLayout = view.findViewById(R.id.content_main_refresh);
-        recyclerView = view.findViewById(R.id.recycler_view);
-        mFilter = view.findViewById(R.id.content_main_filters);
+        if (mFilter == null) {
+            swipeRefreshLayout = view.findViewById(R.id.content_main_refresh);
+            recyclerView = view.findViewById(R.id.recycler_view);
+            mFilter = view.findViewById(R.id.content_main_filters);
 
-        mColors = getResources().getIntArray(R.array.colors);
+            mColors = getResources().getIntArray(R.array.colors);
 
-        orderBy = com.myapps.ron.family_recipes.dal.Constants.SORT_RECENT;
-        mayRefresh = true;
+            orderBy = com.myapps.ron.family_recipes.dal.Constants.SORT_RECENT;
+            mayRefresh = true;
 
-        initViewModel();
-        //initCategories();
-        initRecycler();
+            initViewModel();
+            //initCategories();
+            initRecycler();
 
-        // Associate searchable configuration with the SearchView
-        setSearchView(activity.getMenu());
-        setRefreshLayout();
-        //setSortToggle(activity.getMenu());
+            // Associate searchable configuration with the SearchView
+            setSearchView(activity.getMenu());
+            setRefreshLayout();
+            //setSortToggle(activity.getMenu());
 
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                activity.fetchCategories();
-                activity.fetchRecipes(orderBy);
-            }
-        }, 500);
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    activity.fetchCategories();
+                    activity.fetchRecipes(orderBy);
+                }
+            }, 500);
+        }
 
         /*if (activity.getSupportActionBar() != null)
             activity.getSupportActionBar().setTitle("Recipes");*/
@@ -135,7 +179,11 @@ public class AllRecipesFragment extends MyFragment implements RecipesAdapter.Rec
                     mFilter.setCustomTextView(getString(R.string.number_of_recipes_indicator, recipes.size()));
                 swipeRefreshLayout.setRefreshing(false);
                 //Log.e(TAG, "update from fragment");
-                mAdapter.updateRecipes(recipes, recipes != null && !recipes.isEmpty());
+                if (mAdapter == null) {
+                    mAdapter = new RecipesAdapter(activity, recipes, AllRecipesFragment.this);
+                    recyclerView.setAdapter(mAdapter);
+                } else
+                    mAdapter.updateRecipes(recipes, recipes != null && !recipes.isEmpty());
             }
         });
         viewModel.getCategories().observe(this, new Observer<List<Category>>() {
@@ -159,14 +207,14 @@ public class AllRecipesFragment extends MyFragment implements RecipesAdapter.Rec
     }
 
     private void initRecycler() {
-        List<Recipe> recipeList = new ArrayList<>(viewModel.loadLocalRecipesOrdered(activity, com.myapps.ron.family_recipes.dal.Constants.SORT_RECENT));
-        mAdapter = new RecipesAdapter(activity, recipeList, this);
+        //List<Recipe> recipeList = new ArrayList<>(viewModel.loadLocalRecipesOrdered(activity, com.myapps.ron.family_recipes.dal.Constants.SORT_RECENT));
+        //mAdapter = new RecipesAdapter(activity, recipeList, this);
 
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(activity.getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.addItemDecoration(new MyDividerItemDecoration(activity, DividerItemDecoration.VERTICAL, 36));
-        recyclerView.setAdapter(mAdapter);
+        //recyclerView.setAdapter(mAdapter);
         recyclerView.setItemAnimator(new FiltersListItemAnimator());
     }
 
@@ -318,22 +366,6 @@ public class AllRecipesFragment extends MyFragment implements RecipesAdapter.Rec
     }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        activity = (MainActivity)getActivity();
-    }
-
-    @Override
-    public boolean onBackPressed() {
-        if (!mFilter.isCollapsed()) {
-            mFilter.collapse();
-            return true;
-        }
-        return false;
-    }
-
-    @Override
     public void onItemSelected(Recipe recipe) {
         Intent intent = new Intent(activity, RecipeActivity.class);
         intent.putExtra(Constants.RECIPE, recipe);
@@ -418,7 +450,8 @@ public class AllRecipesFragment extends MyFragment implements RecipesAdapter.Rec
 
     @Override
     public void onNothingSelected() {
-        mAdapter.updateTags(null);
+        if (mAdapter != null)
+            mAdapter.updateTags(null);
     }
 
 

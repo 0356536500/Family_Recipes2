@@ -21,8 +21,6 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -37,14 +35,14 @@ import android.widget.Toast;
 
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUser;
 import com.myapps.ron.family_recipes.R;
-import com.myapps.ron.family_recipes.ui.fragments.FavoritesRecipesFragment;
-import com.myapps.ron.family_recipes.viewmodels.DataViewModel;
 import com.myapps.ron.family_recipes.network.MiddleWareForNetwork;
 import com.myapps.ron.family_recipes.network.cognito.AppHelper;
 import com.myapps.ron.family_recipes.ui.fragments.AllRecipesFragment;
+import com.myapps.ron.family_recipes.ui.fragments.FavoritesRecipesFragment;
 import com.myapps.ron.family_recipes.utils.Constants;
 import com.myapps.ron.family_recipes.utils.MyFragment;
 import com.myapps.ron.family_recipes.utils.SharedPreferencesHandler;
+import com.myapps.ron.family_recipes.viewmodels.DataViewModel;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -61,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
     public MenuItem searchMenuItem;
     //public MenuItem sortMenuItem;
 
-    private MyFragment currentFragment;
+    private MyFragment currentFragment, allRecipesFragment, favoritesRecipesFragment;
     private DataViewModel viewModel;
 
     private CognitoUser user;
@@ -80,6 +78,7 @@ public class MainActivity extends AppCompatActivity {
         configureNavigationDrawer();
 
         init();
+        initFragments();
 
         viewModel =  ViewModelProviders.of(this).get(DataViewModel.class);
 
@@ -327,11 +326,11 @@ public class MainActivity extends AppCompatActivity {
         switch(item.getItemId()) {
             case R.id.nav_main_all_recipes:
                 // Add a new attribute
-                fragment = new AllRecipesFragment();
+                fragment = allRecipesFragment;
                 break;
             case R.id.nav_main_favorites:
                 // Add a new attribute
-                fragment = new FavoritesRecipesFragment();
+                fragment = favoritesRecipesFragment;
                 break;
             case R.id.nav_main_settings:
                 // Show user settings
@@ -354,6 +353,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if(fragment != null) {
+            getSupportFragmentManager().findFragmentByTag("all");
             currentFragment = fragment;
             getSupportFragmentManager()
                     .beginTransaction()
@@ -366,8 +366,13 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void initFragments() {
+        allRecipesFragment = new AllRecipesFragment();
+        favoritesRecipesFragment = new FavoritesRecipesFragment();
+    }
+
     private void startWithDefaultFragment() {
-        currentFragment = new AllRecipesFragment();
+        currentFragment = allRecipesFragment;
         navDrawer.getMenu().getItem(0).setChecked(true);
         getSupportFragmentManager()
                 .beginTransaction()

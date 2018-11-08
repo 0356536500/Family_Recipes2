@@ -13,6 +13,7 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -25,6 +26,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.myapps.ron.family_recipes.MyDividerItemDecoration;
@@ -56,11 +58,15 @@ public class FavoritesRecipesFragment extends MyFragment implements RecipesAdapt
     private final String TAG = getClass().getSimpleName();
     private MainActivity activity;
 
+    private View view;
+    private FrameLayout parent;
+
     private int[] mColors;
     //private String[] mTitles;
     private Filter<Category> mFilter;
     private List<Category> tags;
 
+    private SwipeRefreshLayout swipeRefreshLayout;
     private RecyclerView recyclerView;
     private RecipesAdapter mAdapter;
 
@@ -84,37 +90,64 @@ public class FavoritesRecipesFragment extends MyFragment implements RecipesAdapt
         return false;
     }
 
+    @Override
+    public void onAttach(Context context) {
+        Log.e(TAG, "on attach");
+        super.onAttach(context);
+        if (parent != null) {
+            parent.addView(swipeRefreshLayout);
+            parent.addView(mFilter);
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        Log.e(TAG, "on detach");
+        super.onDetach();
+        parent.removeAllViews();
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.content_main_recipes, container, false);
+        if (mFilter == null) {
+            view = inflater.inflate(R.layout.content_main_recipes, container, false);
+            parent = (FrameLayout) view;
+        }
+        return view;
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        recyclerView = view.findViewById(R.id.recycler_view);
-        mFilter = view.findViewById(R.id.content_main_filters);
+        if (mFilter == null) {
+            swipeRefreshLayout = view.findViewById(R.id.content_main_refresh);
+            recyclerView = view.findViewById(R.id.recycler_view);
+            mFilter = view.findViewById(R.id.content_main_filters);
 
-        mColors = getResources().getIntArray(R.array.colors);
+            mColors = getResources().getIntArray(R.array.colors);
 
-        orderBy = com.myapps.ron.family_recipes.dal.Constants.SORT_RECENT;
+            orderBy = com.myapps.ron.family_recipes.dal.Constants.SORT_RECENT;
 
-        initViewModel();
-        initRecycler();
+            initViewModel();
+            initRecycler();
+
+            setSearchView(activity.getMenu());
+
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    viewModel.loadLocalFavoritesOrdered(activity, com.myapps.ron.family_recipes.dal.Constants.SORT_RECENT);
+                }
+            }, 500);
+        }
+
         //initCategoriesContainer();
 
         /*List<Category> categories = viewModel.loadFavoritesCategories(activity);
         categoriesLoaded(categories);*/
 
         // Associate searchable configuration with the SearchView
-        setSearchView(activity.getMenu());
 
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                viewModel.loadLocalFavoritesOrdered(activity, com.myapps.ron.family_recipes.dal.Constants.SORT_RECENT);
-            }
-        }, 500);
 
         /*if (activity.getSupportActionBar() != null)
             activity.getSupportActionBar().setTitle("Favorites");*/
@@ -144,7 +177,11 @@ public class FavoritesRecipesFragment extends MyFragment implements RecipesAdapt
                     if (mFilter != null)
                         mFilter.setCustomTextView(getString(R.string.number_of_recipes_indicator, recipes.size()));
                     //Log.e(TAG, "update from fragment");
-                    mAdapter.updateRecipes(recipes, !recipes.isEmpty());
+                    if (mAdapter == null) {
+                        mAdapter = new RecipesAdapter(activity, recipes, FavoritesRecipesFragment.this);
+                        recyclerView.setAdapter(mAdapter);
+                    } else
+                        mAdapter.updateRecipes(recipes, !recipes.isEmpty());
                 }
             }
         });
@@ -171,13 +208,13 @@ public class FavoritesRecipesFragment extends MyFragment implements RecipesAdapt
     }
 
     private void initRecycler() {
-        mAdapter = new RecipesAdapter(activity, new ArrayList<Recipe>(), this);
+        //mAdapter = new RecipesAdapter(activity, new ArrayList<Recipe>(), this);
 
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(activity.getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.addItemDecoration(new MyDividerItemDecoration(activity, DividerItemDecoration.VERTICAL, 36));
-        recyclerView.setAdapter(mAdapter);
+        //recyclerView.setAdapter(mAdapter);
         recyclerView.setItemAnimator(new FiltersListItemAnimator());
     }
 
@@ -241,7 +278,7 @@ public class FavoritesRecipesFragment extends MyFragment implements RecipesAdapt
                 Toast.makeText(activity, "search clicked (" + TAG + ")", Toast.LENGTH_SHORT).show();
                 return true;*/
             case R.id.action_refresh:
-                //TODO hide this row
+                //TODO hide this entry
                 return true;
             case R.id.action_sort:
                 showPopupSortMenu();

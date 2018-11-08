@@ -131,7 +131,7 @@ public class CategoriesDBHelper extends MyDBHelper{
                 new String[]{String.valueOf(category.getName())});
     }
 
-    public int updateCategoryUserChanges(Category category) {
+    /*public int updateCategoryUserChanges(Category category) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -147,7 +147,7 @@ public class CategoriesDBHelper extends MyDBHelper{
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_CATEGORIES, CAT_KEY_ID + "=" + id, null);
         db.close();
-    }
+    }*/
 
     //endregion
 
@@ -166,7 +166,7 @@ public class CategoriesDBHelper extends MyDBHelper{
 
     public boolean categoryExists(String id) {
         SQLiteDatabase db = this.getReadableDatabase();
-        String query = "SELECT " + CAT_KEY_ID + " FROM "+ TABLE_CATEGORIES + " WHERE " + CAT_KEY_ID + "=" + id;
+        String query = "SELECT * FROM "+ TABLE_CATEGORIES + " WHERE " + CAT_KEY_ID + "='" + id + "'";
         Cursor cursor = db.rawQuery(query, null);
         boolean result = cursor.getCount() > 0;
         cursor.close();
