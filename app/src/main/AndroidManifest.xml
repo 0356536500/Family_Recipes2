@@ -74,6 +74,11 @@
             android:name=".ui.activities.NewPassword"
             android:label="@string/title_activity_new_password"
             android:theme="@style/AppTheme" />
+
+        <activity
+            android:name=".ui.activities.ForgotPasswordActivity"
+            android:label="@string/title_activity_forgot_password"
+            android:theme="@style/AppTheme" />
         <activity android:name=".TestActivity"
             android:theme="@style/AppTheme.NoActionBar">
            <!-- <intent-filter>

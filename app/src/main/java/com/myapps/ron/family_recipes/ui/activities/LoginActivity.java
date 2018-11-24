@@ -21,9 +21,11 @@ import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserSession
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.AuthenticationContinuation;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.AuthenticationDetails;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.ChallengeContinuation;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.ForgotPasswordContinuation;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.MultiFactorAuthenticationContinuation;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.NewPasswordContinuation;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.AuthenticationHandler;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.ForgotPasswordHandler;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.network.cognito.AppHelper;
 import com.myapps.ron.family_recipes.utils.SharedPreferencesHandler;
@@ -47,7 +49,7 @@ public class LoginActivity extends AppCompatActivity {
 
     //Continuations
     //private MultiFactorAuthenticationContinuation multiFactorAuthenticationContinuation;
-    //private ForgotPasswordContinuation forgotPasswordContinuation;
+    private ForgotPasswordContinuation forgotPasswordContinuation;
     private NewPasswordContinuation newPasswordContinuation;
     //private ChooseMfaContinuation mfaOptionsContinuation;
 
@@ -134,6 +136,21 @@ public class LoginActivity extends AppCompatActivity {
                     }
                 }
                 break;
+            case 3:
+                // Forgot password
+                if(resultCode == RESULT_OK) {
+                    String newPass = data.getStringExtra("newPass");
+                    String code = data.getStringExtra("code");
+                    if (newPass != null && code != null) {
+                        if (!newPass.isEmpty() && !code.isEmpty()) {
+                            showWaitDialog("Setting new password...");
+                            forgotPasswordContinuation.setPassword(newPass);
+                            forgotPasswordContinuation.setVerificationCode(code);
+                            forgotPasswordContinuation.continueTask();
+                        }
+                    }
+                }
+                break;
             case 4:
                 // User
                 if(resultCode == RESULT_OK) {
@@ -172,10 +189,10 @@ public class LoginActivity extends AppCompatActivity {
         signInUser();
     }
 
-    /*// Forgot password processing
+    // Forgot password processing
     public void forgotPassword(View view) {
         forgotpasswordUser();
-    }*/
+    }
 
 
     // Private methods
@@ -246,17 +263,17 @@ public class LoginActivity extends AppCompatActivity {
         AppHelper.getPool().getUser(username).getSessionInBackground(authenticationHandler);
     }
 
-    /*private void forgotpasswordUser() {
+    private void forgotpasswordUser() {
         username = inUsername.getText().toString();
         if(username == null) {
-            TextView label = (TextView) findViewById(R.id.textViewUserIdMessage);
+            TextView label = findViewById(R.id.textViewUserIdMessage);
             label.setText(inUsername.getHint()+" cannot be empty");
             inUsername.setBackground(getDrawable(R.drawable.text_border_error));
             return;
         }
 
         if(username.length() < 1) {
-            TextView label = (TextView) findViewById(R.id.textViewUserIdMessage);
+            TextView label = findViewById(R.id.textViewUserIdMessage);
             label.setText(inUsername.getHint()+" cannot be empty");
             inUsername.setBackground(getDrawable(R.drawable.text_border_error));
             return;
@@ -264,9 +281,9 @@ public class LoginActivity extends AppCompatActivity {
 
         showWaitDialog("");
         AppHelper.getPool().getUser(username).forgotPasswordInBackground(forgotPasswordHandler);
-    }*/
+    }
 
-    /*private void getForgotPasswordCode(ForgotPasswordContinuation forgotPasswordContinuation) {
+    private void getForgotPasswordCode(ForgotPasswordContinuation forgotPasswordContinuation) {
         this.forgotPasswordContinuation = forgotPasswordContinuation;
         Intent intent = new Intent(this, ForgotPasswordActivity.class);
         intent.putExtra("destination",forgotPasswordContinuation.getParameters().getDestination());
@@ -274,7 +291,7 @@ public class LoginActivity extends AppCompatActivity {
         startActivityForResult(intent, 3);
     }
 
-    private void mfaAuth(MultiFactorAuthenticationContinuation continuation) {
+    /*private void mfaAuth(MultiFactorAuthenticationContinuation continuation) {
         multiFactorAuthenticationContinuation = continuation;
         Intent mfaActivity = new Intent(this, MFAActivity.class);
         mfaActivity.putExtra("mode", multiFactorAuthenticationContinuation.getParameters().getDeliveryMedium());
@@ -430,7 +447,7 @@ public class LoginActivity extends AppCompatActivity {
 
 
     // Callbacks
-    /*ForgotPasswordHandler forgotPasswordHandler = new ForgotPasswordHandler() {
+    ForgotPasswordHandler forgotPasswordHandler = new ForgotPasswordHandler() {
         @Override
         public void onSuccess() {
             closeWaitDialog();
@@ -450,7 +467,7 @@ public class LoginActivity extends AppCompatActivity {
             closeWaitDialog();
             showDialogMessage("Forgot password failed",AppHelper.formatException(e));
         }
-    };*/
+    };
 
     //
     AuthenticationHandler authenticationHandler = new AuthenticationHandler() {

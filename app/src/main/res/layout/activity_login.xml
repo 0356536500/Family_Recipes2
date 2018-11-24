@@ -143,7 +143,7 @@
         android:background="@drawable/button_selector"
         android:onClick="logIn"/>
 
-<!--    <Space
+    <Space
         android:layout_width="match_parent"
         android:layout_height="@dimen/activity_intra_group_separation"
         android:layout_below="@+id/buttonLogIn"
@@ -165,11 +165,13 @@
         android:textColor="@color/button_default"
         android:textSize="15dp"
         android:id="@+id/textViewUserForgotPassword"
+        android:focusable="true"
         android:clickable="true"
         android:layout_below="@+id/space6"
         android:layout_alignParentEnd="true"
         android:onClick="forgotPassword"/>
 
+    <!--
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

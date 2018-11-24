@@ -30,16 +30,16 @@ import com.myapps.ron.family_recipes.network.cognito.ItemToDisplay;
 
 public class FirstTimeLoginAttributesDisplayAdapter extends BaseAdapter {
     //private String TAG = "FirstTimeLoginDetails";
-    //private Context context;
+    private Context context;
     private int count;
-    private static LayoutInflater layoutInflater;
+    //private static LayoutInflater layoutInflater;
 
     public FirstTimeLoginAttributesDisplayAdapter(Context context) {
-        //this.context = context;
+        this.context = context;
 
         count = AppHelper.getFirstTimeLogInItemsCount();
 
-        layoutInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        //layoutInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
     @Override
     public int getCount() {
@@ -61,7 +61,9 @@ public class FirstTimeLoginAttributesDisplayAdapter extends BaseAdapter {
         Holder holder;
 
         if(convertView == null) {
-            convertView = layoutInflater.inflate(R.layout.fields_generic, parent);
+            //convertView = layoutInflater.inflate(R.layout.fields_generic, parent);
+            convertView = LayoutInflater.from(context).
+                    inflate(R.layout.fields_generic, parent, false);
             holder = new Holder();
             holder.label = convertView.findViewById(R.id.textViewUserDetailLabel);
             holder.data = convertView.findViewById(R.id.editTextUserDetailInput);
