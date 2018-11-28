@@ -27,6 +27,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.myapps.ron.family_recipes.MyDividerItemDecoration;
@@ -72,6 +73,8 @@ public class AllRecipesFragment extends MyFragment implements RecipesAdapter.Rec
     private String orderBy;
     private boolean mayRefresh;
     private String lastQuery = "";
+
+    ProgressBar firstLoadingProgressBar;
 
 
     @Override
@@ -124,6 +127,7 @@ public class AllRecipesFragment extends MyFragment implements RecipesAdapter.Rec
             swipeRefreshLayout = view.findViewById(R.id.content_main_refresh);
             recyclerView = view.findViewById(R.id.recycler_view);
             mFilter = view.findViewById(R.id.content_main_filters);
+            firstLoadingProgressBar = view.findViewById(R.id.content_main_fist_loading_animation);
 
             mColors = getResources().getIntArray(R.array.colors);
 
@@ -142,6 +146,7 @@ public class AllRecipesFragment extends MyFragment implements RecipesAdapter.Rec
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
+                    firstLoadingProgressBar.setVisibility(View.VISIBLE);
                     activity.fetchCategories();
                     activity.fetchRecipes(orderBy);
                 }
@@ -151,7 +156,6 @@ public class AllRecipesFragment extends MyFragment implements RecipesAdapter.Rec
         /*if (activity.getSupportActionBar() != null)
             activity.getSupportActionBar().setTitle("Recipes");*/
     }
-
 
     private void initCategories() {
         //mTitles = getResources().getStringArray(R.array.job_titles);
@@ -177,6 +181,7 @@ public class AllRecipesFragment extends MyFragment implements RecipesAdapter.Rec
                 Log.e(TAG, "getAllRecipes from db.\n" + log);
                 if (mFilter != null && recipes != null)
                     mFilter.setCustomTextView(getString(R.string.number_of_recipes_indicator, recipes.size()));
+                firstLoadingProgressBar.setVisibility(View.GONE);
                 swipeRefreshLayout.setRefreshing(false);
                 //Log.e(TAG, "update from fragment");
                 if (mAdapter == null) {

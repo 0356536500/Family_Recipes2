@@ -13,7 +13,6 @@ import android.view.ViewGroup;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.dal.storage.StorageWrapper;
 import com.myapps.ron.family_recipes.model.Recipe;
-import com.myapps.ron.family_recipes.network.Constants;
 import com.myapps.ron.family_recipes.network.MyCallback;
 import com.myapps.ron.family_recipes.utils.GlideApp;
 
@@ -25,13 +24,11 @@ import java.io.File;
 public class MyPagerAdapter extends PagerAdapter {
 
     private Context context;
-    private StorageWrapper storageWrapper;
     private Recipe recipe;
 
     public MyPagerAdapter(Context context, Recipe recipe) {
         this.context = context;
         this.recipe = recipe;
-        this.storageWrapper = StorageWrapper.getInstance(context);
     }
 
 
@@ -63,10 +60,10 @@ public class MyPagerAdapter extends PagerAdapter {
     }
 
 
-    private void loadImage(final AppCompatImageView view, int position) {
+    private void loadImage(final AppCompatImageView view, final int position) {
         if (recipe != null && recipe.getFoodFiles() != null && recipe.getFoodFiles().size() > position) {
 
-            storageWrapper.getFoodFile(context, recipe.getFoodFiles().get(position), new MyCallback<String>() {
+            StorageWrapper.getFoodFile(context, recipe.getFoodFiles().get(position), new MyCallback<String>() {
                 @Override
                 public void onFinished(String path) {
                     if(path != null) {
@@ -75,8 +72,12 @@ public class MyPagerAdapter extends PagerAdapter {
                         circularProgressDrawable.setCenterRadius(35f);
                         circularProgressDrawable.start();
 
+                        File file = new File(path);
+                        if (position > 0)
+                            file.deleteOnExit();
+
                         GlideApp.with(context)
-                                .load(Uri.fromFile(new File(path)))
+                                .load(Uri.fromFile(file))
                                 .placeholder(circularProgressDrawable)
                                 //.apply(requestOptions)
                                 .into(view);

@@ -74,12 +74,12 @@ public class RecipeViewModel extends ViewModel {
             });
         }
         else {
-            Toast.makeText(context, "no Internet connection", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(context, "no Internet connection", Toast.LENGTH_SHORT).show();
+            setInfo(context.getString(R.string.no_internet_message));
         }
     }
 
     public void loadRecipeContent(final Context context, final Recipe recipe) {
-        if(MiddleWareForNetwork.checkInternetConnection(context)) {
             if(recipe.getRecipeFile() != null) {
                 StorageWrapper.getRecipeFile(context, recipe.getRecipeFile(), new MyCallback<String>() {
                     @Override
@@ -94,7 +94,7 @@ public class RecipeViewModel extends ViewModel {
                             }
                         }
                         else {
-                            setInfo(context.getString(R.string.recipe_content_not_found));
+                            setInfo(context.getString(R.string.no_internet_message));
                             setRecipePath(null);
                         }
                     }
@@ -104,8 +104,5 @@ public class RecipeViewModel extends ViewModel {
                 setInfo(context.getString(R.string.recipe_not_in_server));
                 setRecipePath(null);
             }
-        }
-        else
-            setInfo(context.getString(R.string.no_internet_message));
     }
 }

@@ -8,6 +8,7 @@ import android.util.Log;
 
 import com.myapps.ron.family_recipes.model.Recipe;
 import com.myapps.ron.family_recipes.network.Constants;
+import com.myapps.ron.family_recipes.network.MiddleWareForNetwork;
 import com.myapps.ron.family_recipes.network.MyCallback;
 import com.myapps.ron.family_recipes.network.S3.OnlineStorageWrapper;
 import com.myapps.ron.family_recipes.utils.DateUtil;
@@ -40,6 +41,20 @@ public class StorageWrapper {
         /*dbHelper = new RecipesDBHelper(context)*/;
     }
 
+    public static void getThumbFile(Context context, String fileName, MyCallback<String> callback) {
+        if(fileName == null || fileName.equals(""))
+            return;
+        String path = ExternalStorageHelper.getFileAbsolutePath(context, fileName, Constants.THUMB_DIR);
+        //Log.e("StorageWrapper", "get local path - " + path);
+        if(path != null)
+            callback.onFinished(path);
+        else if (MiddleWareForNetwork.checkInternetConnection(context)){
+            OnlineStorageWrapper.downloadThumbFile(context, fileName, callback);
+        }
+        else
+            callback.onFinished(null);
+    }
+
     public static void getFoodFile(Context context, String fileName, MyCallback<String> callback) {
         if(fileName == null || fileName.equals(""))
             return;
@@ -47,9 +62,11 @@ public class StorageWrapper {
         //Log.e("StorageWrapper", "get local path - " + path);
         if(path != null)
             callback.onFinished(path);
-        else {
+        else if (MiddleWareForNetwork.checkInternetConnection(context)){
             OnlineStorageWrapper.downloadFoodFile(context, fileName, callback);
         }
+        else
+            callback.onFinished(null);
     }
 
     public static void getRecipeFile(Context context, String fileName, MyCallback<String> callback) {
@@ -59,9 +76,11 @@ public class StorageWrapper {
         //Log.e("StorageWrapper", "get local path - " + path);
         if(path != null)
             callback.onFinished(path);
-        else {
+        else if (MiddleWareForNetwork.checkInternetConnection(context)){
             OnlineStorageWrapper.downloadRecipeFile(context, fileName, callback);
         }
+        else
+            callback.onFinished(null);
     }
 
     public static File createHtmlFile(Context context, String fileName, String html) {

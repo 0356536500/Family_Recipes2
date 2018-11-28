@@ -173,7 +173,7 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
 
     private void loadImage(final MyViewHolder holder, final Recipe recipe) {
         if(recipe.getFoodFiles() != null && recipe.getFoodFiles().size() > 0) {
-            StorageWrapper.getFoodFile(context, recipe.getFoodFiles().get(0), new MyCallback<String>() {
+            StorageWrapper.getThumbFile(context, recipe.getFoodFiles().get(0), new MyCallback<String>() {
                 @Override
                 public void onFinished(String path) {
                     if(path != null) {

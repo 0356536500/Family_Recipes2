@@ -373,6 +373,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void startWithDefaultFragment() {
         currentFragment = allRecipesFragment;
+        /*if (getIntent().getBooleanExtra("load_likes", false)) {
+            currentFragment.setArguments(getIntent().getExtras());
+        }*/
         navDrawer.getMenu().getItem(0).setChecked(true);
         getSupportFragmentManager()
                 .beginTransaction()

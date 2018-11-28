@@ -54,6 +54,7 @@
 
     <!-- AllRecipes Fragment -->
     <string name="str_all_selected">כל הקטגוריות</string>
+    <string name="load_error_message">קרתה תקלה בשרת</string>
     <string name="refresh_error_message">אפשר לרענן פעם בדקה</string>
     <string name="message_from_fetch_recipes">נוספו %1$d, עודכנו %2$d</string>
     <string name="message_from_fetch_categories">נוספו %1$d קטגוריות</string>

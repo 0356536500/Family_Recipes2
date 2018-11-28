@@ -79,6 +79,7 @@ public class APICallsHandler {
                 }
                 else {
                     Log.e(TAG, "error getAllRecipes, code = " + response.code() + "\n body: " + body);
+                    callback.onFinished(null);
                 }
 
                 //generateDataList(response.body());

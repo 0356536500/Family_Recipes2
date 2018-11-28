@@ -45,6 +45,10 @@ public class OnlineStorageWrapper {
         s3.downloadFile(key, rootPath, dir, callback);
     }
 
+    public static void downloadThumbFile(Context context, String key, final MyCallback<String> callback) {
+        downloadFile(context, key, ExternalStorageHelper.getFilesRootPath(context), Constants.THUMB_DIR, callback);
+    }
+
     public static void downloadFoodFile(Context context, String key, final MyCallback<String> callback) {
         downloadFile(context, key, ExternalStorageHelper.getFilesRootPath(context), Constants.FOOD_DIR, callback);
     }

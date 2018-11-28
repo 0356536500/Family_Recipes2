@@ -28,6 +28,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
+    <ProgressBar
+        android:id="@+id/content_main_fist_loading_animation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:indeterminate="true"
+        android:indeterminateBehavior="cycle"
+        android:visibility="gone"/>
+
     <!--<android.support.v4.widget.NestedScrollView
         android:id="@+id/main_scroll_view"
         android:layout_width="match_parent"

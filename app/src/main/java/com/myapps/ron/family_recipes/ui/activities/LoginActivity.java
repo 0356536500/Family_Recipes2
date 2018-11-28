@@ -28,6 +28,7 @@ import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.Authentic
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.ForgotPasswordHandler;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.network.cognito.AppHelper;
+import com.myapps.ron.family_recipes.utils.Constants;
 import com.myapps.ron.family_recipes.utils.SharedPreferencesHandler;
 
 import java.util.Locale;
@@ -348,9 +349,11 @@ public class LoginActivity extends AppCompatActivity {
     }*/
 
     private void launchUser() {
-        Intent mainActivity = new Intent(this, MainActivity.class);
-        mainActivity.putExtra("name", username);
-        startActivityForResult(mainActivity, 4);
+        Intent mainIntent = new Intent(this, MainActivity.class);
+        mainIntent.putExtra("name", username);
+        mainIntent.putExtra("load_likes", true);
+        startActivity(mainIntent);
+        finish();
     }
 
     private void findCurrent() {
