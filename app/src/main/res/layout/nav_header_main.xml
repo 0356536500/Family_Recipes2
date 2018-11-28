@@ -7,7 +7,7 @@
     android:layout_height="@dimen/nav_header_height"
     android:background="@drawable/side_nav_bar"
     android:gravity="center_vertical"
-    android:theme="@style/AppTheme">
+    android:theme="@style/AppTheme.Light">
 
 
     <android.support.v7.widget.AppCompatImageView

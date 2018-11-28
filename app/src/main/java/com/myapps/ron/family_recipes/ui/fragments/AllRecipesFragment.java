@@ -395,6 +395,12 @@ public class AllRecipesFragment extends MyFragment implements RecipesAdapter.Rec
     }
 
     @Override
+    public void onCurrentSizeChanged(int size) {
+        if (mFilter != null)
+            mFilter.setCustomTextView(getString(R.string.number_of_recipes_indicator, size));
+    }
+
+    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == Constants.RECIPE_ACTIVITY_CODE) {

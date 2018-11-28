@@ -320,6 +320,7 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
             } else {
                 oldTemp = recipeListFiltered;
                 recipeListFiltered = list;
+                listener.onCurrentSizeChanged(recipeListFiltered.size());
             }
 
             DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new MyDiffCallback(oldTemp, list));
@@ -364,5 +365,6 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
     public interface RecipesAdapterListener {
         void onItemSelected(Recipe recipe);
         void onImageClicked(Recipe recipe);
+        void onCurrentSizeChanged(int size);
     }
 }

@@ -2,7 +2,7 @@
 
     <!-- Base application theme. -->
 
-    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="AppTheme.Light" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
@@ -10,6 +10,8 @@
         <item name="windowActionBar">false</item>
         <item name="windowActionModeOverlay">true</item>
         <item name="android:windowContentOverlay">@null</item>
+
+        <item name="android:windowAnimationStyle">@style/WindowAnimationTransition</item>
 
         <!-- Active thumb color & Active track color(30% transparency) -->
         <item name="colorControlActivated">@color/colorPrimaryDark</item>
@@ -21,17 +23,43 @@
         <item name="drawerArrowStyle">@style/MyDrawerArrowToggle</item>
     </style>
 
-    <style name="MyAppTheme" parent="@style/AppTheme">
+    <style name="AppTheme.Dark" parent="Theme.AppCompat.NoActionBar">
         <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowActionModeOverlay">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+
+        <item name="android:windowAnimationStyle">@style/WindowAnimationTransition</item>
+
+        <!-- Active thumb color & Active track color(30% transparency) -->
+        <item name="colorControlActivated">@color/colorPrimaryDark</item>
+        <!-- Inactive thumb color -->
+        <item name="colorSwitchThumbNormal">@color/grey_300</item>
+        <!-- Inactive track color(30% transparency) -->
+        <item name="android:colorForeground">@color/grey_600</item>
+
+        <item name="drawerArrowStyle">@style/MyDrawerArrowToggle</item>
+    </style>
+
+    <style name="WindowAnimationTransition">
+        <item name="android:windowEnterAnimation">@android:anim/fade_in</item>
+        <item name="android:windowExitAnimation">@android:anim/fade_out</item>
+    </style>
+
+    <!--<style name="MyAppTheme" parent="@style/AppTheme.Light">
+        &lt;!&ndash; Customize your theme here. &ndash;&gt;
         <item name="android:windowContentTransitions">true</item>
         <item name="android:windowAllowEnterTransitionOverlap">true</item>
         <item name="android:windowAllowReturnTransitionOverlap">true</item>
         <item name="android:windowSharedElementEnterTransition">@android:transition/move</item>
         <item name="android:windowSharedElementExitTransition">@android:transition/move</item>
-<!--        <item name="colorPrimary">@color/colorPrimary</item>
+&lt;!&ndash;        <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>-->
-    </style>
+        <item name="colorAccent">@color/colorAccent</item>&ndash;&gt;
+    </style>-->
 
     <style name="AppThemeWithActionBar" parent="Theme.AppCompat.Light">
         <!-- Customize your theme here. -->
@@ -40,7 +68,7 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <style name="AppTheme.NoActionBar">
+    <style name="AppTheme.Light.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
@@ -63,7 +91,7 @@
         <item name="color">@color/black</item>
     </style>
 
-    <style name="RecyclerTheme" parent="AppTheme">
+    <style name="RecyclerTheme" parent="AppTheme.Light">
         <item name="android:colorEdgeEffect">@color/colorPrimaryDark</item>
     </style>
 
