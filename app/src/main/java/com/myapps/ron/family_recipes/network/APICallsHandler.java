@@ -27,6 +27,7 @@ public class APICallsHandler {
     private static Retrofit retrofit;
 
     private static final int STATUS_OK = 200;
+    private static final int STATUS_NOT_MODIFIED = 304;
     //private static final String BASE_URL = "https://jsonplaceholder.typicode.com";
 
     private static Retrofit getRetrofitInstance() {
@@ -77,6 +78,10 @@ public class APICallsHandler {
                     List<Recipe> list = response.body();
                     callback.onFinished(list);
                 }
+                /*else if (response.code() == STATUS_NOT_MODIFIED) {
+                    Log.i(TAG, "not modified");
+                    callback.onFinished(null);
+                }*/
                 else {
                     Log.e(TAG, "error getAllRecipes, code = " + response.code() + "\n body: " + body);
                     callback.onFinished(null);

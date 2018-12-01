@@ -2,7 +2,6 @@ package com.myapps.ron.family_recipes.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.Nullable;
 
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
@@ -36,7 +35,7 @@ public class Recipe implements Parcelable{
     @SerializedName("categories")
     private List<String> categories;
     @SerializedName("comments")
-    private List<String> comments;
+    private List<Comment> comments;
     @SerializedName("foodFiles")
     private List<String> foodFiles;
     @SerializedName("likes")
@@ -64,10 +63,10 @@ public class Recipe implements Parcelable{
     public Recipe() {
     }
 
-    //from server
+    /*//from server
     public Recipe(String id, String name, String description, String createdAt,
                   String lastModifiedAt, String recipeFile, String uploader,
-                  @Nullable List<String> categories, @Nullable List<String> comments, @Nullable List<String> foodFiles,
+                  @Nullable List<String> categories, @Nullable List<Comment> comments, @Nullable List<String> foodFiles,
                   int likes) {
         this.id = id;
         this.name = name;
@@ -112,7 +111,7 @@ public class Recipe implements Parcelable{
 
         this(id, name, description, createdAt, lastModifiedAt, recipeFile, uploader, categories,
                 comments, foodFiles, likes, false);
-    }
+    }*/
 
 
     public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
@@ -233,9 +232,14 @@ public class Recipe implements Parcelable{
     }
 
     public void setStringCategories(String categories) {
-        Type type = new TypeToken<List<String>>() {}.getType();
-        List<String> value = gson.fromJson(categories, type);
-        setCategories(value);
+        if (categories == null) {
+            setCategories(null);
+        } else {
+            Type type = new TypeToken<List<String>>() {
+            }.getType();
+            List<String> value = gson.fromJson(categories, type);
+            setCategories(value);
+        }
     }
 
     public String getStringComments() {
@@ -245,9 +249,14 @@ public class Recipe implements Parcelable{
     }
 
     public void setStringComments(String comments) {
-        Type type = new TypeToken<List<String>>() {}.getType();
-        List<String> value = gson.fromJson(comments, type);
-        setComments(value);
+        if (comments == null) {
+            setComments(null);
+        } else {
+            Type type = new TypeToken<List<Comment>>() {
+            }.getType();
+            List<Comment> value = gson.fromJson(comments, type);
+            setComments(value);
+        }
     }
 
     public String getStringFoodFiles() {
@@ -257,9 +266,14 @@ public class Recipe implements Parcelable{
     }
 
     public void setStringFoodFiles(String foodFiles) {
-        Type type = new TypeToken<List<String>>() {}.getType();
-        List<String> value = gson.fromJson(foodFiles, type);
-        setFoodFiles(value);
+        if (foodFiles == null) {
+            setFoodFiles(null);
+        } else {
+            Type type = new TypeToken<List<String>>() {
+            }.getType();
+            List<String> value = gson.fromJson(foodFiles, type);
+            setFoodFiles(value);
+        }
     }
 
     public String getId() {
@@ -334,11 +348,11 @@ public class Recipe implements Parcelable{
         this.categories = categories;
     }
 
-    public List<String> getComments() {
+    public List<Comment> getComments() {
         return comments;
     }
 
-    public void setComments(List<String> comments) {
+    public void setComments(List<Comment> comments) {
         this.comments = comments;
     }
 
@@ -411,5 +425,141 @@ public class Recipe implements Parcelable{
         dest.writeList(this.foodFiles);
         dest.writeInt(this.likes);
         dest.writeInt(getMeLike() ? TRUE : FALSE);
+    }
+
+    public class Comment {
+        private String text, user, date;
+
+        public String getText() {
+            return text;
+        }
+
+        public void setText(String text) {
+            this.text = text;
+        }
+
+        public String getUser() {
+            return user;
+        }
+
+        public void setUser(String user) {
+            this.user = user;
+        }
+
+        public String getDate() {
+            return date;
+        }
+
+        public void setDate(String date) {
+            this.date = date;
+        }
+
+        @Override
+        public String toString() {
+            if (text == null || user == null || date == null)
+                return "null";
+            return "Comment{" +
+                    "text='" + text + '\'' +
+                    ", user='" + user + '\'' +
+                    ", date='" + date + '\'' +
+                    '}';
+        }
+    }
+
+    public static class RecipeBuilder {
+        private String builderId;
+        private String builderName;
+        private String builderDescription;
+        private String builderCreatedAt;
+        private String builderLastModifiedAt;
+        private String builderRecipeFile;
+        private String builderUploader;
+        private String builderCategories;
+        private String builderComments;
+        private String builderFoodFiles;
+        private int builderLikes;
+
+        private boolean builderMeLike;
+
+        public RecipeBuilder() {}
+
+        public RecipeBuilder id (String id) {
+            this.builderId = id;
+            return this;
+        }
+
+        public RecipeBuilder name (String name) {
+            this.builderName = name;
+            return this;
+        }
+
+        public RecipeBuilder description (String description) {
+            this.builderDescription = description;
+            return this;
+        }
+
+        public RecipeBuilder createdAt (String createdAt) {
+            this.builderCreatedAt = createdAt;
+            return this;
+        }
+
+        public RecipeBuilder lastModifiedAt (String lastModifiedAt) {
+            this.builderLastModifiedAt = lastModifiedAt;
+            return this;
+        }
+
+        public RecipeBuilder recipeFile (String recipeFile) {
+            this.builderRecipeFile = recipeFile;
+            return this;
+        }
+
+        public RecipeBuilder uploader (String uploader) {
+            this.builderUploader = uploader;
+            return this;
+        }
+
+        public RecipeBuilder categoriesJson (String categoriesJson) {
+            this.builderCategories = categoriesJson;
+            return this;
+        }
+
+        public RecipeBuilder commentsJson (String commentsJson) {
+            this.builderComments = commentsJson;
+            return this;
+        }
+
+        public RecipeBuilder foodFilesJson (String foodFilesJson) {
+            this.builderFoodFiles = foodFilesJson;
+            return this;
+        }
+
+        public RecipeBuilder likes (int likes) {
+            this.builderLikes = likes;
+            return this;
+        }
+
+        public RecipeBuilder meLike (boolean meLike) {
+            this.builderMeLike = meLike;
+            return this;
+        }
+
+        public Recipe build() {
+            Recipe recipe = new Recipe();
+            recipe.setId(builderId);
+            recipe.setName(builderName);
+            recipe.setDescription(builderDescription);
+            recipe.setCreatedAt(builderCreatedAt);
+            recipe.setLastModifiedAt(builderLastModifiedAt);
+            recipe.setRecipeFile(builderRecipeFile);
+            recipe.setUploader(builderUploader);
+            recipe.setStringCategories(builderCategories);
+            recipe.setStringComments(builderComments);
+            recipe.setStringFoodFiles(builderFoodFiles);
+            recipe.setLikes(builderLikes);
+            recipe.setMeLike(builderMeLike);
+
+            return recipe;
+        }
+
     }
 }

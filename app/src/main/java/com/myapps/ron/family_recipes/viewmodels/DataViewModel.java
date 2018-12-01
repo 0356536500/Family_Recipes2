@@ -58,7 +58,11 @@ public class DataViewModel extends ViewModel {
                     //PostRecipeToServerService.startActionPostRecipe(context, new ArrayList<>(result), time);
                     if(result != null) {
                         DateUtil.updateServerTime(context, time);
-                        new MyAsyncRecipeUpdate(context, result, orderBy).execute();
+                        if (result.isEmpty())
+                            loadLocalRecipes(context, orderBy);
+                        else
+                            new MyAsyncRecipeUpdate(context, result, orderBy).execute();
+
                     } else {
                         loadLocalRecipes(context, orderBy);
                         setInfoFromLastFetch(context.getString(R.string.load_error_message));

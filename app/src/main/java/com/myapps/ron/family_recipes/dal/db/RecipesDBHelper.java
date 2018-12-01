@@ -71,12 +71,26 @@ public class RecipesDBHelper extends MyDBHelper{
                 new String[]{String.valueOf(id)},null,null,null,null);
         if(cursor != null) {
             cursor.moveToFirst();
-            return new Recipe(cursor.getString(cursor.getColumnIndex(KEY_ID)), cursor.getString(1),
+            return new Recipe.RecipeBuilder()
+                    .id(cursor.getString(cursor.getColumnIndex(KEY_ID)))
+                    .name(cursor.getString(cursor.getColumnIndex(KEY_NAME)))
+                    .description(cursor.getString(cursor.getColumnIndex(KEY_DESC)))
+                    .createdAt(cursor.getString(cursor.getColumnIndex(KEY_CREATED)))
+                    .lastModifiedAt(cursor.getString(cursor.getColumnIndex(KEY_MODIFIED)))
+                    .recipeFile(cursor.getString(cursor.getColumnIndex(KEY_FILE)))
+                    .uploader(cursor.getString(cursor.getColumnIndex(KEY_UPLOADER)))
+                    .categoriesJson(cursor.getString(cursor.getColumnIndex(KEY_CATEGORIES)))
+                    .commentsJson(cursor.getString(cursor.getColumnIndex(KEY_COMMENTS)))
+                    .foodFilesJson(cursor.getString(cursor.getColumnIndex(KEY_FOOD)))
+                    .likes(cursor.getInt(cursor.getColumnIndex(KEY_LIKES)))
+                    .meLike(cursor.getInt(cursor.getColumnIndex(KEY_ME_LIKE)) == TRUE)
+                    .build();
+            /*return new Recipe(cursor.getString(cursor.getColumnIndex(KEY_ID)), cursor.getString(1),
                     cursor.getString(2), cursor.getString(3),
                     cursor.getString(4), cursor.getString(5),
                     cursor.getString(6), cursor.getString(7),
                     cursor.getString(8), cursor.getString(9),
-                    cursor.getInt(10), cursor.getInt(11) == TRUE);
+                    cursor.getInt(10), cursor.getInt(11) == TRUE);*/
         }
         return null;
     }

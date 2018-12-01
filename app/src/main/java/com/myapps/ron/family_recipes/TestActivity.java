@@ -1,36 +1,32 @@
 package com.myapps.ron.family_recipes;
 
 import android.os.Bundle;
-import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.view.Window;
-import android.view.WindowManager;
+import android.util.Log;
 
 import com.myapps.ron.family_recipes.model.Recipe;
-import com.myapps.ron.family_recipes.adapters.MyPagerAdapter;
-import com.myapps.ron.family_recipes.utils.ZoomOutPageTransformer;
-import com.tbuonomo.viewpagerdotsindicator.WormDotsIndicator;
+import com.myapps.ron.family_recipes.network.APICallsHandler;
+import com.myapps.ron.family_recipes.network.MyCallback;
+import com.myapps.ron.family_recipes.network.cognito.AppHelper;
+
+import java.util.List;
 
 public class TestActivity extends AppCompatActivity {
 
+    private final String TAG = getClass().getSimpleName();
+
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        setContentView(R.layout.sliding_images_layout);
 
-        //DotsIndicator dotsIndicator = findViewById(R.id.dots_indicator);
-        //SpringDotsIndicator springDotsIndicator = findViewById(R.id.spring_dots_indicator);
-        WormDotsIndicator wormDotsIndicator = findViewById(R.id.worm_dots_indicator);
-
-        ViewPager viewPager = findViewById(R.id.view_pager);
-        MyPagerAdapter adapter = new MyPagerAdapter(this, new Recipe());
-        viewPager.setAdapter(adapter);
-        viewPager.setPageTransformer(true, new ZoomOutPageTransformer());
-
-        //dotsIndicator.setViewPager(viewPager);
-        //springDotsIndicator.setViewPager(viewPager);
-        wormDotsIndicator.setViewPager(viewPager);
+        final String time = "0";
+        APICallsHandler.getAllRecipes(time, AppHelper.getAccessToken(), new MyCallback<List<Recipe>>() {
+            @Override
+            public void onFinished(List<Recipe> result) {
+                //PostRecipeToServerService.startActionPostRecipe(context, new ArrayList<>(result), time);
+                if(result != null) {
+                    Log.e(TAG, "success fetching all recipes. count = " + result.size());
+                }
+            }
+        });
     }
 }
