@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    android:background="?android:backgroundTint"
     tools:context=".ui.activities.RecipeActivity"
     tools:showIn="@layout/activity_recipe">
 
@@ -30,14 +31,44 @@
 
         <android.widget.Space
             android:layout_width="match_parent"
-            android:layout_height="15dp" />
+            android:layout_height="20dp" />
 
 
         <TextView
+            android:id="@+id/textView_comments_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="visible"
+            android:layout_margin="@dimen/recipe_activity_margin"
+            android:fontFamily="@font/open_sans_bold"
+            android:text="@string/comments"
+            android:textColor="?android:textColorPrimary"
+            android:textSize="@dimen/comment_primary"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="10dp"
+            android:layout_marginTop="@dimen/recipe_activity_minus_margin"
+            android:layout_marginStart="@dimen/recipe_activity_margin"
+            android:layout_marginEnd="@dimen/recipe_activity_margin"
+            android:foreground="@color/grey_500"/>
+
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recycler_comments"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="invisible"
+            android:nestedScrollingEnabled="true"
+            android:scrollbars="vertical">
+
+        </android.support.v7.widget.RecyclerView>
+
+        <!--<TextView
             android:id="@+id/recipe_textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/large_text" />
+            android:text="@string/large_text" />-->
 
     </LinearLayout>
 

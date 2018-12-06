@@ -166,6 +166,8 @@ class S3Helper {
                     // Handle a completed upload.
                     callback.onFinished(path);
                 }
+                if (TransferState.FAILED == state)
+                    callback.onFinished(null);
             }
 
             @Override

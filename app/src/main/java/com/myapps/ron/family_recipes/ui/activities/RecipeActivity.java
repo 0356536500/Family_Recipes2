@@ -5,10 +5,8 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -20,25 +18,29 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.CircularProgressDrawable;
 import android.support.v4.widget.ContentLoadingProgressBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebView;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.request.target.CustomViewTarget;
-import com.bumptech.glide.request.transition.Transition;
+import com.myapps.ron.family_recipes.MyDividerItemDecoration;
 import com.myapps.ron.family_recipes.R;
-import com.myapps.ron.family_recipes.dal.storage.StorageWrapper;
+import com.myapps.ron.family_recipes.adapters.CommentsAdapter;
 import com.myapps.ron.family_recipes.model.Recipe;
-import com.myapps.ron.family_recipes.network.MiddleWareForNetwork;
-import com.myapps.ron.family_recipes.network.MyCallback;
 import com.myapps.ron.family_recipes.ui.fragments.PagerDialogFragment;
 import com.myapps.ron.family_recipes.utils.Constants;
 import com.myapps.ron.family_recipes.utils.GlideApp;
 import com.myapps.ron.family_recipes.viewmodels.RecipeViewModel;
+import com.myapps.ron.searchfilter.animator.FiltersListItemAnimator;
 
 import java.io.File;
 
@@ -49,14 +51,18 @@ public class RecipeActivity extends AppCompatActivity {
     private MenuItem menuItemShare;
     private Toolbar toolbar;
     private CollapsingToolbarLayout collapsingToolbarLayout;
+    private ImageView imageViewCollapsingImage;
     private FloatingActionButton like;
     //private TextView textView;
     ContentLoadingProgressBar progressBar;
     private WebView myWebView;
     private Recipe recipe;
+    private TextView textViewCommentTitle;
     private RecipeViewModel viewModel;
-    private Observer<Recipe> likeObserver;//, commentObserver;
+    private Observer<Recipe> recipeObserver;//, commentObserver;
 
+    private RecyclerView recyclerView;
+    private CommentsAdapter mAdapter;
 
     private boolean showLikeMessage = false;
     @Override
@@ -82,10 +88,13 @@ public class RecipeActivity extends AppCompatActivity {
     private void bindUI() {
         appBarLayout = findViewById(R.id.activity_recipe_app_bar);
         collapsingToolbarLayout = findViewById(R.id.toolbar_layout);
+        imageViewCollapsingImage = findViewById(R.id.recipe_collapsing_image);
         toolbar = findViewById(R.id.recipe_toolbar);
         like = findViewById(R.id.recipe_like);
         progressBar = findViewById(R.id.recipe_content_progressBar);
         myWebView = findViewById(R.id.recipe_content_webView);
+        recyclerView = findViewById(R.id.recycler_comments);
+        textViewCommentTitle = findViewById(R.id.textView_comments_title);
         //WebSettings webSettings = myWebView.getSettings();
         //webSettings.setJavaScriptEnabled(true);
     }
@@ -94,6 +103,11 @@ public class RecipeActivity extends AppCompatActivity {
         loadLikeDrawable();
         setSupportActionBar(toolbar);
         // toolbar fancy stuff
+        initToolbar();
+        initRecycler();
+    }
+
+    private void initToolbar() {
         if(getSupportActionBar() != null) {
             getSupportActionBar().setDisplayShowHomeEnabled(true);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -162,25 +176,56 @@ public class RecipeActivity extends AppCompatActivity {
         });
     }
 
+    private void initRecycler() {
+        //mAdapter = new CommentsAdapter(this.recipe.getComments());
+
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+        recyclerView.setLayoutManager(mLayoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.addItemDecoration(new MyDividerItemDecoration(this, DividerItemDecoration.VERTICAL, 4));
+        //recyclerView.setAdapter(mAdapter);
+        recyclerView.setItemAnimator(new FiltersListItemAnimator());
+    }
+
     private void initViewModel() {
-        viewModel =  ViewModelProviders.of(this).get(RecipeViewModel.class);
-        likeObserver = new Observer<Recipe>() {
+        viewModel = ViewModelProviders.of(this).get(RecipeViewModel.class);
+        recipeObserver = new Observer<Recipe>() {
             @Override
             public void onChanged(@Nullable Recipe recipe) {
                 RecipeActivity.this.recipe = recipe;
                 loadLikeDrawable();
                 like.setEnabled(true);
-                //viewModel.getRecipe().removeObserver(likeObserver);
+                //mAdapter.setComments(RecipeActivity.this.recipe.getComments());
+                //viewModel.getRecipe().removeObserver(recipeObserver);
             }
         };
 
-        viewModel.getRecipe().observe(this, likeObserver);
+        viewModel.getRecipe().observe(this, recipeObserver);
         viewModel.getRecipePath().observe(this, new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {
                 if (s != null)
                     loadRecipeHtml(s);
                 progressBar.hide();
+            }
+        });
+        viewModel.getImagePath().observe(this, new Observer<String>() {
+            @Override
+            public void onChanged(@Nullable String path) {
+                if (path != null) {
+                    Log.e(TAG, "found path: " + path);
+                    CircularProgressDrawable circularProgressDrawable = new CircularProgressDrawable(getBaseContext());
+                    circularProgressDrawable.setStrokeWidth(5f);
+                    circularProgressDrawable.setCenterRadius(35f);
+                    circularProgressDrawable.start();
+
+                    GlideApp.with(getApplicationContext())
+                            .asDrawable()
+                            .load(Uri.fromFile(new File(path)))
+                            .placeholder(circularProgressDrawable)
+                            .error(android.R.drawable.stat_notify_error)
+                            .into(imageViewCollapsingImage);
+                }
             }
         });
         viewModel.getInfo().observe(this, new Observer<String>() {
@@ -244,10 +289,28 @@ public class RecipeActivity extends AppCompatActivity {
 
     private void loadRecipe() {
         viewModel.loadRecipeContent(this, recipe);
-        loadImage();
+        viewModel.loadRecipeFoodImage(this, recipe);
+        //loadImage();
+        loadComments();
         //loadRecipeHtml();
-        // TODO load comments
         //loadComments();
+    }
+
+    private void loadComments() {
+        if (this.recipe.getComments() != null) {
+            textViewCommentTitle.setText(getString(R.string.comments, recipe.getComments().size()));
+
+            if (mAdapter == null) {
+                mAdapter = new CommentsAdapter(this.recipe.getComments());
+                recyclerView.setAdapter(mAdapter);
+
+                textViewCommentTitle.setVisibility(View.VISIBLE);
+                recyclerView.setVisibility(View.VISIBLE);
+
+            } else {
+                mAdapter.setComments(this.recipe.getComments());
+            }
+        }
     }
 
     private void loadRecipeHtml(String path) {
@@ -271,7 +334,7 @@ public class RecipeActivity extends AppCompatActivity {
         //myWebView.loadUrl(recipe.image);
     }
 
-    private void loadImage() {
+    /*private void loadImage() {
         if(recipe.getFoodFiles() != null && recipe.getFoodFiles().size() > 0) {
             StorageWrapper.getFoodFile(this, recipe.getFoodFiles().get(0), new MyCallback<String>() {
                 @Override
@@ -286,6 +349,9 @@ public class RecipeActivity extends AppCompatActivity {
                                 .asDrawable()
                                 .load(Uri.fromFile(new File(path)))
                                 .placeholder(circularProgressDrawable)
+                                .error(android.R.drawable.stat_notify_error)
+                                .into(imageViewCollapsingImage);
+                    }
                                 .into(new CustomViewTarget<CollapsingToolbarLayout, Drawable>(collapsingToolbarLayout) {
                                     @Override
                                     public void onLoadFailed(@Nullable Drawable errorDrawable) {
@@ -308,13 +374,14 @@ public class RecipeActivity extends AppCompatActivity {
                 }
             });
         }
-    }
+    }*/
+
 
     public void doLike(View view) {
         //recipe.setMeLike(!recipe.getMeLike());
-        if(MiddleWareForNetwork.checkInternetConnection(this))
-            like.setEnabled(false);
-        //viewModel.getRecipe().observe(this, likeObserver);
+        //if(MiddleWareForNetwork.checkInternetConnection(this))
+        like.setEnabled(false);
+        //viewModel.getRecipe().observe(this, recipeObserver);
         viewModel.changeLike(getApplicationContext(), recipe);
         /*String message;
         // do like

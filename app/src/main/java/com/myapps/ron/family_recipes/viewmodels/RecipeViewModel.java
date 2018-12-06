@@ -30,6 +30,7 @@ import java.util.Map;
 public class RecipeViewModel extends ViewModel {
     private final MutableLiveData<Recipe> recipe = new MutableLiveData<>(); // current recipe on the screen
     private MutableLiveData<String> recipePath = new MutableLiveData<>();
+    private MutableLiveData<String> imagePath = new MutableLiveData<>();
     private MutableLiveData<String> infoForUser = new MutableLiveData<>();
 
     private void setRecipe(Recipe item) {
@@ -46,6 +47,14 @@ public class RecipeViewModel extends ViewModel {
 
     public LiveData<String> getRecipePath() {
         return recipePath;
+    }
+
+    private void setImagePath(String item) {
+        imagePath.setValue(item);
+    }
+
+    public LiveData<String> getImagePath() {
+        return imagePath;
     }
 
     private void setInfo(String item) {
@@ -104,5 +113,20 @@ public class RecipeViewModel extends ViewModel {
                 setInfo(context.getString(R.string.recipe_not_in_server));
                 setRecipePath(null);
             }
+    }
+
+    public void loadRecipeFoodImage(final Context context, final Recipe recipe) {
+        if(MiddleWareForNetwork.checkInternetConnection(context)) {
+            if (recipe.getFoodFiles() != null && recipe.getFoodFiles().size() > 0) {
+                StorageWrapper.getFoodFile(context, recipe.getFoodFiles().get(0), new MyCallback<String>() {
+                    @Override
+                    public void onFinished(String path) {
+                        setImagePath(path);
+                    }
+                });
+            }
+        } else {
+            setImagePath(null);
+        }
     }
 }

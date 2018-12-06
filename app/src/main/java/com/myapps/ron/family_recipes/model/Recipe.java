@@ -138,7 +138,7 @@ public class Recipe implements Parcelable{
         foodFiles = new ArrayList<>();
 
         in.readList(this.categories, String.class.getClassLoader());
-        in.readList(this.comments, String.class.getClassLoader());
+        in.readList(this.comments, Comment.class.getClassLoader());
         in.readList(this.foodFiles, String.class.getClassLoader());
 
         this.likes = in.readInt();
@@ -427,8 +427,26 @@ public class Recipe implements Parcelable{
         dest.writeInt(getMeLike() ? TRUE : FALSE);
     }
 
-    public class Comment {
+    public static class Comment implements Parcelable {
         private String text, user, date;
+
+        Comment(Parcel in) {
+            user = in.readString();
+            text = in.readString();
+            date = in.readString();
+        }
+
+        public static final Creator<Comment> CREATOR = new Creator<Comment>() {
+            @Override
+            public Comment createFromParcel(Parcel in) {
+                return new Comment(in);
+            }
+
+            @Override
+            public Comment[] newArray(int size) {
+                return new Comment[size];
+            }
+        };
 
         public String getText() {
             return text;
@@ -463,6 +481,18 @@ public class Recipe implements Parcelable{
                     ", user='" + user + '\'' +
                     ", date='" + date + '\'' +
                     '}';
+        }
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int i) {
+            dest.writeString(this.user);
+            dest.writeString(this.text);
+            dest.writeString(this.date);
         }
     }
 

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="?attr/selectableItemBackground"
+    android:backgroundTint="?android:backgroundTint"
+    android:paddingBottom="@dimen/row_padding"
+    android:paddingLeft="@dimen/activity_margin"
+    android:paddingRight="@dimen/activity_margin"
+    android:paddingTop="@dimen/row_padding">
+
+    <TextView
+        android:id="@+id/sender"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_toStartOf="@id/time_text"
+        android:fontFamily="@font/open_sans_semibold"
+        android:textColor="?android:textColorPrimary"
+        android:text="@string/nav_main_all_recipes"
+        android:textSize="@dimen/comment_primary" />
+
+    <TextView
+        android:id="@+id/comment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/sender"
+        android:layout_marginTop="3dp"
+        android:fontFamily="@font/open_sans"
+        android:textColor="?android:textColorSecondary"
+        android:text="@string/app_main_desc"
+        android:textSize="@dimen/comment_secondary" />
+
+    <TextView
+        android:id="@+id/time_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toStartOf="@id/time_image"
+        android:layout_marginStart="3dp"
+        android:layout_marginEnd="3dp"
+        android:fontFamily="@font/open_sans"
+        android:textColor="?android:textColorSecondary"
+        android:text="16/12/2018"
+        android:textSize="@dimen/comment_time"/>
+
+    <android.support.v7.widget.AppCompatImageView
+        android:id="@+id/time_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:alpha="0.7"
+        app:srcCompat="@drawable/ic_access_time_black"/>
+
+</RelativeLayout>

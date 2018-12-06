@@ -18,9 +18,10 @@ public class DateUtil {
 
     private static final String UPDATED_TIME_KEY = "last_updated_time";
     private static final String UPDATED_CATS_KEY = "last_updated_categories";
-    private static final String DATE_TEMPLATE = "yyyy-MM-dd HH:mm:ss";
+    private static final String DATE_TIME_TEMPLATE = "yyyy-MM-dd HH:mm:ss";
+    private static final String DATE_TEMPLATE = "dd/MM/yyyy";
 
-    public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat(DATE_TEMPLATE, Locale.ENGLISH);
+    public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat(DATE_TIME_TEMPLATE, Locale.ENGLISH);
 
     public static String getUTCTime() {
         DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -37,6 +38,22 @@ public class DateUtil {
             e.printStackTrace();
         }
         return dateUTC;
+    }
+
+    public static String getDateFromDateTime(String dateTime) {
+        DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC"));
+        try {
+            Date date = DATE_FORMAT.parse(dateTime);
+
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DATE_TEMPLATE, Locale.ENGLISH);
+            simpleDateFormat.setTimeZone(TimeZone.getDefault());
+
+            return simpleDateFormat.format(date);
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return dateTime;
     }
 
     public static String getLastUpdateTime(Context context) {

@@ -25,6 +25,12 @@
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
             app:toolbarId="@+id/recipe_toolbar">
 
+            <android.support.v7.widget.AppCompatImageView
+                android:id="@+id/recipe_collapsing_image"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:srcCompat="@android:color/transparent"/>
+
             <android.support.v7.widget.Toolbar
                 android:id="@+id/recipe_toolbar"
                 android:layout_width="match_parent"
