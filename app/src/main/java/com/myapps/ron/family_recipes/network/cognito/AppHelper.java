@@ -15,11 +15,13 @@ import com.amazonaws.services.cognitoidentityprovider.model.AttributeType;
 import com.myapps.ron.family_recipes.network.Constants;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 public class AppHelper {
     private static final String TAG = "AppHelper";
@@ -165,6 +167,11 @@ public class AppHelper {
     }
 
     public static String getAccessToken() {
+        Date date = new Date();
+        date.setTime(date.getTime() + TimeUnit.MINUTES.toMillis(5));
+        if (getCurrSession().getAccessToken().getExpiration().before(date)) {
+            getCredentialsProvider().refresh();
+        }
         return getCurrSession().getAccessToken().getJWTToken();
     }
 

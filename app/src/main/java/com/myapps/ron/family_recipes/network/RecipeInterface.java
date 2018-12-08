@@ -46,7 +46,7 @@ public interface RecipeInterface {
     Call<Recipe> patchRecipe(
             @HeaderMap Map<String, String> headers,
             @Query(Constants.ID_QUERY) String id,
-            @Body Map<String, String> body
+            @Body Map<String, Object> body
     );
 
     //endregion

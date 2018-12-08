@@ -13,9 +13,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static com.myapps.ron.family_recipes.utils.Constants.FALSE;
+import static com.myapps.ron.family_recipes.utils.Constants.TRUE;
+
 public class Recipe implements Parcelable{
-    private static final int FALSE = 0;
-    private static final int TRUE = 1;
+
     public static String image = "https://api.androidhive.info/json/images/keanu.jpg";
 
     @SerializedName("id")
@@ -41,7 +43,7 @@ public class Recipe implements Parcelable{
     @SerializedName("likes")
     private int likes;
 
-    private boolean meLike;
+    private int meLike;
 /*    @SerializedName("sharedKey")
     private String sharedKey;*/
 
@@ -142,7 +144,7 @@ public class Recipe implements Parcelable{
         in.readList(this.foodFiles, String.class.getClassLoader());
 
         this.likes = in.readInt();
-        this.meLike = in.readInt() == TRUE;
+        this.meLike = in.readInt();
     }
 
     @Override
@@ -372,12 +374,16 @@ public class Recipe implements Parcelable{
         this.likes = likes;
     }
 
-    public boolean getMeLike() {
+    public int getMeLike() {
         return meLike;
     }
 
-    public void setMeLike(boolean meLike) {
+    public void setMeLike(int meLike) {
         this.meLike = meLike;
+    }
+
+    public boolean isUserLiked() {
+        return this.meLike == TRUE;
     }
 
     public boolean hasTags(List<String> tags) {
@@ -424,11 +430,16 @@ public class Recipe implements Parcelable{
         dest.writeList(this.comments);
         dest.writeList(this.foodFiles);
         dest.writeInt(this.likes);
-        dest.writeInt(getMeLike() ? TRUE : FALSE);
+        dest.writeInt(this.meLike);
     }
 
     public static class Comment implements Parcelable {
-        private String text, user, date;
+        @SerializedName("text")
+        private String text;
+        @SerializedName("user")
+        private String user;
+        @SerializedName("date")
+        private String date;
 
         Comment(Parcel in) {
             user = in.readString();
@@ -586,7 +597,7 @@ public class Recipe implements Parcelable{
             recipe.setStringComments(builderComments);
             recipe.setStringFoodFiles(builderFoodFiles);
             recipe.setLikes(builderLikes);
-            recipe.setMeLike(builderMeLike);
+            recipe.setMeLike(builderMeLike ? TRUE : FALSE);
 
             return recipe;
         }

@@ -48,7 +48,8 @@
 
         <activity
             android:name=".ui.activities.RecipeActivity"
-            android:label="@string/title_activity_recipe" />
+            android:label="@string/title_activity_recipe"
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".ui.activities.PostRecipeActivity"
             android:label="@string/title_activity_create_recipe"

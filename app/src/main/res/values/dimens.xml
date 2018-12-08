@@ -5,7 +5,7 @@
     <dimen name="row_padding">10dp</dimen>
     <dimen name="comment_primary">16sp</dimen>
     <dimen name="comment_time">13sp</dimen>
-    <dimen name="comment_secondary">14sp</dimen>
+    <dimen name="comment_secondary">15sp</dimen>
 
     <!-- Recipe Activity -->
     <dimen name="recipe_activity_margin">4dp</dimen>
@@ -16,6 +16,7 @@
     <dimen name="app_bar_height1">150dp</dimen>
     <dimen name="app_bar_height">256dp</dimen>
     <dimen name="text_margin">16dp</dimen>
+    <dimen name="recipe_content_margin">10dp</dimen>
 
     <!-- Item in recycler -->
     <dimen name="item_name_text_size">22sp</dimen>

@@ -4,8 +4,8 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 import android.content.Context;
+import android.os.Handler;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.dal.db.RecipesDBHelper;
@@ -20,6 +20,9 @@ import com.myapps.ron.family_recipes.network.cognito.AppHelper;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.myapps.ron.family_recipes.utils.Constants.FALSE;
+import static com.myapps.ron.family_recipes.utils.Constants.TRUE;
 
 /**
  * class for use by RecipeActivity.
@@ -68,13 +71,13 @@ public class RecipeViewModel extends ViewModel {
 
     public void changeLike(final Context context, final Recipe recipe) {
         if(MiddleWareForNetwork.checkInternetConnection(context)) {
-            Map<String, String> attrs = new HashMap<>();
-            String likeStr = recipe.getMeLike() ? "unlike" : "like";
+            Map<String, Object> attrs = new HashMap<>();
+            String likeStr = recipe.isUserLiked() ? "unlike" : "like";
             attrs.put(Constants.LIKES, likeStr);
             APICallsHandler.patchRecipe(attrs, recipe.getId(), AppHelper.getAccessToken(), new MyCallback<Recipe>() {
                 @Override
                 public void onFinished(Recipe result) {
-                    result.setMeLike(!recipe.getMeLike());
+                    result.setMeLike(!recipe.isUserLiked() ? TRUE : FALSE);
                     RecipesDBHelper dbHelper = new RecipesDBHelper(context);
                     dbHelper.updateRecipeUserChanges(result);
                     Log.e("viewModel", dbHelper.getRecipe(recipe.getId()).toString());
@@ -83,8 +86,34 @@ public class RecipeViewModel extends ViewModel {
             });
         }
         else {
-            //Toast.makeText(context, "no Internet connection", Toast.LENGTH_SHORT).show();
             setInfo(context.getString(R.string.no_internet_message));
+        }
+    }
+
+    public void postComment(final Context context, final Recipe recipe, String text) {
+        if (!"".equals(text)) {
+            if(MiddleWareForNetwork.checkInternetConnection(context)) {
+                Map<String, Object> attrs = new HashMap<>();
+                Map<String, String> commentMap = new HashMap<>();
+                commentMap.put(Constants.COMMENT_TEXT, text);
+                commentMap.put(Constants.COMMENT_USER, AppHelper.getCurrUser());
+                attrs.put(Constants.COMMENTS, commentMap);
+                Log.e("viewModel", "before posting comment:\n" + attrs);
+                APICallsHandler.patchRecipe(attrs, recipe.getId(), AppHelper.getAccessToken(), new MyCallback<Recipe>() {
+                    @Override
+                    public void onFinished(Recipe result) {
+                        RecipesDBHelper dbHelper = new RecipesDBHelper(context);
+                        dbHelper.updateRecipeUserChanges(result);
+                        Log.e("viewModel", dbHelper.getRecipe(recipe.getId()).toString());
+                        setRecipe(dbHelper.getRecipe(recipe.getId()));
+                        setInfo(context.getString(R.string.post_comment_succeeded));
+                    }
+                });
+            } else {
+                setInfo(context.getString(R.string.no_internet_message));
+            }
+        } else {
+            setInfo(context.getString(R.string.post_comment_error));
         }
     }
 

@@ -18,6 +18,9 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.CircularProgressDrawable;
 import android.support.v4.widget.ContentLoadingProgressBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.AppCompatButton;
+import android.support.v7.widget.AppCompatEditText;
+import android.support.v7.widget.AppCompatImageButton;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -29,6 +32,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -61,10 +66,15 @@ public class RecipeActivity extends AppCompatActivity {
     private RecipeViewModel viewModel;
     private Observer<Recipe> recipeObserver;//, commentObserver;
 
+    private LinearLayout commentsLayout;
     private RecyclerView recyclerView;
     private CommentsAdapter mAdapter;
+    private AppCompatButton postCommentButton;
+    private AppCompatEditText postCommentEditText;
+    private ProgressBar postCommentProgressBar;
 
     private boolean showLikeMessage = false;
+    private long animationDuration = 700;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -93,8 +103,12 @@ public class RecipeActivity extends AppCompatActivity {
         like = findViewById(R.id.recipe_like);
         progressBar = findViewById(R.id.recipe_content_progressBar);
         myWebView = findViewById(R.id.recipe_content_webView);
+        commentsLayout = findViewById(R.id.recipe_content_comments_layout);
         recyclerView = findViewById(R.id.recycler_comments);
         textViewCommentTitle = findViewById(R.id.textView_comments_title);
+        postCommentButton = findViewById(R.id.recipe_content_post_button);
+        postCommentEditText = findViewById(R.id.recipe_content_post_editText);
+        postCommentProgressBar = findViewById(R.id.recipe_content_post_progressBar);
         //WebSettings webSettings = myWebView.getSettings();
         //webSettings.setJavaScriptEnabled(true);
     }
@@ -105,6 +119,8 @@ public class RecipeActivity extends AppCompatActivity {
         // toolbar fancy stuff
         initToolbar();
         initRecycler();
+
+        postCommentButton.setOnClickListener(postCommentListener);
     }
 
     private void initToolbar() {
@@ -192,11 +208,29 @@ public class RecipeActivity extends AppCompatActivity {
         recipeObserver = new Observer<Recipe>() {
             @Override
             public void onChanged(@Nullable Recipe recipe) {
-                RecipeActivity.this.recipe = recipe;
-                loadLikeDrawable();
-                like.setEnabled(true);
-                //mAdapter.setComments(RecipeActivity.this.recipe.getComments());
-                //viewModel.getRecipe().removeObserver(recipeObserver);
+                if (recipe != null) {
+                    boolean changedLike = false, postedComment = false;
+                    // user changed like value
+                    if (RecipeActivity.this.recipe.isUserLiked() != recipe.isUserLiked()) {
+                        changedLike = true;
+                    }
+                    // user posted a comment
+                    if (!RecipeActivity.this.recipe.getStringComments().equals(recipe.getStringComments())) {
+                        postedComment = true;
+                    }
+
+                    RecipeActivity.this.recipe = recipe;
+                    if (changedLike) {
+                        loadLikeDrawable();
+                        like.setEnabled(true);
+                    }
+                    if (postedComment) {
+                        loadComments();
+                        postCommentButton.setEnabled(true);
+                        postCommentButton.animate().alpha(1f).setDuration(animationDuration).start();
+                        postCommentProgressBar.animate().alpha(0f).setDuration(animationDuration).start();
+                    }
+                }
             }
         };
 
@@ -207,6 +241,7 @@ public class RecipeActivity extends AppCompatActivity {
                 if (s != null)
                     loadRecipeHtml(s);
                 progressBar.hide();
+                commentsLayout.setVisibility(View.VISIBLE);
             }
         });
         viewModel.getImagePath().observe(this, new Observer<String>() {
@@ -271,7 +306,7 @@ public class RecipeActivity extends AppCompatActivity {
     private void loadLikeDrawable() {
         Log.e(TAG, recipe.toString());
         String message;
-        if(recipe.getMeLike()) {
+        if(recipe.isUserLiked()) {
             Log.e(TAG, "showing full heart");
             like.setImageDrawable(getResources().getDrawable(R.drawable.ic_favorite_red_36dp));
             message = "like";
@@ -303,9 +338,6 @@ public class RecipeActivity extends AppCompatActivity {
             if (mAdapter == null) {
                 mAdapter = new CommentsAdapter(this.recipe.getComments());
                 recyclerView.setAdapter(mAdapter);
-
-                textViewCommentTitle.setVisibility(View.VISIBLE);
-                recyclerView.setVisibility(View.VISIBLE);
 
             } else {
                 mAdapter.setComments(this.recipe.getComments());
@@ -376,6 +408,18 @@ public class RecipeActivity extends AppCompatActivity {
         }
     }*/
 
+    private View.OnClickListener postCommentListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            //Toast.makeText(getApplicationContext(), postCommentEditText.getText(), Toast.LENGTH_SHORT).show();
+            if (postCommentEditText.getText() != null) {
+                viewModel.postComment(getApplicationContext(), recipe, postCommentEditText.getText().toString());
+                postCommentButton.setEnabled(false);
+                postCommentButton.animate().alpha(0f).setDuration(animationDuration).start();
+                postCommentProgressBar.animate().alpha(1f).setDuration(animationDuration).start();
+            }
+        }
+    };
 
     public void doLike(View view) {
         //recipe.setMeLike(!recipe.getMeLike());

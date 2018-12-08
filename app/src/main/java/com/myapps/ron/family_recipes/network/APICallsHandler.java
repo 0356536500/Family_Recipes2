@@ -148,7 +148,7 @@ public class APICallsHandler {
         return fields;
     }
 
-    public static void patchRecipe(Map<String, String> attributes, String id, String token, final MyCallback<Recipe> callback) {
+    public static void patchRecipe(Map<String, Object> attributes, String id, String token, final MyCallback<Recipe> callback) {
         Map<String, String> headers = new HashMap<>();
         headers.put(Constants.CONTENT_TYPE, "application/json");
         headers.put(Constants.AUTHORIZATION, token);

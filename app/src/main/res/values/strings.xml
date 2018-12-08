@@ -67,7 +67,10 @@
     <string name="recipe_content_not_found">recipe content not found</string>
     <string name="recipe_not_in_server">recipe has no content in server</string>
     <string name="no_internet_message">Not connected to internet</string>
-    <string name="comments">Comments %1$d</string>
+    <string name="post_comment_error">Can\'t send empty message</string>
+    <string name="comments">Comments (%1$d)</string>
+    <string name="post_comment_hint">Type a message</string>
+    <string name="post_comment_succeeded">Message posted successfully</string>
 
     <!-- CreateRecipe Activity -->
     <string name="post_recipe_name">Recipe name</string>

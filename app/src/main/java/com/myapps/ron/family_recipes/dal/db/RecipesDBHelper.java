@@ -10,12 +10,11 @@ import com.myapps.ron.family_recipes.model.Recipe;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.myapps.ron.family_recipes.utils.Constants.TRUE;
+
 
 public class RecipesDBHelper extends MyDBHelper{
     // All Static variables
-    private static final int FALSE = 0;
-    private static final int TRUE = 1;
-
     public static final String SORT_POPULAR = KEY_LIKES;
     public static final String SORT_RECENT = KEY_CREATED;
     public static final String SORT_MODIFIED = KEY_MODIFIED;
@@ -57,7 +56,7 @@ public class RecipesDBHelper extends MyDBHelper{
         values.put(KEY_COMMENTS, recipe.getStringComments());
         values.put(KEY_FOOD, recipe.getStringFoodFiles());
         values.put(KEY_LIKES, recipe.getLikes());
-        values.put(KEY_ME_LIKE, recipe.getMeLike() ? TRUE : FALSE);
+        values.put(KEY_ME_LIKE, recipe.getMeLike());
 
         // Inserting Row
         db.insert(TABLE_RECIPES, null, values);
@@ -71,7 +70,7 @@ public class RecipesDBHelper extends MyDBHelper{
                 new String[]{String.valueOf(id)},null,null,null,null);
         if(cursor != null) {
             cursor.moveToFirst();
-            return new Recipe.RecipeBuilder()
+            Recipe recipe = new Recipe.RecipeBuilder()
                     .id(cursor.getString(cursor.getColumnIndex(KEY_ID)))
                     .name(cursor.getString(cursor.getColumnIndex(KEY_NAME)))
                     .description(cursor.getString(cursor.getColumnIndex(KEY_DESC)))
@@ -85,12 +84,15 @@ public class RecipesDBHelper extends MyDBHelper{
                     .likes(cursor.getInt(cursor.getColumnIndex(KEY_LIKES)))
                     .meLike(cursor.getInt(cursor.getColumnIndex(KEY_ME_LIKE)) == TRUE)
                     .build();
+            cursor.close();
+            return recipe;
             /*return new Recipe(cursor.getString(cursor.getColumnIndex(KEY_ID)), cursor.getString(1),
                     cursor.getString(2), cursor.getString(3),
                     cursor.getString(4), cursor.getString(5),
                     cursor.getString(6), cursor.getString(7),
                     cursor.getString(8), cursor.getString(9),
                     cursor.getInt(10), cursor.getInt(11) == TRUE);*/
+
         }
         return null;
     }
@@ -105,7 +107,21 @@ public class RecipesDBHelper extends MyDBHelper{
         // looping through all rows and adding to list
         if (cursor.moveToFirst()) {
             do {
-                Recipe recipe = new Recipe();
+                Recipe recipe = new Recipe.RecipeBuilder()
+                        .id(cursor.getString(0))
+                        .name(cursor.getString(1))
+                        .description(cursor.getString(2))
+                        .createdAt(cursor.getString(3))
+                        .lastModifiedAt(cursor.getString(4))
+                        .recipeFile(cursor.getString(5))
+                        .uploader(cursor.getString(6))
+                        .categoriesJson(cursor.getString(7))
+                        .commentsJson(cursor.getString(8))
+                        .foodFilesJson(cursor.getString(9))
+                        .likes(cursor.getInt(10))
+                        .meLike(cursor.getInt(11) == TRUE)
+                        .build();
+                /*Recipe recipe = new Recipe();
                 recipe.setId(cursor.getString(0));
                 recipe.setName(cursor.getString(1));
                 recipe.setDescription(cursor.getString(2));
@@ -117,12 +133,14 @@ public class RecipesDBHelper extends MyDBHelper{
                 recipe.setStringComments(cursor.getString(8));
                 recipe.setStringFoodFiles(cursor.getString(9));
                 recipe.setLikes(cursor.getInt(10));
-                recipe.setMeLike(cursor.getInt(11) == TRUE);
+                recipe.setMeLike(cursor.getInt(11));*/
 
                 // Adding contact to list
                 recipeList.add(recipe);
 
             } while (cursor.moveToNext());
+
+            cursor.close();
         }
 
         db.close();
@@ -188,7 +206,7 @@ public class RecipesDBHelper extends MyDBHelper{
         values.put(KEY_COMMENTS, recipe.getStringComments());
         //values.put(KEY_FOOD, recipe.getStringFoodFiles());
         values.put(KEY_LIKES, recipe.getLikes());
-        values.put(KEY_ME_LIKE, recipe.getMeLike() ? TRUE : FALSE);
+        values.put(KEY_ME_LIKE, recipe.getMeLike());
 
         // updating row
         return db.update(TABLE_RECIPES, values, KEY_ID + " = ?",
