@@ -495,6 +495,21 @@ public class Recipe implements Parcelable{
         }
 
         @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Comment comment = (Comment) o;
+            return this.text.equals(comment.text) &&
+                    this.user.equals(comment.user) &&
+                    this.date.equals(comment.date);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(text, user, date);
+        }
+
+        @Override
         public int describeContents() {
             return 0;
         }

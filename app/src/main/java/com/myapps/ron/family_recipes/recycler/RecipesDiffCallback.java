@@ -10,13 +10,13 @@ import java.util.List;
 /**
  * Created by ronginat on 23/10/2018.
  */
-public class MyDiffCallback extends DiffUtil.Callback {
+public class RecipesDiffCallback extends DiffUtil.Callback {
 
-    //private static final String TAG = MyDiffCallback.class.getSimpleName();
+    //private static final String TAG = RecipesDiffCallback.class.getSimpleName();
     private List<Recipe> oldRecipes;
     private List<Recipe> newRecipes;
 
-    public MyDiffCallback(List<Recipe> oldRecipes, List<Recipe> newRecipes) {
+    public RecipesDiffCallback(List<Recipe> oldRecipes, List<Recipe> newRecipes) {
         this.oldRecipes = new ArrayList<>(oldRecipes);
         this.newRecipes = new ArrayList<>(newRecipes);
     }

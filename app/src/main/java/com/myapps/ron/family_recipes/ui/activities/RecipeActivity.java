@@ -30,6 +30,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -66,7 +67,7 @@ public class RecipeActivity extends AppCompatActivity {
     private RecipeViewModel viewModel;
     private Observer<Recipe> recipeObserver;//, commentObserver;
 
-    private LinearLayout commentsLayout;
+    private ViewGroup commentsLayout;
     private RecyclerView recyclerView;
     private CommentsAdapter mAdapter;
     private AppCompatButton postCommentButton;
@@ -228,7 +229,12 @@ public class RecipeActivity extends AppCompatActivity {
                         loadComments();
                         postCommentButton.setEnabled(true);
                         postCommentButton.animate().alpha(1f).setDuration(animationDuration).start();
-                        postCommentProgressBar.animate().alpha(0f).setDuration(animationDuration).start();
+                        postCommentProgressBar.animate().alpha(0f).setDuration(animationDuration).withEndAction(new Runnable() {
+                            @Override
+                            public void run() {
+                                postCommentProgressBar.setVisibility(View.INVISIBLE);
+                            }
+                        }).start();
                     }
                 }
             }
@@ -328,7 +334,6 @@ public class RecipeActivity extends AppCompatActivity {
         //loadImage();
         loadComments();
         //loadRecipeHtml();
-        //loadComments();
     }
 
     private void loadComments() {
@@ -348,22 +353,6 @@ public class RecipeActivity extends AppCompatActivity {
     private void loadRecipeHtml(String path) {
         if(path != null)
             myWebView.loadUrl(path);
-
-
-        //textView.setMovementMethod(LinkMovementMethod.getInstance());
-        /*File htmlFile = StorageWrapper.getInstance(this).createHtmlFile(this, "demoFile.html", buildDemoHtml());
-        if(htmlFile != null)
-            myWebView.loadUrl(htmlFile.getPath());*/
-
-        /*File file = new File(getFilesDir().getPath(), "demoFile.html");
-        if (file.exists()) {
-            Log.e("Recipe", "file exists");
-            myWebView.loadUrl("file:///" + file.getAbsolutePath());
-        }*/
-
-        //textView.setText(buildDemoHtml());
-        //myWebView.loadData(buildDemoHtml().toString(), null, "utf-8");
-        //myWebView.loadUrl(recipe.image);
     }
 
     /*private void loadImage() {
@@ -415,6 +404,7 @@ public class RecipeActivity extends AppCompatActivity {
             if (postCommentEditText.getText() != null) {
                 viewModel.postComment(getApplicationContext(), recipe, postCommentEditText.getText().toString());
                 postCommentButton.setEnabled(false);
+                postCommentProgressBar.setVisibility(View.VISIBLE);
                 postCommentButton.animate().alpha(0f).setDuration(animationDuration).start();
                 postCommentProgressBar.animate().alpha(1f).setDuration(animationDuration).start();
             }

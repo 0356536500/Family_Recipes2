@@ -26,7 +26,7 @@ import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.dal.storage.StorageWrapper;
 import com.myapps.ron.family_recipes.model.Recipe;
 import com.myapps.ron.family_recipes.network.MyCallback;
-import com.myapps.ron.family_recipes.recycler.MyDiffCallback;
+import com.myapps.ron.family_recipes.recycler.RecipesDiffCallback;
 import com.myapps.ron.family_recipes.utils.GlideApp;
 
 import java.io.File;
@@ -323,7 +323,7 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
                 listener.onCurrentSizeChanged(recipeListFiltered.size());
             }
 
-            DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new MyDiffCallback(oldTemp, list));
+            DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new RecipesDiffCallback(oldTemp, list));
             diffResult.dispatchUpdatesTo(this);
 
             if (addedRecipes)
@@ -343,7 +343,7 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
             recipeList = list;
             recipeListFiltered = recipeList;
 
-            DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new MyDiffCallback(oldTemp, list));
+            DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new RecipesDiffCallback(oldTemp, list));
             diffResult.dispatchUpdatesTo(this);
 
             getFilter().filter(null);
