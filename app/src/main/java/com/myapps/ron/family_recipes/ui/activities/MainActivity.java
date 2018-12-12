@@ -334,6 +334,8 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case R.id.nav_main_settings:
                 // Show user settings
+                Intent settingsIntent = new Intent(MainActivity.this, SettingsActivity.class);
+                startActivity(settingsIntent);
                 //showSettings();
                 break;
             case R.id.nav_main_sign_out:

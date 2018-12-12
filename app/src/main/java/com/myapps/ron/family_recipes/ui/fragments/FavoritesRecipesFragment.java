@@ -26,6 +26,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
@@ -34,6 +36,7 @@ import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.adapters.RecipesAdapter;
 import com.myapps.ron.family_recipes.model.Category;
 import com.myapps.ron.family_recipes.model.Recipe;
+import com.myapps.ron.family_recipes.recycler.MyRecyclerScroll;
 import com.myapps.ron.family_recipes.ui.activities.MainActivity;
 import com.myapps.ron.family_recipes.ui.activities.RecipeActivity;
 import com.myapps.ron.family_recipes.utils.Constants;
@@ -216,6 +219,21 @@ public class FavoritesRecipesFragment extends MyFragment implements RecipesAdapt
         recyclerView.addItemDecoration(new MyDividerItemDecoration(activity, DividerItemDecoration.VERTICAL, 36));
         //recyclerView.setAdapter(mAdapter);
         recyclerView.setItemAnimator(new FiltersListItemAnimator());
+        recyclerView.addOnScrollListener(new MyRecyclerScroll() {
+            @Override
+            public void show() {
+                if (mFilter != null && mFilter.isCollapsed()) {
+                    mFilter.animate().translationY(0).setInterpolator(new DecelerateInterpolator(1.5f)).start();
+                }
+            }
+
+            @Override
+            public void hide() {
+                if (mFilter != null && mFilter.isCollapsed()) {
+                    mFilter.animate().translationY(-mFilter.getHeight()).setInterpolator(new AccelerateInterpolator(2)).start();
+                }
+            }
+        });
     }
 
     private void setSearchView(Menu menu) {
@@ -440,7 +458,8 @@ public class FavoritesRecipesFragment extends MyFragment implements RecipesAdapt
 
     @Override
     public void onNothingSelected() {
-        mAdapter.updateTags(null);
+        if (mAdapter != null)
+            mAdapter.updateTags(null);
     }
 
 

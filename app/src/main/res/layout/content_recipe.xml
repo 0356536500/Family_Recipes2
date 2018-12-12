@@ -5,7 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    android:background="?android:backgroundTint"
     tools:context=".ui.activities.RecipeActivity"
     tools:showIn="@layout/activity_recipe"
     android:scrollbarStyle="outsideInset"
@@ -40,7 +39,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:visibility="visible">
+            android:visibility="invisible">
 
             <TextView
                 android:id="@+id/textView_comments_title"

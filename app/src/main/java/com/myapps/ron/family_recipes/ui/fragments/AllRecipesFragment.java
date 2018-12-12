@@ -26,12 +26,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.myapps.ron.family_recipes.MyDividerItemDecoration;
 import com.myapps.ron.family_recipes.R;
+import com.myapps.ron.family_recipes.recycler.MyRecyclerScroll;
 import com.myapps.ron.family_recipes.viewmodels.DataViewModel;
 import com.myapps.ron.family_recipes.model.Category;
 import com.myapps.ron.family_recipes.model.Recipe;
@@ -76,7 +79,6 @@ public class AllRecipesFragment extends MyFragment implements RecipesAdapter.Rec
 
     ProgressBar firstLoadingProgressBar;
 
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -114,7 +116,9 @@ public class AllRecipesFragment extends MyFragment implements RecipesAdapter.Rec
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
+        Log.e(TAG, "on createView");
         if (mFilter == null) {
+            Log.e(TAG, "on createView mFilter was null");
             view = inflater.inflate(R.layout.content_main_recipes, container, false);
             parent = (FrameLayout) view;
         }
@@ -123,7 +127,9 @@ public class AllRecipesFragment extends MyFragment implements RecipesAdapter.Rec
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        Log.e(TAG, "on viewCreated");
         if (mFilter == null) {
+            Log.e(TAG, "on viewCreated mFilter was null");
             swipeRefreshLayout = view.findViewById(R.id.content_main_refresh);
             recyclerView = view.findViewById(R.id.recycler_view);
             mFilter = view.findViewById(R.id.content_main_filters);
@@ -221,6 +227,21 @@ public class AllRecipesFragment extends MyFragment implements RecipesAdapter.Rec
         recyclerView.addItemDecoration(new MyDividerItemDecoration(activity, DividerItemDecoration.VERTICAL, 36));
         //recyclerView.setAdapter(mAdapter);
         recyclerView.setItemAnimator(new FiltersListItemAnimator());
+        recyclerView.addOnScrollListener(new MyRecyclerScroll() {
+            @Override
+            public void show() {
+                if (mFilter != null && mFilter.isCollapsed()) {
+                    mFilter.animate().translationY(0).setInterpolator(new DecelerateInterpolator(1.5f)).start();
+                }
+            }
+
+            @Override
+            public void hide() {
+                if (mFilter != null && mFilter.isCollapsed()) {
+                    mFilter.animate().translationY(-mFilter.getHeight()).setInterpolator(new AccelerateInterpolator(2)).start();
+                }
+            }
+        });
     }
 
     private void setRefreshLayout() {

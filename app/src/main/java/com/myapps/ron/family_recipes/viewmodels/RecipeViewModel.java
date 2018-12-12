@@ -118,7 +118,7 @@ public class RecipeViewModel extends ViewModel {
     }
 
     public void loadRecipeContent(final Context context, final Recipe recipe) {
-            if(recipe.getRecipeFile() != null) {
+            if(recipe.getRecipeFile() != null && !recipe.getRecipeFile().equals("\"\"")) {
                 StorageWrapper.getRecipeFile(context, recipe.getRecipeFile(), new MyCallback<String>() {
                     @Override
                     public void onFinished(String path) {

@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -227,6 +228,7 @@ public class RecipeActivity extends AppCompatActivity {
                     }
                     if (postedComment) {
                         loadComments();
+                        postCommentEditText.setText("");
                         postCommentButton.setEnabled(true);
                         postCommentButton.animate().alpha(1f).setDuration(animationDuration).start();
                         postCommentProgressBar.animate().alpha(0f).setDuration(animationDuration).withEndAction(new Runnable() {
@@ -247,7 +249,12 @@ public class RecipeActivity extends AppCompatActivity {
                 if (s != null)
                     loadRecipeHtml(s);
                 progressBar.hide();
-                commentsLayout.setVisibility(View.VISIBLE);
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        commentsLayout.setVisibility(View.VISIBLE);
+                    }
+                }, 1500);
             }
         });
         viewModel.getImagePath().observe(this, new Observer<String>() {
@@ -271,9 +278,9 @@ public class RecipeActivity extends AppCompatActivity {
         });
         viewModel.getInfo().observe(this, new Observer<String>() {
             @Override
-            public void onChanged(@Nullable String s) {
-                if (s != null)
-                    Toast.makeText(RecipeActivity.this, s, Toast.LENGTH_LONG).show();
+            public void onChanged(@Nullable String message) {
+                if (message != null)
+                    Toast.makeText(RecipeActivity.this, message, Toast.LENGTH_LONG).show();
             }
         });
 

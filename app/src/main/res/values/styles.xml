@@ -20,9 +20,13 @@
         <!-- Inactive track color(30% transparency) -->
         <item name="android:colorForeground">@color/grey_600</item>
 
-        <item name="android:backgroundTint">@color/white</item>
-        <item name="android:textColorPrimary">@color/grey_700</item>
-        <item name="android:textColorSecondary">@color/grey_500</item>
+        <!--<item name="android:backgroundTint">@color/white</item>-->
+        <!--<item name="android:textColorPrimary">@color/grey_700</item>
+        <item name="android:textColorSecondary">@color/grey_500</item>-->
+        <item name="backgroundColor">@color/white</item>
+        <item name="textColorMain">@color/grey_700</item>
+        <item name="textColorSecond">@color/grey_500</item>
+
 
         <item name="drawerArrowStyle">@style/MyDrawerArrowToggle</item>
     </style>
@@ -45,9 +49,13 @@
         <!-- Inactive track color(30% transparency) -->
         <item name="android:colorForeground">@color/grey_600</item>
 
-        <item name="android:backgroundTint">@color/dark_theme_background</item>
-        <item name="android:textColorPrimary">@color/grey_100</item>
-        <item name="android:textColorSecondary">@color/grey_100</item>
+        <!--<item name="android:backgroundTint">@color/dark_theme_background</item>-->
+        <!--<item name="android:textColorPrimary">@color/grey_100</item>
+        <item name="android:textColorSecondary">@color/grey_100</item>-->
+
+        <item name="backgroundColor">@color/dark_theme_background</item>
+        <item name="textColorMain">@color/grey_100</item>
+        <item name="textColorSecond">@color/grey_100</item>
 
         <item name="drawerArrowStyle">@style/MyDrawerArrowToggle</item>
     </style>
