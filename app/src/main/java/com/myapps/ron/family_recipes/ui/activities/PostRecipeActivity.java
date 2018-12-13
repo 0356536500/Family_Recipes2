@@ -40,8 +40,8 @@ public class PostRecipeActivity extends MyBaseActivity {
     private boolean inPreview = false;
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    protected void onMyCreate(@Nullable Bundle savedInstanceState) {
+        //super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post_recipe);
 
         nextButton = findViewById(R.id.create_recipe_next_button);

@@ -87,10 +87,9 @@ public class FirstStepFragment extends MyFragment implements FilterListener<Cate
     public void onDetach(){
         super.onDetach();
         Log.e(getClass().getSimpleName(), "on detach");
-        mFilter = view.findViewById(R.id.first_step_filter);
-        floater = parent.findViewById(R.id.create_recipe_first_step_layout);
-        parent.removeView(floater);
-        parent.removeView(mFilter);
+        /*mFilter = view.findViewById(R.id.first_step_filter);
+        floater = parent.findViewById(R.id.create_recipe_first_step_layout);*/
+        parent.removeAllViews();
     }
 
     @Nullable

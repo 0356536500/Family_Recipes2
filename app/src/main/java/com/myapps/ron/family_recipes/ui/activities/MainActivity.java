@@ -27,6 +27,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -68,8 +69,8 @@ public class MainActivity extends MyBaseActivity {
     private String lastOrderBy;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    protected void onMyCreate(Bundle savedInstanceState) {
+        //super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
@@ -180,10 +181,12 @@ public class MainActivity extends MyBaseActivity {
 
                 //int barWidthRemainder = width % drawerCurrentWidth;
 
-                backgroundPaint.setColor(getResources().getColor(R.color.logo_background_darker));
+                //backgroundPaint.setColor(getResources().getColor(R.color.logo_background_darker));
+                backgroundPaint.setColor(getColorSecondary());
                 canvas.drawRect(new RectF(0, 0, barWidth, height), backgroundPaint);
 
-                backgroundPaint.setColor(Color.WHITE);
+                //backgroundPaint.setColor(Color.WHITE);
+                backgroundPaint.setColor(getColorPrimary());
                 canvas.drawRect(new RectF(barWidth, 0, width, height), backgroundPaint);
 
                 /*backgroundPaint.setColor(Color.BLACK);
@@ -209,6 +212,18 @@ public class MainActivity extends MyBaseActivity {
             @Override
             public int getOpacity() {
                 return PixelFormat.OPAQUE;
+            }
+
+            private int getColorPrimary() {
+                TypedValue value = new TypedValue();
+                MainActivity.this.getTheme().resolveAttribute(R.attr.toolbarBackgroundPrimary, value, true);
+                return value.data;
+            }
+
+            private int getColorSecondary() {
+                TypedValue value = new TypedValue();
+                MainActivity.this.getTheme().resolveAttribute(R.attr.toolbarBackgroundSecondary, value, true);
+                return value.data;
             }
         };
 

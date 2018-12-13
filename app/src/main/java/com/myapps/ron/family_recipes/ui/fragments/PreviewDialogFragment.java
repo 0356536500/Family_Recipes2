@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.util.TypedValue;
 import android.util.Xml;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +15,7 @@ import android.webkit.WebView;
 
 import com.amazonaws.services.s3.util.Mimetypes;
 import com.myapps.ron.family_recipes.R;
+import com.myapps.ron.family_recipes.ui.activities.MainActivity;
 
 /**
  * Created by ronginat on 29/10/2018.
@@ -42,6 +44,9 @@ public class PreviewDialogFragment extends Fragment {
 
         Log.e("dialog", html);
         WebView webView = view.findViewById(R.id.html_preview_webView);
+        /*TypedValue value = new TypedValue();
+        getActivity().getTheme().resolveAttribute(R.attr.toolbarBackgroundSecondary, value, true);
+        webView.setBackgroundColor(value.data);*/
 
         webView.loadData(html, "text/html", "utf-8");
 

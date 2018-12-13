@@ -1,6 +1,5 @@
 package com.myapps.ron.family_recipes.ui.activities;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -10,7 +9,6 @@ import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 
-import com.myapps.ron.family_recipes.MyApplication;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.utils.LocaleHelper;
 import com.myapps.ron.family_recipes.utils.MyBaseActivity;
@@ -18,14 +16,13 @@ import com.myapps.ron.family_recipes.utils.MyBaseActivity;
 /**
  * Created by ronginat on 12/12/2018.
  */
-public class SettingsActivity extends MyBaseActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
+public class SettingsActivity extends MyBaseActivity {
 
     private Toolbar toolbar;
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        ((MyApplication)getApplication()).applyTheme(this);
+    protected void onMyCreate(@Nullable Bundle savedInstanceState) {
+        //super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
         toolbar = findViewById(R.id.main_toolbar);
@@ -41,16 +38,10 @@ public class SettingsActivity extends MyBaseActivity implements SharedPreference
                 //.addToBackStack(null)
                 .commit();
 
-        getSharedPreferences(getString(R.string.sharedPreferences), MODE_PRIVATE).registerOnSharedPreferenceChangeListener(this);
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        getSharedPreferences(getString(R.string.sharedPreferences), MODE_PRIVATE).unregisterOnSharedPreferenceChangeListener(this);
-    }
 
-    @Override
+    /*@Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         Log.e(getClass().getSimpleName(), "change event, " + key);
         if (key == null)
@@ -66,7 +57,7 @@ public class SettingsActivity extends MyBaseActivity implements SharedPreference
             LocaleHelper.setLocale(SettingsActivity.this, sharedPreferences.getString(key, "he"));
             SettingsActivity.this.recreate();
         }
-    }
+    }*/
 
 
     public static class GeneralPreferenceFragment1 extends PreferenceFragmentCompat {

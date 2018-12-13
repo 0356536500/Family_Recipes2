@@ -80,8 +80,8 @@ public class RecipeActivity extends MyBaseActivity {
     private long animationDuration = 700;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    protected void onMyCreate(Bundle savedInstanceState) {
+        //super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipe);
 
         initViewModel();

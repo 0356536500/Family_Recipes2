@@ -32,7 +32,7 @@ public class MyApplication extends Application {
 
     public void applyTheme(Activity activity) {
         SharedPreferences sPref = activity.getSharedPreferences(getString(R.string.sharedPreferences), MODE_PRIVATE);
-        activity.setTheme(sPref.getBoolean("dark_mode", false) ? R.style.AppTheme_Dark : R.style.AppTheme_Light);
+        activity.setTheme(sPref.getBoolean(getString(R.string.preference_key_dark_mode), false) ? R.style.AppTheme_Dark : R.style.AppTheme_Light);
     }
 
     @Override

@@ -73,8 +73,6 @@ public class AdvancedStepFragment extends MyFragment {
         parent.removeView(preview);
         parent.removeView(recyclerView);*/
         parent.removeAllViews();
-        parent = null;
-        view = null;
     }
 
     @Override

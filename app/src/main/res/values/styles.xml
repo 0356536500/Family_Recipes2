@@ -2,7 +2,10 @@
 
     <!-- Base application theme - Default - Light -->
     <style name="AppTheme.Light" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- toolbar colors and themes -->
         <item name="toolbar_theme">@style/ActionBarTheme.Light</item>
+        <item name="toolbarBackgroundPrimary">@color/white</item>
+        <item name="toolbarBackgroundSecondary">@color/logo_background_darker</item>
 
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
@@ -33,9 +36,12 @@
 
     <!-- Base application theme - Dark -->
     <style name="AppTheme.Dark" parent="Theme.AppCompat.NoActionBar">
+        <!-- toolbar colors and themes -->
         <item name="toolbar_theme">@style/ActionBarTheme.Dark</item>
+        <item name="toolbarBackgroundPrimary">@color/grey_500</item>
+        <item name="toolbarBackgroundSecondary">@color/logo_foreground</item>
 
-        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimary">@color/grey_100</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="windowActionBar">false</item>
@@ -45,7 +51,7 @@
         <item name="android:windowAnimationStyle">@style/WindowAnimationTransition</item>
 
         <!-- Active thumb color & Active track color(30% transparency) -->
-        <item name="colorControlActivated">@color/colorPrimaryDark</item>
+        <item name="colorControlActivated">?android:colorPrimary</item>
         <!-- Inactive thumb color -->
         <item name="colorSwitchThumbNormal">@color/grey_300</item>
         <!-- Inactive track color(30% transparency) -->
@@ -99,6 +105,8 @@
         <!-- android:textColorPrimary is the color of the title text in the Toolbar  -->
         <item name="android:textColorPrimary">@color/dark_background</item>
         <item name="android:backgroundTint">@color/white</item>
+        <item name="android:colorPrimary">@color/md_grey_900</item>
+        <item name="android:colorPrimaryDark">@color/black</item>
 
         <!-- actionMenuTextColor is the color of the text of action (menu) items  -->
         <item name="actionMenuTextColor">@android:color/holo_green_light</item>
@@ -125,6 +133,8 @@
         <!-- android:textColorPrimary is the color of the title text in the Toolbar  -->
         <item name="android:textColorPrimary">@color/grey_100</item>
         <item name="android:backgroundTint">@color/grey_500</item>
+        <item name="colorPrimary">@color/grey_100</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
 
         <!-- actionMenuTextColor is the color of the text of action (menu) items  -->
         <item name="actionMenuTextColor">@android:color/holo_green_light</item>
@@ -147,6 +157,10 @@
     </style>
 
 
+    <style name="AppTheme.Launcher" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:windowBackground">@drawable/splash_screen</item>
+        <item name="colorPrimary">@color/grey_500</item>
+    </style>
 
 
 

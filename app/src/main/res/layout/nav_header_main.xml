@@ -17,12 +17,9 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:scaleType="fitXY"
-        android:src="@mipmap/ic_logo_round"
-        app:layout_constraintBottom_toTopOf="@+id/textViewNavUserSub"
+        android:src="@mipmap/ic_logo_foreground"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.75"
-        app:layout_constraintVertical_chainStyle="packed" />
+        app:layout_constraintTop_toTopOf="parent" />
 
 
     <!--    <TextView
@@ -69,9 +66,10 @@
     <TextView
         android:id="@+id/space3"
         android:layout_width="match_parent"
-        android:layout_height="10dp"
+        android:layout_height="8dp"
         android:background="@color/logo_foreground1"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewNavSupportEmail" />
 
 
 </android.support.constraint.ConstraintLayout>

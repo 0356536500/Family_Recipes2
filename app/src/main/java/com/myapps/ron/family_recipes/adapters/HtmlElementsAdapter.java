@@ -160,7 +160,7 @@ public class HtmlElementsAdapter extends RecyclerView.Adapter<HtmlElementsAdapte
     @Override
     public FlexibleHtmlStructureHolder onCreateViewHolder(@NonNull ViewGroup parent, int position) {
         View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.flexible_html_structure, parent, false);
+                .inflate(R.layout.row_item_flexible_html_structure, parent, false);
 
         return new FlexibleHtmlStructureHolder(itemView);
     }

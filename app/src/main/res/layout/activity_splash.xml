@@ -7,12 +7,13 @@
     tools:context=".ui.activities.SplashActivity">
 
     <android.support.v7.widget.AppCompatImageView
-        android:layout_width="200dp"
-        android:layout_height="200dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:id="@+id/imageView"
-        android:layout_marginTop="45dp"
+        android:layout_marginBottom="40dp"
         app:srcCompat="@mipmap/ic_logo_foreground"
-        android:layout_alignParentTop="true"
+        android:scaleType="fitXY"
+        android:layout_above="@id/textView"
         android:layout_centerHorizontal="true" />
 
     <TextView
