@@ -8,16 +8,7 @@
     android:orientation="vertical">
 
     <!-- Add the ActionBar -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="@color/white"
-        android:elevation="7dp">
-
-        <include
-            layout="@layout/main_toolbar"/>
-    </LinearLayout>
+    <include layout="@layout/toolbar" />
 
 
     <android.support.v4.widget.DrawerLayout

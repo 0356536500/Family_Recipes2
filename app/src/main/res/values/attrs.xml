@@ -4,4 +4,6 @@
     <attr name="textColorMain" format="reference" />
     <attr name="textColorSecond" format="reference" />
     <attr name="textColorThird" format="reference" />
+
+    <attr name="toolbar_theme" format="reference" />
 </resources>

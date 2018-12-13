@@ -22,8 +22,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme.Light">
         <activity
-            android:name=".ui.activities.SplashActivity"
-            android:theme="@style/AppTheme.Light.NoActionBar">
+            android:name=".ui.activities.SplashActivity">
+            <!--android:theme="@style/AppTheme.Light.NoActionBar">-->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -52,18 +52,20 @@
             android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".ui.activities.PostRecipeActivity"
-            android:label="@string/title_activity_create_recipe"
-            android:theme="@style/AppThemeWithActionBar"
-            android:windowSoftInputMode="adjustPan"
-            android:parentActivityName=".ui.activities.MainActivity"
             android:configChanges="orientation"
-            android:screenOrientation="portrait">
+            android:label="@string/title_activity_create_recipe"
+            android:parentActivityName=".ui.activities.MainActivity"
+            android:screenOrientation="portrait"
 
-        <!--<intent-filter>
+            android:windowSoftInputMode="adjustPan">
+
+            <!--
+        <intent-filter>
             <action android:name="android.intent.action.MAIN" />
 
             <category android:name="android.intent.category.LAUNCHER" />
-        </intent-filter>-->
+        </intent-filter>
+            -->
         </activity>
         <activity
             android:name=".ui.activities.LoginActivity"
@@ -71,24 +73,31 @@
         <activity
             android:name=".ui.activities.NewPassword"
             android:label="@string/title_activity_new_password" />
-
         <activity
             android:name=".ui.activities.ForgotPasswordActivity"
             android:label="@string/title_activity_forgot_password" />
+        <activity
+            android:name=".TestActivity">
 
-        <activity android:name=".TestActivity"
-            android:theme="@style/AppTheme.Light.NoActionBar">
-           <!-- <intent-filter>
+            <!--
+            <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>-->
+            </intent-filter>
+            -->
 
         </activity>
 
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
+
+        <activity
+            android:name=".ui.activities.SettingsActivity1"
+            android:label="@string/title_activity_settings"
+            android:parentActivityName=".ui.activities.MainActivity">
+        </activity>
     </application>
 
 </manifest>

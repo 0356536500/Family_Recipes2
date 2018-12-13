@@ -112,6 +112,12 @@ public class AllRecipesFragment extends MyFragment implements RecipesAdapter.Rec
         parent.removeAllViews();
     }
 
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        setRetainInstance(true);
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
