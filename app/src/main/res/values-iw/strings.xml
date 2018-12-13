@@ -27,12 +27,12 @@
     <string name="sort_toggle_text_on">חדשים</string>
     <string name="sort_toggle_text_off">פופלריים</string>
 
-    <string name="sharedPreferences">com.myapps.ron.family_recipes</string>
-    <string name="title_activity_recipe">RecipeActivity</string>
+    <string name="title_activity_recipe">מתכון</string>
     <string name="title_activity_create_recipe">מתכון חדש</string>
-    <string name="title_activity_new_password">NewPassword</string>
-    <string name="title_activity_forgot_password">Forgot Password</string>
-    <string name="title_activity_login">Sign in</string>
+    <string name="title_activity_new_password">סיסמא חדשה</string>
+    <string name="title_activity_forgot_password">שכחתי סיסמא</string>
+    <string name="title_activity_login">כניסה</string>
+    <string name="title_activity_settings">הגדרות</string>
 
     <!-- strings for navigation drawer -->
     <string name="nav_main_post">תרומה לקהילה</string>
@@ -96,6 +96,19 @@
         <item>רשימה לא ממוספרת</item>
         <item>רשימה ממוספרת</item>
     </string-array>
+
+    <!-- SettingsActivity -->
+    <string name="settings_category_display">תצוגה</string>
+    <string name="settings_category_notifications">התראות</string>
+    <string name="settings_category_general">כללי</string>
+
+    <string name="pref_title_choose_language">בחירת שפה</string>
+    <string-array name="pref_languages_list_titles">
+        <item>אנגלית</item>
+        <item>עברית</item>
+        <!--<item>תימנית</item>-->
+    </string-array>
+
 
     <string name="large_text">
         "Material is the metaphor.\n\n"

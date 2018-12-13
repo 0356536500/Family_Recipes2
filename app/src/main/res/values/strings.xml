@@ -28,12 +28,12 @@
     <string name="sort_toggle_text_on">recent</string>
     <string name="sort_toggle_text_off">popular</string>
 
-    <string name="sharedPreferences">com.myapps.ron.family_recipes</string>
     <string name="title_activity_recipe">RecipeActivity</string>
     <string name="title_activity_create_recipe">Create Recipe</string>
     <string name="title_activity_new_password">NewPassword</string>
     <string name="title_activity_forgot_password">Forgot Password</string>
     <string name="title_activity_login">Sign in</string>
+    <string name="title_activity_settings">Settings</string>
 
     <string name="support_email" translatable="false">mail.support@provider.com</string>
 
@@ -107,6 +107,30 @@
         <item>ul</item>
         <item>ol</item>
     </string-array>
+
+    <!-- SettingsActivity -->
+    <string name="settings_category_display">Display</string>
+    <string name="settings_category_notifications">Notifications</string>
+    <string name="settings_category_general">General</string>
+
+    <string name="pref_title_choose_language">Language</string>
+    <string-array name="pref_languages_list_titles">
+        <item>English</item>
+        <item>Hebrew</item>
+        <!--<item>Yemeni</item>-->
+    </string-array>
+    <string-array name="pref_languages_list_values">
+        <item>en</item>
+        <item>iw</item>
+        <!--<item>2</item>-->
+    </string-array>
+
+    <!-- SharedPreferences -->
+    <string name="sharedPreferences" translatable="false">com.myapps.ron.family_recipes</string>
+    <string name="preference_key_dark_mode" translatable="false">dark_mode</string>
+    <string name="preference_key_language" translatable="false">system_language</string>
+
+
 
     <!--
     <string name="create_recipe_">Not connected to internet</string>
@@ -216,7 +240,7 @@
         "For example, position the FAB to one side of stream of a cards so the FAB won’t interfere "
         "when a user tries to pick up one of cards.\n\n"
     </string>
-    <string name="title_activity_settings">Settings</string>
+
 
     <!-- Strings related to Settings -->
 
@@ -231,17 +255,6 @@
     <string name="pref_title_display_name">Display name</string>
     <string name="pref_default_display_name">John Smith</string>
 
-    <string name="pref_title_add_friends_to_messages">Add friends to messages</string>
-    <string-array name="pref_example_list_titles">
-        <item>Always</item>
-        <item>When possible</item>
-        <item>Never</item>
-    </string-array>
-    <string-array name="pref_example_list_values">
-        <item>1</item>
-        <item>0</item>
-        <item>-1</item>
-    </string-array>
 
     <!-- Example settings for Data & Sync -->
     <string name="pref_header_data_sync">Data &amp; sync</string>

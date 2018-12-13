@@ -20,6 +20,7 @@ import com.myapps.ron.family_recipes.ui.fragments.AdvancedStepFragment;
 import com.myapps.ron.family_recipes.ui.fragments.FirstStepFragment;
 import com.myapps.ron.family_recipes.ui.fragments.PickPhotosFragment;
 import com.myapps.ron.family_recipes.ui.fragments.PreviewDialogFragment;
+import com.myapps.ron.family_recipes.utils.MyBaseActivity;
 import com.myapps.ron.family_recipes.utils.MyFragment;
 import com.myapps.ron.family_recipes.viewmodels.PostRecipeViewModel;
 
@@ -29,7 +30,7 @@ import java.util.List;
 /**
  * Created by ronginat on 29/10/2018.
  */
-public class PostRecipeActivity extends AppCompatActivity {
+public class PostRecipeActivity extends MyBaseActivity {
 
     private PostRecipeViewModel viewModel;
     private List<MyFragment> fragments;
@@ -37,6 +38,7 @@ public class PostRecipeActivity extends AppCompatActivity {
     public AppCompatButton nextButton;
     private int currentIndex = 0;
     private boolean inPreview = false;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

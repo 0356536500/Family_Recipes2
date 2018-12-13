@@ -10,6 +10,7 @@ import com.myapps.ron.family_recipes.network.MyCallback;
 import com.myapps.ron.family_recipes.network.cognito.AppHelper;
 
 import java.util.List;
+import java.util.Locale;
 
 public class TestActivity extends AppCompatActivity {
 
@@ -18,7 +19,7 @@ public class TestActivity extends AppCompatActivity {
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        final String time = "0";
+        /*final String time = "0";
         APICallsHandler.getAllRecipes(time, AppHelper.getAccessToken(), new MyCallback<List<Recipe>>() {
             @Override
             public void onFinished(List<Recipe> result) {
@@ -27,6 +28,11 @@ public class TestActivity extends AppCompatActivity {
                     Log.e(TAG, "success fetching all recipes. count = " + result.size());
                 }
             }
-        });
+        });*/
+
+        Locale[] locales = Locale.getAvailableLocales();
+        for (Locale locale : locales) {
+            Log.e(TAG, locale.toString());
+        }
     }
 }

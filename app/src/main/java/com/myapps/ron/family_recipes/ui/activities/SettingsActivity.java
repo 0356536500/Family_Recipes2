@@ -1,5 +1,6 @@
 package com.myapps.ron.family_recipes.ui.activities;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -11,13 +12,16 @@ import android.util.Log;
 
 import com.myapps.ron.family_recipes.MyApplication;
 import com.myapps.ron.family_recipes.R;
+import com.myapps.ron.family_recipes.utils.LocaleHelper;
+import com.myapps.ron.family_recipes.utils.MyBaseActivity;
 
 /**
  * Created by ronginat on 12/12/2018.
  */
-public class SettingsActivity1 extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
+public class SettingsActivity extends MyBaseActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     private Toolbar toolbar;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,11 +53,18 @@ public class SettingsActivity1 extends AppCompatActivity implements SharedPrefer
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         Log.e(getClass().getSimpleName(), "change event, " + key);
-        if (key.equals("dark_mode")) {
+        if (key == null)
+            return;
+        if (key.equals(getString(R.string.preference_key_dark_mode))) {
             Log.e(getClass().getSimpleName(), "value, " + sharedPreferences.getBoolean(key, false));
             setTheme(sharedPreferences.getBoolean(key, false) ? R.style.AppTheme_Dark : R.style.AppTheme_Dark);
             //toolbar.setPopupTheme(sharedPreferences.getBoolean(key, false) ? R.style.AppTheme_PopupOverlay_Dark : R.style.AppTheme_PopupOverlay_Light);
-            SettingsActivity1.this.recreate();
+            SettingsActivity.this.recreate();
+        }
+        if (key.equals(getString(R.string.preference_key_language))) {
+            Log.e(getClass().getSimpleName(), "new lang, " + sharedPreferences.getString(key, "en"));
+            LocaleHelper.setLocale(SettingsActivity.this, sharedPreferences.getString(key, "he"));
+            SettingsActivity.this.recreate();
         }
     }
 
@@ -67,13 +78,13 @@ public class SettingsActivity1 extends AppCompatActivity implements SharedPrefer
             preferenceManager.setSharedPreferencesName(getString(R.string.sharedPreferences));
             preferenceManager.setSharedPreferencesMode(MODE_PRIVATE);
 
-            addPreferencesFromResource(R.xml.pref_general);
+            addPreferencesFromResource(R.xml.pref_screen_main);
             getPreferenceManager().getPreferenceScreen().setIconSpaceReserved(false);
         }
 
         @Override
         public void onCreatePreferences(Bundle bundle, String s) {
-            Log.e(getClass().getSimpleName(), "onCreatePreferences, " + s);
+            //Log.e(getClass().getSimpleName(), "onCreatePreferences, " + s);
 
         }
     }

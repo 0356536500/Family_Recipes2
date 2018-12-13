@@ -46,12 +46,13 @@ import com.myapps.ron.family_recipes.model.Recipe;
 import com.myapps.ron.family_recipes.ui.fragments.PagerDialogFragment;
 import com.myapps.ron.family_recipes.utils.Constants;
 import com.myapps.ron.family_recipes.utils.GlideApp;
+import com.myapps.ron.family_recipes.utils.MyBaseActivity;
 import com.myapps.ron.family_recipes.viewmodels.RecipeViewModel;
 import com.myapps.ron.searchfilter.animator.FiltersListItemAnimator;
 
 import java.io.File;
 
-public class RecipeActivity extends AppCompatActivity {
+public class RecipeActivity extends MyBaseActivity {
 
     private final String TAG = RecipeActivity.class.getSimpleName();
     private AppBarLayout appBarLayout;
@@ -77,6 +78,7 @@ public class RecipeActivity extends AppCompatActivity {
 
     private boolean showLikeMessage = false;
     private long animationDuration = 700;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

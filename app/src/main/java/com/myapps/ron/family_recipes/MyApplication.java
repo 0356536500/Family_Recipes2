@@ -8,6 +8,8 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.v4.app.ActivityCompat;
 
+import com.myapps.ron.family_recipes.utils.LocaleHelper;
+
 
 public class MyApplication extends Application {
 
@@ -31,5 +33,10 @@ public class MyApplication extends Application {
     public void applyTheme(Activity activity) {
         SharedPreferences sPref = activity.getSharedPreferences(getString(R.string.sharedPreferences), MODE_PRIVATE);
         activity.setTheme(sPref.getBoolean("dark_mode", false) ? R.style.AppTheme_Dark : R.style.AppTheme_Light);
+    }
+
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(LocaleHelper.onAttach(base, "en"));
     }
 }

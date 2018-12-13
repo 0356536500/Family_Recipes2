@@ -1,6 +1,7 @@
 package com.myapps.ron.family_recipes.ui.activities;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -29,6 +30,7 @@ import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.ForgotPas
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.network.cognito.AppHelper;
 import com.myapps.ron.family_recipes.utils.Constants;
+import com.myapps.ron.family_recipes.utils.LocaleHelper;
 import com.myapps.ron.family_recipes.utils.SharedPreferencesHandler;
 
 import java.util.Locale;
@@ -58,7 +60,11 @@ public class LoginActivity extends AppCompatActivity {
     private String username;
     private String password;
 
-    // Mandatory overrides first
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(LocaleHelper.onAttach(newBase));
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
