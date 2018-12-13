@@ -54,6 +54,7 @@ public class MainActivity extends MyBaseActivity {
     private Toolbar toolbar;
     private int drawerCurrentWidth;
     private Paint backgroundPaint;
+    private boolean isRTL;
 
     //private SearchView searchView;
 
@@ -81,6 +82,7 @@ public class MainActivity extends MyBaseActivity {
 
         init();
         initFragments();
+        isRTL = isRTL();
 
         viewModel =  ViewModelProviders.of(this).get(DataViewModel.class);
 
@@ -181,13 +183,24 @@ public class MainActivity extends MyBaseActivity {
 
                 //int barWidthRemainder = width % drawerCurrentWidth;
 
-                //backgroundPaint.setColor(getResources().getColor(R.color.logo_background_darker));
-                backgroundPaint.setColor(getColorSecondary());
-                canvas.drawRect(new RectF(0, 0, barWidth, height), backgroundPaint);
+                if (!isRTL) {
+                    //backgroundPaint.setColor(getResources().getColor(R.color.logo_background_darker));
+                    backgroundPaint.setColor(getColorSecondary());
+                    canvas.drawRect(new RectF(0, 0, barWidth, height), backgroundPaint);
 
-                //backgroundPaint.setColor(Color.WHITE);
-                backgroundPaint.setColor(getColorPrimary());
-                canvas.drawRect(new RectF(barWidth, 0, width, height), backgroundPaint);
+                    //backgroundPaint.setColor(Color.WHITE);
+                    backgroundPaint.setColor(getColorPrimary());
+                    canvas.drawRect(new RectF(barWidth, 0, width, height), backgroundPaint);
+                } else {
+                    //backgroundPaint.setColor(getResources().getColor(R.color.logo_background_darker));
+                    backgroundPaint.setColor(getColorSecondary());
+                    canvas.drawRect(new RectF(width - barWidth, 0, width, height), backgroundPaint);
+
+                    //backgroundPaint.setColor(Color.WHITE);
+                    backgroundPaint.setColor(getColorPrimary());
+                    canvas.drawRect(new RectF(0, 0, width - barWidth, height), backgroundPaint);
+                }
+
 
                 /*backgroundPaint.setColor(Color.BLACK);
                 canvas.drawRoundRect(new RectF(0, height, width, height - 10), 3, 3, backgroundPaint);*/
@@ -231,6 +244,11 @@ public class MainActivity extends MyBaseActivity {
         /*if(getSupportActionBar() != null){
 
         }*/
+    }
+
+    private boolean isRTL() {
+        return getResources().getConfiguration()
+                .getLayoutDirection() == View.LAYOUT_DIRECTION_RTL;
     }
 
     private void bindUI() {

@@ -51,13 +51,15 @@ public abstract class MyBaseActivity extends AppCompatActivity implements Shared
     }
 
     /**
-     * Listens to changing in sharedPreferences and react when theme value had changed
+     * Listens to changing in sharedPreferences and react when dark theme value had changed
      * @param sharedPreferences sharedPreferences file (name - R.string.sharedPreferences)
      *                          had changed
      * @param key the key that changed in the file
      */
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (key == null)
+            return;
         if (key.equals(getString(R.string.preference_key_dark_mode))) {
             Log.e(getClass().getSimpleName(), "value, " + sharedPreferences.getBoolean(key, false));
             setTheme(sharedPreferences.getBoolean(key, false) ? R.style.AppTheme_Dark : R.style.AppTheme_Dark);

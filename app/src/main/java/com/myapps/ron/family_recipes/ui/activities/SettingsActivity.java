@@ -41,7 +41,7 @@ public class SettingsActivity extends MyBaseActivity {
     }
 
 
-    /*@Override
+    @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         Log.e(getClass().getSimpleName(), "change event, " + key);
         if (key == null)
@@ -49,7 +49,6 @@ public class SettingsActivity extends MyBaseActivity {
         if (key.equals(getString(R.string.preference_key_dark_mode))) {
             Log.e(getClass().getSimpleName(), "value, " + sharedPreferences.getBoolean(key, false));
             setTheme(sharedPreferences.getBoolean(key, false) ? R.style.AppTheme_Dark : R.style.AppTheme_Dark);
-            //toolbar.setPopupTheme(sharedPreferences.getBoolean(key, false) ? R.style.AppTheme_PopupOverlay_Dark : R.style.AppTheme_PopupOverlay_Light);
             SettingsActivity.this.recreate();
         }
         if (key.equals(getString(R.string.preference_key_language))) {
@@ -57,7 +56,7 @@ public class SettingsActivity extends MyBaseActivity {
             LocaleHelper.setLocale(SettingsActivity.this, sharedPreferences.getString(key, "he"));
             SettingsActivity.this.recreate();
         }
-    }*/
+    }
 
 
     public static class GeneralPreferenceFragment1 extends PreferenceFragmentCompat {
