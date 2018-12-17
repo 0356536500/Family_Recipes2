@@ -25,7 +25,7 @@ class CollapseView : FrameLayout {
         buttonOk.visibility = if (hasText) View.VISIBLE else GONE
     }
 
-    internal fun rotateArrow(rotation: Float): Unit {
+    internal fun rotateArrow(rotation: Float) {
         imageArrow.rotation = rotation
     }
 

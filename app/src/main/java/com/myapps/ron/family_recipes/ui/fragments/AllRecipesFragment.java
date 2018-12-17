@@ -21,6 +21,7 @@ import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -177,8 +178,13 @@ public class AllRecipesFragment extends MyFragment implements RecipesAdapter.Rec
 
         //the text to show when there's no selected items
         mFilter.setCustomTextView(getString(R.string.str_all_selected));
-        mFilter.build();
 
+        //set the collapsed text color according to current theme
+        TypedValue value = new TypedValue();
+        activity.getTheme().resolveAttribute(android.R.attr.textColorPrimary, value, true);
+        mFilter.setCustomTextViewColor(value.data);
+
+        mFilter.build();
     }
 
     private void initViewModel() {

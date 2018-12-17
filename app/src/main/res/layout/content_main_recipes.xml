@@ -29,7 +29,11 @@
     <com.myapps.ron.searchfilter.widget.Filter
         android:id="@+id/content_main_filters"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        app:collapsedBackground="?attr/toolbarBackgroundPrimary"
+        app:expandedBackground="?attr/toolbarBackgroundPrimary"/>
+
+    <!--app:customTextViewColor="?android:textColorPrimary"-->
 
     <ProgressBar
         android:id="@+id/content_main_fist_loading_animation"

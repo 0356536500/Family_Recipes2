@@ -22,6 +22,7 @@ import kotlinx.android.synthetic.main.filter.view.*
 import java.io.Serializable
 import java.util.*
 import android.graphics.Color
+import android.support.annotation.ColorInt
 import android.util.Log
 import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
@@ -44,6 +45,13 @@ class Filter<T : FilterModel<T>> : FrameLayout, FilterItemListener, CollapseList
     var replaceArrowByText: Boolean = false
         set(value) {
             collapseView.setHasText(value)
+        }
+
+    var customTextViewColor: Int = 0x827f93
+        set(value) {
+            field = value
+            collapsedText.setTextColor(value)
+            collapseView.invalidate()
         }
 
     var collapsedBackground: Int = Color.WHITE
