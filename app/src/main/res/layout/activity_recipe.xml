@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/app_bar_height"
         android:fitsSystemWindows="true"
-        android:theme="@style/AppTheme.PopupOverlay.Light">
+        android:theme="?attr/toolbar_theme">
 
         <android.support.design.widget.CollapsingToolbarLayout
             android:id="@+id/toolbar_layout"
@@ -21,7 +21,7 @@
             android:fitsSystemWindows="true"
             app:collapsedTitleGravity="start"
             app:expandedTitleGravity="start|bottom"
-            app:contentScrim="?attr/colorPrimary"
+            app:statusBarScrim="@android:color/transparent"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
             app:toolbarId="@+id/recipe_toolbar">
 
@@ -36,9 +36,9 @@
                 android:id="@+id/recipe_toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                app:layout_collapseMode="pin"
-                android:theme="@style/AppTheme.PopupOverlay.Light"
-                app:popupTheme="@style/AppTheme.PopupOverlay.Light" />
+                app:layout_collapseMode="pin" />
+                <!--android:theme="@style/AppTheme.PopupOverlay.Light"
+                app:popupTheme="@style/AppTheme.PopupOverlay.Light" />-->
 
         </android.support.design.widget.CollapsingToolbarLayout>
     </android.support.design.widget.AppBarLayout>
@@ -50,7 +50,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/fab_margin"
-        app:backgroundTint="@color/light_background"
+        app:backgroundTint="?attr/backgroundColor"
         app:layout_anchor="@id/activity_recipe_app_bar"
         app:layout_anchorGravity="bottom|end"
         app:srcCompat="@drawable/ic_favorite_border_red_36dp"

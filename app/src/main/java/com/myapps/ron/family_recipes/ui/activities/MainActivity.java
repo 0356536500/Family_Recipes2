@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
@@ -24,7 +23,6 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.util.TypedValue;
@@ -69,6 +67,8 @@ public class MainActivity extends MyBaseActivity {
     private IntentFilter customFilter;
     private String lastOrderBy;
 
+    private int toolbarColorPrimary, toolbarColorSecond;
+
     @Override
     protected void onMyCreate(Bundle savedInstanceState) {
         //super.onCreate(savedInstanceState);
@@ -76,6 +76,7 @@ public class MainActivity extends MyBaseActivity {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         bindUI();
+        loadColorsFromTheme();
         setToolbarBackground();
         configureToolbar();
         configureNavigationDrawer();
@@ -96,6 +97,17 @@ public class MainActivity extends MyBaseActivity {
         //whiteNotificationBar(recyclerView);
 
         //initViewModel();
+    }
+
+    private void loadColorsFromTheme() {
+        TypedValue valuePrimary = new TypedValue();
+        TypedValue valueSecond = new TypedValue();
+
+        getTheme().resolveAttribute(R.attr.toolbarBackgroundPrimary, valuePrimary, true);
+        getTheme().resolveAttribute(R.attr.toolbarBackgroundSecondary, valueSecond, true);
+
+        toolbarColorPrimary = valuePrimary.data;
+        toolbarColorSecond = valueSecond.data;
     }
 
     //region Init Methods
@@ -228,15 +240,11 @@ public class MainActivity extends MyBaseActivity {
             }
 
             private int getColorPrimary() {
-                TypedValue value = new TypedValue();
-                MainActivity.this.getTheme().resolveAttribute(R.attr.toolbarBackgroundPrimary, value, true);
-                return value.data;
+                return toolbarColorPrimary;
             }
 
             private int getColorSecondary() {
-                TypedValue value = new TypedValue();
-                MainActivity.this.getTheme().resolveAttribute(R.attr.toolbarBackgroundSecondary, value, true);
-                return value.data;
+                return  toolbarColorSecond;
             }
         };
 
@@ -315,6 +323,9 @@ public class MainActivity extends MyBaseActivity {
             case android.R.id.home:
                 mDrawer.openDrawer(GravityCompat.START);
                 return true;
+            case R.id.action_settings:
+                showSettings();
+                return true;
             case R.id.action_search:
                 return true;
             case R.id.action_sort:
@@ -368,9 +379,7 @@ public class MainActivity extends MyBaseActivity {
                 break;
             case R.id.nav_main_settings:
                 // Show user settings
-                Intent settingsIntent = new Intent(MainActivity.this, SettingsActivity.class);
-                startActivity(settingsIntent);
-                //showSettings();
+                showSettings();
                 break;
             case R.id.nav_main_sign_out:
                 // Sign out from this account
@@ -426,6 +435,11 @@ public class MainActivity extends MyBaseActivity {
         SharedPreferencesHandler.removeString(this, com.myapps.ron.family_recipes.network.Constants.USERNAME);
         SharedPreferencesHandler.removeString(this, com.myapps.ron.family_recipes.network.Constants.PASSWORD);
         exit();
+    }
+
+    private void showSettings() {
+        Intent settingsIntent = new Intent(MainActivity.this, SettingsActivity.class);
+        startActivity(settingsIntent);
     }
 
     private void exit () {

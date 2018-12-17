@@ -18,23 +18,21 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.CircularProgressDrawable;
 import android.support.v4.widget.ContentLoadingProgressBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.AppCompatEditText;
-import android.support.v7.widget.AppCompatImageButton;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -52,7 +50,7 @@ import com.myapps.ron.searchfilter.animator.FiltersListItemAnimator;
 
 import java.io.File;
 
-public class RecipeActivity extends MyBaseActivity {
+public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOffsetChangedListener {
 
     private final String TAG = RecipeActivity.class.getSimpleName();
     private AppBarLayout appBarLayout;
@@ -79,12 +77,16 @@ public class RecipeActivity extends MyBaseActivity {
     private boolean showLikeMessage = false;
     private long animationDuration = 700;
 
+    private int textColorPrimary, textColorSecondary,
+            iconCollapsedColor, iconExpandedColor, toolbarCollapsedColor;
+
     @Override
     protected void onMyCreate(Bundle savedInstanceState) {
         //super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipe);
 
         initViewModel();
+        loadColorsFromTheme();
 
         Bundle extras = getIntent().getExtras();
         if(extras != null) {
@@ -98,7 +100,25 @@ public class RecipeActivity extends MyBaseActivity {
         }
     }
 
-    //@SuppressLint("SetJavaScriptEnabled")
+    private void loadColorsFromTheme() {
+        TypedValue primaryValue = new TypedValue();
+        TypedValue secondValue = new TypedValue();
+        TypedValue iconCollapsedValue = new TypedValue();
+        TypedValue iconExpandedValue = new TypedValue();
+        TypedValue toolbarCollapsedValue = new TypedValue();
+        getTheme().resolveAttribute(android.R.attr.textColorPrimary, primaryValue, true);
+        getTheme().resolveAttribute(android.R.attr.textColorSecondary, secondValue, true);
+        getTheme().resolveAttribute(R.attr.textColorMain, iconCollapsedValue, true);
+        getTheme().resolveAttribute(R.attr.textColorSecond, iconExpandedValue, true);
+        getTheme().resolveAttribute(R.attr.toolbarBackgroundPrimary, toolbarCollapsedValue, true);
+
+        textColorPrimary = primaryValue.data;
+        textColorSecondary = secondValue.data;
+        iconCollapsedColor = iconCollapsedValue.data;
+        iconExpandedColor = iconExpandedValue.data;
+        toolbarCollapsedColor = toolbarCollapsedValue.data;
+    }
+
     private void bindUI() {
         appBarLayout = findViewById(R.id.activity_recipe_app_bar);
         collapsingToolbarLayout = findViewById(R.id.toolbar_layout);
@@ -113,8 +133,6 @@ public class RecipeActivity extends MyBaseActivity {
         postCommentButton = findViewById(R.id.recipe_content_post_button);
         postCommentEditText = findViewById(R.id.recipe_content_post_editText);
         postCommentProgressBar = findViewById(R.id.recipe_content_post_progressBar);
-        //WebSettings webSettings = myWebView.getSettings();
-        //webSettings.setJavaScriptEnabled(true);
     }
 
     private void initUI() {
@@ -124,6 +142,8 @@ public class RecipeActivity extends MyBaseActivity {
         initToolbar();
         initRecycler();
 
+        /*WebSettings webSettings = myWebView.getSettings();
+        webSettings.setJavaScriptEnabled(false);*/
         postCommentButton.setOnClickListener(postCommentListener);
     }
 
@@ -143,37 +163,15 @@ public class RecipeActivity extends MyBaseActivity {
             }
         });
 
-        appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
-            @Override
-            public void onOffsetChanged(final AppBarLayout appBarLayout, final int verticalOffset) {
-                appBarLayout.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        if(menuItemShare == null)
-                            return;
-                        if (Math.abs(verticalOffset) == appBarLayout.getTotalScrollRange()) {
-                            // Collapsed
-                            menuItemShare.setIcon(R.drawable.ic_share_black_24dp);
-                            if (toolbar.getNavigationIcon() != null)
-                                toolbar.getNavigationIcon().setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_ATOP);
-                            //getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_share_black_24dp);
-                            //toolbar.setPopupTheme(R.style.AppTheme_PopupOverlayDark);
-                        } else if (verticalOffset == 0) {
-                            // Expanded
-                            menuItemShare.setIcon(R.drawable.ic_share_white_24dp);
-                            if (toolbar.getNavigationIcon() != null)
-                                toolbar.getNavigationIcon().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
-                            //getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_share_white_24dp);
-                            //toolbar.setPopupTheme(R.style.AppTheme_PopupOverlayLight);
-                        } /*else {
-                            // Somewhere in between
-                        }*/
-                    }
-                });
-            }
-        });
-        collapsingToolbarLayout.setCollapsedTitleTextColor(Color.BLACK);
-        collapsingToolbarLayout.setExpandedTitleColor(Color.WHITE);
+        appBarLayout.addOnOffsetChangedListener(this);
+
+        //set the collapsed text color according to current theme
+
+        collapsingToolbarLayout.setCollapsedTitleTextColor(textColorPrimary);
+        collapsingToolbarLayout.setExpandedTitleColor(textColorSecondary);
+        collapsingToolbarLayout.setContentScrimColor(toolbarCollapsedColor);
+        /*collapsingToolbarLayout.setCollapsedTitleTextColor(Color.BLACK);
+        collapsingToolbarLayout.setExpandedTitleColor(Color.WHITE);*/
         setTitle(recipe.getName());
 
         collapsingToolbarLayout.setOnClickListener(new View.OnClickListener() {
@@ -454,5 +452,33 @@ public class RecipeActivity extends MyBaseActivity {
     @Override
     public void onBackPressed() {
         exit();
+    }
+
+    @Override
+    public void onOffsetChanged(final AppBarLayout appBarLayout, final int verticalOffset) {
+        appBarLayout.post(new Runnable() {
+            @Override
+            public void run() {
+                if(menuItemShare == null)
+                    return;
+                if (Math.abs(verticalOffset) == appBarLayout.getTotalScrollRange()) {
+                    // Collapsed
+                    menuItemShare.setIcon(R.drawable.ic_share_black_24dp);
+                    if (toolbar.getNavigationIcon() != null)
+                        toolbar.getNavigationIcon().setColorFilter(iconCollapsedColor, PorterDuff.Mode.SRC_ATOP);
+                    //getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_share_black_24dp);
+                    //toolbar.setPopupTheme(R.style.AppTheme_PopupOverlayDark);
+                } else if (verticalOffset == 0) {
+                    // Expanded
+                    menuItemShare.setIcon(R.drawable.ic_share_white_24dp);
+                    if (toolbar.getNavigationIcon() != null)
+                        toolbar.getNavigationIcon().setColorFilter(iconExpandedColor, PorterDuff.Mode.SRC_ATOP);
+                    //getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_share_white_24dp);
+                    //toolbar.setPopupTheme(R.style.AppTheme_PopupOverlayLight);
+                } /*else {
+                            // Somewhere in between
+                }*/
+            }
+        });
     }
 }
