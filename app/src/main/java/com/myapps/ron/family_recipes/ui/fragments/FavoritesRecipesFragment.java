@@ -57,9 +57,81 @@ import static android.app.Activity.RESULT_OK;
 /**
  * Created by ronginat on 07/11/2018.
  */
-public class FavoritesRecipesFragment extends MyFragment implements RecipesAdapter.RecipesAdapterListener, FilterListener<Category> {
+public class FavoritesRecipesFragment extends RecyclerWithFiltersFragment implements RecipesAdapter.RecipesAdapterListener, FilterListener<Category> {
 
-    private final String TAG = getClass().getSimpleName();
+    @Override
+    protected void initAfterViewCreated() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                viewModel.loadLocalFavoritesOrdered(activity, com.myapps.ron.family_recipes.dal.Constants.SORT_RECENT);
+            }
+        }, 500);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int itemId = item.getItemId();
+
+        switch (itemId) {
+            case R.id.action_refresh:
+                //TODO hide this entry
+                return true;
+            case R.id.action_sort:
+                showPopupSortMenu();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void initViewModel() {
+        viewModel =  ViewModelProviders.of(activity).get(DataViewModel.class);
+        viewModel.getFavorites().observe(this, new Observer<List<Recipe>>() {
+            @Override
+            public void onChanged(@Nullable List<Recipe> recipes) {
+                //Toast.makeText(activity, "get recipes from DAL", Toast.LENGTH_SHORT).show();
+                Log.e(TAG, "in favorite recipes observer");
+                if(recipes != null) {
+                    Log.e(TAG, recipes.toString());
+                    if (mFilter != null)
+                        mFilter.setCustomTextView(getString(R.string.number_of_recipes_indicator, recipes.size()));
+                    //Log.e(TAG, "update from fragment");
+                    if (mAdapter == null) {
+                        mAdapter = new RecipesAdapter(activity, recipes, FavoritesRecipesFragment.this);
+                        recyclerView.setAdapter(mAdapter);
+                    } else
+                        mAdapter.updateRecipes(recipes, !recipes.isEmpty());
+                }
+            }
+        });
+        viewModel.getCategories().observe(this, new Observer<List<Category>>() {
+            @Override
+            public void onChanged(@Nullable List<Category> categories) {
+                Log.e(TAG, "in categories observer");
+                if(categories != null) {
+                    Log.e(TAG, categories.toString());
+                    tags = new ArrayList<>(categories);
+                    tags.add(0, new Category(getString(R.string.str_all_selected), mColors[0]));
+                    loadFiltersColor();
+                    setCategories();
+                    initCategories();
+                }
+            }
+        });
+        /*viewModel.getInfoFromLastFetch().observe(this, new Observer<String>() {
+            @Override
+            public void onChanged(@Nullable String s) {
+                if (s != null)
+                    Toast.makeText(activity, s, Toast.LENGTH_LONG).show();
+            }
+        });*/
+    }
+
+    /*private final String TAG = getClass().getSimpleName();
     private MainActivity activity;
 
     private View view;
@@ -147,14 +219,14 @@ public class FavoritesRecipesFragment extends MyFragment implements RecipesAdapt
 
         //initCategoriesContainer();
 
-        /*List<Category> categories = viewModel.loadFavoritesCategories(activity);
-        categoriesLoaded(categories);*/
+        *//*List<Category> categories = viewModel.loadFavoritesCategories(activity);
+        categoriesLoaded(categories);*//*
 
         // Associate searchable configuration with the SearchView
 
 
-        /*if (activity.getSupportActionBar() != null)
-            activity.getSupportActionBar().setTitle("Favorites");*/
+        *//*if (activity.getSupportActionBar() != null)
+            activity.getSupportActionBar().setTitle("Favorites");*//*
     }
 
     private void initCategoriesContainer() {
@@ -168,7 +240,7 @@ public class FavoritesRecipesFragment extends MyFragment implements RecipesAdapt
 
         //set the collapsed text color according to current theme
         TypedValue value = new TypedValue();
-        activity.getTheme().resolveAttribute(android.R.attr.textColorPrimary, value, true);
+        activity.getTheme().resolveAttribute(R.attr.searchFilterCustomTextColor, value, true);
         mFilter.setCustomTextViewColor(value.data);
 
         mFilter.build();
@@ -203,18 +275,19 @@ public class FavoritesRecipesFragment extends MyFragment implements RecipesAdapt
                     Log.e(TAG, categories.toString());
                     tags = new ArrayList<>(categories);
                     tags.add(0, new Category(getString(R.string.str_all_selected), mColors[0]));
+                    loadFiltersColor();
                     setCategoriesLocalColors();
                     initCategoriesContainer();
                 }
             }
         });
-        /*viewModel.getInfoFromLastFetch().observe(this, new Observer<String>() {
+        *//*viewModel.getInfoFromLastFetch().observe(this, new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {
                 if (s != null)
                     Toast.makeText(activity, s, Toast.LENGTH_LONG).show();
             }
-        });*/
+        });*//*
     }
 
     private void initRecycler() {
@@ -299,9 +372,9 @@ public class FavoritesRecipesFragment extends MyFragment implements RecipesAdapt
         int itemId = item.getItemId();
 
         switch (itemId) {
-            /*case R.id.action_search:
+            *//*case R.id.action_search:
                 Toast.makeText(activity, "search clicked (" + TAG + ")", Toast.LENGTH_SHORT).show();
-                return true;*/
+                return true;*//*
             case R.id.action_refresh:
                 //TODO hide this entry
                 return true;
@@ -484,10 +557,10 @@ public class FavoritesRecipesFragment extends MyFragment implements RecipesAdapt
             if (item.getText().equals(tags.get(0).getText()))
                 filterItem.setHeader(true);
             filterItem.setStrokeColor(mColors[0]);
-            filterItem.setTextColor(mColors[0]);
+            filterItem.setTextColor(filterTextColor);
             filterItem.setCornerRadius(75f);
             filterItem.setCheckedTextColor(ContextCompat.getColor(activity, android.R.color.white));
-            filterItem.setColor(ContextCompat.getColor(activity, android.R.color.white));
+            filterItem.setColor(filterBackgroundColor);
             filterItem.setCheckedColor(mColors[position]);
             filterItem.setText(item.getText());
             filterItem.deselect();
@@ -505,14 +578,14 @@ public class FavoritesRecipesFragment extends MyFragment implements RecipesAdapt
             filterItem.setTextColor(parent.getCheckedColor());
             filterItem.setCornerRadius(100f);
             filterItem.setCheckedTextColor(ContextCompat.getColor(activity, android.R.color.white));
-            filterItem.setColor(ContextCompat.getColor(activity, android.R.color.white));
+            filterItem.setColor(filterBackgroundColor);
             filterItem.setCheckedColor(item.getColor());
             filterItem.setText(item.getCategories().get(position));
             filterItem.deselect();
 
             return filterItem;
         }
-    }
+    }*/
 
 
 }

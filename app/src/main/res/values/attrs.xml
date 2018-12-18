@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <attr name="searchFilterBackgroundColor" format="reference" />
+    <attr name="searchFilterTextColor" format="reference" />
+    <attr name="searchFilterCustomTextColor" format="reference" />
+
     <attr name="backgroundColor" format="reference" />
     <attr name="textColorMain" format="reference" />
     <attr name="textColorSecond" format="reference" />

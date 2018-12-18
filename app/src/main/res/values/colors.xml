@@ -15,6 +15,9 @@
     <color name="logo_foreground">#7c7c7c</color>
     <color name="logo_circle_border">#e78200</color>
 
+    <color name="search_filter_text_light">#827f93</color>
+    <color name="search_filter_text_dark">#bfbadb</color>
+
     <color name="transparent">#00000000</color>
     <color name="light_background">#FFFFFFFF</color>
     <color name="dark_background">#FF424242</color>

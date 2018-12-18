@@ -39,8 +39,10 @@ import com.myapps.ron.family_recipes.adapters.RecipesAdapter;
 import com.myapps.ron.family_recipes.model.Category;
 import com.myapps.ron.family_recipes.model.Recipe;
 import com.myapps.ron.family_recipes.recycler.MyRecyclerScroll;
+import com.myapps.ron.family_recipes.ui.activities.MainActivity;
 import com.myapps.ron.family_recipes.ui.activities.RecipeActivity;
 import com.myapps.ron.family_recipes.utils.Constants;
+import com.myapps.ron.family_recipes.utils.MyFragment;
 import com.myapps.ron.family_recipes.viewmodels.DataViewModel;
 import com.myapps.ron.searchfilter.adapter.FilterAdapter;
 import com.myapps.ron.searchfilter.animator.FiltersListItemAnimator;
@@ -53,109 +55,43 @@ import java.util.List;
 
 import static android.app.Activity.RESULT_OK;
 
-public class AllRecipesFragment extends RecyclerWithFiltersFragment implements RecipesAdapter.RecipesAdapterListener, FilterListener<Category> {
+/**
+ * Created by ronginat on 18/12/2018.
+ */
+public abstract class RecyclerWithFiltersFragment extends MyFragment implements RecipesAdapter.RecipesAdapterListener, FilterListener<Category> {
 
-    @Override
-    protected void initAfterViewCreated() {
-        setRefreshLayout();
-        //setSortToggle(activity.getMenu());
+    protected final String TAG = getClass().getSimpleName();
 
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                firstLoadingProgressBar.setVisibility(View.VISIBLE);
-                activity.fetchCategories();
-                activity.fetchRecipes(orderBy);
-            }
-        }, 500);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int itemId = item.getItemId();
-
-        switch (itemId) {
-            /*case R.id.action_search:
-                Toast.makeText(activity, "search clicked (" + TAG + ")", Toast.LENGTH_SHORT).show();
-                return true;*/
-            case R.id.action_refresh:
-                swipeRefreshLayout.setRefreshing(true);
-                onRefreshListener.onRefresh();
-                return true;
-            case R.id.action_sort:
-                showPopupSortMenu();
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    protected void initViewModel() {
-        viewModel = ViewModelProviders.of(activity).get(DataViewModel.class);
-        viewModel.getRecipes().observe(this, new Observer<List<Recipe>>() {
-            @Override
-            public void onChanged(@Nullable List<Recipe> recipes) {
-                //Toast.makeText(activity, "get recipes from DAL", Toast.LENGTH_SHORT).show();
-                String log = "null";
-                if (recipes != null)
-                    log = recipes.toString();
-                Log.e(TAG, "getAllRecipes from db.\n" + log);
-                if (mFilter != null && recipes != null)
-                    mFilter.setCustomTextView(getString(R.string.number_of_recipes_indicator, recipes.size()));
-                firstLoadingProgressBar.setVisibility(View.GONE);
-                swipeRefreshLayout.setRefreshing(false);
-                //Log.e(TAG, "update from fragment");
-                if (mAdapter == null) {
-                    mAdapter = new RecipesAdapter(activity, recipes, AllRecipesFragment.this);
-                    recyclerView.setAdapter(mAdapter);
-                } else
-                    mAdapter.updateRecipes(recipes, recipes != null && !recipes.isEmpty());
-            }
-        });
-        viewModel.getCategories().observe(this, new Observer<List<Category>>() {
-            @Override
-            public void onChanged(@Nullable List<Category> categories) {
-                if (categories != null) {
-                    tags = new ArrayList<>(categories);
-                    tags.add(0, new Category(getString(R.string.str_all_selected), mColors[0]));
-                    loadFiltersColor();
-                    setCategories();
-                    initCategories();
-                }
-            }
-        });
-        viewModel.getInfoFromLastFetch().observe(this, new Observer<String>() {
-            @Override
-            public void onChanged(@Nullable String s) {
-                if (s != null)
-                    Toast.makeText(activity, s, Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-    /*private static final String TAG = AllRecipesFragment.class.getSimpleName();
+    protected MainActivity activity;
 
     private View view;
     private FrameLayout parent;
 
-    private int[] mColors;
-    //private String[] mTitles;
-    private Filter<Category> mFilter;
-    private List<Category> tags;
+    protected int[] mColors;
+    protected int filterBackgroundColor, filterTextColor;
 
-    private SwipeRefreshLayout swipeRefreshLayout;
-    private SwipeRefreshLayout.OnRefreshListener onRefreshListener;
-    private RecyclerView recyclerView;
-    private RecipesAdapter mAdapter;
+    protected Filter<Category> mFilter;
+    protected List<Category> tags;
 
-    private DataViewModel viewModel;
-    private String orderBy;
+    protected SwipeRefreshLayout swipeRefreshLayout;
+    protected SwipeRefreshLayout.OnRefreshListener onRefreshListener;
+    protected RecyclerView recyclerView;
+    protected RecipesAdapter mAdapter;
+
+    protected DataViewModel viewModel;
+    protected String orderBy;
     private boolean mayRefresh;
     private String lastQuery = "";
 
     ProgressBar firstLoadingProgressBar;
+
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        activity = (MainActivity)getActivity();
+    }
 
     @Override
     public boolean onBackPressed() {
@@ -223,27 +159,21 @@ public class AllRecipesFragment extends RecyclerWithFiltersFragment implements R
 
             // Associate searchable configuration with the SearchView
             setSearchView(activity.getMenu());
-            setRefreshLayout();
-            //setSortToggle(activity.getMenu());
-
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    firstLoadingProgressBar.setVisibility(View.VISIBLE);
-                    activity.fetchCategories();
-                    activity.fetchRecipes(orderBy);
-                }
-            }, 500);
+            
+            initAfterViewCreated();
         }
 
-        *//*if (activity.getSupportActionBar() != null)
-            activity.getSupportActionBar().setTitle("Recipes");*//*
+        /*if (activity.getSupportActionBar() != null)
+            activity.getSupportActionBar().setTitle("Recipes");*/
     }
 
-    private void initCategories() {
+    protected abstract void initAfterViewCreated();
+    protected abstract void initViewModel();
+
+    protected void initCategories() {
         //mTitles = getResources().getStringArray(R.array.job_titles);
 
-        mFilter.setAdapter(new Adapter(tags));
+        mFilter.setAdapter(new RecyclerWithFiltersFragment.Adapter(tags));
         mFilter.setListener(this);
 
         //the text to show when there's no selected items
@@ -257,7 +187,7 @@ public class AllRecipesFragment extends RecyclerWithFiltersFragment implements R
         mFilter.build();
     }
 
-    private void initViewModel() {
+    /*private void initViewModel() {
         viewModel =  ViewModelProviders.of(activity).get(DataViewModel.class);
         viewModel.getRecipes().observe(this, new Observer<List<Recipe>>() {
             @Override
@@ -273,7 +203,7 @@ public class AllRecipesFragment extends RecyclerWithFiltersFragment implements R
                 swipeRefreshLayout.setRefreshing(false);
                 //Log.e(TAG, "update from fragment");
                 if (mAdapter == null) {
-                    mAdapter = new RecipesAdapter(activity, recipes, AllRecipesFragment.this);
+                    mAdapter = new RecipesAdapter(activity, recipes, RecyclerWithFiltersFragment.this);
                     recyclerView.setAdapter(mAdapter);
                 } else
                     mAdapter.updateRecipes(recipes, recipes != null && !recipes.isEmpty());
@@ -298,7 +228,7 @@ public class AllRecipesFragment extends RecyclerWithFiltersFragment implements R
                     Toast.makeText(activity, s, Toast.LENGTH_SHORT).show();
             }
         });
-    }
+    }*/
 
     private void initRecycler() {
         //List<Recipe> recipeList = new ArrayList<>(viewModel.loadLocalRecipesOrdered(activity, com.myapps.ron.family_recipes.dal.Constants.SORT_RECENT));
@@ -327,7 +257,7 @@ public class AllRecipesFragment extends RecyclerWithFiltersFragment implements R
         });
     }
 
-    private void setRefreshLayout() {
+    protected void setRefreshLayout() {
         onRefreshListener = new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -399,7 +329,7 @@ public class AllRecipesFragment extends RecyclerWithFiltersFragment implements R
     }
 
 
-    @Override
+    /*@Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
@@ -419,9 +349,9 @@ public class AllRecipesFragment extends RecyclerWithFiltersFragment implements R
                 return true;
         }
         return super.onOptionsItemSelected(item);
-    }
+    }*/
 
-    private void showPopupSortMenu() {
+    protected void showPopupSortMenu() {
         final PopupMenu popup = new PopupMenu(activity, activity.findViewById(R.id.action_sort));
 
         // This activity implements OnMenuItemClickListener
@@ -516,7 +446,16 @@ public class AllRecipesFragment extends RecyclerWithFiltersFragment implements R
         }
     }
 
-    private void setCategories() {
+    protected void loadFiltersColor() {
+        TypedValue backgroundValue = new TypedValue();
+        TypedValue textValue = new TypedValue();
+        activity.getTheme().resolveAttribute(R.attr.searchFilterBackgroundColor, backgroundValue, true);
+        activity.getTheme().resolveAttribute(R.attr.searchFilterTextColor, textValue, true);
+        filterBackgroundColor = backgroundValue.data;
+        filterTextColor = textValue.data;
+    }
+
+    protected void setCategories() {
         //List<Category> tags = new ArrayList<>();
 
         for (int i = 0; i < tags.size(); ++i) {
@@ -612,5 +551,5 @@ public class AllRecipesFragment extends RecyclerWithFiltersFragment implements R
 
             return filterItem;
         }
-    }*/
+    }
 }
