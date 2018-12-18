@@ -4,7 +4,7 @@
     tools:context="com.myapps.ron.family_recipes.ui.activities.RecipeActivity">
     <item
         android:id="@+id/action_share"
-        android:icon="@drawable/ic_share_white_24dp"
+        android:icon="@drawable/ic_share_expanded_24dp"
         android:title="@string/action_share"
         app:showAsAction="ifRoom" />
 </menu>

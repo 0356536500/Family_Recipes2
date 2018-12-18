@@ -3,7 +3,6 @@ package com.myapps.ron.family_recipes.ui.activities;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Bundle;
@@ -78,7 +77,7 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
     private long animationDuration = 700;
 
     private int textColorPrimary, textColorSecondary,
-            iconCollapsedColor, iconExpandedColor, toolbarCollapsedColor;
+            navigationCollapsedColor, navigationExpandedColor;
 
     @Override
     protected void onMyCreate(Bundle savedInstanceState) {
@@ -103,20 +102,18 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
     private void loadColorsFromTheme() {
         TypedValue primaryValue = new TypedValue();
         TypedValue secondValue = new TypedValue();
-        TypedValue iconCollapsedValue = new TypedValue();
-        TypedValue iconExpandedValue = new TypedValue();
-        TypedValue toolbarCollapsedValue = new TypedValue();
+        TypedValue navigationCollapsedValue = new TypedValue();
+        TypedValue navigationExpandedValue = new TypedValue();
+
         getTheme().resolveAttribute(android.R.attr.textColorPrimary, primaryValue, true);
-        getTheme().resolveAttribute(android.R.attr.textColorSecondary, secondValue, true);
-        getTheme().resolveAttribute(R.attr.textColorMain, iconCollapsedValue, true);
-        getTheme().resolveAttribute(R.attr.textColorSecond, iconExpandedValue, true);
-        getTheme().resolveAttribute(R.attr.toolbarBackgroundPrimary, toolbarCollapsedValue, true);
+        getTheme().resolveAttribute(android.R.attr.colorPrimaryDark, secondValue, true);
+        getTheme().resolveAttribute(R.attr.collapsedIconsColor, navigationCollapsedValue, true);
+        getTheme().resolveAttribute(R.attr.expandedIconsColor, navigationExpandedValue, true);
 
         textColorPrimary = primaryValue.data;
         textColorSecondary = secondValue.data;
-        iconCollapsedColor = iconCollapsedValue.data;
-        iconExpandedColor = iconExpandedValue.data;
-        toolbarCollapsedColor = toolbarCollapsedValue.data;
+        navigationCollapsedColor = navigationCollapsedValue.data;
+        navigationExpandedColor = navigationExpandedValue.data;
     }
 
     private void bindUI() {
@@ -169,9 +166,7 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
 
         collapsingToolbarLayout.setCollapsedTitleTextColor(textColorPrimary);
         collapsingToolbarLayout.setExpandedTitleColor(textColorSecondary);
-        collapsingToolbarLayout.setContentScrimColor(toolbarCollapsedColor);
-        /*collapsingToolbarLayout.setCollapsedTitleTextColor(Color.BLACK);
-        collapsingToolbarLayout.setExpandedTitleColor(Color.WHITE);*/
+        //collapsingToolbarLayout.setContentScrimColor(toolbarCollapsedColor);
         setTitle(recipe.getName());
 
         collapsingToolbarLayout.setOnClickListener(new View.OnClickListener() {
@@ -463,18 +458,16 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
                     return;
                 if (Math.abs(verticalOffset) == appBarLayout.getTotalScrollRange()) {
                     // Collapsed
-                    menuItemShare.setIcon(R.drawable.ic_share_black_24dp);
-                    if (toolbar.getNavigationIcon() != null)
-                        toolbar.getNavigationIcon().setColorFilter(iconCollapsedColor, PorterDuff.Mode.SRC_ATOP);
-                    //getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_share_black_24dp);
-                    //toolbar.setPopupTheme(R.style.AppTheme_PopupOverlayDark);
+                    menuItemShare.setIcon(R.drawable.ic_share_collapsed_24dp);
+                    if (toolbar.getNavigationIcon() != null) {
+                        toolbar.getNavigationIcon().setColorFilter(navigationCollapsedColor, PorterDuff.Mode.SRC_ATOP);
+                    }
                 } else if (verticalOffset == 0) {
                     // Expanded
-                    menuItemShare.setIcon(R.drawable.ic_share_white_24dp);
-                    if (toolbar.getNavigationIcon() != null)
-                        toolbar.getNavigationIcon().setColorFilter(iconExpandedColor, PorterDuff.Mode.SRC_ATOP);
-                    //getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_share_white_24dp);
-                    //toolbar.setPopupTheme(R.style.AppTheme_PopupOverlayLight);
+                    menuItemShare.setIcon(R.drawable.ic_share_expanded_24dp);
+                    if (toolbar.getNavigationIcon() != null) {
+                        toolbar.getNavigationIcon().setColorFilter(navigationExpandedColor, PorterDuff.Mode.SRC_ATOP);
+                    }
                 } /*else {
                             // Somewhere in between
                 }*/

@@ -8,5 +8,8 @@
     <attr name="toolbarBackgroundPrimary" format="reference" />
     <attr name="toolbarBackgroundSecondary" format="reference" />
 
+    <attr name="collapsedIconsColor" format="reference" />
+    <attr name="expandedIconsColor" format="reference" />
+
     <attr name="toolbar_theme" format="reference" />
 </resources>
