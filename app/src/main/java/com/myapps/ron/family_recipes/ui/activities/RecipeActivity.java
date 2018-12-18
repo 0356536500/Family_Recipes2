@@ -405,10 +405,12 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
             //Toast.makeText(getApplicationContext(), postCommentEditText.getText(), Toast.LENGTH_SHORT).show();
             if (postCommentEditText.getText() != null) {
                 viewModel.postComment(getApplicationContext(), recipe, postCommentEditText.getText().toString());
-                postCommentButton.setEnabled(false);
-                postCommentProgressBar.setVisibility(View.VISIBLE);
-                postCommentButton.animate().alpha(0f).setDuration(animationDuration).start();
-                postCommentProgressBar.animate().alpha(1f).setDuration(animationDuration).start();
+                if (postCommentEditText.getText().length() > 0) {
+                    postCommentButton.setEnabled(false);
+                    postCommentProgressBar.setVisibility(View.VISIBLE);
+                    postCommentButton.animate().alpha(0f).setDuration(animationDuration).start();
+                    postCommentProgressBar.animate().alpha(1f).setDuration(animationDuration).start();
+                }
             }
         }
     };

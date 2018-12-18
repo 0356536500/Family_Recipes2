@@ -102,6 +102,10 @@
     <string name="settings_category_notifications">התראות</string>
     <string name="settings_category_general">כללי</string>
 
+    <string name="pref_title_dark_theme">מצב כהה</string>
+    <string name="pref_description_dark_theme">מצב כהה של אפליקציות מומלץ מאוד וחוסך בחיי הסוללה
+    </string>
+
     <string name="pref_title_choose_language">בחירת שפה</string>
     <string-array name="pref_languages_list_titles">
         <item>אנגלית</item>

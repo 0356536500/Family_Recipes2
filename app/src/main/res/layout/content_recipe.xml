@@ -28,6 +28,7 @@
             android:layout_height="50dp"
             android:visibility="visible"
             android:layout_gravity="center"
+            android:indeterminateTint="?android:colorControlActivated"
             style="@style/Widget.AppCompat.ProgressBar" />
 
         <android.widget.Space
@@ -57,7 +58,7 @@
                 android:layout_marginTop="@dimen/recipe_activity_minus_margin"
                 android:layout_marginStart="@dimen/recipe_activity_margin"
                 android:layout_marginEnd="@dimen/recipe_activity_margin"
-                android:foreground="@color/grey_500"/>
+                android:foreground="?attr/textColorSecond"/>
 
 
             <android.support.v7.widget.RecyclerView
@@ -90,6 +91,7 @@
                     android:layout_height="wrap_content"
                     android:visibility="invisible"
                     android:alpha="0"
+                    android:indeterminateTint="?android:colorControlActivated"
                     android:layout_centerInParent="true"
                     android:layout_marginBottom="15dp"/>
 
@@ -98,7 +100,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:background="@drawable/background_button_round_dark"
+                    android:background="@drawable/background_button_round_send_comment"
+                    android:textColor="?android:colorPrimary"
                     android:text="Send"
                     android:layout_centerInParent="true"/>
             </RelativeLayout>
@@ -121,7 +124,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:background="@drawable/background_button_round_dark"
+                    android:background="@drawable/background_button_round_send_comment"
                     android:text="Send"/>
             </android.support.design.widget.CoordinatorLayout>-->
 
