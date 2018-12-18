@@ -168,7 +168,7 @@ public class AppHelper {
 
     public static String getAccessToken() {
         Date date = new Date();
-        date.setTime(date.getTime() + TimeUnit.MINUTES.toMillis(5));
+        //date.setTime(date.getTime() + TimeUnit.MINUTES.toMillis(5));
         if (getCurrSession().getAccessToken().getExpiration().before(date)) {
             getCredentialsProvider().refresh();
         }

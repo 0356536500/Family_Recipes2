@@ -1,8 +1,6 @@
 package com.myapps.ron.family_recipes.ui.fragments;
 
 import android.app.SearchManager;
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -58,7 +56,7 @@ import static android.app.Activity.RESULT_OK;
 /**
  * Created by ronginat on 18/12/2018.
  */
-public abstract class RecyclerWithFiltersFragment extends MyFragment implements RecipesAdapter.RecipesAdapterListener, FilterListener<Category> {
+public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment implements RecipesAdapter.RecipesAdapterListener, FilterListener<Category> {
 
     protected final String TAG = getClass().getSimpleName();
 
@@ -163,17 +161,16 @@ public abstract class RecyclerWithFiltersFragment extends MyFragment implements 
             initAfterViewCreated();
         }
 
-        /*if (activity.getSupportActionBar() != null)
-            activity.getSupportActionBar().setTitle("Recipes");*/
     }
 
     protected abstract void initAfterViewCreated();
     protected abstract void initViewModel();
+    protected abstract void optionRefresh();
 
     protected void initCategories() {
         //mTitles = getResources().getStringArray(R.array.job_titles);
 
-        mFilter.setAdapter(new RecyclerWithFiltersFragment.Adapter(tags));
+        mFilter.setAdapter(new RecyclerWithFiltersAbstractFragment.Adapter(tags));
         mFilter.setListener(this);
 
         //the text to show when there's no selected items
@@ -203,7 +200,7 @@ public abstract class RecyclerWithFiltersFragment extends MyFragment implements 
                 swipeRefreshLayout.setRefreshing(false);
                 //Log.e(TAG, "update from fragment");
                 if (mAdapter == null) {
-                    mAdapter = new RecipesAdapter(activity, recipes, RecyclerWithFiltersFragment.this);
+                    mAdapter = new RecipesAdapter(activity, recipes, RecyclerWithFiltersAbstractFragment.this);
                     recyclerView.setAdapter(mAdapter);
                 } else
                     mAdapter.updateRecipes(recipes, recipes != null && !recipes.isEmpty());
@@ -328,8 +325,7 @@ public abstract class RecyclerWithFiltersFragment extends MyFragment implements 
         }
     }
 
-
-    /*@Override
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
@@ -337,19 +333,18 @@ public abstract class RecyclerWithFiltersFragment extends MyFragment implements 
         int itemId = item.getItemId();
 
         switch (itemId) {
-            *//*case R.id.action_search:
+            /*case R.id.action_search:
                 Toast.makeText(activity, "search clicked (" + TAG + ")", Toast.LENGTH_SHORT).show();
-                return true;*//*
+                return true;*/
             case R.id.action_refresh:
-                swipeRefreshLayout.setRefreshing(true);
-                onRefreshListener.onRefresh();
+                optionRefresh();
                 return true;
             case R.id.action_sort:
                 showPopupSortMenu();
                 return true;
         }
         return super.onOptionsItemSelected(item);
-    }*/
+    }
 
     protected void showPopupSortMenu() {
         final PopupMenu popup = new PopupMenu(activity, activity.findViewById(R.id.action_sort));
