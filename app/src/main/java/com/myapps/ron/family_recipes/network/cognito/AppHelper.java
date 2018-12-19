@@ -10,9 +10,16 @@ import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserAttribu
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserDetails;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserPool;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserSession;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.AuthenticationContinuation;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.AuthenticationDetails;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.ChallengeContinuation;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.MultiFactorAuthenticationContinuation;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.AuthenticationHandler;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.cognitoidentityprovider.model.AttributeType;
+import com.myapps.ron.family_recipes.MyApplication;
 import com.myapps.ron.family_recipes.network.Constants;
+import com.myapps.ron.family_recipes.utils.SharedPreferencesHandler;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -170,7 +177,42 @@ public class AppHelper {
         Date date = new Date();
         //date.setTime(date.getTime() + TimeUnit.MINUTES.toMillis(5));
         if (getCurrSession().getAccessToken().getExpiration().before(date)) {
-            getCredentialsProvider().refresh();
+            /*getPool().getCurrentUser().getSession(new AuthenticationHandler() {
+                @Override
+                public void onSuccess(CognitoUserSession cognitoUserSession, CognitoDevice device) {
+                    Log.d(TAG, " -- Auth Success");
+                    setCurrSession(cognitoUserSession);
+                    newDevice(device);
+                    Log.e(TAG, "IDToken: " + cognitoUserSession.getIdToken().getJWTToken());
+                    Log.e(TAG, "AccessToken: " + cognitoUserSession.getAccessToken().getJWTToken());
+
+                    setIdentityProvider(MyApplication.getContext(), cognitoUserSession);
+                }
+
+                @Override
+                public void getAuthenticationDetails(AuthenticationContinuation continuation, String userId) {
+                    String password = SharedPreferencesHandler.getString(MyApplication.getContext(), Constants.PASSWORD);
+                    AuthenticationDetails authenticationDetails = new AuthenticationDetails(user, password, null);
+                    continuation.setAuthenticationDetails(authenticationDetails);
+                    continuation.continueTask();
+                }
+
+                @Override
+                public void getMFACode(MultiFactorAuthenticationContinuation continuation) {
+
+                }
+
+                @Override
+                public void authenticationChallenge(ChallengeContinuation continuation) {
+
+                }
+
+                @Override
+                public void onFailure(Exception exception) {
+
+                }
+            });*/
+            //getCredentialsProvider().refresh();
         }
         return getCurrSession().getAccessToken().getJWTToken();
     }

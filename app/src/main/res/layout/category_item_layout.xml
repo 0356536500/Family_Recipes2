@@ -1,10 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
+<TextView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/category_text"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    android:background="@drawable/category_item_background"
+    android:textColor="@color/white"
+    android:textSize="@dimen/item_desc_text_size"
+    android:fontFamily="@font/open_sans"
+    android:text="category">
+
+</TextView>
+
+<!--
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="@drawable/category_item_background"
-    android:gravity="center">
+    android:background="@drawable/category_item_background">
 
     <TextView
         android:id="@+id/category_text"
@@ -16,4 +30,4 @@
         android:fontFamily="@font/open_sans"
         android:text="category" />
 
-</RelativeLayout>
+</RelativeLayout>-->

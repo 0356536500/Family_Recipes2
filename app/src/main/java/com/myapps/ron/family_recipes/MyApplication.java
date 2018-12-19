@@ -15,9 +15,12 @@ public class MyApplication extends Application {
 
     public static final String TAG = MyApplication.class.getSimpleName();
 
+    private static MyApplication mContext;
+
     @Override
     public void onCreate() {
         super.onCreate();
+        mContext = this;
     }
 
     public boolean checkInternetConnection(){
@@ -38,5 +41,9 @@ public class MyApplication extends Application {
     @Override
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(LocaleHelper.onAttach(base, "en"));
+    }
+
+    public static Context getContext() {
+        return mContext;
     }
 }

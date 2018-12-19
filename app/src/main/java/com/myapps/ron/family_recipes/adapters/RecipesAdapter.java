@@ -157,11 +157,14 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
                 View view = LayoutInflater.from(context).inflate(R.layout.category_item_layout, internalWrapper, false);
                 //view.setLayoutParams(marginLayoutParams);
                 ((TextView) view.findViewById(R.id.category_text)).setText(category);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                //view.findViewById(R.id.category_text).getBackground().setTint(pickColor());
+                view.findViewById(R.id.category_text).getBackground().setColorFilter(pickColor(), PorterDuff.Mode.SRC_ATOP);
+                /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     view.setForegroundGravity(Gravity.CENTER);
-                }
-                view.getBackground().setColorFilter(pickColor(), PorterDuff.Mode.SRC_ATOP);
-                ((GradientDrawable)view.getBackground()).setStroke(5, Color.BLACK);
+                }*/
+
+                //view.getBackground().setColorFilter(pickColor(), PorterDuff.Mode.SRC_ATOP);
+                //((GradientDrawable)view.getBackground()).setStroke(5, Color.BLACK);
                 //((TextView) view.findViewById(R.id.category_text)).setTextColor(color);
                 internalWrapper.addView(view, marginLayoutParams);
             }

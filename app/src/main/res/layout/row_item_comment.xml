@@ -15,6 +15,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_toStartOf="@id/time_text"
+        android:gravity="start"
         android:fontFamily="@font/open_sans_semibold"
         android:textColor="?android:textColorPrimary"
         android:text="@string/nav_main_all_recipes"

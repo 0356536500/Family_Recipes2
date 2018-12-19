@@ -316,12 +316,14 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
         String message;
         if(recipe.isUserLiked()) {
             Log.e(TAG, "showing full heart");
-            like.setImageDrawable(getResources().getDrawable(R.drawable.ic_favorite_red_36dp));
+            like.setImageResource(R.drawable.ic_favorite_red_36dp);
+            //like.setImageDrawable(getResources().getDrawable(R.drawable.ic_favorite_red_36dp));
             message = "like";
         }
         else {
             Log.e(this.getClass().getSimpleName(), "showing empty heart");
-            like.setImageDrawable(getResources().getDrawable(R.drawable.ic_favorite_border_red_36dp));
+            like.setImageResource(R.drawable.ic_favorite_border_red_36dp);
+            //like.setImageDrawable(getResources().getDrawable(R.drawable.ic_favorite_border_red_36dp));
             message = "unlike";
         }
         if(showLikeMessage)

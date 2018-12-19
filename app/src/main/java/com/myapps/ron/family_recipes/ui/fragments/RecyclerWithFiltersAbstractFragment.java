@@ -104,10 +104,10 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
     public void onAttach(Context context) {
         Log.e(TAG, "on attach");
         super.onAttach(context);
-        if (parent != null) {
+        /*if (parent != null) {
             parent.addView(swipeRefreshLayout);
             parent.addView(mFilter);
-        }
+        }*/
     }
 
     @Override
@@ -128,7 +128,7 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         Log.e(TAG, "on createView");
-        if (mFilter == null) {
+        if (parent == null) {
             Log.e(TAG, "on createView mFilter was null");
             view = inflater.inflate(R.layout.content_main_recipes, container, false);
             parent = (FrameLayout) view;
