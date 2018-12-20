@@ -28,7 +28,7 @@
             android:layout_alignParentTop="true"
              />
 
-        <android.support.v7.widget.AppCompatEditText
+        <androidx.appcompat.widget.AppCompatEditText
             android:id="@+id/recipe_name_editText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -54,7 +54,7 @@
             android:layout_alignParentStart="true"
             android:layout_below="@id/recipe_name_editText"/>
 
-        <android.support.v7.widget.AppCompatEditText
+        <androidx.appcompat.widget.AppCompatEditText
             android:id="@+id/recipe_desc_editText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

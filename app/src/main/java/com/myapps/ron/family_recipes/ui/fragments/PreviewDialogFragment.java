@@ -1,21 +1,16 @@
 package com.myapps.ron.family_recipes.ui.fragments;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import android.util.Log;
-import android.util.TypedValue;
-import android.util.Xml;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 
-import com.amazonaws.services.s3.util.Mimetypes;
 import com.myapps.ron.family_recipes.R;
-import com.myapps.ron.family_recipes.ui.activities.MainActivity;
 
 /**
  * Created by ronginat on 29/10/2018.

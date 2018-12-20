@@ -1,16 +1,14 @@
 package com.myapps.ron.family_recipes.utils;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 
 import com.myapps.ron.family_recipes.MyApplication;
 import com.myapps.ron.family_recipes.R;
-import com.myapps.ron.family_recipes.ui.activities.SettingsActivity;
 
 /**
  * Created by ronginat on 13/12/2018.

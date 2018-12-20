@@ -1,7 +1,7 @@
 package com.myapps.ron.family_recipes.network;
 
 import android.os.StrictMode;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.util.Log;
 
 import com.google.gson.Gson;

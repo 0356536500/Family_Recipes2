@@ -1,15 +1,9 @@
 package com.myapps.ron.family_recipes;
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 
-import com.myapps.ron.family_recipes.model.Recipe;
-import com.myapps.ron.family_recipes.network.APICallsHandler;
-import com.myapps.ron.family_recipes.network.MyCallback;
-import com.myapps.ron.family_recipes.network.cognito.AppHelper;
-
-import java.util.List;
 import java.util.Locale;
 
 public class TestActivity extends AppCompatActivity {

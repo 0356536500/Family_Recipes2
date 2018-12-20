@@ -1,6 +1,6 @@
 package com.myapps.ron.family_recipes.recycler;
 
-import android.support.v7.util.DiffUtil;
+import androidx.recyclerview.widget.DiffUtil;
 
 import com.myapps.ron.family_recipes.model.Recipe.Comment;
 

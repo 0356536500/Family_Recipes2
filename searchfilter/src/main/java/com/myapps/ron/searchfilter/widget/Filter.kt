@@ -22,7 +22,7 @@ import kotlinx.android.synthetic.main.filter.view.*
 import java.io.Serializable
 import java.util.*
 import android.graphics.Color
-import android.support.annotation.ColorInt
+import androidx.annotation.ColorInt
 import android.util.Log
 import android.view.animation.AlphaAnimation
 import android.view.animation.Animation

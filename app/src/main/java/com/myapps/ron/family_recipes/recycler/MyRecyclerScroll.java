@@ -1,7 +1,7 @@
 package com.myapps.ron.family_recipes.recycler;
 
-import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 
 /**
  * Created by ronginat on 12/12/2018.
