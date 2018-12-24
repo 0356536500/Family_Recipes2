@@ -30,12 +30,12 @@ class CollapsedFilterContainer : RelativeLayout {
         LayoutInflater.from(context).inflate(R.layout.collapsed_container, this, true)
     }
 
-    override fun onInterceptTouchEvent(ev: MotionEvent): Boolean {
+    /*override fun onInterceptTouchEvent(ev: MotionEvent): Boolean {
         val isEmpty = collapsedFilter.childCount == 0
         val containsEvent = ev.x >= collapsedFilter.x && ev.x <= collapsedFilter.x + collapsedFilter.measuredWidth
 
         return isEmpty || !containsEvent
-    }
+    }*/
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
         when (event.action) {
@@ -44,18 +44,18 @@ class CollapsedFilterContainer : RelativeLayout {
                 mStartY = event.y
             }
             MotionEvent.ACTION_UP -> {
-                if (!collapsedFilter.isBusy && isClick(mStartX, mStartY, event.x, event.y)) {
+                if (isClick(mStartX, mStartY, event.x, event.y)) {
                     listener?.toggle()
                     mStartX = 0f
                     mStartY = 0f
                 }
             }
             MotionEvent.ACTION_MOVE -> {
-                if (!collapsedFilter.isBusy && Math.abs(mStartX - event.x) < 20 && event.y - mStartY > 20) {
+                if (Math.abs(mStartX - event.x) < 20 && event.y - mStartY > 20) {
                     listener?.expand()
                     mStartX = 0f
                     mStartY = 0f
-                } else if (!collapsedFilter.isBusy && Math.abs(mStartX - event.x) < 20 && event.y - mStartY < -20) {
+                } else if (Math.abs(mStartX - event.x) < 20 && event.y - mStartY < -20) {
                     listener?.collapse()
                     mStartX = 0f
                     mStartY = 0f

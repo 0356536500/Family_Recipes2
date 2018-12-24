@@ -27,7 +27,6 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    def compat_version = "27.1.1"
     implementation 'androidx.appcompat:appcompat:1.1.0-alpha01'
     implementation 'com.google.android.material:material:1.1.0-alpha02'
     testImplementation 'junit:junit:4.12'
@@ -37,19 +36,8 @@ dependencies {
 /*
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 */
+    implementation 'com.google.android:flexbox:1.1.0'
 }
 repositories {
     mavenCentral()
-}
-
-configurations.all {
-    resolutionStrategy.eachDependency { DependencyResolveDetails details ->
-        def requested = details.requested
-        if (requested.group == 'com.android.support') {
-            // Skip multidex because it follows a different versioning pattern.
-            if (!requested.name.startsWith("multidex")) {
-                details.useVersion '25.3.0'
-            }
-        }
-    }
 }

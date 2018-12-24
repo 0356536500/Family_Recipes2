@@ -8,6 +8,6 @@ interface FilterItemListener {
 
     fun onItemDeselected(item: FilterItem)
 
-    fun onItemRemoved(item: FilterItem)
+    //fun onItemRemoved(item: FilterItem)
 
 }

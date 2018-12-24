@@ -92,7 +92,6 @@ class Filter<T : FilterModel<T>> : FrameLayout, FilterItemListener, CollapseList
         LayoutInflater.from(context).inflate(R.layout.filter, this, true)
         visibility = View.INVISIBLE
         collapseView.setOnClickListener { toggle() }
-        collapsedFilter.scrollListener = this
         collapsedContainer.listener = this
         expandedFilter.listener = this
         val attributes = context.obtainStyledAttributes(attrs, R.styleable.Filter, 0, 0)
@@ -169,7 +168,6 @@ class Filter<T : FilterModel<T>> : FrameLayout, FilterItemListener, CollapseList
             }
         }
         expandedFilter.margin = margin
-        collapsedFilter.margin = margin
     }
 
     private fun validate(): Boolean = adapter != null && adapter?.items != null && !adapter?.items?.isEmpty()!!
@@ -183,7 +181,7 @@ class Filter<T : FilterModel<T>> : FrameLayout, FilterItemListener, CollapseList
     }
 
     private fun collapse(duration: Long) {
-        if (mIsBusy || collapsedFilter.isBusy) return
+        if (mIsBusy) return
         mIsBusy = true
         mRemovedFilters.clear()
 
@@ -200,41 +198,9 @@ class Filter<T : FilterModel<T>> : FrameLayout, FilterItemListener, CollapseList
                 collapseView.rotateArrow(180 * (1 - ratio))
                 collapseView.turnIntoArrow(ratio)
 
-                /*mSelectedFilters.keys.forEachIndexed { index, filterItem ->
-                    val x = calculateX(index, collapsedFilterScroll.measuredWidth, margin, filterItem.collapsedSize)
-
-                    filterItem.decrease(ratio)
-
-                    if (index >= calculateCount(collapsedFilterScroll.measuredWidth, filterItem.collapsedSize, margin)) {
-                        filterItem.alpha = 1 - ratio * 3
-                    } else {
-                        filterItem.translationX = filterItem.startX + (x - filterItem.startX
-                                - filterItem.measuredWidth / 2 + filterItem.collapsedSize / 2) * ratio
-                        filterItem.translationY = filterItem.startY + (dpToPx(getDimen(R.dimen.margin)).toFloat() / 4
-                                - filterItem.startY) * ratio
-                    }
-
-                    if (ratio == 1f) {
-                        filterItem.removeFromParent()
-                        collapsedFilter.addView(filterItem)
-                        filterItem.translationX = (x - filterItem.measuredWidth / 2 + filterItem.collapsedSize / 2).toFloat()
-                        filterItem.translationY = dpToPx(getDimen(R.dimen.margin)).toFloat() / 4
-                        filterItem.alpha = 1f
-                        filterItem.bringToFront()
-                    }
-                }*/
-
                 collapsedContainer.translationY = ratio * (-measuredHeight + collapsedContainer.height)
                 dividerTop.alpha = 1 - 2 * ratio
                 expandedFilterScroll.translationY = ratio * (-measuredHeight + collapsedContainer.height)
-
-                /*if (mSelectedFilters.isEmpty()) {
-                    collapsedText.visibility = View.VISIBLE
-                    collapsedText.alpha = ratio
-                } else {
-                    collapsedText.visibility = View.GONE
-                    collapsedText.alpha = 1 - ratio
-                }*/
 
                 collapsedText.visibility = View.VISIBLE
                 collapsedText.alpha = ratio
@@ -251,7 +217,7 @@ class Filter<T : FilterModel<T>> : FrameLayout, FilterItemListener, CollapseList
     }
 
     override fun expand() {
-        if (collapsedFilter.isBusy || mIsBusy) return
+        if (mIsBusy) return
 
         mIsBusy = true
 
@@ -276,39 +242,6 @@ class Filter<T : FilterModel<T>> : FrameLayout, FilterItemListener, CollapseList
                 collapseView.rotateArrow(180 * ratio)
                 collapseView.turnIntoOkButton(ratio)
 
-                /*mSelectedFilters.keys.forEachIndexed { index, filterItem ->
-
-                    val x = mSelectedFilters[filterItem]?.x
-                    val y = mSelectedFilters[filterItem]?.y
-
-                    if (index < calculateCount(collapsedFilterScroll.measuredWidth, filterItem.collapsedSize, margin)) {
-                        filterItem.translationX = filterItem.startX + (x!! - filterItem.startX) * ratio
-                        filterItem.translationY = filterItem.startY + (y!! - filterItem.startY) * ratio
-                    } else {
-                        filterItem.translationX = x!!.toFloat()
-                        filterItem.translationY = y!!.toFloat()
-                        filterItem.alpha = ratio
-                    }
-                    filterItem.increase(ratio)
-
-                    if (ratio == 1f) {
-                        filterItem.removeFromParent()
-                        if(!filterItem.isHidden)
-                            expandedFilter.addView(filterItem)
-                        filterItem.translationX = 0f
-                        filterItem.translationY = 0f
-                    }
-                }
-
-                mRemovedFilters.keys.forEach { filterItem ->
-                    filterItem.alpha = ratio
-
-                    filterItem.removeFromParent()
-                    if(!filterItem.isHidden)
-                        expandedFilter.addView(filterItem)
-                    filterItem.translationX = mRemovedFilters[filterItem]?.x!! * (1 - ratio)
-                    filterItem.translationY = mRemovedFilters[filterItem]?.y!! * (1 - ratio)
-                }*/
                 collapsedText.alpha = 1 - ratio
                 dividerTop.alpha = 2 * ratio
                 collapsedContainer.translationY = -container.height.toFloat() * (1 - ratio)
@@ -323,37 +256,6 @@ class Filter<T : FilterModel<T>> : FrameLayout, FilterItemListener, CollapseList
             }
         }.start()
 
-        mRemovedFilters.keys.forEach { filterItem ->
-            val x = mRemovedFilters[filterItem]?.x
-            val y = mRemovedFilters[filterItem]?.y
-
-            filterItem.translationX = x!!.toFloat()
-            filterItem.translationY = y!!.toFloat()
-            filterItem.increase(1f)
-            filterItem.deselect()
-        }
-    }
-
-    private fun removeItemsFromParent() {
-        mSelectedFilters.keys.forEach { item ->
-            remove(item)
-        }
-    }
-
-    /**
-     * remove the view after it has been removed from {@link #mSelectedFilters}
-     * @param item - to be removed from collapsedView
-     */
-    private fun remove(item: FilterItem) {
-        val x = item.x
-        val y = item.y
-        item.removeFromParent()
-        container.addView(item)
-        item.translationX = x
-        item.translationY = y
-        item.startX = x
-        item.startY = y
-        item.bringToFront()
     }
 
     override fun onItemSelected(item: FilterItem) {
@@ -409,29 +311,6 @@ class Filter<T : FilterModel<T>> : FrameLayout, FilterItemListener, CollapseList
         mSelectedFilters.remove(item)
         if(!item.isContainer) {
             listener?.onFilterDeselected(filter)
-        }
-    }
-
-    /**
-     * cancelButton onClick in CollapsedFilterView
-     */
-    override fun onItemRemoved(item: FilterItem) {
-        val coord = mSelectedFilters[item]
-        if (coord != null && collapsedFilter.removeItem(item)) {
-            mSelectedFilters.remove(item)
-            mSelectedItems.remove(mItems[item])
-            mRemovedFilters.put(item, coord)
-
-            postDelayed({
-                remove(item)
-
-                if (mSelectedFilters.isEmpty()) {
-                    collapsedText.visibility = View.VISIBLE
-                    collapsedText.alpha = 1f
-                }
-            }, Constant.ANIMATION_DURATION / 2)
-
-            notifyListener()
         }
     }
 
@@ -575,7 +454,7 @@ class Filter<T : FilterModel<T>> : FrameLayout, FilterItemListener, CollapseList
      * change the filterView state from expanded to collapsed and vice versa
      */
     override fun toggle() {
-        if (collapsedFilter.isBusy || mIsBusy) return
+        if (mIsBusy) return
 
         if (isCollapsed != null && isCollapsed as Boolean) expand() else collapse()
     }

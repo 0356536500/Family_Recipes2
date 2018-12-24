@@ -17,20 +17,26 @@
         android:id="@+id/dividerBottom"
         android:layout_width="match_parent"
         android:layout_height="0.5dp"
-        android:layout_below="@+id/collapsedFilterScroll"
+        android:layout_below="@+id/collapsedTextContainer"
         android:background="#b2b6c6" />
 
-    <TextView
-        android:id="@+id/collapsedText"
+    <FrameLayout
+        android:id="@+id/collapsedTextContainer"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_marginStart="16dp"
-        android:textColor="#827f93"
-        android:textSize="18sp"
-        tools:text="All categories" />
+        android:layout_height="@dimen/container_height"
+        android:layout_marginStart="16dp">
+        <TextView
+            android:id="@+id/collapsedText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textColor="#827f93"
+            android:textSize="18sp"
+            tools:text="All categories" />
+    </FrameLayout>
 
-    <HorizontalScrollView
+
+    <!--<HorizontalScrollView
         android:id="@+id/collapsedFilterScroll"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/container_height"
@@ -44,7 +50,7 @@
             android:layout_width="wrap_content"
             android:layout_height="@dimen/container_height" />
 
-    </HorizontalScrollView>
+    </HorizontalScrollView>-->
 
 
     <com.myapps.ron.searchfilter.widget.CollapseView

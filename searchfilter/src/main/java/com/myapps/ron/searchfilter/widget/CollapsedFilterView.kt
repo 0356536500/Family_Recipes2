@@ -10,7 +10,7 @@ import com.myapps.ron.searchfilter.R
 import com.myapps.ron.searchfilter.listener.CollapseListener
 
 
-class CollapsedFilterView : ViewGroup {
+/*class CollapsedFilterView : ViewGroup {
 
     internal var margin: Int = dpToPx(getDimen(R.dimen.margin))
     internal var isBusy = false
@@ -24,7 +24,11 @@ class CollapsedFilterView : ViewGroup {
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
     constructor(context: Context, attrs: AttributeSet?, defStyleRes: Int) : super(context, attrs, defStyleRes)
 
-    override fun onLayout(p0: Boolean, p1: Int, p2: Int, p3: Int, p4: Int) {
+    override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
+
+    }*/
+
+    /*override fun onLayout(p0: Boolean, p1: Int, p2: Int, p3: Int, p4: Int) {
         for (i in 0..childCount - 1) {
             val child: FilterItem = getChildAt(i) as FilterItem
             child.layout(0, 0, child.collapsedSize / 2 + child.measuredWidth / 2 + 1, child.measuredHeight)
@@ -117,6 +121,6 @@ class CollapsedFilterView : ViewGroup {
     }
 
     private fun containsCoord(item: FilterItem, x: Float): Boolean
-            = item.x + item.fullSize / 2 - item.collapsedSize / 2 <= x && x <= item.x + item.fullSize / 2 + item.collapsedSize / 2
+            = item.x + item.fullSize / 2 - item.collapsedSize / 2 <= x && x <= item.x + item.fullSize / 2 + item.collapsedSize / 2*/
 
-}
+//}
