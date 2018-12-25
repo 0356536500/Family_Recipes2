@@ -3,10 +3,10 @@ package com.myapps.ron.searchfilter.model
 import java.io.Serializable
 
 
-interface FilterModel<T> : Serializable {
+interface FilterModel : Serializable {
 
     fun getText(): String
 
-    fun getSubs(): List<T>
+    fun getSubs(): List<FilterModel>
 
 }

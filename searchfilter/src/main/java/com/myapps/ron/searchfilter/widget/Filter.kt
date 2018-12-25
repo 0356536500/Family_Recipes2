@@ -28,7 +28,7 @@ import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
 
 
-class Filter<T : FilterModel<T>> : FrameLayout, FilterItemListener, CollapseListener {
+class Filter<T : FilterModel> : FrameLayout, FilterItemListener, CollapseListener {
 
     var adapter: FilterAdapter<T>? = null
     var listener: FilterListener<T>? = null
@@ -109,6 +109,19 @@ class Filter<T : FilterModel<T>> : FrameLayout, FilterItemListener, CollapseList
         }
 
         mItems.clear()
+
+        expandedFilter.post {
+            adapter?.items?.forEachIndexed { i, item ->
+
+                buildItem(item, true)
+                //add the group header to the main View
+                val view: FilterItem = adapter?.createView(i, item)!!
+                view.listener = this
+                view.isContainer = true
+
+            }
+        }
+
         expandedFilter.post {
             val mainItems: MutableList<FilterItem> = mutableListOf()
             adapter?.items?.forEachIndexed { i, item ->
@@ -137,7 +150,7 @@ class Filter<T : FilterModel<T>> : FrameLayout, FilterItemListener, CollapseList
                         subView.isContainer = false
                         subView.isHidden = true
                         subList.add(indexInParent, subView)
-                        subItems.add(indexInParent, subItem)
+                        subItems.add(indexInParent, subItem as T)
                         //expandedFilter.addView(subView)
                         mItems.put(subView, subItem)
                     }
@@ -168,6 +181,15 @@ class Filter<T : FilterModel<T>> : FrameLayout, FilterItemListener, CollapseList
             }
         }
         expandedFilter.margin = margin
+    }
+
+    private fun buildItem(item: T, isVisible: Boolean) {
+        //add the group header to the main View
+        //val view: FilterItem = adapter?.createView(item)!!
+        //view.listener = this
+
+        //if ()
+        //view.isContainer = true
     }
 
     private fun validate(): Boolean = adapter != null && adapter?.items != null && !adapter?.items?.isEmpty()!!

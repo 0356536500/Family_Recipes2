@@ -35,18 +35,6 @@ class ExpandedFilterView : FlexboxLayout {
         alignContent = AlignContent.FLEX_START
         justifyContent = JustifyContent.FLEX_START
     }
-    /*override fun onLayout(p0: Boolean, p1: Int, p2: Int, p3: Int, p4: Int) {
-        if (!filters.isEmpty()) {
-            for (i in 0..childCount - 1) {
-                val child: View = getChildAt(i)
-                val coord: Coord? = filters[child]
-
-                if (coord != null) {
-                    child.layout(coord.x, coord.y, coord.x + child.measuredWidth, coord.y + child.measuredHeight)
-                }
-            }
-        }
-    }*/
 
     fun refreshView() {
         /*filters.clear()

@@ -534,7 +534,7 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
         public FilterItem createSubCategory(int position, Category item, @NonNull FilterItem parent) {
             FilterItem filterItem = new FilterItem(activity);
 
-            filterItem.setContainer(true);
+            //filterItem.setContainer(true);
             filterItem.setStrokeColor(parent.getCheckedColor());
             filterItem.setTextColor(parent.getCheckedColor());
             filterItem.setCornerRadius(100f);
