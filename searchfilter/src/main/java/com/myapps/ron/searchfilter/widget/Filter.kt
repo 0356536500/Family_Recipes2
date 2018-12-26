@@ -1,6 +1,5 @@
 package com.myapps.ron.searchfilter.widget
 
-import android.animation.Animator
 import android.animation.ValueAnimator
 import android.content.Context
 import android.os.Bundle
@@ -22,8 +21,6 @@ import kotlinx.android.synthetic.main.filter.view.*
 import java.io.Serializable
 import java.util.*
 import android.graphics.Color
-import androidx.annotation.ColorInt
-import android.util.Log
 import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
 
@@ -83,6 +80,8 @@ class Filter<T : FilterModel> : FrameLayout, FilterItemListener, CollapseListene
     private val mSelectedFilters: LinkedHashMap<FilterItem, Coord> = LinkedHashMap()
     private val mRemovedFilters: LinkedHashMap<FilterItem, Coord> = LinkedHashMap()
     private val mItems: LinkedHashMap<FilterItem, T> = LinkedHashMap()
+    private val mainFilters: ArrayList<FilterItem> = ArrayList()
+    private var mSelectedFilters1: ArrayList<FilterItem> = ArrayList()
     private var mSelectedItems: ArrayList<T> = ArrayList()
     private var mRemovedItems: ArrayList<T> = ArrayList()
 
@@ -113,16 +112,36 @@ class Filter<T : FilterModel> : FrameLayout, FilterItemListener, CollapseListene
         expandedFilter.post {
             adapter?.items?.forEachIndexed { i, item ->
 
-                buildItem(item, true)
+                mainFilters.add(buildItem(item, true))
                 //add the group header to the main View
-                val view: FilterItem = adapter?.createView(i, item)!!
+                /*val view: FilterItem = buildItem(item, true)
                 view.listener = this
-                view.isContainer = true
+                view.isContainer = true*/
 
+            }
+
+            if (isCollapsed == null) {
+                collapse(1)
+                val animation = AlphaAnimation(0f, 1f)
+                animation.duration = Constant.ANIMATION_DURATION
+                animation.setAnimationListener(object : Animation.AnimationListener {
+                    override fun onAnimationRepeat(animation: Animation?) {
+                        // actually, I don't need this method but I have to implement this.
+                    }
+
+                    override fun onAnimationEnd(animation: Animation?) {
+                        visibility = View.VISIBLE
+                    }
+
+                    override fun onAnimationStart(animation: Animation?) {
+                        // actually, I don't need this method but I have to implement this.
+                    }
+                })
+                startAnimation(animation)
             }
         }
 
-        expandedFilter.post {
+        /*expandedFilter.post {
             val mainItems: MutableList<FilterItem> = mutableListOf()
             adapter?.items?.forEachIndexed { i, item ->
                 //add the group header to the main View
@@ -148,7 +167,7 @@ class Filter<T : FilterModel> : FrameLayout, FilterItemListener, CollapseListene
                         val subView: FilterItem = adapter?.createSubCategory(indexInParent, item, mainItems.get(index))!!
                         subView.listener = this
                         subView.isContainer = false
-                        subView.isHidden = true
+                        //subView.isHidden = true
                         subList.add(indexInParent, subView)
                         subItems.add(indexInParent, subItem as T)
                         //expandedFilter.addView(subView)
@@ -179,17 +198,40 @@ class Filter<T : FilterModel> : FrameLayout, FilterItemListener, CollapseListene
                 })
                 startAnimation(animation)
             }
-        }
+        }*/
         expandedFilter.margin = margin
     }
 
-    private fun buildItem(item: T, isVisible: Boolean) {
+    private fun buildItem(item: FilterModel, isVisible: Boolean) : FilterItem{
         //add the group header to the main View
-        //val view: FilterItem = adapter?.createView(item)!!
-        //view.listener = this
+        val filter: T = item as T
+        val itemView: FilterItem = adapter?.createView(filter)!!
+        mItems[itemView] = filter
+        if(itemView.text == customTextView) {
+            itemView.select()
+            mNothingSelectedItem = itemView
+        }
+        itemView.listener = this
+        // view saves reference to its FilterModel
+        itemView.item = filter
+        // if the view is initially visible then it's must be a main container, therefore not contained
+        // else, this view is not initially visible, therefore contained by other view
+        itemView.isContained = isVisible
 
-        //if ()
-        //view.isContainer = true
+        expandedFilter.addView(itemView)
+        if (!isVisible)
+            itemView.visibility = View.GONE
+
+        // init the sub filters if exists. recursive method, so it can be flexible structure of filters
+        if (filter.getSubs().isNotEmpty()) {
+            itemView.isContainer = true
+            itemView.subItems.addAll(filter.getSubs())
+            filter.getSubs().forEach { subItem ->
+                itemView.subFilters.add(buildItem(subItem, false))
+            }
+        }
+
+        return itemView
     }
 
     private fun validate(): Boolean = adapter != null && adapter?.items != null && !adapter?.items?.isEmpty()!!
@@ -249,13 +291,6 @@ class Filter<T : FilterModel> : FrameLayout, FilterItemListener, CollapseListene
         container.bringToFront()
         container.requestFocus()
 
-        /*if (firstExpand) {
-            firstExpand = false
-            firstExpandList.forEach { view ->
-                expandedFilter.addView(view)
-            }
-            firstExpandList.clear()
-        }*/
 
         ValueAnimator.ofFloat(0f, Constant.ANIMATION_DURATION.toFloat()).setDuration(Constant.ANIMATION_DURATION).apply {
             addUpdateListener {
@@ -284,10 +319,24 @@ class Filter<T : FilterModel> : FrameLayout, FilterItemListener, CollapseListene
         val filter = mItems[item]!!
         if (mItems.contains(item)) {
             mSelectedItems.add(filter)
+            mSelectedFilters1.add(item)
+
+            //if item representing a whole group, make this group visible in ExpandedFilter
+            if (item.isContainer && !item.isHeader) {
+                item.subFilters.forEach { subFilter ->
+                    subFilter.visibility = View.VISIBLE
+                }
+            }
+
+            // if the item is a leaf in filters structure, call onFilterSelected
+            // if its a header, call onFilterSelected
+            if(!item.isContainer || item.isHeader) {
+                listener?.onFilterSelected(filter)
+            }
 
             //if item representing a whole group, re-create list of views for ExpandedFilterView
             //and refresh its measures
-            if(item.isContainer && !item.isHeader) {
+            /*if(item.isContainer && !item.isHeader) {
                 val expandedChildren: MutableList<View> = mutableListOf()
                 for (index in 0..(expandedFilter.childCount - 1)) {
                     if(expandedFilter.getChildAt(index) != null)
@@ -299,19 +348,19 @@ class Filter<T : FilterModel> : FrameLayout, FilterItemListener, CollapseListene
                     if (expandedFilter.indexOfChild(subView) >= 0)
                         expandedFilter.removeView(subView)
 
-                    subView.isHidden = false
+                    //subView.isHidden = false
                     //add a subView right after its parent
                     expandedChildren.add(parentIndex + i + 1, subView)
                 }
                 expandedFilter.addAllViews(expandedChildren)
                 expandedFilter.refreshView()
-            }
+            }*/
         }
 
-        mSelectedFilters.put(item, Coord(item.x.toInt(), item.y.toInt()))
+        /*mSelectedFilters.put(item, Coord(item.x.toInt(), item.y.toInt()))
         if(!item.isContainer || item.isHeader) {
             listener?.onFilterSelected(filter)
-        }
+        }*/
     }
 
     /**
@@ -320,20 +369,33 @@ class Filter<T : FilterModel> : FrameLayout, FilterItemListener, CollapseListene
     override fun onItemDeselected(item: FilterItem) {
         val filter = mItems[item]!!
         if (mItems.contains(item)) {
+
             mSelectedItems.remove(filter)
+            mSelectedFilters1.remove(item)
+
+            // if the item contains sub filters or sub sub filter etc, hide them all
+            if(item.isContainer) {
+                item.hideAll(false)
+            }
+
+            if(!item.isContainer) {
+                listener?.onFilterDeselected(filter)
+            }
+
+            /*mSelectedItems.remove(filter)
             if(item.isContainer) {
                 item.subFilters.forEach{ subView ->
                     expandedFilter.removeView(subView)
-                    subView.isHidden = true
+                    //subView.isHidden = true
                 }
                 expandedFilter.refreshView()
-            }
+            }*/
         }
 
-        mSelectedFilters.remove(item)
+        /*mSelectedFilters.remove(item)
         if(!item.isContainer) {
             listener?.onFilterDeselected(filter)
-        }
+        }*/
     }
 
     /**
@@ -350,25 +412,43 @@ class Filter<T : FilterModel> : FrameLayout, FilterItemListener, CollapseListene
 
     private fun getSelectedItems(): ArrayList<T> {
         val items: ArrayList<T> = ArrayList()
-        mSelectedFilters.keys.forEach { filter ->
+        mSelectedFilters1.forEach { filter ->
+            val item: T? = mItems[filter]
+            if (item != null && !filter.isContainer) {
+                items.add(item)
+            }
+        }
+        /*mSelectedFilters.keys.forEach { filter ->
             val item: T? = mItems[filter]
 
             if (item != null && !filter.isContainer) {
                 items.add(item)
             }
-        }
+        }*/
 
         return items
     }
 
     fun deselectAll() {
-        if(mSelectedFilters.isNotEmpty()) {
+
+        if (mSelectedItems.isNotEmpty()) {
+            mainFilters.forEach { filter ->
+                if (!filter.isHeader) {
+                    filter.deselectAll()
+                    filter.hideAll(false)
+                }
+            }
+        }
+        mSelectedItems.clear()
+        listener?.onNothingSelected()
+
+        /*if(mSelectedFilters.isNotEmpty()) {
             mSelectedFilters.keys.forEach { item -> item.deselect(false) }
             mSelectedFilters.keys.forEach { item ->
                 if (item.isContainer) {
                     item.subFilters.forEach { subView ->
                         expandedFilter.removeView(subView)
-                        subView.isHidden = true
+                        //subView.isHidden = true
                     }
                 }
             }
@@ -376,7 +456,7 @@ class Filter<T : FilterModel> : FrameLayout, FilterItemListener, CollapseListene
             mSelectedFilters.clear()
             mSelectedItems.clear()
         }
-        listener?.onNothingSelected()
+        listener?.onNothingSelected()*/
     }
 
     /**
@@ -409,13 +489,13 @@ class Filter<T : FilterModel> : FrameLayout, FilterItemListener, CollapseListene
             putBoolean(STATE_COLLAPSED, collapsed)
             //putBoolean(STATE_COLLAPSED, isCollapsed!!)
             val selected = mSelectedItems
-            val removed = mRemovedItems
+            //val removed = mRemovedItems
             if (selected is Serializable) {
                 putSerializable(STATE_SELECTED, selected)
             }
-            if (removed is Serializable) {
+            /*if (removed is Serializable) {
                 putSerializable(STATE_REMOVED, removed)
-            }
+            }*/
         }
     }
 
@@ -439,7 +519,7 @@ class Filter<T : FilterModel> : FrameLayout, FilterItemListener, CollapseListene
             isCollapsed = state.getBoolean(STATE_COLLAPSED)
             if (selected is ArrayList<T> && removed is ArrayList<T>) {
                 mSelectedItems = selected
-                mRemovedItems = removed
+                //mRemovedItems = removed
                 expandedFilter.post {
                     restore(expandedFilter.filters)
                 }
@@ -455,12 +535,13 @@ class Filter<T : FilterModel> : FrameLayout, FilterItemListener, CollapseListene
                     val item = { item: T -> filterItem.text == item.getText() }
 
                     if (mSelectedItems.any(item)) {
-                        mSelectedFilters.put(filterItem, coord)
+                        mSelectedFilters1.add(filterItem)
+                        //mSelectedFilters.put(filterItem, coord)
                         filterItem.select(false)
-                    } else if (mRemovedItems.any(item)) {
+                    } /*else if (mRemovedItems.any(item)) {
                         mRemovedFilters.put(filterItem, coord)
                         filterItem.deselect(false)
-                    }
+                    }*/
                 }
             }
 

@@ -14,11 +14,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class Category implements FilterModel<Category>, Parcelable {
+public class Category implements FilterModel, Parcelable {
     @SerializedName("name")
     private String name;
     @SerializedName("categories")
-    private List<String> categories;
+    private List<Category> categories;
     private int color;
 
     private static final Gson gson = new Gson();
@@ -35,7 +35,10 @@ public class Category implements FilterModel<Category>, Parcelable {
     public Category(String text, int color, List<String> categories) {
         this.name = text;
         this.color = color;
-        this.categories = categories;
+        this.categories = new ArrayList<>();
+        for (String str: categories) {
+            this.categories.add(new Category(str, this.color));
+        }
     }
 
     public Category(String text, String categories, int color) {
@@ -69,11 +72,11 @@ public class Category implements FilterModel<Category>, Parcelable {
         this.color = color;
     }
 
-    public List<String> getCategories() {
+    public List<Category> getCategories() {
         return categories;
     }
 
-    public void setCategories(List<String> categories) {
+    public void setCategories(List<Category> categories) {
         this.categories = categories;
     }
 
@@ -83,7 +86,7 @@ public class Category implements FilterModel<Category>, Parcelable {
 
     public void setStringCategories(String categories) {
         Type type = new TypeToken<List<String>>() {}.getType();
-        List<String> value = gson.fromJson(categories, type);
+        List<Category> value = gson.fromJson(categories, type);
         setCategories(value);
     }
 
@@ -114,14 +117,9 @@ public class Category implements FilterModel<Category>, Parcelable {
 
     @NonNull
     @Override
-    public List<Category> getSubs() {
-        List<Category> subs = new ArrayList<>();
+    public List<FilterModel> getSubs() {
 
-        for (String cat: categories) {
-            subs.add(new Category(cat, color));
-        }
-
-        return subs;
+        return new ArrayList<>(categories);
     }
 
     public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {

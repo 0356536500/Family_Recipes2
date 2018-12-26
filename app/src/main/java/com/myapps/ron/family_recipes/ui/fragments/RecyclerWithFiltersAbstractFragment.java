@@ -50,6 +50,7 @@ import com.myapps.ron.searchfilter.widget.FilterItem;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -456,7 +457,7 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
         for (int i = 0; i < tags.size(); ++i) {
             //tags.add(new Category(mTitles[i], mColors[i]));
             if(tags.get(i).getColor() == 0)
-                tags.get(i).setColor(mColors[i]);
+                tags.get(i).setColor(mColors[i % mColors.length]);
         }
 
         //return tags;
@@ -510,6 +511,29 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
             super(items);
         }
 
+        private int pickColor() {
+            Random rand = new Random(System.currentTimeMillis());
+            return rand.nextInt(mColors.length);
+        }
+
+        @Override
+        public FilterItem createView(Category item) {
+            FilterItem filterItem = new FilterItem(activity);
+
+            if (item.getText().equals(tags.get(0).getText()))
+                filterItem.setHeader(true);
+            filterItem.setStrokeColor(mColors[0]);
+            filterItem.setTextColor(filterTextColor);
+            filterItem.setCornerRadius(75f);
+            filterItem.setCheckedTextColor(ContextCompat.getColor(activity, android.R.color.white));
+            filterItem.setColor(filterBackgroundColor);
+            filterItem.setCheckedColor(mColors[pickColor()]);
+            filterItem.setText(item.getText());
+            filterItem.deselect();
+
+            return filterItem;
+        }
+
         @NonNull
         @Override
         public FilterItem createView(int position, Category item) {
@@ -541,10 +565,11 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
             filterItem.setCheckedTextColor(ContextCompat.getColor(activity, android.R.color.white));
             filterItem.setColor(filterBackgroundColor);
             filterItem.setCheckedColor(item.getColor());
-            filterItem.setText(item.getCategories().get(position));
+            filterItem.setText(item.getCategories().get(position).getText());
             filterItem.deselect();
 
             return filterItem;
         }
+
     }
 }

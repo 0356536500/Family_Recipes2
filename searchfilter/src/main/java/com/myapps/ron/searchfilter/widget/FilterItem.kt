@@ -7,6 +7,7 @@ import android.graphics.drawable.GradientDrawable
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.MotionEvent
+import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.annotation.ColorInt
@@ -20,9 +21,10 @@ import java.io.Serializable
 
 class FilterItem : FrameLayout, Serializable {
 
-    var isHidden: Boolean = false
+    var isContained: Boolean = false
     var isContainer: Boolean = false
     var isHeader: Boolean = false
+    var item: Any? = null
     var subFilters: MutableList<FilterItem> = mutableListOf()
     val subItems: MutableList<Any> = mutableListOf()
     var isFilterSelected: Boolean = false
@@ -70,6 +72,26 @@ class FilterItem : FrameLayout, Serializable {
                 select()
             }
         }
+    }
+
+    fun hideAll(visible: Boolean) {
+        subFilters.forEach { filter ->
+            filter.hideAll(visible)
+        }
+
+        visibility =
+        if (visible && isContained)
+            View.VISIBLE
+        else
+            View.GONE
+    }
+
+    fun deselectAll() {
+        subFilters.forEach { filter ->
+            filter.deselectAll()
+        }
+        if (isFilterSelected)
+            deselect(false)
     }
 
     fun select(notify: Boolean = true) {
