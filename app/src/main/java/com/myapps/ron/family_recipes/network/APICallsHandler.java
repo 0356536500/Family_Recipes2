@@ -1,12 +1,12 @@
 package com.myapps.ron.family_recipes.network;
 
 import android.os.StrictMode;
-import androidx.annotation.NonNull;
 import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.myapps.ron.family_recipes.model.Category;
+import com.myapps.ron.family_recipes.model.Category1;
 import com.myapps.ron.family_recipes.model.Recipe;
 
 import java.io.IOException;
@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import androidx.annotation.NonNull;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -184,7 +185,7 @@ public class APICallsHandler {
 
     public static void getAllCategories(String date, String token, final MyCallback<List<Category>> callback) {
         RecipeInterface service = getRetrofitInstance().create(RecipeInterface.class);
-        Call<List<Category>> call = service.getAllCategories(token, "0");
+        Call<List<Category>> call = service.getAllCategories(token, date);
 
         call.enqueue(new Callback<List<Category>>() {
             @Override

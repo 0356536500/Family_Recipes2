@@ -66,7 +66,10 @@ public class FavoritesRecipesFragment extends RecyclerWithFiltersAbstractFragmen
                 if(categories != null) {
                     Log.e(TAG, categories.toString());
                     tags = new ArrayList<>(categories);
-                    tags.add(0, new Category(getString(R.string.str_all_selected), mColors[0]));
+                    tags.add(0, new Category.CategoryBuilder()
+                            .name(getString(R.string.str_all_selected))
+                            .color(mColors[0])
+                            .build());
                     loadFiltersColor();
                     setCategories();
                     initCategories();

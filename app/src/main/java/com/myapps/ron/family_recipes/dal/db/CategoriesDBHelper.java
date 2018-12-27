@@ -66,8 +66,8 @@ public class CategoriesDBHelper extends MyDBHelper{
         ContentValues values = new ContentValues();
 
         values.put(CAT_KEY_ID, category.getName());
-        values.put(CAT_KEY_CATS, category.getStringCategories());
         values.put(CAT_KEY_COLOR, category.getColor());
+        values.put(CAT_KEY_CATS, category.getStringCategories());
 
 
         // Inserting Row
@@ -83,7 +83,12 @@ public class CategoriesDBHelper extends MyDBHelper{
         Category temp = null;
         if(cursor != null) {
             cursor.moveToFirst();
-            temp = new Category(cursor.getString(cursor.getColumnIndex(CAT_KEY_ID)), cursor.getString(1), cursor.getInt(2));
+            temp = new Category.CategoryBuilder()
+                    .name(cursor.getString(cursor.getColumnIndex(CAT_KEY_ID)))
+                    .color(cursor.getString(1))
+                    .categories(cursor.getString(2))
+                    .build();
+
             cursor.close();
         }
         return temp;
@@ -101,10 +106,11 @@ public class CategoriesDBHelper extends MyDBHelper{
             // looping through all rows and adding to list
             if (cursor.moveToFirst()) {
                 do {
-                    Category category = new Category();
-                    category.setName(cursor.getString(0));
-                    category.setStringCategories(cursor.getString(1));
-                    category.setColor(cursor.getInt(2));
+                    Category category = new Category.CategoryBuilder()
+                            .name(cursor.getString(cursor.getColumnIndex(CAT_KEY_ID)))
+                            .color(cursor.getString(1))
+                            .categories(cursor.getString(2))
+                            .build();
 
                     // Adding contact to list
                     categoryList.add(category);

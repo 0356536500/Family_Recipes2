@@ -456,8 +456,8 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
 
         for (int i = 0; i < tags.size(); ++i) {
             //tags.add(new Category(mTitles[i], mColors[i]));
-            if(tags.get(i).getColor() == 0)
-                tags.get(i).setColor(mColors[i % mColors.length]);
+            if(tags.get(i).getIntColor() == 0)
+                tags.get(i).setIntColor(mColors[i % mColors.length]);
         }
 
         //return tags;
@@ -564,7 +564,7 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
             filterItem.setCornerRadius(100f);
             filterItem.setCheckedTextColor(ContextCompat.getColor(activity, android.R.color.white));
             filterItem.setColor(filterBackgroundColor);
-            filterItem.setCheckedColor(item.getColor());
+            filterItem.setCheckedColor(item.getIntColor());
             filterItem.setText(item.getCategories().get(position).getText());
             filterItem.deselect();
 

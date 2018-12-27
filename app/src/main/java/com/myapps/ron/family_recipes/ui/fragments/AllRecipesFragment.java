@@ -68,7 +68,10 @@ public class AllRecipesFragment extends RecyclerWithFiltersAbstractFragment impl
             public void onChanged(@Nullable List<Category> categories) {
                 if (categories != null) {
                     tags = new ArrayList<>(categories);
-                    tags.add(0, new Category(getString(R.string.str_all_selected), mColors[0]));
+                    tags.add(0, new Category.CategoryBuilder()
+                            .name(getString(R.string.str_all_selected))
+                            .color(mColors[0])
+                            .build());
                     loadFiltersColor();
                     setCategories();
                     initCategories();

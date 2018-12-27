@@ -17,16 +17,19 @@ import java.util.List;
 public class Category implements FilterModel, Parcelable {
     @SerializedName("name")
     private String name;
+    @SerializedName("color")
+    private String color;
     @SerializedName("categories")
     private List<Category> categories;
-    private int color;
+
+    private int intColor;
 
     private static final Gson gson = new Gson();
 
     public Category() {
     }
 
-    public Category(String text, int color) {
+    /*public Category(String text, int color) {
         this.name = text;
         this.color = color;
         this.categories = null;
@@ -45,11 +48,11 @@ public class Category implements FilterModel, Parcelable {
         this.name = text;
         this.color = color;
         setStringCategories(categories);
-    }
+    }*/
 
     private Category(Parcel in) {
         this.name = in.readString();
-        this.color = in.readInt();
+        this.color = in.readString();
 
         categories = new ArrayList<>();
 
@@ -64,12 +67,20 @@ public class Category implements FilterModel, Parcelable {
         this.name = text;
     }
 
-    public int getColor() {
+    public String getColor() {
         return color;
     }
 
-    public void setColor(int color) {
+    public void setColor(String color) {
         this.color = color;
+    }
+
+    public void setIntColor(int color) {
+        this.color = String.valueOf(color);
+    }
+
+    public int getIntColor() {
+        return Integer.parseInt(color);
     }
 
     public List<Category> getCategories() {
@@ -105,7 +116,7 @@ public class Category implements FilterModel, Parcelable {
     @Override
     public int hashCode() {
         int result = getText().hashCode();
-        result = 31 * result + getColor();
+        result = 31 * result + getIntColor();
         return result;
     }
 
@@ -149,7 +160,56 @@ public class Category implements FilterModel, Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(this.name);
-        dest.writeInt(this.color);
+        dest.writeString(this.color);
         dest.writeList(this.categories);
+    }
+
+    public static class CategoryBuilder {
+        private String builderName;
+        private String builderColor;
+        private String builderStringCategories = null;
+        private List<Category> builderCategories = null;
+
+
+        public CategoryBuilder() {}
+
+        public CategoryBuilder name (String name) {
+            this.builderName = name;
+            return this;
+        }
+
+        public CategoryBuilder color (String color) {
+            this.builderColor = color;
+            return this;
+        }
+
+        public CategoryBuilder color (int color) {
+            this.builderColor = String.valueOf(color);
+            return this;
+        }
+
+        public CategoryBuilder categories (List<Category> categories) {
+            this.builderCategories = categories;
+            return this;
+        }
+
+        public CategoryBuilder categories (String categories) {
+            this.builderStringCategories = categories;
+            return this;
+        }
+
+
+        public Category build() {
+            Category category = new Category();
+            category.setName(builderName);
+            category.setColor(builderColor);
+            if (builderCategories != null)
+                category.setCategories(builderCategories);
+            else
+                category.setStringCategories(builderStringCategories);
+
+            return category;
+        }
+
     }
 }

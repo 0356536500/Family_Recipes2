@@ -12,7 +12,13 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.google.android.flexbox.FlexboxLayout;
+import com.myapps.ron.family_recipes.model.Category;
+import com.myapps.ron.family_recipes.model.Category1;
+import com.myapps.ron.family_recipes.network.APICallsHandler;
+import com.myapps.ron.family_recipes.network.MyCallback;
+import com.myapps.ron.family_recipes.network.cognito.AppHelper;
 
+import java.util.List;
 import java.util.Locale;
 
 public class TestActivity extends AppCompatActivity {
@@ -30,6 +36,18 @@ public class TestActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         new Handler().postDelayed(this::createMoreViews, 1000);
+
+        getCategories();
+    }
+
+    private void getCategories() {
+        APICallsHandler.getAllCategories("0", AppHelper.getAccessToken(), result -> {
+            if (result != null) {
+                for (Category cat: result) {
+                    Log.e(TAG, cat.toString());
+                }
+            }
+        });
     }
 
     private void createMoreViews() {

@@ -148,7 +148,10 @@ public class FirstStepFragment extends MyFragment implements FilterListener<Cate
             public void onChanged(@Nullable List<Category> categories) {
                 if(categories != null) {
                     allTags = new ArrayList<>(categories);
-                    allTags.add(0, new Category(getString(R.string.str_all_selected), mColors[0]));
+                    allTags.add(0, new Category.CategoryBuilder()
+                            .name(getString(R.string.str_all_selected))
+                            .color(mColors[0])
+                            .build());
                     setCategories();
                     initCategories();
                 }
@@ -175,8 +178,8 @@ public class FirstStepFragment extends MyFragment implements FilterListener<Cate
 
     private void setCategories() {
         for (int i = 0; i < allTags.size(); ++i) {
-            if(allTags.get(i).getColor() == 0)
-                allTags.get(i).setColor(mColors[i % mColors.length]);
+            if(allTags.get(i).getIntColor() == 0)
+                allTags.get(i).setIntColor(mColors[i % mColors.length]);
         }
     }
 
@@ -310,7 +313,7 @@ public class FirstStepFragment extends MyFragment implements FilterListener<Cate
             filterItem.setCornerRadius(75f);
             filterItem.setCheckedTextColor(ContextCompat.getColor(activity, android.R.color.white));
             filterItem.setColor(ContextCompat.getColor(activity, android.R.color.white));
-            filterItem.setCheckedColor(item.getColor() == 0 ? pickColor() : item.getColor());
+            filterItem.setCheckedColor(item.getIntColor() == 0 ? pickColor() : item.getIntColor());
             filterItem.setText(item.getText());
             filterItem.deselect();
 
@@ -348,7 +351,7 @@ public class FirstStepFragment extends MyFragment implements FilterListener<Cate
             filterItem.setCornerRadius(100f);
             filterItem.setCheckedTextColor(ContextCompat.getColor(activity, android.R.color.white));
             filterItem.setColor(ContextCompat.getColor(activity, android.R.color.white));
-            filterItem.setCheckedColor(item.getColor());
+            filterItem.setCheckedColor(item.getIntColor());
             filterItem.setText(item.getCategories().get(position).getText());
             filterItem.deselect();
 
