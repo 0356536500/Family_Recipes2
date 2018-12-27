@@ -48,6 +48,8 @@ import com.myapps.ron.searchfilter.listener.FilterListener;
 import com.myapps.ron.searchfilter.widget.Filter;
 import com.myapps.ron.searchfilter.widget.FilterItem;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -485,7 +487,7 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
     }
 
     @Override
-    public void onFiltersSelected(ArrayList<Category> arrayList) {
+    public void onFiltersSelected(@NotNull ArrayList<Category> arrayList) {
         //List<Recipe> oldList = new ArrayList<>(mAdapter.getCurrentList());
         final List<String> newTags = convertCategoriesToString(arrayList);
         new Handler().postDelayed(new Runnable() {
@@ -516,6 +518,7 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
             return rand.nextInt(mColors.length);
         }
 
+        @NotNull
         @Override
         public FilterItem createView(Category item) {
             FilterItem filterItem = new FilterItem(activity);
@@ -534,7 +537,7 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
             return filterItem;
         }
 
-        @NonNull
+        @NotNull
         @Override
         public FilterItem createView(int position, Category item) {
             FilterItem filterItem = new FilterItem(activity);
@@ -553,9 +556,9 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
             return filterItem;
         }
 
-        @NonNull
+        @NotNull
         @Override
-        public FilterItem createSubCategory(int position, Category item, @NonNull FilterItem parent) {
+        public FilterItem createSubCategory(int position, Category item, @NotNull FilterItem parent) {
             FilterItem filterItem = new FilterItem(activity);
 
             //filterItem.setContainer(true);

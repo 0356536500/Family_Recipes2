@@ -30,6 +30,8 @@ import com.myapps.ron.searchfilter.listener.FilterListener;
 import com.myapps.ron.searchfilter.widget.Filter;
 import com.myapps.ron.searchfilter.widget.FilterItem;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -268,7 +270,7 @@ public class FirstStepFragment extends MyFragment implements FilterListener<Cate
     }
 
     @Override
-    public void onFiltersSelected(@Nullable ArrayList<Category> filters) {
+    public void onFiltersSelected(@NotNull ArrayList<Category> filters) {
         tags = convertCategoriesToString(filters);
     }
 
@@ -302,6 +304,7 @@ public class FirstStepFragment extends MyFragment implements FilterListener<Cate
             return rand.nextInt(mColors.length);
         }
 
+        @NotNull
         @Override
         public FilterItem createView(Category item) {
             FilterItem filterItem = new FilterItem(activity);
@@ -321,7 +324,7 @@ public class FirstStepFragment extends MyFragment implements FilterListener<Cate
             return filterItem;
         }
 
-        @NonNull
+        @NotNull
         @Override
         public FilterItem createView(int position, Category item) {
             FilterItem filterItem = new FilterItem(activity);
@@ -340,9 +343,9 @@ public class FirstStepFragment extends MyFragment implements FilterListener<Cate
             return filterItem;
         }
 
-        @NonNull
+        @NotNull
         @Override
-        public FilterItem createSubCategory(int position, Category item, @NonNull FilterItem parent) {
+        public FilterItem createSubCategory(int position, Category item, @NotNull FilterItem parent) {
             FilterItem filterItem = new FilterItem(activity);
 
             filterItem.setContainer(true);
