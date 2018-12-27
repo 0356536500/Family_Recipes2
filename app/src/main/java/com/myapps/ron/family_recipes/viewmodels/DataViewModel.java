@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.dal.db.CategoriesDBHelper;
@@ -141,14 +142,14 @@ public class DataViewModel extends ViewModel {
 
     public void loadCategories(final Context context) {
         if(MiddleWareForNetwork.checkInternetConnection(context)) {
-            if (DateUtil.shouldUpdateCategories(context)) {
+            if (true || DateUtil.shouldUpdateCategories(context)) {
                 final String time = DateUtil.getUTCTime();
-                APICallsHandler.getAllCategories(DateUtil.getLastUpdateTime(context), AppHelper.getAccessToken(), new MyCallback<List<Category>>() {
+                APICallsHandler.getAllCategories(/*DateUtil.getLastUpdateTime(context)*/"0", AppHelper.getAccessToken(), new MyCallback<List<Category>>() {
                     @Override
                     public void onFinished(List<Category> result) {
                         //PostRecipeToServerService.startActionPostRecipe(context, new ArrayList<>(result), time);
                         if (result != null) {
-                            DateUtil.updateCategoriesServerTime(context, time);
+                            //DateUtil.updateCategoriesServerTime(context, time);
                             new MyAsyncCategoriesUpdate(context, result).execute();
                         }
                     }
@@ -189,11 +190,13 @@ public class DataViewModel extends ViewModel {
         @Override
         protected Boolean doInBackground(Void... voids) {
             numberOfOldCategories = dbHelper.getCategoriesCount();
+            dbHelper.deleteAll();
             numberOfNewCategories = categories.size();
             for (Category item : categories) {
-                if(dbHelper.categoryExists(item.getName()))
+                Log.e(getClass().getSimpleName(), "inserting category: " + item.toString());
+                /*if(dbHelper.categoryExists(item.getName()))
                     dbHelper.updateCategoryServerChanges(item);
-                else
+                else*/
                     dbHelper.insertCategory(item);
             }
             return true;

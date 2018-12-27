@@ -2,6 +2,8 @@ package com.myapps.ron.family_recipes.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import com.google.gson.Gson;
@@ -22,7 +24,6 @@ public class Category implements FilterModel, Parcelable {
     @SerializedName("categories")
     private List<Category> categories;
 
-    private int intColor;
 
     private static final Gson gson = new Gson();
 
@@ -96,6 +97,7 @@ public class Category implements FilterModel, Parcelable {
     }
 
     public void setStringCategories(String categories) {
+        Log.e(getClass().getSimpleName(), "set string categories, " + categories);
         Type type = new TypeToken<List<String>>() {}.getType();
         List<Category> value = gson.fromJson(categories, type);
         setCategories(value);
@@ -205,7 +207,7 @@ public class Category implements FilterModel, Parcelable {
             category.setColor(builderColor);
             if (builderCategories != null)
                 category.setCategories(builderCategories);
-            else
+            else if (builderStringCategories != null)
                 category.setStringCategories(builderStringCategories);
 
             return category;

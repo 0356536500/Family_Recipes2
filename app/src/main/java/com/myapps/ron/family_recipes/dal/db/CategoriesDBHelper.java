@@ -85,8 +85,8 @@ public class CategoriesDBHelper extends MyDBHelper{
             cursor.moveToFirst();
             temp = new Category.CategoryBuilder()
                     .name(cursor.getString(cursor.getColumnIndex(CAT_KEY_ID)))
-                    .color(cursor.getString(1))
-                    .categories(cursor.getString(2))
+                    .color(cursor.getString(cursor.getColumnIndex(CAT_KEY_COLOR)))
+                    .categories(cursor.getString(cursor.getColumnIndex(CAT_KEY_CATS)))
                     .build();
 
             cursor.close();
@@ -108,8 +108,8 @@ public class CategoriesDBHelper extends MyDBHelper{
                 do {
                     Category category = new Category.CategoryBuilder()
                             .name(cursor.getString(cursor.getColumnIndex(CAT_KEY_ID)))
-                            .color(cursor.getString(1))
-                            .categories(cursor.getString(2))
+                            .color(cursor.getString(cursor.getColumnIndex(CAT_KEY_COLOR)))
+                            .categories(cursor.getString(cursor.getColumnIndex(CAT_KEY_CATS)))
                             .build();
 
                     // Adding contact to list
@@ -129,8 +129,8 @@ public class CategoriesDBHelper extends MyDBHelper{
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(CAT_KEY_CATS, category.getStringCategories());
         values.put(CAT_KEY_COLOR, category.getColor());
+        values.put(CAT_KEY_CATS, category.getStringCategories());
 
         // updating row
         return db.update(TABLE_CATEGORIES, values, CAT_KEY_ID + " = ?",
@@ -179,5 +179,10 @@ public class CategoriesDBHelper extends MyDBHelper{
         return result;
     }
 
+    public void deleteAll() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("delete from "+ TABLE_CATEGORIES);
+        db.close();
+    }
 
 }

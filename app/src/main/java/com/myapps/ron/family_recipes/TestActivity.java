@@ -2,6 +2,8 @@ package com.myapps.ron.family_recipes;
 
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModelProviders;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -17,6 +19,7 @@ import com.myapps.ron.family_recipes.model.Category1;
 import com.myapps.ron.family_recipes.network.APICallsHandler;
 import com.myapps.ron.family_recipes.network.MyCallback;
 import com.myapps.ron.family_recipes.network.cognito.AppHelper;
+import com.myapps.ron.family_recipes.viewmodels.DataViewModel;
 
 import java.util.List;
 import java.util.Locale;
@@ -37,7 +40,13 @@ public class TestActivity extends AppCompatActivity {
 
         new Handler().postDelayed(this::createMoreViews, 1000);
 
-        getCategories();
+        DataViewModel viewModel = ViewModelProviders.of(this).get(DataViewModel.class);
+        viewModel.getCategories().observe(this, categories -> {
+            for (Category category: categories) {
+                Log.e(TAG, category.toString());
+            }
+        });
+        viewModel.loadCategories(this);
     }
 
     private void getCategories() {
