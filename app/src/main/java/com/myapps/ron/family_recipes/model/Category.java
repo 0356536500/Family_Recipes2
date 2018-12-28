@@ -1,5 +1,6 @@
 package com.myapps.ron.family_recipes.model;
 
+import android.graphics.Color;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
@@ -10,6 +11,8 @@ import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 import com.myapps.ron.searchfilter.model.FilterModel;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -81,7 +84,9 @@ public class Category implements FilterModel, Parcelable {
     }
 
     public int getIntColor() {
-        return Integer.parseInt(color);
+        //Log.e(getClass().getSimpleName(), "getting color of " + name + ", " + color);
+        return Color.parseColor(color);
+        //return Integer.parseInt(color);
     }
 
     public List<Category> getCategories() {
@@ -97,8 +102,8 @@ public class Category implements FilterModel, Parcelable {
     }
 
     public void setStringCategories(String categories) {
-        Log.e(getClass().getSimpleName(), "set string categories, " + categories);
-        Type type = new TypeToken<List<String>>() {}.getType();
+        //Log.e(getClass().getSimpleName(), "set string categories, " + categories);
+        Type type = new TypeToken<List<Category>>() {}.getType();
         List<Category> value = gson.fromJson(categories, type);
         setCategories(value);
     }
@@ -110,7 +115,8 @@ public class Category implements FilterModel, Parcelable {
 
         Category tag = (Category) o;
 
-        if (getColor() != tag.getColor()) return false;
+        if (!getColor().equals(tag.getColor()))
+            return false;
         return getText().equals(tag.getText());
 
     }
@@ -122,17 +128,18 @@ public class Category implements FilterModel, Parcelable {
         return result;
     }
 
-    @NonNull
+    @NotNull
     @Override
     public String getText() {
         return getName();
     }
 
-    @NonNull
+    @NotNull
     @Override
     public List<FilterModel> getSubs() {
-
-        return new ArrayList<>(categories);
+        if (categories != null)
+            return new ArrayList<>(categories);
+        return new ArrayList<>();
     }
 
     public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {

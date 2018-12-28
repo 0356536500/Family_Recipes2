@@ -74,16 +74,16 @@ class FilterItem : FrameLayout, Serializable {
         }
     }
 
-    fun hideAll(visible: Boolean) {
+    fun hideSubFilters() {
         subFilters.forEach { filter ->
-            filter.hideAll(visible)
+            filter.hide()
         }
+    }
 
-        visibility =
-        if (visible && isContained)
-            View.VISIBLE
-        else
-            View.GONE
+    private fun hide() {
+        visibility = View.GONE
+        if (subFilters.isNotEmpty())
+            hideSubFilters()
     }
 
     fun deselectAll() {
@@ -147,17 +147,20 @@ class FilterItem : FrameLayout, Serializable {
             //textBackground.setBackgroundColor(getColor(android.R.color.white))
         }
 
-        if (isFilterSelected) {
-            drawable.setStroke(2, Color.BLACK)
+        if (!isFilterSelected) {
+            var strokeColorCurrent = Color.BLACK
+            if (strokeColor != null)
+                strokeColorCurrent = strokeColor!!
+            drawable.setStroke(2, strokeColorCurrent)
         }
 
         textBackground.background = drawable
 
-        if (strokeColor != null) {
+        /*if (strokeColor != null) {
             //drawable.setStroke(mStrokeWidth, strokeColor!!)
             topStroke.setBackgroundColor(strokeColor!!)
             bottomStroke.setBackgroundColor(strokeColor!!)
-        }
+        }*/
     }
 
     private fun getColor(@ColorRes color: Int): Int {

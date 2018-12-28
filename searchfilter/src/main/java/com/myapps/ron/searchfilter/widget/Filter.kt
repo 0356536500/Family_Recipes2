@@ -21,12 +21,14 @@ import kotlinx.android.synthetic.main.filter.view.*
 import java.io.Serializable
 import java.util.*
 import android.graphics.Color
+import android.util.Log
 import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
 
 
 class Filter<T : FilterModel> : FrameLayout, FilterItemListener, CollapseListener {
 
+    private val TAG = "Filter"
     var adapter: FilterAdapter<T>? = null
     var listener: FilterListener<T>? = null
     var margin = dpToPx(getDimen(R.dimen.margin))
@@ -219,7 +221,10 @@ class Filter<T : FilterModel> : FrameLayout, FilterItemListener, CollapseListene
         itemView.isContained = isVisible
 
         expandedFilter.addView(itemView)
-        if (!isVisible)
+
+        if (isVisible)
+            itemView.visibility = View.VISIBLE
+        else
             itemView.visibility = View.GONE
 
         // init the sub filters if exists. recursive method, so it can be flexible structure of filters
@@ -375,7 +380,7 @@ class Filter<T : FilterModel> : FrameLayout, FilterItemListener, CollapseListene
 
             // if the item contains sub filters or sub sub filter etc, hide them all
             if(item.isContainer) {
-                item.hideAll(false)
+                item.hideSubFilters()
             }
 
             if(!item.isContainer) {
@@ -435,7 +440,7 @@ class Filter<T : FilterModel> : FrameLayout, FilterItemListener, CollapseListene
             mainFilters.forEach { filter ->
                 if (!filter.isHeader) {
                     filter.deselectAll()
-                    filter.hideAll(false)
+                    filter.hideSubFilters()
                 }
             }
         }

@@ -142,14 +142,14 @@ public class DataViewModel extends ViewModel {
 
     public void loadCategories(final Context context) {
         if(MiddleWareForNetwork.checkInternetConnection(context)) {
-            if (true || DateUtil.shouldUpdateCategories(context)) {
+            if (DateUtil.shouldUpdateCategories(context)) {
                 final String time = DateUtil.getUTCTime();
-                APICallsHandler.getAllCategories(/*DateUtil.getLastUpdateTime(context)*/"0", AppHelper.getAccessToken(), new MyCallback<List<Category>>() {
+                APICallsHandler.getAllCategories(DateUtil.getLastUpdateTime(context), AppHelper.getAccessToken(), new MyCallback<List<Category>>() {
                     @Override
                     public void onFinished(List<Category> result) {
                         //PostRecipeToServerService.startActionPostRecipe(context, new ArrayList<>(result), time);
                         if (result != null) {
-                            //DateUtil.updateCategoriesServerTime(context, time);
+                            DateUtil.updateCategoriesServerTime(context, time);
                             new MyAsyncCategoriesUpdate(context, result).execute();
                         }
                     }
@@ -230,6 +230,7 @@ public class DataViewModel extends ViewModel {
 
     public List<Category> loadFavoritesCategories(final Context context) {
         CategoriesDBHelper dbHelper = new CategoriesDBHelper(context);
+        setCategories(dbHelper.getAllCategories());
         return dbHelper.getAllCategories();
     }
 

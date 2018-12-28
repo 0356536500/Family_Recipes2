@@ -325,7 +325,7 @@ public class FirstStepFragment extends MyFragment implements FilterListener<Cate
         }
 
         @NotNull
-        @Override
+        //@Override
         public FilterItem createView(int position, Category item) {
             FilterItem filterItem = new FilterItem(activity);
 
@@ -344,7 +344,7 @@ public class FirstStepFragment extends MyFragment implements FilterListener<Cate
         }
 
         @NotNull
-        @Override
+        //@Override
         public FilterItem createSubCategory(int position, Category item, @NotNull FilterItem parent) {
             FilterItem filterItem = new FilterItem(activity);
 
