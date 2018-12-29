@@ -2,27 +2,14 @@ package com.myapps.ron.family_recipes;
 
 import android.graphics.Color;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
-import androidx.lifecycle.ViewModel;
-import androidx.lifecycle.ViewModelProviders;
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
 import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.google.android.flexbox.FlexboxLayout;
 import com.myapps.ron.family_recipes.model.Category;
-import com.myapps.ron.family_recipes.model.Category1;
 import com.myapps.ron.family_recipes.network.APICallsHandler;
-import com.myapps.ron.family_recipes.network.MyCallback;
 import com.myapps.ron.family_recipes.network.cognito.AppHelper;
 import com.myapps.ron.family_recipes.viewmodels.DataViewModel;
 import com.myapps.ron.searchfilter.adapter.FilterAdapter;
@@ -34,8 +21,14 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
-import java.util.Random;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.lifecycle.ViewModelProviders;
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 public class TestActivity extends AppCompatActivity implements FilterListener<Category> {
 
@@ -50,14 +43,10 @@ public class TestActivity extends AppCompatActivity implements FilterListener<Ca
     Filter<Category> mFilter;
     private List<Category> tags;
 
-    private int[] mColors;
-
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test);
-
-        mColors = getResources().getIntArray(R.array.colors);
 
         ButterKnife.bind(this);
 
@@ -72,26 +61,13 @@ public class TestActivity extends AppCompatActivity implements FilterListener<Ca
                 tags = new ArrayList<>(categories);
                 tags.add(0, new Category.CategoryBuilder()
                         .name(getString(R.string.str_all_selected))
-                        .color(mColors[0])
+                        .color(ContextCompat.getColor(this, R.color.search_filter_text_light))
                         .build());
-                setCategories();
                 initCategories();
             }
         });
 
         viewModel.loadFavoritesCategories(this);
-    }
-
-    protected void setCategories() {
-        //List<Category> tags = new ArrayList<>();
-
-        for (int i = 1; i < tags.size(); ++i) {
-            //tags.add(new Category(mTitles[i], mColors[i]));
-            if(tags.get(i).getIntColor() == 0)
-                tags.get(i).setIntColor(mColors[i % mColors.length]);
-        }
-
-        //return tags;
     }
 
     protected void initCategories() {
@@ -149,7 +125,10 @@ public class TestActivity extends AppCompatActivity implements FilterListener<Ca
 
     @Override
     public void onFilterSelected(Category item) {
-
+        if (item.getText().equals(tags.get(0).getText())) {
+            mFilter.deselectAll();
+            mFilter.collapse();
+        }
     }
 
     @Override
@@ -163,30 +142,39 @@ public class TestActivity extends AppCompatActivity implements FilterListener<Ca
             super(items);
         }
 
-        private int pickColor() {
-            Random rand = new Random(System.currentTimeMillis());
-            return rand.nextInt(mColors.length);
-        }
-
         @NotNull
         @Override
-        public FilterItem createView(Category item) {
+        public FilterItem createView(Category item, Category parent) {
             FilterItem filterItem = new FilterItem(TestActivity.this);
 
-            if (item.getText().equals(tags.get(0).getText()))
-                filterItem.setHeader(true);
-            filterItem.setStrokeColor(mColors[0]);
-            //filterItem.setTextColor(filterTextColor);
-            filterItem.setTextColor(mColors[0]);
-            filterItem.setCornerRadius(70f);
+            filterItem.setTextColor(ContextCompat.getColor(TestActivity.this, R.color.search_filter_text_light));
             filterItem.setCheckedTextColor(ContextCompat.getColor(TestActivity.this, android.R.color.white));
+            filterItem.setStrokeColor(ContextCompat.getColor(TestActivity.this, R.color.search_filter_stoke));
             filterItem.setColor(Color.WHITE);
-            //filterItem.setCheckedColor(mColors[pickColor()]);
-            if (filterItem.isHeader())
-                filterItem.setCheckedColor(mColors[0]);
-            else
-                filterItem.setCheckedColor(item.getIntColor());
+            filterItem.setCheckedColor(item.getIntColor());
+
             filterItem.setText(item.getText());
+
+            if (parent != null) {
+                filterItem.setStrokeColor(parent.getIntColor());
+            }
+
+            if (item.hasSubCategories()) {
+                filterItem.setCornerRadius(60f);
+                filterItem.setStrokeWidth(7);
+
+            }
+            else {
+                filterItem.setCornerRadius(80f);
+                filterItem.setStrokeWidth(5);
+            }
+
+            if (item.getText().equals(tags.get(0).getText())) {
+                filterItem.setHeader(true);
+                filterItem.setCornerRadius(60f);
+                filterItem.setStrokeWidth(7);
+            }
+
             filterItem.deselect();
 
             return filterItem;

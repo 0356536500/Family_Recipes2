@@ -1,16 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/textBackground"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content">
+    android:layout_height="@dimen/item_height"
+    android:background="@drawable/item_background"
+    android:clipChildren="false"
+    android:layout_margin="@dimen/item_vertical_margin">
 
-    <RelativeLayout
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/item_horizontal_margin"
+        android:layout_marginEnd="@dimen/item_horizontal_margin"
+        android:layout_gravity="center"
+        android:text="Test filter item"
+        android:textColor="@android:color/white"
+        android:textSize="16sp" />
+
+    <!--<RelativeLayout
         android:id="@+id/textBackground"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/item_height"
         android:background="@drawable/item_background"
         android:clipChildren="false">
 
-        <!--<View
+        &lt;!&ndash;<View
             android:id="@+id/topStroke"
             android:layout_width="wrap_content"
             android:layout_height="1.25dp"
@@ -24,7 +39,7 @@
             android:layout_height="1.25dp"
             android:layout_alignParentBottom="true"
             android:layout_alignStart="@+id/textView"
-            android:layout_alignEnd="@+id/textView" />-->
+            android:layout_alignEnd="@+id/textView" />&ndash;&gt;
 
         <TextView
             android:id="@+id/textView"
@@ -37,7 +52,7 @@
             android:textColor="@android:color/white"
             android:textSize="16sp" />
 
-    </RelativeLayout>
+    </RelativeLayout>-->
 
     <!--<androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/buttonCancel"

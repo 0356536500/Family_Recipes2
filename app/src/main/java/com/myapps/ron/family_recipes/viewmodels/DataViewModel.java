@@ -28,7 +28,7 @@ import java.util.List;
 public class DataViewModel extends ViewModel {
     private MutableLiveData<List<Recipe>> recipeList = new MutableLiveData<>(); // list of recipes from api
     private MutableLiveData<List<Recipe>> favoriteList = new MutableLiveData<>(); // list of recipes local db
-    private MutableLiveData<List<Category>> categoryList = new MutableLiveData<>(); // list of categories from api
+    private MutableLiveData<List<Category>> categoryList = new MutableLiveData<>(); // list of newCategories from api
 
     private MutableLiveData<String> infoFromLastFetch = new MutableLiveData<>(); // info about new or modified data from last fetch from api
 
@@ -131,7 +131,7 @@ public class DataViewModel extends ViewModel {
     }
     //endregion
 
-    //region categories
+    //region newCategories
     public LiveData<List<Category>> getCategories() {
         return categoryList;
     }
@@ -149,13 +149,19 @@ public class DataViewModel extends ViewModel {
                     public void onFinished(List<Category> result) {
                         //PostRecipeToServerService.startActionPostRecipe(context, new ArrayList<>(result), time);
                         if (result != null) {
-                            DateUtil.updateCategoriesServerTime(context, time);
-                            new MyAsyncCategoriesUpdate(context, result).execute();
+                            if (result.isEmpty())
+                                loadLocalCategories(context);
+                            else {
+                                DateUtil.updateCategoriesServerTime(context, time);
+                                new MyAsyncCategoriesUpdate(context, result).execute();
+                            }
+                        } else {
+                            setInfoFromLastFetch(context.getString(R.string.error_message_from_fetch_categories));
                         }
                     }
                 });
             }
-            //don't need to check the categories every time
+            //don't need to check the newCategories every time
             else
                 loadLocalCategories(context);
         }
@@ -175,29 +181,42 @@ public class DataViewModel extends ViewModel {
     class MyAsyncCategoriesUpdate extends AsyncTask<Void, Void, Boolean> {
 
         private Context context;
-        private List<Category> categories;
+        private List<Category> newCategoriesList;
         private CategoriesDBHelper dbHelper;
-        private int numberOfOldCategories, numberOfNewCategories;
+        private int newCategories, modifiedCategories;
 
         MyAsyncCategoriesUpdate(Context context, List<Category> categories) {
             this.context = context;
             this.dbHelper = new CategoriesDBHelper(context);
-            this.categories = categories;
-            this.numberOfOldCategories = 0;
-            this.numberOfNewCategories = 0;
+            this.newCategoriesList = categories;
+            this.newCategories = 0;
+            this.modifiedCategories = 0;
         }
 
         @Override
         protected Boolean doInBackground(Void... voids) {
-            numberOfOldCategories = dbHelper.getCategoriesCount();
-            dbHelper.deleteAll();
-            numberOfNewCategories = categories.size();
-            for (Category item : categories) {
+            List<Category> oldCategories = dbHelper.getAllCategories();
+
+            for (Category item : newCategoriesList) {
+                int oldIndex = oldCategories.indexOf(item);
+                if (oldIndex >= 0) {
+                    Log.e(getClass().getSimpleName(), "category exists: " + item.toString());
+                    if (item.fartherEquals(oldCategories.get(oldIndex))) {
+                        Log.e(getClass().getSimpleName(), "exact category exists");
+                        continue;
+                    } else {
+                        Log.e(getClass().getSimpleName(), "need to update, deleting local category.\n" + oldCategories.get(oldIndex).toString());
+                        dbHelper.deleteCategory(oldCategories.get(oldIndex));
+                        modifiedCategories++;
+                    }
+                } else
+                    newCategories++;
+
                 Log.e(getClass().getSimpleName(), "inserting category: " + item.toString());
                 /*if(dbHelper.categoryExists(item.getName()))
                     dbHelper.updateCategoryServerChanges(item);
                 else*/
-                    dbHelper.insertCategory(item);
+                dbHelper.insertCategory(item);
             }
             return true;
         }
@@ -207,7 +226,7 @@ public class DataViewModel extends ViewModel {
             super.onPostExecute(aBoolean);
             if(aBoolean) {
                 setCategories(dbHelper.getAllCategories());
-                setInfoFromLastFetch(context.getString(R.string.message_from_fetch_categories, numberOfNewCategories - numberOfOldCategories));
+                setInfoFromLastFetch(context.getString(R.string.message_from_fetch_categories, newCategories, modifiedCategories));
             }
         }
     }

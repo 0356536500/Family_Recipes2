@@ -24,4 +24,6 @@ public class Constants {
 
     //PostRecipeActivity
     public static final int MIN_NUMBER_OF_HTML_ELEMENTS = 2;
+
+    public static final String DEFAULT_COLOR = "#827f93";
 }

@@ -24,17 +24,6 @@ public class RecipesDBHelper extends MyDBHelper{
     }
 
 
-    @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
-        // Drop older table if existed
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_RECIPES);
-
-        // Create tables again
-        onCreate(db);
-    }
-    //endregion
-
     //region CRUD Methods
     /**
      * CRUD(Create, Read, Update, Delete) Operations
@@ -215,7 +204,8 @@ public class RecipesDBHelper extends MyDBHelper{
 
     public void deleteRecipe(String id){
         SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(TABLE_RECIPES, KEY_ID + "=" + id, null);
+        db.delete(TABLE_RECIPES, KEY_ID + "=?", new String[]{ id });
+        //db.delete(TABLE_RECIPES, KEY_ID + "=" + id, null);
         db.close();
     }
 

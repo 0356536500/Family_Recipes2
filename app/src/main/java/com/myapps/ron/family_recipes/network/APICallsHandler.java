@@ -3,18 +3,18 @@ package com.myapps.ron.family_recipes.network;
 import android.os.StrictMode;
 import android.util.Log;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.myapps.ron.family_recipes.model.Category;
-import com.myapps.ron.family_recipes.model.Category1;
 import com.myapps.ron.family_recipes.model.Recipe;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import androidx.annotation.NonNull;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -24,7 +24,6 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class APICallsHandler {
 
     private static final String TAG = APICallsHandler.class.getSimpleName();
-    private static Gson gson = new Gson();
     private static Retrofit retrofit;
 
     private static final int STATUS_OK = 200;
@@ -41,25 +40,25 @@ public class APICallsHandler {
         return retrofit;
     }
 
-    public static void getOneRecipe(String token) {
+    /*public static void getOneRecipe(String token) {
         RecipeInterface service = getRetrofitInstance().create(RecipeInterface.class);
         Call<Recipe> call = service.getOneRecipe(token);
 
         call.enqueue(new Callback<Recipe>() {
             @Override
-            public void onResponse(@NonNull Call<Recipe> call, @NonNull Response<Recipe> response) {
+            public void onResponse(@NotNull Call<Recipe> call, @NotNull Response<Recipe> response) {
                 String body = response.body() != null ? response.body().toString() : "null";
                 Log.i(TAG, body);
                 //generateDataList(response.body());
             }
 
             @Override
-            public void onFailure(@NonNull Call<Recipe> call, @NonNull Throwable t) {
+            public void onFailure(@NotNull Call<Recipe> call, @NotNull Throwable t) {
                 Log.e(TAG, "error getting one recipe");
                 //Toast.makeText(MainActivity.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
             }
         });
-    }
+    }*/
 
     public static void getAllRecipes(String date, String token, final MyCallback<List<Recipe>> callback) {
         /*Map<String, String> headers = new HashMap<>();
@@ -71,7 +70,7 @@ public class APICallsHandler {
 
         call.enqueue(new Callback<List<Recipe>>() {
             @Override
-            public void onResponse(@NonNull Call<List<Recipe>> call, @NonNull Response<List<Recipe>> response) {
+            public void onResponse(@NotNull Call<List<Recipe>> call, @NotNull Response<List<Recipe>> response) {
                 String body = response.body() != null ? response.body().toString() : "null";
 
                 if (response.code() == STATUS_OK) {
@@ -92,7 +91,7 @@ public class APICallsHandler {
             }
 
             @Override
-            public void onFailure(@NonNull Call<List<Recipe>> call, @NonNull Throwable t) {
+            public void onFailure(@NotNull Call<List<Recipe>> call, @NotNull Throwable t) {
                 Log.e(TAG, "error getting all recipes. message: " + t.getMessage());
                 //Toast.makeText(MainActivity.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
             }
@@ -117,7 +116,7 @@ public class APICallsHandler {
 
         call.enqueue(new Callback<JsonObject>() {
             @Override
-            public void onResponse(@NonNull Call<JsonObject> call, @NonNull Response<JsonObject> response) {
+            public void onResponse(@NotNull Call<JsonObject> call, @NotNull Response<JsonObject> response) {
                 String url = "null";
                 if (response.body() != null && response.body().get("url") != null)
                     url = response.body().get("url").getAsString();
@@ -131,7 +130,7 @@ public class APICallsHandler {
             }
 
             @Override
-            public void onFailure(@NonNull Call<JsonObject> call, @NonNull Throwable t) {
+            public void onFailure(@NotNull Call<JsonObject> call, @NotNull Throwable t) {
                 Log.e(TAG, "error posting recipe. message: " + t.getMessage());
                 //Toast.makeText(MainActivity.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
             }
@@ -162,7 +161,7 @@ public class APICallsHandler {
 
         call.enqueue(new Callback<Recipe>() {
             @Override
-            public void onResponse(@NonNull Call<Recipe> call, @NonNull Response<Recipe> response) {
+            public void onResponse(@NotNull Call<Recipe> call, @NotNull Response<Recipe> response) {
                 String body = response.body() != null ? response.body().toString() : "null";
 
                 if (response.code() == STATUS_OK) {
@@ -176,7 +175,7 @@ public class APICallsHandler {
             }
 
             @Override
-            public void onFailure(@NonNull Call<Recipe> call, @NonNull Throwable t) {
+            public void onFailure(@NotNull Call<Recipe> call, @NotNull Throwable t) {
                 Log.e(TAG, "error patching recipe. message: " + t.getMessage());
                 //Toast.makeText(MainActivity.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
             }
@@ -189,7 +188,7 @@ public class APICallsHandler {
 
         call.enqueue(new Callback<List<Category>>() {
             @Override
-            public void onResponse(@NonNull Call<List<Category>> call, @NonNull Response<List<Category>> response) {
+            public void onResponse(@NotNull Call<List<Category>> call, @NotNull Response<List<Category>> response) {
                 String body = response.body() != null ? response.body().toString() : "null";
 
                 if (response.code() == STATUS_OK) {
@@ -198,15 +197,19 @@ public class APICallsHandler {
                     callback.onFinished(list);
                 }
                 else {
-                    Log.e(TAG, "error getAllCategories, code = " + response.code() + "\n body: " + body);
+                    if (response.code() == STATUS_NOT_MODIFIED) {
+                        callback.onFinished(new ArrayList<>());
+                    }
+                    Log.e(TAG, "getAllCategories, code = " + response.code() + "\n body: " + body);
                 }
 
                 //generateDataList(response.body());
             }
 
             @Override
-            public void onFailure(@NonNull Call<List<Category>> call, @NonNull Throwable t) {
+            public void onFailure(@NotNull Call<List<Category>> call, @NotNull Throwable t) {
                 Log.e(TAG, "error getting all recipes. message: " + t.getMessage());
+                callback.onFinished(null);
                 //Toast.makeText(MainActivity.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
             }
         });
@@ -222,7 +225,7 @@ public class APICallsHandler {
 
         call.enqueue(new Callback<List<String>>() {
             @Override
-            public void onResponse(@NonNull Call<List<String>> call, @NonNull Response<List<String>> response) {
+            public void onResponse(@NotNull Call<List<String>> call, @NotNull Response<List<String>> response) {
                 String body = response.body() != null ? response.body().toString() : "null";
 
                 if (response.code() == STATUS_OK) {
@@ -235,7 +238,7 @@ public class APICallsHandler {
             }
 
             @Override
-            public void onFailure(@NonNull Call<List<String>> call, @NonNull Throwable t) {
+            public void onFailure(@NotNull Call<List<String>> call, @NotNull Throwable t) {
                 Log.e(TAG, "error getting all recipes. message: " + t.getMessage());
                 //Toast.makeText(MainActivity.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
             }

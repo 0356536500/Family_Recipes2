@@ -14,10 +14,10 @@ import java.util.List;
 public class CategoriesDBHelper extends MyDBHelper{
     // All Static variables
     // Database Version
-    private static final int DATABASE_VERSION = 1;
+    /*private static final int DATABASE_VERSION = 1;
 
     // Database Name
-    private static final String DATABASE_NAME = "records.db";
+    private static final String DATABASE_NAME = "categories.db";*/
 
     // Contacts table name
     /*private static final String TABLE_NAME = "categories";
@@ -37,23 +37,6 @@ public class CategoriesDBHelper extends MyDBHelper{
         super(context);
     }
 
-    //region Override From SQLite
-    //creating Tables
-    /*@Override
-    public void onCreate(SQLiteDatabase db) {
-        db.execSQL(CREATE_EXEC);
-    }*/
-
-    @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
-        // Drop older table if existed
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CATEGORIES);
-
-        // Create tables again
-        onCreate(db);
-    }
-    //endregion
 
     //region CRUD Methods
     /**
@@ -182,6 +165,12 @@ public class CategoriesDBHelper extends MyDBHelper{
     public void deleteAll() {
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL("delete from "+ TABLE_CATEGORIES);
+        db.close();
+    }
+
+    public void deleteCategory(Category category) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_CATEGORIES, CAT_KEY_ID + "=?", new String[]{ category.getName() });
         db.close();
     }
 

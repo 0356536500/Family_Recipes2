@@ -13,7 +13,7 @@ import java.util.*
 
 class ExpandedFilterView : FlexboxLayout {
 
-    private var mPrevItem: View? = null
+    //private var mPrevItem: View? = null
     private var mStartX = 0f
     private var mStartY = 0f
     private var myLayoutParams: FlexboxLayout.LayoutParams =
@@ -25,7 +25,11 @@ class ExpandedFilterView : FlexboxLayout {
 
     constructor(context: Context) : this(context, null)
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
-    constructor(context: Context, attrs: AttributeSet?, defStyleRes: Int) : super(context, attrs, defStyleRes)
+    constructor(context: Context, attrs: AttributeSet?, defStyleRes: Int) : super(context, attrs, defStyleRes) {
+        val verticalPad = dpToPx(getDimen(R.dimen.expanded_vertical_padding))
+        val horizontalPad = dpToPx(getDimen(R.dimen.expanded_horizontal_padding))
+        setPadding(horizontalPad, verticalPad, horizontalPad, verticalPad)
+    }
 
     init {
         myLayoutParams.setMargins(16,16,16,16)
@@ -34,20 +38,6 @@ class ExpandedFilterView : FlexboxLayout {
         alignItems = AlignItems.FLEX_START
         alignContent = AlignContent.FLEX_START
         justifyContent = JustifyContent.FLEX_START
-    }
-
-    fun refreshView() {
-        /*filters.clear()
-        mPrevItem = null
-        measure(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)*/
-    }
-
-    fun addAllViews(views: MutableList<View>) {
-        removeAllViews()
-        views.forEach { view ->
-            (view as FilterItem).removeFromParent()
-            addView(view, myLayoutParams)
-        }
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {

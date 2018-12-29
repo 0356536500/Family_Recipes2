@@ -57,8 +57,9 @@
     <string name="load_error_message">קרתה תקלה בשרת</string>
     <string name="refresh_error_message">אפשר לרענן פעם בדקה</string>
     <string name="message_from_fetch_recipes">נוספו %1$d, עודכנו %2$d</string>
-    <string name="message_from_fetch_categories">נוספו %1$d קטגוריות</string>
+    <string name="message_from_fetch_categories">נוספו %1$d, עודכנו %2$d קטגוריות</string>
     <string name="number_of_recipes_indicator">מתכונים %1$d</string>
+    <string name="error_message_from_fetch_categories">שגיאה בשליפת הקטגוריות מהשרת</string>
 
     <!-- Recipe Activity -->
     <string name="recipe_content_not_found">המתכון לא נמצא</string>

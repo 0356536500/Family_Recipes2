@@ -5,19 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.core.content.ContextCompat;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.appcompat.widget.PopupMenu;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.appcompat.widget.SearchView;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -52,7 +39,20 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.PopupMenu;
+import androidx.appcompat.widget.SearchView;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -68,19 +68,18 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
     private View view;
     private FrameLayout parent;
 
-    protected int[] mColors;
-    protected int filterBackgroundColor, filterTextColor;
+    private int filterBackgroundColor, filterTextColor;
 
-    protected Filter<Category> mFilter;
-    protected List<Category> tags;
+    Filter<Category> mFilter;
+    List<Category> tags;
 
-    protected SwipeRefreshLayout swipeRefreshLayout;
-    protected SwipeRefreshLayout.OnRefreshListener onRefreshListener;
-    protected RecyclerView recyclerView;
-    protected RecipesAdapter mAdapter;
+    SwipeRefreshLayout swipeRefreshLayout;
+    SwipeRefreshLayout.OnRefreshListener onRefreshListener;
+    RecyclerView recyclerView;
+    RecipesAdapter mAdapter;
 
     protected DataViewModel viewModel;
-    protected String orderBy;
+    String orderBy;
     private boolean mayRefresh;
     private String lastQuery = "";
 
@@ -149,8 +148,6 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
             mFilter = view.findViewById(R.id.content_main_filters);
             firstLoadingProgressBar = view.findViewById(R.id.content_main_fist_loading_animation);
 
-            mColors = getResources().getIntArray(R.array.colors);
-
             orderBy = com.myapps.ron.family_recipes.dal.Constants.SORT_RECENT;
             mayRefresh = true;
 
@@ -170,9 +167,7 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
     protected abstract void initViewModel();
     protected abstract void optionRefresh();
 
-    protected void initCategories() {
-        //mTitles = getResources().getStringArray(R.array.job_titles);
-
+    void initCategories() {
         mFilter.setAdapter(new RecyclerWithFiltersAbstractFragment.Adapter(tags));
         mFilter.setListener(this);
 
@@ -186,6 +181,8 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
 
         mFilter.build();
     }
+
+    // region initViewModel
 
     /*private void initViewModel() {
         viewModel =  ViewModelProviders.of(activity).get(DataViewModel.class);
@@ -230,6 +227,8 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
         });
     }*/
 
+    // endregion
+
     private void initRecycler() {
         //List<Recipe> recipeList = new ArrayList<>(viewModel.loadLocalRecipesOrdered(activity, com.myapps.ron.family_recipes.dal.Constants.SORT_RECENT));
         //mAdapter = new RecipesAdapter(activity, recipeList, this);
@@ -257,7 +256,7 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
         });
     }
 
-    protected void setRefreshLayout() {
+    void setRefreshLayout() {
         onRefreshListener = new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -277,7 +276,7 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
             }
         };
         swipeRefreshLayout.setOnRefreshListener(onRefreshListener);
-        swipeRefreshLayout.setColorSchemeColors(mColors);
+        swipeRefreshLayout.setColorSchemeColors(getResources().getIntArray(R.array.colors));
     }
 
     private void setSearchView(Menu menu) {
@@ -349,7 +348,7 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
         return super.onOptionsItemSelected(item);
     }
 
-    protected void showPopupSortMenu() {
+    private void showPopupSortMenu() {
         final PopupMenu popup = new PopupMenu(activity, activity.findViewById(R.id.action_sort));
 
         // This activity implements OnMenuItemClickListener
@@ -402,6 +401,7 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
         menu.findItem(R.id.sort_action_last_modified).setChecked(sorts[2]);
     }
 
+    // region Recycler Listener
     @Override
     public void onItemSelected(Recipe recipe) {
         Intent intent = new Intent(activity, RecipeActivity.class);
@@ -432,6 +432,8 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
             mFilter.setCustomTextView(getString(R.string.number_of_recipes_indicator, size));
     }
 
+    // endregion
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -444,25 +446,13 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
         }
     }
 
-    protected void loadFiltersColor() {
+    void loadFiltersColor() {
         TypedValue backgroundValue = new TypedValue();
         TypedValue textValue = new TypedValue();
         activity.getTheme().resolveAttribute(R.attr.searchFilterBackgroundColor, backgroundValue, true);
         activity.getTheme().resolveAttribute(R.attr.searchFilterTextColor, textValue, true);
         filterBackgroundColor = backgroundValue.data;
         filterTextColor = textValue.data;
-    }
-
-    protected void setCategories() {
-        //List<Category> tags = new ArrayList<>();
-
-        for (int i = 0; i < tags.size(); ++i) {
-            //tags.add(new Category(mTitles[i], mColors[i]));
-            if(tags.get(i).getIntColor() == 0)
-                tags.get(i).setIntColor(mColors[i % mColors.length]);
-        }
-
-        //return tags;
     }
 
     private List<String> convertCategoriesToString(ArrayList<Category> arrayList) {
@@ -513,62 +503,41 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
             super(items);
         }
 
-        private int pickColor() {
-            Random rand = new Random(System.currentTimeMillis());
-            return rand.nextInt(mColors.length);
-        }
-
         @NotNull
         @Override
-        public FilterItem createView(Category item) {
+        public FilterItem createView(Category item, Category parent) {
             FilterItem filterItem = new FilterItem(activity);
 
-            if (item.getText().equals(tags.get(0).getText()))
-                filterItem.setHeader(true);
-            filterItem.setStrokeColor(mColors[0]);
             filterItem.setTextColor(filterTextColor);
-            filterItem.setCornerRadius(75f);
+            //filterItem.setTextColor(ContextCompat.getColor(activity, R.color.search_filter_text_light));
             filterItem.setCheckedTextColor(ContextCompat.getColor(activity, android.R.color.white));
+            filterItem.setStrokeColor(ContextCompat.getColor(activity, R.color.search_filter_stoke));
             filterItem.setColor(filterBackgroundColor);
-            filterItem.setCheckedColor(mColors[pickColor()]);
-            filterItem.setText(item.getText());
-            filterItem.deselect();
-
-            return filterItem;
-        }
-
-        @NotNull
-        //@Override
-        public FilterItem createView(int position, Category item) {
-            FilterItem filterItem = new FilterItem(activity);
-
-            if (item.getText().equals(tags.get(0).getText()))
-                filterItem.setHeader(true);
-            filterItem.setStrokeColor(mColors[0]);
-            filterItem.setTextColor(filterTextColor);
-            filterItem.setCornerRadius(75f);
-            filterItem.setCheckedTextColor(ContextCompat.getColor(activity, android.R.color.white));
-            filterItem.setColor(filterBackgroundColor);
-            filterItem.setCheckedColor(mColors[position]);
-            filterItem.setText(item.getText());
-            filterItem.deselect();
-
-            return filterItem;
-        }
-
-        @NotNull
-        //@Override
-        public FilterItem createSubCategory(int position, Category item, @NotNull FilterItem parent) {
-            FilterItem filterItem = new FilterItem(activity);
-
-            //filterItem.setContainer(true);
-            filterItem.setStrokeColor(parent.getCheckedColor());
-            filterItem.setTextColor(parent.getCheckedColor());
-            filterItem.setCornerRadius(100f);
-            filterItem.setCheckedTextColor(ContextCompat.getColor(activity, android.R.color.white));
-            filterItem.setColor(filterBackgroundColor);
+            //filterItem.setColor(Color.WHITE);
             filterItem.setCheckedColor(item.getIntColor());
-            filterItem.setText(item.getCategories().get(position).getText());
+
+            filterItem.setText(item.getText());
+
+            if (parent != null) {
+                filterItem.setStrokeColor(parent.getIntColor());
+            }
+
+            if (item.hasSubCategories()) {
+                filterItem.setCornerRadius(60f);
+                filterItem.setStrokeWidth(7);
+
+            }
+            else {
+                filterItem.setCornerRadius(80f);
+                filterItem.setStrokeWidth(5);
+            }
+
+            if (item.getText().equals(tags.get(0).getText())) {
+                filterItem.setHeader(true);
+                filterItem.setCornerRadius(60f);
+                filterItem.setStrokeWidth(7);
+            }
+
             filterItem.deselect();
 
             return filterItem;

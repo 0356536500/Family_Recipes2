@@ -16,6 +16,8 @@
     <color name="logo_circle_border">#e78200</color>
 
     <color name="search_filter_text_light">#827f93</color>
+    <color name="search_filter_stoke">#827f93</color>
+    <color name="search_filter_stoke_lighter">#aca8c4</color>
     <color name="search_filter_text_dark">#bfbadb</color>
 
     <color name="transparent">#00000000</color>

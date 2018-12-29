@@ -1,5 +1,6 @@
 package com.myapps.ron.family_recipes.ui.fragments;
 
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import android.os.Handler;
@@ -70,10 +71,9 @@ public class AllRecipesFragment extends RecyclerWithFiltersAbstractFragment impl
                     tags = new ArrayList<>(categories);
                     tags.add(0, new Category.CategoryBuilder()
                             .name(getString(R.string.str_all_selected))
-                            .color(mColors[0])
+                            .color(ContextCompat.getColor(activity, R.color.search_filter_text_light))
                             .build());
                     loadFiltersColor();
-                    setCategories();
                     initCategories();
                 }
             }

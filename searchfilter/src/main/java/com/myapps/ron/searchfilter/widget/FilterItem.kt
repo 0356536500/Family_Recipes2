@@ -27,10 +27,11 @@ class FilterItem : FrameLayout, Serializable {
     var item: Any? = null
     var subFilters: MutableList<FilterItem> = mutableListOf()
     val subItems: MutableList<Any> = mutableListOf()
-    var isFilterSelected: Boolean = false
+    private var isFilterSelected: Boolean = false
     var startX: Float = 0f
     var startY: Float = 0f
 
+    var strokeWidth: Int = 5
     @ColorInt var color: Int? = null
     @ColorInt var checkedColor: Int? = null
     @ColorInt var strokeColor: Int? = null
@@ -55,7 +56,7 @@ class FilterItem : FrameLayout, Serializable {
     internal var listener: FilterItemListener? = null
 
     private var mText: String? = null
-    private var mStrokeWidth: Int = dpToPx(1.25f)
+    //private var mStrokeWidth: Int = dpToPx(1.25f)
 
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
@@ -151,7 +152,7 @@ class FilterItem : FrameLayout, Serializable {
             var strokeColorCurrent = Color.BLACK
             if (strokeColor != null)
                 strokeColorCurrent = strokeColor!!
-            drawable.setStroke(2, strokeColorCurrent)
+            drawable.setStroke(strokeWidth, strokeColorCurrent)
         }
 
         textBackground.background = drawable

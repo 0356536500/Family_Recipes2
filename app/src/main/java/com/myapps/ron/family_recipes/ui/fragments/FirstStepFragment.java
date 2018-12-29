@@ -1,22 +1,16 @@
 package com.myapps.ron.family_recipes.ui.fragments;
 
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
-import androidx.appcompat.widget.AppCompatEditText;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.myapps.ron.family_recipes.R;
@@ -34,7 +28,13 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.AppCompatEditText;
+import androidx.core.content.ContextCompat;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 
 /**
  * Created by ronginat on 29/10/2018.
@@ -43,16 +43,18 @@ public class FirstStepFragment extends MyFragment implements FilterListener<Cate
 
     private View view;
     private FrameLayout parent;
-    private RelativeLayout floater;
+    //private RelativeLayout floater;
     private AppCompatEditText editTextName, editTextDesc;
     private Filter<Category> mFilter;
     private List<Category> allTags;
     private List<String> tags;
-    private int[] mColors;
+
     private String name, desc;
 
     private PostRecipeViewModel viewModel;
     private PostRecipeActivity activity;
+
+    private int filterBackgroundColor, filterTextColor;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -80,10 +82,10 @@ public class FirstStepFragment extends MyFragment implements FilterListener<Cate
     public void onAttach(Context context) {
         super.onAttach(context);
         Log.e(getClass().getSimpleName(), "on attach");
-        if (parent != null){
+        /*if (parent != null){
             parent.addView(mFilter);
             parent.addView(floater);
-        }
+        }*/
     }
 
     @Override
@@ -98,17 +100,9 @@ public class FirstStepFragment extends MyFragment implements FilterListener<Cate
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        if (mFilter == null) {
+        if (parent == null) {
             view = inflater.inflate(R.layout.content_post_first_step, container,false);
             parent = (FrameLayout) view;
-
-            mFilter = view.findViewById(R.id.first_step_filter);
-            //editTextName = view.findViewById(R.id.recipe_name_editText);
-            //editTextDesc = view.findViewById(R.id.recipe_desc_editText);
-
-            mColors = getResources().getIntArray(R.array.colors);
-
-            //setListeners();
 
             initViewModel();
             viewModel.loadCategories(activity);
@@ -122,10 +116,14 @@ public class FirstStepFragment extends MyFragment implements FilterListener<Cate
         Log.e(getClass().getSimpleName(), "on view created");
         activity.setTitle(getString(R.string.nav_main_post_recipe) + " 1/3");
 
-        editTextName = view.findViewById(R.id.recipe_name_editText);
-        editTextDesc = view.findViewById(R.id.recipe_desc_editText);
+        if (mFilter == null) {
+            mFilter = view.findViewById(R.id.first_step_filter);
 
-        setListeners();
+            editTextName = view.findViewById(R.id.recipe_name_editText);
+            editTextDesc = view.findViewById(R.id.recipe_desc_editText);
+
+            setListeners();
+        }
 
         /*editTextDesc = view.findViewById(R.id.recipe_desc_editText);
         editTextName = view.findViewById(R.id.recipe_name_editText);
@@ -150,11 +148,7 @@ public class FirstStepFragment extends MyFragment implements FilterListener<Cate
             public void onChanged(@Nullable List<Category> categories) {
                 if(categories != null) {
                     allTags = new ArrayList<>(categories);
-                    allTags.add(0, new Category.CategoryBuilder()
-                            .name(getString(R.string.str_all_selected))
-                            .color(mColors[0])
-                            .build());
-                    setCategories();
+                    loadFiltersColor();
                     initCategories();
                 }
             }
@@ -178,11 +172,13 @@ public class FirstStepFragment extends MyFragment implements FilterListener<Cate
         mFilter.build();
     }
 
-    private void setCategories() {
-        for (int i = 0; i < allTags.size(); ++i) {
-            if(allTags.get(i).getIntColor() == 0)
-                allTags.get(i).setIntColor(mColors[i % mColors.length]);
-        }
+    private void loadFiltersColor() {
+        TypedValue backgroundValue = new TypedValue();
+        TypedValue textValue = new TypedValue();
+        activity.getTheme().resolveAttribute(R.attr.searchFilterBackgroundColor, backgroundValue, true);
+        activity.getTheme().resolveAttribute(R.attr.searchFilterTextColor, textValue, true);
+        filterBackgroundColor = backgroundValue.data;
+        filterTextColor = textValue.data;
     }
 
     private void setListeners() {
@@ -299,64 +295,34 @@ public class FirstStepFragment extends MyFragment implements FilterListener<Cate
             super(items);
         }
 
-        private int pickColor() {
-            Random rand = new Random(System.currentTimeMillis());
-            return rand.nextInt(mColors.length);
-        }
-
         @NotNull
         @Override
-        public FilterItem createView(Category item) {
+        public FilterItem createView(Category item, Category parent) {
             FilterItem filterItem = new FilterItem(activity);
 
-            if (item.getText().equals(allTags.get(0).getText()))
-                filterItem.setHeader(true);
-            filterItem.setStrokeColor(mColors[0]);
-            filterItem.setTextColor(mColors[0]);
-            filterItem.setCornerRadius(75f);
+            filterItem.setTextColor(filterTextColor);
+            //filterItem.setTextColor(ContextCompat.getColor(activity, R.color.search_filter_text_light));
             filterItem.setCheckedTextColor(ContextCompat.getColor(activity, android.R.color.white));
-            filterItem.setColor(ContextCompat.getColor(activity, android.R.color.white));
-            filterItem.setCheckedColor(item.getIntColor() == 0 ? pickColor() : item.getIntColor());
-            filterItem.setText(item.getText());
-            filterItem.deselect();
-
-
-            return filterItem;
-        }
-
-        @NotNull
-        //@Override
-        public FilterItem createView(int position, Category item) {
-            FilterItem filterItem = new FilterItem(activity);
-
-            if (item.getText().equals(allTags.get(0).getText()))
-                filterItem.setHeader(true);
-            filterItem.setStrokeColor(mColors[0]);
-            filterItem.setTextColor(mColors[0]);
-            filterItem.setCornerRadius(75f);
-            filterItem.setCheckedTextColor(ContextCompat.getColor(activity, android.R.color.white));
-            filterItem.setColor(ContextCompat.getColor(activity, android.R.color.white));
-            filterItem.setCheckedColor(mColors[position]);
-            filterItem.setText(item.getText());
-            filterItem.deselect();
-
-            return filterItem;
-        }
-
-        @NotNull
-        //@Override
-        public FilterItem createSubCategory(int position, Category item, @NotNull FilterItem parent) {
-            FilterItem filterItem = new FilterItem(activity);
-
-            filterItem.setContainer(true);
-            filterItem.setStrokeColor(parent.getCheckedColor());
-            filterItem.setTextColor(parent.getCheckedColor());
-            filterItem.setCornerRadius(100f);
-            filterItem.setCheckedTextColor(ContextCompat.getColor(activity, android.R.color.white));
-            filterItem.setColor(ContextCompat.getColor(activity, android.R.color.white));
+            filterItem.setStrokeColor(ContextCompat.getColor(activity, R.color.search_filter_stoke));
+            filterItem.setColor(filterBackgroundColor);
+            //filterItem.setColor(Color.WHITE);
             filterItem.setCheckedColor(item.getIntColor());
-            filterItem.setText(item.getCategories().get(position).getText());
-            filterItem.deselect();
+
+            filterItem.setText(item.getText());
+
+            if (parent != null) {
+                filterItem.setStrokeColor(parent.getIntColor());
+            }
+
+            if (item.hasSubCategories()) {
+                filterItem.setCornerRadius(60f);
+                filterItem.setStrokeWidth(7);
+
+            }
+            else {
+                filterItem.setCornerRadius(80f);
+                filterItem.setStrokeWidth(5);
+            }
 
             return filterItem;
         }

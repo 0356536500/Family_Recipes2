@@ -1,11 +1,11 @@
 package com.myapps.ron.searchfilter.widget
 
 import android.util.DisplayMetrics
-import android.view.View
+//import android.view.View
 import android.view.ViewGroup
 
 
-internal fun calculateSize(measureSpec: Int, desiredSize: Int): Int {
+/*internal fun calculateSize(measureSpec: Int, desiredSize: Int): Int {
     val mode = View.MeasureSpec.getMode(measureSpec)
     val size = View.MeasureSpec.getSize(measureSpec)
 
@@ -16,20 +16,21 @@ internal fun calculateSize(measureSpec: Int, desiredSize: Int): Int {
     }
 
     return actualSize
-}
+}*/
 
 internal fun ViewGroup.dpToPx(dp: Int): Int {
     val displayMetrics = context.resources.displayMetrics
     return Math.round(dp * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT))
 }
 
-internal fun ViewGroup.dpToPx(dp: Float): Int {
+/*internal fun ViewGroup.dpToPx(dp: Float): Int {
     val displayMetrics = context.resources.displayMetrics
     return Math.round(dp * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT))
-}
+}*/
 
 internal fun ViewGroup.getDimen(res: Int): Int = context.resources.getDimensionPixelOffset(res)
 
+/*
 internal fun calculateX(position: Int, size: Int, minMargin: Int, itemSize: Int): Int {
     val realMargin = calculateMargin(size, itemSize, minMargin)
     return position * itemSize + position * realMargin + realMargin
@@ -41,5 +42,6 @@ internal fun calculateMargin(width: Int, itemWidth: Int, margin: Int): Int {
 }
 
 internal fun calculateCount(width: Int, itemWidth: Int, margin: Int): Int = width / (itemWidth + margin)
+*/
 
 internal fun isClick(startX: Float, startY: Float, x: Float, y: Float): Boolean = Math.abs(x - startX) < 20 && Math.abs(y - startY) < 20

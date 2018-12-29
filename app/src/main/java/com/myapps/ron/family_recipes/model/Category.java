@@ -3,13 +3,11 @@ package com.myapps.ron.family_recipes.model;
 import android.graphics.Color;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
-
-import androidx.annotation.NonNull;
 
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
+import com.myapps.ron.family_recipes.utils.Constants;
 import com.myapps.ron.searchfilter.model.FilterModel;
 
 import org.jetbrains.annotations.NotNull;
@@ -32,27 +30,6 @@ public class Category implements FilterModel, Parcelable {
 
     public Category() {
     }
-
-    /*public Category(String text, int color) {
-        this.name = text;
-        this.color = color;
-        this.categories = null;
-    }
-
-    public Category(String text, int color, List<String> categories) {
-        this.name = text;
-        this.color = color;
-        this.categories = new ArrayList<>();
-        for (String str: categories) {
-            this.categories.add(new Category(str, this.color));
-        }
-    }
-
-    public Category(String text, String categories, int color) {
-        this.name = text;
-        this.color = color;
-        setStringCategories(categories);
-    }*/
 
     private Category(Parcel in) {
         this.name = in.readString();
@@ -79,14 +56,14 @@ public class Category implements FilterModel, Parcelable {
         this.color = color;
     }
 
-    public void setIntColor(int color) {
-        this.color = String.valueOf(color);
-    }
+    /*public void setIntColor(int color) {
+        this.color = "#" + Integer.toHexString(color & 0x00ffffff);
+    }*/
 
     public int getIntColor() {
-        //Log.e(getClass().getSimpleName(), "getting color of " + name + ", " + color);
-        return Color.parseColor(color);
-        //return Integer.parseInt(color);
+        if (!color.equals(""))
+            return Color.parseColor(color);
+        return Color.parseColor(Constants.DEFAULT_COLOR);
     }
 
     public List<Category> getCategories() {
@@ -95,6 +72,10 @@ public class Category implements FilterModel, Parcelable {
 
     public void setCategories(List<Category> categories) {
         this.categories = categories;
+    }
+
+    public boolean hasSubCategories() {
+        return categories != null && !categories.isEmpty();
     }
 
     public String getStringCategories() {
@@ -118,7 +99,25 @@ public class Category implements FilterModel, Parcelable {
         if (!getColor().equals(tag.getColor()))
             return false;
         return getText().equals(tag.getText());
+    }
 
+    public boolean fartherEquals(Category tag) {
+        if (!getColor().equals(tag.getColor()))
+            return false;
+        if (!getText().equals(tag.getText()))
+            return false;
+
+        if (categories != null && tag.categories != null) {
+            if (categories.size() != tag.categories.size())
+                return false;
+            for (int i = 0; i < categories.size(); i++) {
+                if (!categories.get(i).equals(tag.categories.get(i)))
+                    return false;
+            }
+            return true;
+        }
+        // if both null return 'true'
+        return categories == tag.categories;
     }
 
     @Override
@@ -193,7 +192,7 @@ public class Category implements FilterModel, Parcelable {
         }
 
         public CategoryBuilder color (int color) {
-            this.builderColor = String.valueOf(color);
+            this.builderColor = "#" + Integer.toHexString(color & 0x00ffffff);
             return this;
         }
 
