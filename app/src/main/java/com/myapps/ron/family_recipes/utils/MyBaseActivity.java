@@ -60,7 +60,7 @@ public abstract class MyBaseActivity extends AppCompatActivity implements Shared
             return;
         if (key.equals(getString(R.string.preference_key_dark_mode))) {
             Log.e(getClass().getSimpleName(), "value, " + sharedPreferences.getBoolean(key, false));
-            setTheme(sharedPreferences.getBoolean(key, false) ? R.style.AppTheme_Dark : R.style.AppTheme_Dark);
+            setTheme(sharedPreferences.getBoolean(key, false) ? R.style.AppTheme_Dark : R.style.AppTheme_Light);
             //toolbar.setPopupTheme(sharedPreferences.getBoolean(key, false) ? R.style.AppTheme_PopupOverlay_Dark : R.style.AppTheme_PopupOverlay_Light);
             recreate();
         }

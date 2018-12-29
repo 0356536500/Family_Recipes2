@@ -78,11 +78,11 @@ class Filter<T : FilterModel> : FrameLayout, FilterItemListener, CollapseListene
     private val STATE_COLLAPSED = "state_collapsed"
 
     private var mNothingSelectedItem: FilterItem? = null
-    private val mSelectedFilters: LinkedHashMap<FilterItem, Coord> = LinkedHashMap()
+    //private val mSelectedFilters: LinkedHashMap<FilterItem, Coord> = LinkedHashMap()
     private val mRemovedFilters: LinkedHashMap<FilterItem, Coord> = LinkedHashMap()
     private val mItems: LinkedHashMap<FilterItem, T> = LinkedHashMap()
     private val mainFilters: ArrayList<FilterItem> = ArrayList()
-    private var mSelectedFilters1: ArrayList<FilterItem> = ArrayList()
+    private var mSelectedFilters: ArrayList<FilterItem> = ArrayList()
     private var mSelectedItems: ArrayList<T> = ArrayList()
     //private var mRemovedItems: ArrayList<T> = ArrayList()
 
@@ -260,10 +260,10 @@ class Filter<T : FilterModel> : FrameLayout, FilterItemListener, CollapseListene
         val filter = mItems[item]!!
         if (mItems.contains(item)) {
             mSelectedItems.add(filter)
-            mSelectedFilters1.add(item)
+            mSelectedFilters.add(item)
 
             //if item representing a whole group, make this group visible in ExpandedFilter
-            if (item.isContainer && !item.isHeader) {
+            if (item.isContainer && !item.isDeselectHead) {
                 item.subFilters.forEach { subFilter ->
                     subFilter.visibility = View.VISIBLE
                 }
@@ -271,7 +271,7 @@ class Filter<T : FilterModel> : FrameLayout, FilterItemListener, CollapseListene
 
             // if the item is a leaf in filters structure, call onFilterSelected
             // if its a header, call onFilterSelected
-            if(!item.isContainer || item.isHeader) {
+            if(!item.isContainer || item.isDeselectHead) {
                 listener?.onFilterSelected(filter)
             }
         }
@@ -286,7 +286,7 @@ class Filter<T : FilterModel> : FrameLayout, FilterItemListener, CollapseListene
         if (mItems.contains(item)) {
 
             mSelectedItems.remove(filter)
-            mSelectedFilters1.remove(item)
+            mSelectedFilters.remove(item)
 
             // if the item contains sub filters or sub sub filter etc, hide them all
             if(item.isContainer) {
@@ -313,9 +313,9 @@ class Filter<T : FilterModel> : FrameLayout, FilterItemListener, CollapseListene
 
     private fun getSelectedItems(): ArrayList<T> {
         val items: ArrayList<T> = ArrayList()
-        mSelectedFilters1.forEach { filter ->
+        mSelectedFilters.forEach { filter ->
             val item: T? = mItems[filter]
-            if (item != null && !filter.isContainer) {
+            if (item != null && !filter.isContainer && !filter.isDeselectHead) {
                 items.add(item)
             }
         }
@@ -333,7 +333,7 @@ class Filter<T : FilterModel> : FrameLayout, FilterItemListener, CollapseListene
     fun deselectAll() {
         if (mSelectedItems.isNotEmpty()) {
             mainFilters.forEach { filter ->
-                if (filter.isHeader) {
+                if (filter.isDeselectHead) {
                     filter.deselect(false)
                 } else {
                     filter.deselectAll()
@@ -342,7 +342,8 @@ class Filter<T : FilterModel> : FrameLayout, FilterItemListener, CollapseListene
             }
         }
         mSelectedItems.clear()
-        listener?.onNothingSelected()
+        mSelectedFilters.clear()
+        //listener?.onNothingSelected()
     }
 
     /**
@@ -414,14 +415,14 @@ class Filter<T : FilterModel> : FrameLayout, FilterItemListener, CollapseListene
     }
 
     private fun restore(filters: LinkedHashMap<FilterItem, Coord>) {
-        mSelectedFilters.clear()
+        //mSelectedFilters.clear()
         expandedFilter.post {
             filters.keys.forEach { filterItem ->
                 filters[filterItem]?.let { coord ->
                     val item = { item: T -> filterItem.text == item.getText() }
 
                     if (mSelectedItems.any(item)) {
-                        mSelectedFilters1.add(filterItem)
+                        mSelectedFilters.add(filterItem)
                         //mSelectedFilters.put(filterItem, coord)
                         filterItem.select(false)
                     } /*else if (mRemovedItems.any(item)) {

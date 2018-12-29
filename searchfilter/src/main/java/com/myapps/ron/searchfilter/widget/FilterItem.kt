@@ -23,7 +23,7 @@ class FilterItem : FrameLayout, Serializable {
 
     var isContained: Boolean = false
     var isContainer: Boolean = false
-    var isHeader: Boolean = false
+    var isDeselectHead: Boolean = false
     var item: Any? = null
     var subFilters: MutableList<FilterItem> = mutableListOf()
     val subItems: MutableList<Any> = mutableListOf()

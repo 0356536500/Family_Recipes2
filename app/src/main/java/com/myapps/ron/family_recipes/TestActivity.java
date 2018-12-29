@@ -170,7 +170,7 @@ public class TestActivity extends AppCompatActivity implements FilterListener<Ca
             }
 
             if (item.getText().equals(tags.get(0).getText())) {
-                filterItem.setHeader(true);
+                filterItem.setDeselectHead(true);
                 filterItem.setCornerRadius(60f);
                 filterItem.setStrokeWidth(7);
             }

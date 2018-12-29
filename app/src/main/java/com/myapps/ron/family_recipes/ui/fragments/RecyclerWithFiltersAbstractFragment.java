@@ -3,6 +3,7 @@ package com.myapps.ron.family_recipes.ui.fragments;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -42,6 +43,7 @@ import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.SearchView;
 import androidx.core.content.ContextCompat;
@@ -229,6 +231,7 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
 
     // endregion
 
+    // region init Views
     private void initRecycler() {
         //List<Recipe> recipeList = new ArrayList<>(viewModel.loadLocalRecipesOrdered(activity, com.myapps.ron.family_recipes.dal.Constants.SORT_RECENT));
         //mAdapter = new RecipesAdapter(activity, recipeList, this);
@@ -327,6 +330,10 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
         }
     }
 
+    // endregion
+
+    // region Option Menu
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -401,6 +408,8 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
         menu.findItem(R.id.sort_action_last_modified).setChecked(sorts[2]);
     }
 
+    // endregion
+
     // region Recycler Listener
     @Override
     public void onItemSelected(Recipe recipe) {
@@ -463,6 +472,8 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
         return results;
     }
 
+    // region SearchFilter listeners
+
     @Override
     public void onFilterDeselected(Category category) {
 
@@ -476,8 +487,11 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void onFiltersSelected(@NotNull ArrayList<Category> arrayList) {
+        Log.e(TAG, "onFiltersSelected");
+        arrayList.forEach(category -> Log.e(TAG, category.getText()));
         //List<Recipe> oldList = new ArrayList<>(mAdapter.getCurrentList());
         final List<String> newTags = convertCategoriesToString(arrayList);
         new Handler().postDelayed(new Runnable() {
@@ -495,6 +509,8 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
         if (mAdapter != null)
             mAdapter.updateTags(null);
     }
+
+    // endregion
 
 
     class Adapter extends FilterAdapter<Category> {
@@ -533,7 +549,7 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
             }
 
             if (item.getText().equals(tags.get(0).getText())) {
-                filterItem.setHeader(true);
+                filterItem.setDeselectHead(true);
                 filterItem.setCornerRadius(60f);
                 filterItem.setStrokeWidth(7);
             }
@@ -542,6 +558,5 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
 
             return filterItem;
         }
-
     }
 }
