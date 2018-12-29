@@ -87,6 +87,9 @@ public class MainActivity extends MyBaseActivity {
 
         viewModel =  ViewModelProviders.of(this).get(DataViewModel.class);
 
+        viewModel.setRecipesReady(false);
+        viewModel.setCategoriesReady(false);
+
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {

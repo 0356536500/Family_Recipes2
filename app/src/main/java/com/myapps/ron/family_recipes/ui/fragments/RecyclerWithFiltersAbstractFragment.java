@@ -74,6 +74,7 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
 
     Filter<Category> mFilter;
     List<Category> tags;
+    protected List<Recipe> recipes;
 
     SwipeRefreshLayout swipeRefreshLayout;
     SwipeRefreshLayout.OnRefreshListener onRefreshListener;
@@ -490,8 +491,6 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void onFiltersSelected(@NotNull ArrayList<Category> arrayList) {
-        Log.e(TAG, "onFiltersSelected");
-        arrayList.forEach(category -> Log.e(TAG, category.getText()));
         //List<Recipe> oldList = new ArrayList<>(mAdapter.getCurrentList());
         final List<String> newTags = convertCategoriesToString(arrayList);
         new Handler().postDelayed(new Runnable() {

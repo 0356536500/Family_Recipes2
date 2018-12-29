@@ -29,9 +29,21 @@ public class DataViewModel extends ViewModel {
     private MutableLiveData<List<Recipe>> recipeList = new MutableLiveData<>(); // list of recipes from api
     private MutableLiveData<List<Recipe>> favoriteList = new MutableLiveData<>(); // list of recipes local db
     private MutableLiveData<List<Category>> categoryList = new MutableLiveData<>(); // list of newCategories from api
+    private MutableLiveData<Boolean> canInitBothRecyclerAndFilters = new MutableLiveData<>();
 
     private MutableLiveData<String> infoFromLastFetch = new MutableLiveData<>(); // info about new or modified data from last fetch from api
 
+    private boolean recipesReady = false, categoriesReady = false;
+
+    public void setRecipesReady(boolean value) {
+        this.recipesReady = value;
+        setCanInitBothRecyclerAndFilters(recipesReady && categoriesReady);
+    }
+
+    public void setCategoriesReady(boolean value) {
+        this.categoriesReady = value;
+        setCanInitBothRecyclerAndFilters(recipesReady && categoriesReady);
+    }
 
     private void setInfoFromLastFetch(String item) {
         infoFromLastFetch.setValue(item);
@@ -39,6 +51,14 @@ public class DataViewModel extends ViewModel {
 
     public LiveData<String> getInfoFromLastFetch() {
         return infoFromLastFetch;
+    }
+
+    private void setCanInitBothRecyclerAndFilters(boolean value) {
+        canInitBothRecyclerAndFilters.setValue(value);
+    }
+
+    public LiveData<Boolean> getCanInitBothRecyclerAndFilters() {
+        return canInitBothRecyclerAndFilters;
     }
 
     //region recipes

@@ -52,7 +52,7 @@ public class FavoritesRecipesFragment extends RecyclerWithFiltersAbstractFragmen
                         mFilter.setCustomTextView(getString(R.string.number_of_recipes_indicator, recipes.size()));
                     //Log.e(TAG, "update from fragment");
                     if (mAdapter == null) {
-                        mAdapter = new RecipesAdapter(activity, recipes, FavoritesRecipesFragment.this);
+                        mAdapter = new RecipesAdapter(activity, recipes, tags, FavoritesRecipesFragment.this);
                         recyclerView.setAdapter(mAdapter);
                     } else
                         mAdapter.updateRecipes(recipes, !recipes.isEmpty());

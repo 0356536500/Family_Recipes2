@@ -5,6 +5,7 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import android.os.Handler;
 import androidx.annotation.Nullable;
+
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -13,6 +14,7 @@ import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.adapters.RecipesAdapter;
 import com.myapps.ron.family_recipes.model.Category;
 import com.myapps.ron.family_recipes.model.Recipe;
+import com.myapps.ron.family_recipes.recycler.RecipesAdapterHelper;
 import com.myapps.ron.family_recipes.viewmodels.DataViewModel;
 import com.myapps.ron.searchfilter.listener.FilterListener;
 
@@ -46,21 +48,21 @@ public class AllRecipesFragment extends RecyclerWithFiltersAbstractFragment impl
         viewModel = ViewModelProviders.of(activity).get(DataViewModel.class);
         viewModel.getRecipes().observe(this, new Observer<List<Recipe>>() {
             @Override
-            public void onChanged(@Nullable List<Recipe> recipes) {
+            public void onChanged(@Nullable List<Recipe> recipesList) {
                 //Toast.makeText(activity, "get recipes from DAL", Toast.LENGTH_SHORT).show();
-                String log = "null";
+                /*String log = "null";
                 if (recipes != null)
                     log = recipes.toString();
-                Log.e(TAG, "getAllRecipes from db.\n" + log);
-                if (mFilter != null && recipes != null)
-                    mFilter.setCustomTextView(getString(R.string.number_of_recipes_indicator, recipes.size()));
+                Log.e(TAG, "getAllRecipes from db.\n" + log);*/
+                Log.e(TAG, String.valueOf("in recipes observer. recipes != null"));
+
                 firstLoadingProgressBar.setVisibility(View.GONE);
                 swipeRefreshLayout.setRefreshing(false);
+                recipes = recipesList;
+
+                viewModel.setRecipesReady(true);
                 //Log.e(TAG, "update from fragment");
-                if (mAdapter == null) {
-                    mAdapter = new RecipesAdapter(activity, recipes, AllRecipesFragment.this);
-                    recyclerView.setAdapter(mAdapter);
-                } else
+                if (mAdapter != null)
                     mAdapter.updateRecipes(recipes, recipes != null && !recipes.isEmpty());
             }
         });
@@ -68,13 +70,31 @@ public class AllRecipesFragment extends RecyclerWithFiltersAbstractFragment impl
             @Override
             public void onChanged(@Nullable List<Category> categories) {
                 if (categories != null) {
+                    Log.e(TAG, "in category observer. categories != null");
                     tags = new ArrayList<>(categories);
                     tags.add(0, new Category.CategoryBuilder()
                             .name(getString(R.string.str_all_selected))
                             .color(ContextCompat.getColor(activity, R.color.search_filter_text_light))
                             .build());
                     loadFiltersColor();
+
+                    viewModel.setCategoriesReady(true);
+                }
+            }
+        });
+        viewModel.getCanInitBothRecyclerAndFilters().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean value) {
+                if (value) {
+                    Log.e(TAG, "in both observer");
                     initCategories();
+                    if (mFilter != null &&  recipes != null)
+                        mFilter.setCustomTextView(getString(R.string.number_of_recipes_indicator, recipes.size()));
+                    if (mAdapter == null) {
+                        mAdapter = new RecipesAdapter(activity, recipes, tags, AllRecipesFragment.this);
+                        recyclerView.setAdapter(mAdapter);
+                    }
+                    viewModel.getCanInitBothRecyclerAndFilters().removeObserver(this);
                 }
             }
         });

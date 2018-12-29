@@ -21,8 +21,10 @@ import android.widget.TextView;
 
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.dal.storage.StorageWrapper;
+import com.myapps.ron.family_recipes.model.Category;
 import com.myapps.ron.family_recipes.model.Recipe;
 import com.myapps.ron.family_recipes.network.MyCallback;
+import com.myapps.ron.family_recipes.recycler.RecipesAdapterHelper;
 import com.myapps.ron.family_recipes.recycler.RecipesDiffCallback;
 import com.myapps.ron.family_recipes.utils.GlideApp;
 
@@ -40,6 +42,8 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
     private List<Recipe> recipeList;
     private List<Recipe> recipeListFiltered;
     private List<String> tags; // filters the user chose
+
+    private List<Category> categoryList;
 
     private String mLastQuery = "";
     private RecipesAdapterListener listener;
@@ -80,15 +84,20 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
     }
 
 
-    public RecipesAdapter(Context context, List<Recipe> recipeList, RecipesAdapterListener listener) {
+    public RecipesAdapter(Context context, List<Recipe> recipeList, List<Category> categoryList, RecipesAdapterListener listener) {
         this.context = context;
         this.listener = listener;
+        this.categoryList = categoryList;
         this.recipeList = recipeList;
         this.recipeListFiltered = recipeList;
         this.tags = new ArrayList<>();
         //this.storageWrapper = StorageWrapper.getInstance(context);
         this.colors = context.getResources().getIntArray(R.array.colors);
         this.random = new Random();
+    }
+
+    public void setCategoryList(List<Category> categoryList) {
+        this.categoryList = categoryList;
     }
 
     @NonNull
@@ -155,7 +164,7 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
                 //view.setLayoutParams(marginLayoutParams);
                 ((TextView) view.findViewById(R.id.category_text)).setText(category);
                 //view.findViewById(R.id.category_text).getBackground().setTint(pickColor());
-                view.findViewById(R.id.category_text).getBackground().setColorFilter(pickColor(), PorterDuff.Mode.SRC_ATOP);
+                view.findViewById(R.id.category_text).getBackground().setColorFilter(RecipesAdapterHelper.getCategoryColorByName(categoryList, category), PorterDuff.Mode.SRC_ATOP);
                 /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     view.setForegroundGravity(Gravity.CENTER);
                 }*/
