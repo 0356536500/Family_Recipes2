@@ -2,7 +2,7 @@ package com.myapps.ron.family_recipes.recycler;
 
 import androidx.recyclerview.widget.DiffUtil;
 
-import com.myapps.ron.family_recipes.model.Recipe.Comment;
+import com.myapps.ron.family_recipes.model.RecipeEntity.Comment;
 
 import java.util.ArrayList;
 import java.util.List;

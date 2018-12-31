@@ -13,8 +13,7 @@ import android.widget.Toast;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.adapters.RecipesAdapter;
 import com.myapps.ron.family_recipes.model.Category;
-import com.myapps.ron.family_recipes.model.Recipe;
-import com.myapps.ron.family_recipes.recycler.RecipesAdapterHelper;
+import com.myapps.ron.family_recipes.model.RecipeEntity;
 import com.myapps.ron.family_recipes.viewmodels.DataViewModel;
 import com.myapps.ron.searchfilter.listener.FilterListener;
 
@@ -46,9 +45,9 @@ public class AllRecipesFragment extends RecyclerWithFiltersAbstractFragment impl
     @Override
     protected void initViewModel() {
         viewModel = ViewModelProviders.of(activity).get(DataViewModel.class);
-        viewModel.getRecipes().observe(this, new Observer<List<Recipe>>() {
+        viewModel.getRecipes().observe(this, new Observer<List<RecipeEntity>>() {
             @Override
-            public void onChanged(@Nullable List<Recipe> recipesList) {
+            public void onChanged(@Nullable List<RecipeEntity> recipesList) {
                 //Toast.makeText(activity, "get recipes from DAL", Toast.LENGTH_SHORT).show();
                 /*String log = "null";
                 if (recipes != null)

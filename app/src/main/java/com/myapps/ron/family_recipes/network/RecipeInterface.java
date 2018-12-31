@@ -2,7 +2,6 @@ package com.myapps.ron.family_recipes.network;
 
 import com.google.gson.JsonObject;
 import com.myapps.ron.family_recipes.model.Category;
-import com.myapps.ron.family_recipes.model.Recipe;
 
 import java.util.List;
 import java.util.Map;
@@ -16,36 +15,38 @@ import retrofit2.http.HeaderMap;
 import retrofit2.http.PATCH;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
-import retrofit2.http.Query;
+import retrofit2.http.Path;
 
 
 public interface RecipeInterface {
 
-    String recipes = Constants.URL_RECIPES;
-    String categories = Constants.URL_CATEGORIES;
+    String recipesGET = Constants.URL_RECIPES + "/{" + Constants.DATE_QUERY + "}";
+    String recipesPOST = Constants.URL_RECIPES;
+    String recipesUpdate = Constants.URL_RECIPES + "/{" + Constants.ID_QUERY + "}";
+    String categories = Constants.URL_CATEGORIES + "/{" + Constants.DATE_QUERY + "}";
     String food = Constants.URL_FOOD;
 
 
-    @GET(food)
-    Call<Recipe> getOneRecipe(
-            @Header(Constants.AUTHORIZATION) String token);
+    /*@GET(food)
+    Call<RecipeTO> getOneRecipe(
+            @Header(Constants.AUTHORIZATION) String token);*/
     //region recipes
-    @GET(recipes)
-    Call<List<Recipe>> getAllRecipes(
+    @GET(recipesGET)
+    Call<List<RecipeTO>> getAllRecipes(
             @Header(Constants.AUTHORIZATION) String auth,
-            @Query(Constants.DATE_QUERY) String query
+            @Path(Constants.DATE_QUERY) String date
     );
 
-    @POST(recipes)
+    @POST(recipesPOST)
     Call<JsonObject> postPendRecipe(
             @HeaderMap Map<String, String> headers,
             @Body Map<String, Object> body
     );
 
-    @PATCH(recipes)
-    Call<Recipe> patchRecipe(
+    @PATCH(recipesUpdate)
+    Call<RecipeTO> patchRecipe(
             @HeaderMap Map<String, String> headers,
-            @Query(Constants.ID_QUERY) String id,
+            @Path(Constants.ID_QUERY) String id,
             @Body Map<String, Object> body
     );
 
@@ -55,7 +56,7 @@ public interface RecipeInterface {
     @GET(categories)
     Call<List<Category>> getAllCategories(
             @Header(Constants.AUTHORIZATION) String auth,
-            @Query(Constants.DATE_QUERY) String query
+            @Path(Constants.DATE_QUERY) String date
     );
 
     //endregion
@@ -64,7 +65,7 @@ public interface RecipeInterface {
     @PUT(food)
     Call<List<String>> requestFoodUrls(
             @Header(Constants.AUTHORIZATION) String auth,
-            @Query(Constants.ID_QUERY) String id,
+            @Path(Constants.ID_QUERY) String id,
             @Body Map<String, String> body
     );
 

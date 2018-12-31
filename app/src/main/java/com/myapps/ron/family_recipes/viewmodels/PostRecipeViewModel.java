@@ -8,7 +8,7 @@ import android.content.Context;
 import com.myapps.ron.family_recipes.dal.db.CategoriesDBHelper;
 import com.myapps.ron.family_recipes.dal.storage.StorageWrapper;
 import com.myapps.ron.family_recipes.model.Category;
-import com.myapps.ron.family_recipes.model.Recipe;
+import com.myapps.ron.family_recipes.model.RecipeEntity;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -23,7 +23,7 @@ public class PostRecipeViewModel extends ViewModel {
 
     private File recipeFile;
     //private List<Uri> imagesUris = new ArrayList<>();
-    public Recipe recipe = new Recipe();
+    public RecipeEntity recipe = new RecipeEntity();
 
     private void setRecipePath(String item) {
         recipePath.setValue(item);

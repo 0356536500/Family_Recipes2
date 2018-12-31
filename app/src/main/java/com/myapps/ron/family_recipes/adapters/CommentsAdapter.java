@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.myapps.ron.family_recipes.R;
-import com.myapps.ron.family_recipes.model.Recipe.Comment;
+import com.myapps.ron.family_recipes.model.RecipeEntity.Comment;
 import com.myapps.ron.family_recipes.recycler.CommentsDiffCallback;
 import com.myapps.ron.family_recipes.utils.DateUtil;
 

@@ -12,7 +12,7 @@ import android.view.ViewGroup;
 
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.dal.storage.StorageWrapper;
-import com.myapps.ron.family_recipes.model.Recipe;
+import com.myapps.ron.family_recipes.model.RecipeEntity;
 import com.myapps.ron.family_recipes.network.MyCallback;
 import com.myapps.ron.family_recipes.utils.GlideApp;
 
@@ -24,9 +24,9 @@ import java.io.File;
 public class MyPagerAdapter extends PagerAdapter {
 
     private Context context;
-    private Recipe recipe;
+    private RecipeEntity recipe;
 
-    public MyPagerAdapter(Context context, Recipe recipe) {
+    public MyPagerAdapter(Context context, RecipeEntity recipe) {
         this.context = context;
         this.recipe = recipe;
     }
@@ -100,7 +100,7 @@ public class MyPagerAdapter extends PagerAdapter {
         circularProgressDrawable.start();
 
         GlideApp.with(context)
-                .load(Recipe.image)
+                .load(RecipeEntity.image)
                 .placeholder(circularProgressDrawable)
                 /*.listener(new RequestListener<Drawable>() {
                     @Override

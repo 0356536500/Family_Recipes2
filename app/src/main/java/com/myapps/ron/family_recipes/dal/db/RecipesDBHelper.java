@@ -5,7 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.myapps.ron.family_recipes.model.Recipe;
+import com.myapps.ron.family_recipes.model.RecipeEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +29,7 @@ public class RecipesDBHelper extends MyDBHelper{
      * CRUD(Create, Read, Update, Delete) Operations
      */
 
-    public void insertRecipe(Recipe recipe) {
+    public void insertRecipe(RecipeEntity recipe) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -52,14 +52,14 @@ public class RecipesDBHelper extends MyDBHelper{
         db.close(); // Closing database connection
     }
 
-    public Recipe getRecipe(String id){
+    public RecipeEntity getRecipe(String id){
         SQLiteDatabase db = this.getReadableDatabase();
         //                                  new String[]{CAT_KEY_ID,KEY_NAME}
         Cursor cursor = db.query(TABLE_RECIPES, null,KEY_ID+"=?",
                 new String[]{String.valueOf(id)},null,null,null,null);
         if(cursor != null) {
             cursor.moveToFirst();
-            Recipe recipe = new Recipe.RecipeBuilder()
+            RecipeEntity recipe = new RecipeEntity.RecipeBuilder()
                     .id(cursor.getString(cursor.getColumnIndex(KEY_ID)))
                     .name(cursor.getString(cursor.getColumnIndex(KEY_NAME)))
                     .description(cursor.getString(cursor.getColumnIndex(KEY_DESC)))
@@ -87,8 +87,8 @@ public class RecipesDBHelper extends MyDBHelper{
     }
 
     // Getting All Records
-    private List<Recipe> getAllRecipesFromQuery(String selectQuery) {
-        List<Recipe> recipeList = new ArrayList<>();
+    private List<RecipeEntity> getAllRecipesFromQuery(String selectQuery) {
+        List<RecipeEntity> recipeList = new ArrayList<>();
 
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
@@ -96,7 +96,7 @@ public class RecipesDBHelper extends MyDBHelper{
         // looping through all rows and adding to list
         if (cursor.moveToFirst()) {
             do {
-                Recipe recipe = new Recipe.RecipeBuilder()
+                RecipeEntity recipe = new RecipeEntity.RecipeBuilder()
                         .id(cursor.getString(0))
                         .name(cursor.getString(1))
                         .description(cursor.getString(2))
@@ -138,7 +138,7 @@ public class RecipesDBHelper extends MyDBHelper{
     }
 
     // Getting All Records
-    public List<Recipe> getAllRecipes(String orderedBy) {
+    public List<RecipeEntity> getAllRecipes(String orderedBy) {
         // Default is by creation date
         if(orderedBy == null)
             orderedBy = KEY_CREATED;
@@ -153,7 +153,7 @@ public class RecipesDBHelper extends MyDBHelper{
     }
 
     // Getting All Records
-    public List<Recipe> getFavoriteRecipes(String orderedBy) {
+    public List<RecipeEntity> getFavoriteRecipes(String orderedBy) {
         // Default is by creation date
         if(orderedBy == null)
             orderedBy = KEY_CREATED;
@@ -168,7 +168,7 @@ public class RecipesDBHelper extends MyDBHelper{
         return getAllRecipesFromQuery(selectQuery);
     }
 
-    public int updateRecipeServerChanges(Recipe recipe) {
+    public int updateRecipeServerChanges(RecipeEntity recipe) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -185,7 +185,7 @@ public class RecipesDBHelper extends MyDBHelper{
                 new String[]{String.valueOf(recipe.getId())});
     }
 
-    public int updateRecipeUserChanges(Recipe recipe) {
+    public int updateRecipeUserChanges(RecipeEntity recipe) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();

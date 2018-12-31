@@ -7,9 +7,10 @@ import android.os.Handler;
 import android.os.StrictMode;
 import android.util.Log;
 
-import com.myapps.ron.family_recipes.model.Recipe;
+import com.myapps.ron.family_recipes.model.RecipeEntity;
 import com.myapps.ron.family_recipes.network.APICallsHandler;
 import com.myapps.ron.family_recipes.network.MyCallback;
+import com.myapps.ron.family_recipes.network.RecipeTO;
 import com.myapps.ron.family_recipes.network.S3.OnlineStorageWrapper;
 import com.myapps.ron.family_recipes.network.cognito.AppHelper;
 import com.myapps.ron.family_recipes.utils.Constants;
@@ -47,7 +48,7 @@ public class OldService extends IntentService {
      * @see IntentService
      */
     // TODO: Customize helper method
-    public static void startActionPostRecipe(Context context, Recipe recipe) {
+    public static void startActionPostRecipe(Context context, RecipeEntity recipe) {
         Log.e(TAG, "handle action post recipe");
         Intent intent = new Intent(context, PostRecipeToServerService.class);
         intent.setAction(ACTION_POST_RECIPE);
@@ -76,7 +77,7 @@ public class OldService extends IntentService {
         if (intent != null) {
             final String action = intent.getAction();
             if (ACTION_POST_RECIPE.equals(action)) {
-                final Recipe recipe = intent.getParcelableExtra(EXTRA_PARAM1);
+                final RecipeEntity recipe = intent.getParcelableExtra(EXTRA_PARAM1);
                 //final String time = intent.getStringExtra(EXTRA_PARAM2);
                 handleActionPostRecipe(recipe);
             }
@@ -87,11 +88,11 @@ public class OldService extends IntentService {
      * Handle action Foo in the provided background thread with the provided
      * parameters.
      */
-    private void handleActionPostRecipe(final Recipe recipe) {
+    private void handleActionPostRecipe(final RecipeEntity recipe) {
         this.recipe = recipe;
         Log.e(TAG, "handle action post recipe");
         //maybe open a new thread
-        APICallsHandler.postRecipe(recipe, AppHelper.getAccessToken(), new MyCallback<String>() {
+        APICallsHandler.postRecipe(new RecipeTO(recipe), AppHelper.getAccessToken(), new MyCallback<String>() {
             @Override
             public void onFinished(String result) {
                 Log.e(TAG, "finished post pend, got a url, " + result);
@@ -123,7 +124,7 @@ public class OldService extends IntentService {
 
 
     private int picturesUploaded;
-    private Recipe recipe = null;
+    private RecipeEntity recipe = null;
     private List<String> urls;
     private MyCallback<Boolean> myCallback = new MyCallback<Boolean>() {
         @Override
@@ -136,7 +137,7 @@ public class OldService extends IntentService {
         }
     };
 
-    private void uploadFoodFiles(final Recipe recipe) {
+    private void uploadFoodFiles(final RecipeEntity recipe) {
         picturesUploaded = 0;
         Log.e(TAG, "uploading images");
         //Asynchronous request with retrofit 2.0
@@ -167,7 +168,7 @@ public class OldService extends IntentService {
         sendBroadcast(intent);
     }
 
-    private void deleteAllLocalFiles(Recipe recipe) {
+    private void deleteAllLocalFiles(RecipeEntity recipe) {
 
     }
 

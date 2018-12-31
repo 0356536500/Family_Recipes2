@@ -11,7 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.myapps.ron.family_recipes.R;
-import com.myapps.ron.family_recipes.model.Recipe;
+import com.myapps.ron.family_recipes.model.RecipeEntity;
 import com.myapps.ron.family_recipes.utils.DepthPageTransformer;
 import com.myapps.ron.family_recipes.adapters.MyPagerAdapter;
 import com.myapps.ron.family_recipes.utils.Constants;
@@ -21,7 +21,7 @@ import com.tbuonomo.viewpagerdotsindicator.WormDotsIndicator;
  * Created by ronginat on 25/10/2018.
  */
 public class PagerDialogFragment extends DialogFragment {
-    private Recipe recipe;
+    private RecipeEntity recipe;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

@@ -5,7 +5,6 @@ import android.util.Log;
 
 import com.google.gson.JsonObject;
 import com.myapps.ron.family_recipes.model.Category;
-import com.myapps.ron.family_recipes.model.Recipe;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -60,22 +59,22 @@ public class APICallsHandler {
         });
     }*/
 
-    public static void getAllRecipes(String date, String token, final MyCallback<List<Recipe>> callback) {
+    public static void getAllRecipes(String date, String token, final MyCallback<List<RecipeTO>> callback) {
         /*Map<String, String> headers = new HashMap<>();
         headers.put(Constants.CONTENT_TYPE, "application/json");
         headers.put(Constants.AUTHORIZATION, token);*/
 
         RecipeInterface service = getRetrofitInstance().create(RecipeInterface.class);
-        Call<List<Recipe>> call = service.getAllRecipes(token, date);
+        Call<List<RecipeTO>> call = service.getAllRecipes(token, date);
 
-        call.enqueue(new Callback<List<Recipe>>() {
+        call.enqueue(new Callback<List<RecipeTO>>() {
             @Override
-            public void onResponse(@NotNull Call<List<Recipe>> call, @NotNull Response<List<Recipe>> response) {
+            public void onResponse(@NotNull Call<List<RecipeTO>> call, @NotNull Response<List<RecipeTO>> response) {
                 String body = response.body() != null ? response.body().toString() : "null";
 
                 if (response.code() == STATUS_OK) {
                     Log.i(TAG, body);
-                    List<Recipe> list = response.body();
+                    List<RecipeTO> list = response.body();
                     callback.onFinished(list);
                 }
                 /*else if (response.code() == STATUS_NOT_MODIFIED) {
@@ -91,14 +90,14 @@ public class APICallsHandler {
             }
 
             @Override
-            public void onFailure(@NotNull Call<List<Recipe>> call, @NotNull Throwable t) {
+            public void onFailure(@NotNull Call<List<RecipeTO>> call, @NotNull Throwable t) {
                 Log.e(TAG, "error getting all recipes. message: " + t.getMessage());
                 //Toast.makeText(MainActivity.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    public static void postRecipe(final Recipe recipe, final String token, final MyCallback<String> callback) {
+    public static void postRecipe(final RecipeTO recipe, final String token, final MyCallback<String> callback) {
         Log.e(TAG, "start post recipe");
 
         Map<String, String> headers = new HashMap<>();
@@ -137,7 +136,7 @@ public class APICallsHandler {
         });
     }
 
-    private static Map<String,Object> generatePostRecipeFields(Recipe recipe) {
+    private static Map<String,Object> generatePostRecipeFields(RecipeTO recipe) {
         Map<String, Object> fields = new HashMap<>();
         fields.put(Constants.POSTED_NAME, recipe.getName());
         fields.put(Constants.POSTED_DESCRIPTION, recipe.getDescription());
@@ -148,7 +147,7 @@ public class APICallsHandler {
         return fields;
     }
 
-    public static void patchRecipe(Map<String, Object> attributes, String id, String token, final MyCallback<Recipe> callback) {
+    public static void patchRecipe(Map<String, Object> attributes, String id, String token, final MyCallback<RecipeTO> callback) {
         Map<String, String> headers = new HashMap<>();
         headers.put(Constants.CONTENT_TYPE, "application/json");
         headers.put(Constants.AUTHORIZATION, token);
@@ -157,16 +156,16 @@ public class APICallsHandler {
         //body.put(Constants.NUM_FILES_TO_UPLOAD, String.valueOf(numOfFiles));
 
         RecipeInterface service = getRetrofitInstance().create(RecipeInterface.class);
-        Call<Recipe> call = service.patchRecipe(headers, id, attributes);
+        Call<RecipeTO> call = service.patchRecipe(headers, id, attributes);
 
-        call.enqueue(new Callback<Recipe>() {
+        call.enqueue(new Callback<RecipeTO>() {
             @Override
-            public void onResponse(@NotNull Call<Recipe> call, @NotNull Response<Recipe> response) {
+            public void onResponse(@NotNull Call<RecipeTO> call, @NotNull Response<RecipeTO> response) {
                 String body = response.body() != null ? response.body().toString() : "null";
 
                 if (response.code() == STATUS_OK) {
                     Log.i(TAG, body);
-                    Recipe recipe = response.body();
+                    RecipeTO recipe = response.body();
                     callback.onFinished(recipe);
                 }
                 else {
@@ -175,7 +174,7 @@ public class APICallsHandler {
             }
 
             @Override
-            public void onFailure(@NotNull Call<Recipe> call, @NotNull Throwable t) {
+            public void onFailure(@NotNull Call<RecipeTO> call, @NotNull Throwable t) {
                 Log.e(TAG, "error patching recipe. message: " + t.getMessage());
                 //Toast.makeText(MainActivity.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
             }

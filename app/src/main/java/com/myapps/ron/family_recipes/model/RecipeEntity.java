@@ -4,7 +4,6 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.google.gson.Gson;
-import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 import com.myapps.ron.family_recipes.utils.Constants;
 
@@ -16,117 +15,43 @@ import java.util.Objects;
 import static com.myapps.ron.family_recipes.utils.Constants.FALSE;
 import static com.myapps.ron.family_recipes.utils.Constants.TRUE;
 
-public class Recipe implements Parcelable{
+/**
+ * Created by ronginat on 31/12/2018.
+ */
+public class RecipeEntity implements Parcelable{
 
     public static String image = "https://api.androidhive.info/json/images/keanu.jpg";
 
-    @SerializedName("id")
     private String id;
-    @SerializedName("name")
     private String name;
-    @SerializedName("description")
     private String description;
-    @SerializedName("createdAt")
     private String createdAt;
-    @SerializedName("lastModifiedAt")
     private String lastModifiedAt;
-    @SerializedName("recipeFile")
     private String recipeFile;
-    @SerializedName("uploader")
     private String uploader;
-    @SerializedName("categories")
     private List<String> categories;
-    @SerializedName("comments")
-    private List<Comment> comments;
-    @SerializedName("foodFiles")
+    private List<RecipeEntity.Comment> comments;
     private List<String> foodFiles;
-    @SerializedName("likes")
     private int likes;
-
     private int meLike;
-/*    @SerializedName("sharedKey")
-    private String sharedKey;*/
 
-    /*private String id;
-    private String name;
-    private String description;
-    private String createdAt;
-    private String lastModifiedAt;
-    private String recipeFile;
-    private String uploader;
-    private Set<String> categories;
-    private List<String> comments;
-    private List<String> foodFiles;
-    private int likes;
-    private String sharedKey;*/
 
     private static final Gson gson = new Gson();
 
-    public Recipe() {
+    public RecipeEntity() {
     }
-
-    /*//from server
-    public Recipe(String id, String name, String description, String createdAt,
-                  String lastModifiedAt, String recipeFile, String uploader,
-                  @Nullable List<String> categories, @Nullable List<Comment> comments, @Nullable List<String> foodFiles,
-                  int likes) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.createdAt = createdAt;
-        this.lastModifiedAt = lastModifiedAt;
-        this.recipeFile = recipeFile;
-        this.uploader = uploader;
-        this.categories = categories;
-        this.comments = comments;
-        this.foodFiles = foodFiles;
-        this.likes = likes;
-
-        this.meLike = false;
-    }
-
-    //from db
-    public Recipe(String id, String name, String description, String createdAt,
-                  String lastModifiedAt, String recipeFile, String uploader,
-                  String categories, String comments, String foodFiles,
-                  int likes, boolean meLike) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.createdAt = createdAt;
-        this.lastModifiedAt = lastModifiedAt;
-        this.recipeFile = recipeFile;
-        this.uploader = uploader;
-        this.likes = likes;
-
-        this.meLike = meLike;
-
-        setStringCategories(categories);
-        setStringComments(comments);
-        setStringFoodFiles(foodFiles);
-    }
-
-    public Recipe(String id, String name, String description, String createdAt,
-                  String lastModifiedAt, String recipeFile, String uploader,
-                  String categories, String comments, String foodFiles,
-                  int likes) {
-
-        this(id, name, description, createdAt, lastModifiedAt, recipeFile, uploader, categories,
-                comments, foodFiles, likes, false);
-    }*/
-
 
     public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
-        public Recipe createFromParcel(Parcel in) {
-            return new Recipe(in);
+        public RecipeEntity createFromParcel(Parcel in) {
+            return new RecipeEntity(in);
         }
 
-        public Recipe[] newArray(int size) {
-            return new Recipe[size];
+        public RecipeEntity[] newArray(int size) {
+            return new RecipeEntity[size];
         }
     };
 
-    private Recipe(Parcel in) {
+    private RecipeEntity(Parcel in) {
         this.id = in.readString();
         this.name = in.readString();
         this.description = in.readString();
@@ -140,7 +65,7 @@ public class Recipe implements Parcelable{
         foodFiles = new ArrayList<>();
 
         in.readList(this.categories, String.class.getClassLoader());
-        in.readList(this.comments, Comment.class.getClassLoader());
+        in.readList(this.comments, RecipeEntity.Comment.class.getClassLoader());
         in.readList(this.foodFiles, String.class.getClassLoader());
 
         this.likes = in.readInt();
@@ -149,8 +74,8 @@ public class Recipe implements Parcelable{
 
     @Override
     public boolean equals(Object obj) {
-        if(obj instanceof Recipe) {
-            return getId().equals(((Recipe)obj).getId());
+        if(obj instanceof RecipeEntity) {
+            return getId().equals(((RecipeEntity)obj).getId());
         }
         return false;
         //return super.equals(obj);
@@ -166,7 +91,7 @@ public class Recipe implements Parcelable{
      * @param other - other recipe
      * @return whether or not current and second recipes are exactly the same
      */
-    public boolean identical(Recipe other) {
+    public boolean identical(RecipeEntity other) {
         boolean ids = getId() == null && other.getId() == null;
         if (id != null && other.getId() != null)
             ids = getId().equals(other.getId());
@@ -254,9 +179,9 @@ public class Recipe implements Parcelable{
         if (comments == null) {
             setComments(null);
         } else {
-            Type type = new TypeToken<List<Comment>>() {
+            Type type = new TypeToken<List<RecipeEntity.Comment>>() {
             }.getType();
-            List<Comment> value = gson.fromJson(comments, type);
+            List<RecipeEntity.Comment> value = gson.fromJson(comments, type);
             setComments(value);
         }
     }
@@ -350,11 +275,11 @@ public class Recipe implements Parcelable{
         this.categories = categories;
     }
 
-    public List<Comment> getComments() {
+    public List<RecipeEntity.Comment> getComments() {
         return comments;
     }
 
-    public void setComments(List<Comment> comments) {
+    public void setComments(List<RecipeEntity.Comment> comments) {
         this.comments = comments;
     }
 
@@ -434,12 +359,12 @@ public class Recipe implements Parcelable{
     }
 
     public static class Comment implements Parcelable {
-        @SerializedName("text")
         private String text;
-        @SerializedName("user")
         private String user;
-        @SerializedName("date")
         private String date;
+
+        public Comment(){
+        }
 
         Comment(Parcel in) {
             user = in.readString();
@@ -447,15 +372,15 @@ public class Recipe implements Parcelable{
             date = in.readString();
         }
 
-        public static final Creator<Comment> CREATOR = new Creator<Comment>() {
+        public static final Creator<RecipeEntity.Comment> CREATOR = new Creator<RecipeEntity.Comment>() {
             @Override
-            public Comment createFromParcel(Parcel in) {
-                return new Comment(in);
+            public RecipeEntity.Comment createFromParcel(Parcel in) {
+                return new RecipeEntity.Comment(in);
             }
 
             @Override
-            public Comment[] newArray(int size) {
-                return new Comment[size];
+            public RecipeEntity.Comment[] newArray(int size) {
+                return new RecipeEntity.Comment[size];
             }
         };
 
@@ -498,7 +423,7 @@ public class Recipe implements Parcelable{
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
-            Comment comment = (Comment) o;
+            RecipeEntity.Comment comment = (RecipeEntity.Comment) o;
             return this.text.equals(comment.text) &&
                     this.user.equals(comment.user) &&
                     this.date.equals(comment.date);
@@ -539,68 +464,68 @@ public class Recipe implements Parcelable{
 
         public RecipeBuilder() {}
 
-        public RecipeBuilder id (String id) {
+        public RecipeEntity.RecipeBuilder id (String id) {
             this.builderId = id;
             return this;
         }
 
-        public RecipeBuilder name (String name) {
+        public RecipeEntity.RecipeBuilder name (String name) {
             this.builderName = name;
             return this;
         }
 
-        public RecipeBuilder description (String description) {
+        public RecipeEntity.RecipeBuilder description (String description) {
             this.builderDescription = description;
             return this;
         }
 
-        public RecipeBuilder createdAt (String createdAt) {
+        public RecipeEntity.RecipeBuilder createdAt (String createdAt) {
             this.builderCreatedAt = createdAt;
             return this;
         }
 
-        public RecipeBuilder lastModifiedAt (String lastModifiedAt) {
+        public RecipeEntity.RecipeBuilder lastModifiedAt (String lastModifiedAt) {
             this.builderLastModifiedAt = lastModifiedAt;
             return this;
         }
 
-        public RecipeBuilder recipeFile (String recipeFile) {
+        public RecipeEntity.RecipeBuilder recipeFile (String recipeFile) {
             this.builderRecipeFile = recipeFile;
             return this;
         }
 
-        public RecipeBuilder uploader (String uploader) {
+        public RecipeEntity.RecipeBuilder uploader (String uploader) {
             this.builderUploader = uploader;
             return this;
         }
 
-        public RecipeBuilder categoriesJson (String categoriesJson) {
+        public RecipeEntity.RecipeBuilder categoriesJson (String categoriesJson) {
             this.builderCategories = categoriesJson;
             return this;
         }
 
-        public RecipeBuilder commentsJson (String commentsJson) {
+        public RecipeEntity.RecipeBuilder commentsJson (String commentsJson) {
             this.builderComments = commentsJson;
             return this;
         }
 
-        public RecipeBuilder foodFilesJson (String foodFilesJson) {
+        public RecipeEntity.RecipeBuilder foodFilesJson (String foodFilesJson) {
             this.builderFoodFiles = foodFilesJson;
             return this;
         }
 
-        public RecipeBuilder likes (int likes) {
+        public RecipeEntity.RecipeBuilder likes (int likes) {
             this.builderLikes = likes;
             return this;
         }
 
-        public RecipeBuilder meLike (boolean meLike) {
+        public RecipeEntity.RecipeBuilder meLike (boolean meLike) {
             this.builderMeLike = meLike;
             return this;
         }
 
-        public Recipe build() {
-            Recipe recipe = new Recipe();
+        public RecipeEntity build() {
+            RecipeEntity recipe = new RecipeEntity();
             recipe.setId(builderId);
             recipe.setName(builderName);
             recipe.setDescription(builderDescription);

@@ -7,9 +7,10 @@ import android.os.Handler;
 import android.os.StrictMode;
 import android.util.Log;
 
-import com.myapps.ron.family_recipes.model.Recipe;
+import com.myapps.ron.family_recipes.model.RecipeEntity;
 import com.myapps.ron.family_recipes.network.APICallsHandler;
 import com.myapps.ron.family_recipes.network.MyCallback;
+import com.myapps.ron.family_recipes.network.RecipeTO;
 import com.myapps.ron.family_recipes.network.S3.OnlineStorageWrapper;
 import com.myapps.ron.family_recipes.network.cognito.AppHelper;
 import com.myapps.ron.family_recipes.utils.Constants;
@@ -48,7 +49,7 @@ public class PostRecipeToServerService extends IntentService {
      * @see IntentService
      */
     // TODO: Customize helper method
-    public static void startActionPostRecipe(Context context, Recipe recipe) {
+    public static void startActionPostRecipe(Context context, RecipeEntity recipe) {
         Log.e(TAG, "handle action post recipe");
         Intent intent = new Intent(context, PostRecipeToServerService.class);
         intent.setAction(ACTION_POST_RECIPE);
@@ -77,7 +78,7 @@ public class PostRecipeToServerService extends IntentService {
         if (intent != null) {
             final String action = intent.getAction();
             if (ACTION_POST_RECIPE.equals(action)) {
-                final Recipe recipe = intent.getParcelableExtra(EXTRA_PARAM1);
+                final RecipeEntity recipe = intent.getParcelableExtra(EXTRA_PARAM1);
                 //final String time = intent.getStringExtra(EXTRA_PARAM2);
                 handleActionPostRecipeSync(recipe);
                 //handleActionPostRecipe(recipe);
@@ -93,14 +94,14 @@ public class PostRecipeToServerService extends IntentService {
      * Handle action Foo in the provided background thread with the provided
      * parameters.
      */
-    private void handleActionPostRecipeSync(final Recipe recipe) {
+    private void handleActionPostRecipeSync(final RecipeEntity recipe) {
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
                 .permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
         Log.e(TAG, "handle action post recipe");
         //maybe open a new thread
-        APICallsHandler.postRecipe(recipe, AppHelper.getAccessToken(), new MyCallback<String>() {
+        APICallsHandler.postRecipe(new RecipeTO(recipe), AppHelper.getAccessToken(), new MyCallback<String>() {
             @Override
             public void onFinished(String urlForContent) {
                 Log.e(TAG, "finished post pend, got a url, " + urlForContent);
@@ -162,7 +163,7 @@ public class PostRecipeToServerService extends IntentService {
         sendBroadcast(intent);
     }
 
-    private void deleteAllLocalFiles(Recipe recipe) {
+    private void deleteAllLocalFiles(RecipeEntity recipe) {
         if (recipe.getFoodFiles() != null && !recipe.getFoodFiles().isEmpty()) {
             for (int i = 0; i < recipe.getFoodFiles().size(); i++) {
                 new File(recipe.getFoodFiles().get(i)).delete();

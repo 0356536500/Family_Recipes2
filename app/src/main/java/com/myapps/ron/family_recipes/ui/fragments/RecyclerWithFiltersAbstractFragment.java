@@ -23,7 +23,7 @@ import com.myapps.ron.family_recipes.MyDividerItemDecoration;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.adapters.RecipesAdapter;
 import com.myapps.ron.family_recipes.model.Category;
-import com.myapps.ron.family_recipes.model.Recipe;
+import com.myapps.ron.family_recipes.model.RecipeEntity;
 import com.myapps.ron.family_recipes.recycler.MyRecyclerScroll;
 import com.myapps.ron.family_recipes.ui.activities.MainActivity;
 import com.myapps.ron.family_recipes.ui.activities.RecipeActivity;
@@ -74,7 +74,7 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
 
     Filter<Category> mFilter;
     List<Category> tags;
-    protected List<Recipe> recipes;
+    protected List<RecipeEntity> recipes;
 
     SwipeRefreshLayout swipeRefreshLayout;
     SwipeRefreshLayout.OnRefreshListener onRefreshListener;
@@ -413,14 +413,14 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
 
     // region Recycler Listener
     @Override
-    public void onItemSelected(Recipe recipe) {
+    public void onItemSelected(RecipeEntity recipe) {
         Intent intent = new Intent(activity, RecipeActivity.class);
         intent.putExtra(Constants.RECIPE, recipe);
         startActivityForResult(intent, Constants.RECIPE_ACTIVITY_CODE);
     }
 
     @Override
-    public void onImageClicked(Recipe recipe) {
+    public void onImageClicked(RecipeEntity recipe) {
         FragmentTransaction ft = activity.getSupportFragmentManager().beginTransaction();
         Fragment prev = activity.getSupportFragmentManager().findFragmentByTag("dialog");
         if (prev != null) {
@@ -450,7 +450,7 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
         if(requestCode == Constants.RECIPE_ACTIVITY_CODE) {
             if(resultCode == RESULT_OK) {
                 //mAdapter.updateRecipes(new RecipesDBHelper(this).getAllRecipes());
-                Recipe updatedRecipe = data.getParcelableExtra(Constants.RECIPE);
+                RecipeEntity updatedRecipe = data.getParcelableExtra(Constants.RECIPE);
                 mAdapter.updateOneRecipe(updatedRecipe);
             }
         }

@@ -6,7 +6,6 @@ import android.text.Html;
 import android.text.Spanned;
 import android.util.Log;
 
-import com.myapps.ron.family_recipes.model.Recipe;
 import com.myapps.ron.family_recipes.network.Constants;
 import com.myapps.ron.family_recipes.network.MiddleWareForNetwork;
 import com.myapps.ron.family_recipes.network.MyCallback;

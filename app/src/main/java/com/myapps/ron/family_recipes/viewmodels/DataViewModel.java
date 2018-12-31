@@ -12,7 +12,8 @@ import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.dal.db.CategoriesDBHelper;
 import com.myapps.ron.family_recipes.dal.db.RecipesDBHelper;
 import com.myapps.ron.family_recipes.model.Category;
-import com.myapps.ron.family_recipes.model.Recipe;
+import com.myapps.ron.family_recipes.model.RecipeEntity;
+import com.myapps.ron.family_recipes.network.RecipeTO;
 import com.myapps.ron.family_recipes.network.APICallsHandler;
 import com.myapps.ron.family_recipes.network.MiddleWareForNetwork;
 import com.myapps.ron.family_recipes.network.MyCallback;
@@ -26,8 +27,8 @@ import java.util.List;
  * loads all recipes, updates local db and server time.
  */
 public class DataViewModel extends ViewModel {
-    private MutableLiveData<List<Recipe>> recipeList = new MutableLiveData<>(); // list of recipes from api
-    private MutableLiveData<List<Recipe>> favoriteList = new MutableLiveData<>(); // list of recipes local db
+    private MutableLiveData<List<RecipeEntity>> recipeList = new MutableLiveData<>(); // list of recipes from api
+    private MutableLiveData<List<RecipeEntity>> favoriteList = new MutableLiveData<>(); // list of recipes local db
     private MutableLiveData<List<Category>> categoryList = new MutableLiveData<>(); // list of newCategories from api
     private MutableLiveData<Boolean> canInitBothRecyclerAndFilters = new MutableLiveData<>();
 
@@ -62,20 +63,20 @@ public class DataViewModel extends ViewModel {
     }
 
     //region recipes
-    private void setRecipes(List<Recipe> items) {
+    private void setRecipes(List<RecipeEntity> items) {
         recipeList.setValue(items);
     }
 
-    public LiveData<List<Recipe>> getRecipes() {
+    public LiveData<List<RecipeEntity>> getRecipes() {
         return recipeList;
     }
 
     public void loadRecipes(final Context context, final String orderBy) {
         if(MiddleWareForNetwork.checkInternetConnection(context)) {
             final String time = DateUtil.getUTCTime();
-            APICallsHandler.getAllRecipes(DateUtil.getLastUpdateTime(context), AppHelper.getAccessToken(), new MyCallback<List<Recipe>>() {
+            APICallsHandler.getAllRecipes(DateUtil.getLastUpdateTime(context), AppHelper.getAccessToken(), new MyCallback<List<RecipeTO>>() {
                 @Override
-                public void onFinished(List<Recipe> result) {
+                public void onFinished(List<RecipeTO> result) {
                     //PostRecipeToServerService.startActionPostRecipe(context, new ArrayList<>(result), time);
                     if(result != null) {
                         DateUtil.updateServerTime(context, time);
@@ -96,7 +97,7 @@ public class DataViewModel extends ViewModel {
         }
     }
 
-    public List<Recipe> loadLocalRecipesOrdered(final Context context, String orderBy) {
+    public List<RecipeEntity> loadLocalRecipesOrdered(final Context context, String orderBy) {
         RecipesDBHelper dbHelper = new RecipesDBHelper(context);
         return dbHelper.getAllRecipes(orderBy);
     }
@@ -111,10 +112,10 @@ public class DataViewModel extends ViewModel {
         private int newRecipes, modifiedRecipes;
         private Context context;
         private String orderBy;
-        private List<Recipe> recipes;
+        private List<RecipeTO> recipes;
         private RecipesDBHelper dbHelper;
 
-        MyAsyncRecipeUpdate(Context context, List<Recipe> recipes, String orderBy) {
+        MyAsyncRecipeUpdate(Context context, List<RecipeTO> recipes, String orderBy) {
             this.context = context;
             this.dbHelper = new RecipesDBHelper(context);
             this.recipes = recipes;
@@ -125,15 +126,15 @@ public class DataViewModel extends ViewModel {
 
         @Override
         protected Boolean doInBackground(Void... voids) {
-            for (Recipe item : recipes) {
+            for (RecipeTO item : recipes) {
                 //Log.e(getClass().getSimpleName(), "item: " + item.getId());
                 if(dbHelper.recipeExists(item.getId())) {
                     //Log.e(getClass().getSimpleName(), "\t exists");
-                    dbHelper.updateRecipeServerChanges(item);
+                    dbHelper.updateRecipeServerChanges(item.toEntity());
                     modifiedRecipes++;
                 } else {
                     //Log.e(getClass().getSimpleName(), "\t not exists");
-                    dbHelper.insertRecipe(item);
+                    dbHelper.insertRecipe(item.toEntity());
                     newRecipes++;
                 }
             }
@@ -254,11 +255,11 @@ public class DataViewModel extends ViewModel {
 
     //region favorites
 
-    private void setFavorites(List<Recipe> items) {
+    private void setFavorites(List<RecipeEntity> items) {
         favoriteList.setValue(items);
     }
 
-    public LiveData<List<Recipe>> getFavorites() {
+    public LiveData<List<RecipeEntity>> getFavorites() {
         return favoriteList;
     }
 

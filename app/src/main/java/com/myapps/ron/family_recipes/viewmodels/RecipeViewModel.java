@@ -9,7 +9,8 @@ import android.util.Log;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.dal.db.RecipesDBHelper;
 import com.myapps.ron.family_recipes.dal.storage.StorageWrapper;
-import com.myapps.ron.family_recipes.model.Recipe;
+import com.myapps.ron.family_recipes.model.RecipeEntity;
+import com.myapps.ron.family_recipes.network.RecipeTO;
 import com.myapps.ron.family_recipes.network.APICallsHandler;
 import com.myapps.ron.family_recipes.network.Constants;
 import com.myapps.ron.family_recipes.network.MiddleWareForNetwork;
@@ -30,16 +31,16 @@ import static com.myapps.ron.family_recipes.utils.Constants.TRUE;
  * - add comment
  */
 public class RecipeViewModel extends ViewModel {
-    private final MutableLiveData<Recipe> recipe = new MutableLiveData<>(); // current recipe on the screen
+    private final MutableLiveData<RecipeEntity> recipe = new MutableLiveData<>(); // current recipe on the screen
     private MutableLiveData<String> recipePath = new MutableLiveData<>();
     private MutableLiveData<String> imagePath = new MutableLiveData<>();
     private MutableLiveData<String> infoForUser = new MutableLiveData<>();
 
-    private void setRecipe(Recipe item) {
+    private void setRecipe(RecipeEntity item) {
         recipe.setValue(item);
     }
 
-    public LiveData<Recipe> getRecipe() {
+    public LiveData<RecipeEntity> getRecipe() {
         return recipe;
     }
 
@@ -68,17 +69,18 @@ public class RecipeViewModel extends ViewModel {
     }
 
 
-    public void changeLike(final Context context, final Recipe recipe) {
+    public void changeLike(final Context context, final RecipeEntity recipe) {
         if(MiddleWareForNetwork.checkInternetConnection(context)) {
             Map<String, Object> attrs = new HashMap<>();
             String likeStr = recipe.isUserLiked() ? "unlike" : "like";
             attrs.put(Constants.LIKES, likeStr);
-            APICallsHandler.patchRecipe(attrs, recipe.getId(), AppHelper.getAccessToken(), new MyCallback<Recipe>() {
+            APICallsHandler.patchRecipe(attrs, recipe.getId(), AppHelper.getAccessToken(), new MyCallback<RecipeTO>() {
                 @Override
-                public void onFinished(Recipe result) {
-                    result.setMeLike(!recipe.isUserLiked() ? TRUE : FALSE);
+                public void onFinished(RecipeTO result) {
+                    RecipeEntity rv = result.toEntity();
+                    rv.setMeLike(!recipe.isUserLiked() ? TRUE : FALSE);
                     RecipesDBHelper dbHelper = new RecipesDBHelper(context);
-                    dbHelper.updateRecipeUserChanges(result);
+                    dbHelper.updateRecipeUserChanges(rv);
                     Log.e("viewModel", dbHelper.getRecipe(recipe.getId()).toString());
                     setRecipe(dbHelper.getRecipe(recipe.getId()));
                 }
@@ -89,7 +91,7 @@ public class RecipeViewModel extends ViewModel {
         }
     }
 
-    public void postComment(final Context context, final Recipe recipe, String text) {
+    public void postComment(final Context context, final RecipeEntity recipe, String text) {
         if (!"".equals(text)) {
             if(MiddleWareForNetwork.checkInternetConnection(context)) {
                 Map<String, Object> attrs = new HashMap<>();
@@ -98,11 +100,13 @@ public class RecipeViewModel extends ViewModel {
                 commentMap.put(Constants.COMMENT_USER, AppHelper.getCurrUser());
                 attrs.put(Constants.COMMENTS, commentMap);
                 Log.e("viewModel", "before posting comment:\n" + attrs);
-                APICallsHandler.patchRecipe(attrs, recipe.getId(), AppHelper.getAccessToken(), new MyCallback<Recipe>() {
+                APICallsHandler.patchRecipe(attrs, recipe.getId(), AppHelper.getAccessToken(), new MyCallback<RecipeTO>() {
                     @Override
-                    public void onFinished(Recipe result) {
+                    public void onFinished(RecipeTO result) {
+                        RecipeEntity rv = result.toEntity();
+                        rv.setMeLike(recipe.isUserLiked() ? TRUE : FALSE);
                         RecipesDBHelper dbHelper = new RecipesDBHelper(context);
-                        dbHelper.updateRecipeUserChanges(result);
+                        dbHelper.updateRecipeUserChanges(rv);
                         Log.e("viewModel", dbHelper.getRecipe(recipe.getId()).toString());
                         setRecipe(dbHelper.getRecipe(recipe.getId()));
                         setInfo(context.getString(R.string.post_comment_succeeded));
@@ -116,7 +120,7 @@ public class RecipeViewModel extends ViewModel {
         }
     }
 
-    public void loadRecipeContent(final Context context, final Recipe recipe) {
+    public void loadRecipeContent(final Context context, final RecipeEntity recipe) {
             if(recipe.getRecipeFile() != null && !recipe.getRecipeFile().equals("\"\"")) {
                 StorageWrapper.getRecipeFile(context, recipe.getRecipeFile(), new MyCallback<String>() {
                     @Override
@@ -143,7 +147,7 @@ public class RecipeViewModel extends ViewModel {
             }
     }
 
-    public void loadRecipeFoodImage(final Context context, final Recipe recipe) {
+    public void loadRecipeFoodImage(final Context context, final RecipeEntity recipe) {
         if(MiddleWareForNetwork.checkInternetConnection(context)) {
             if (recipe.getFoodFiles() != null && recipe.getFoodFiles().size() > 0) {
                 StorageWrapper.getFoodFile(context, recipe.getFoodFiles().get(0), new MyCallback<String>() {

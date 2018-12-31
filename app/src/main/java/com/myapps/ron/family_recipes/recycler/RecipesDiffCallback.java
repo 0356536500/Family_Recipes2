@@ -2,7 +2,7 @@ package com.myapps.ron.family_recipes.recycler;
 
 import androidx.recyclerview.widget.DiffUtil;
 
-import com.myapps.ron.family_recipes.model.Recipe;
+import com.myapps.ron.family_recipes.model.RecipeEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,10 +13,10 @@ import java.util.List;
 public class RecipesDiffCallback extends DiffUtil.Callback {
 
     //private static final String TAG = RecipesDiffCallback.class.getSimpleName();
-    private List<Recipe> oldRecipes;
-    private List<Recipe> newRecipes;
+    private List<RecipeEntity> oldRecipes;
+    private List<RecipeEntity> newRecipes;
 
-    public RecipesDiffCallback(List<Recipe> oldRecipes, List<Recipe> newRecipes) {
+    public RecipesDiffCallback(List<RecipeEntity> oldRecipes, List<RecipeEntity> newRecipes) {
         this.oldRecipes = new ArrayList<>(oldRecipes);
         this.newRecipes = new ArrayList<>(newRecipes);
     }

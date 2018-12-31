@@ -22,7 +22,7 @@ import android.widget.TextView;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.dal.storage.StorageWrapper;
 import com.myapps.ron.family_recipes.model.Category;
-import com.myapps.ron.family_recipes.model.Recipe;
+import com.myapps.ron.family_recipes.model.RecipeEntity;
 import com.myapps.ron.family_recipes.network.MyCallback;
 import com.myapps.ron.family_recipes.recycler.RecipesAdapterHelper;
 import com.myapps.ron.family_recipes.recycler.RecipesDiffCallback;
@@ -39,8 +39,8 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
     private int[] colors;
     private Random random;
     private Context context;
-    private List<Recipe> recipeList;
-    private List<Recipe> recipeListFiltered;
+    private List<RecipeEntity> recipeList;
+    private List<RecipeEntity> recipeListFiltered;
     private List<String> tags; // filters the user chose
 
     private List<Category> categoryList;
@@ -84,7 +84,7 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
     }
 
 
-    public RecipesAdapter(Context context, List<Recipe> recipeList, List<Category> categoryList, RecipesAdapterListener listener) {
+    public RecipesAdapter(Context context, List<RecipeEntity> recipeList, List<Category> categoryList, RecipesAdapterListener listener) {
         this.context = context;
         this.listener = listener;
         this.categoryList = categoryList;
@@ -111,7 +111,7 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, final int position) {
-        final Recipe recipe = recipeListFiltered.get(position);
+        final RecipeEntity recipe = recipeListFiltered.get(position);
 
         if (recipe.getName() != null)
             holder.name.setText(recipe.getName());
@@ -143,7 +143,7 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
         requestOptions.error(android.R.drawable.stat_notify_error);// ic_error);*/
     }
 
-    private void inflateCategories(MyViewHolder holder, Recipe recipe) {
+    private void inflateCategories(MyViewHolder holder, RecipeEntity recipe) {
         if (recipe.getCategories() != null && !recipe.getCategories().isEmpty()) {
             /*LinearLayout internalWrapper = new LinearLayout(context);
             internalWrapper.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
@@ -180,7 +180,7 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
         }
     }
 
-    private void loadImage(final MyViewHolder holder, final Recipe recipe) {
+    private void loadImage(final MyViewHolder holder, final RecipeEntity recipe) {
         if(recipe.getFoodFiles() != null && recipe.getFoodFiles().size() > 0) {
             StorageWrapper.getThumbFile(context, recipe.getFoodFiles().get(0), new MyCallback<String>() {
                 @Override
@@ -219,7 +219,7 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
         circularProgressDrawable.start();
 
         GlideApp.with(context)
-                .load(Recipe.image)
+                .load(RecipeEntity.image)
                 .placeholder(circularProgressDrawable)
                 /*.listener(new RequestListener<Drawable>() {
                     @Override
@@ -249,7 +249,7 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
         return new Filter() {
             @Override
             protected FilterResults performFiltering(CharSequence charSequence) {
-                List<Recipe> filteredList;
+                List<RecipeEntity> filteredList;
                 String charString = mLastQuery;
                 if(charSequence != null){
                     charString = charSequence.toString();
@@ -259,7 +259,7 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
                     filteredList = new ArrayList<>(recipeList);
                 } else {
                     filteredList = new ArrayList<>();
-                    for (Recipe row : recipeList) {
+                    for (RecipeEntity row : recipeList) {
 
                         // name match condition. this might differ depending on your requirement
                         // here we are looking for name or description number match
@@ -282,7 +282,7 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
             protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
                 //Log.e("adapter", "update from filter");
                 if(filterResults.values != null)
-                    updateRecipes((ArrayList<Recipe>) filterResults.values, false);
+                    updateRecipes((ArrayList<RecipeEntity>) filterResults.values, false);
                 //notifyDataSetChanged();
             }
         };
@@ -311,7 +311,7 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
         updateRecipes(filteredList);*/
     }
 
-    public void updateRecipes(List<Recipe> list, boolean addedRecipes) {
+    public void updateRecipes(List<RecipeEntity> list, boolean addedRecipes) {
         if (list == null)
             return;
         Log.e(getClass().getSimpleName(), "update recipes, added = " + addedRecipes +"\n " + list.toString());
@@ -320,7 +320,7 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
             notifyDataSetChanged();
 
         } else {
-            List<Recipe> oldTemp;
+            List<RecipeEntity> oldTemp;
             if (addedRecipes) {
                 oldTemp = recipeList;
                 recipeList = list;
@@ -340,7 +340,7 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
         }
     }
 
-    public void updateRecipesOrder(List<Recipe> list) {
+    public void updateRecipesOrder(List<RecipeEntity> list) {
         if (list == null)
             return;
         if (this.recipeListFiltered == null || this.recipeListFiltered.isEmpty()){
@@ -348,7 +348,7 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
             notifyDataSetChanged();
         }
         else {
-            List<Recipe> oldTemp = recipeList;
+            List<RecipeEntity> oldTemp = recipeList;
             recipeList = list;
             recipeListFiltered = recipeList;
 
@@ -359,7 +359,7 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
         }
     }
 
-    public void updateOneRecipe(Recipe recipe) {
+    public void updateOneRecipe(RecipeEntity recipe) {
         //List<Recipe> newList = new ArrayList<>(recipeList);
 
         int index = recipeList.indexOf(recipe);
@@ -372,8 +372,8 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
     }
 
     public interface RecipesAdapterListener {
-        void onItemSelected(Recipe recipe);
-        void onImageClicked(Recipe recipe);
+        void onItemSelected(RecipeEntity recipe);
+        void onImageClicked(RecipeEntity recipe);
         void onCurrentSizeChanged(int size);
     }
 }

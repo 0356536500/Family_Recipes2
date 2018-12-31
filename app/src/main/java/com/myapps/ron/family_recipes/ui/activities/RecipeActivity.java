@@ -39,7 +39,7 @@ import android.widget.Toast;
 import com.myapps.ron.family_recipes.MyDividerItemDecoration;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.adapters.CommentsAdapter;
-import com.myapps.ron.family_recipes.model.Recipe;
+import com.myapps.ron.family_recipes.model.RecipeEntity;
 import com.myapps.ron.family_recipes.ui.fragments.PagerDialogFragment;
 import com.myapps.ron.family_recipes.utils.Constants;
 import com.myapps.ron.family_recipes.utils.GlideApp;
@@ -61,10 +61,10 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
     //private TextView textView;
     ContentLoadingProgressBar progressBar;
     private WebView myWebView;
-    private Recipe recipe;
+    private RecipeEntity recipe;
     private TextView textViewCommentTitle;
     private RecipeViewModel viewModel;
-    private Observer<Recipe> recipeObserver;//, commentObserver;
+    private Observer<RecipeEntity> recipeObserver;//, commentObserver;
 
     private ViewGroup commentsLayout;
     private RecyclerView recyclerView;
@@ -202,9 +202,9 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
 
     private void initViewModel() {
         viewModel = ViewModelProviders.of(this).get(RecipeViewModel.class);
-        recipeObserver = new Observer<Recipe>() {
+        recipeObserver = new Observer<RecipeEntity>() {
             @Override
-            public void onChanged(@Nullable Recipe recipe) {
+            public void onChanged(@Nullable RecipeEntity recipe) {
                 if (recipe != null) {
                     boolean changedLike = false, postedComment = false;
                     // user changed like value
