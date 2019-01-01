@@ -124,7 +124,7 @@ public class CategoriesDBHelper extends MyDBHelper{
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(CAT_KEY_CATS, category.getStringCategories());
+        values.put(CAT_KEY_CATS, category.getCategoriesToString());
         values.put(CAT_KEY_COLOR, category.getColor());
 
         // updating row

@@ -19,7 +19,7 @@ public class MyDBHelper extends SQLiteOpenHelper {
     static final String KEY_ID = "id";
     static final String KEY_NAME = "name";
     static final String KEY_DESC = "description";
-    static final String KEY_CREATED = "createdAt";
+    static final String KEY_CREATED = "creationDate";
     static final String KEY_MODIFIED = "lastModifiedAt";
     static final String KEY_FILE = "recipeFile";
     static final String KEY_UPLOADER = "uploader";

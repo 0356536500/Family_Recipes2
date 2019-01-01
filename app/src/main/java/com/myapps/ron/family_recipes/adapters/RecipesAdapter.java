@@ -23,7 +23,7 @@ import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.dal.storage.StorageWrapper;
 import com.myapps.ron.family_recipes.model.Category;
 import com.myapps.ron.family_recipes.model.RecipeEntity;
-import com.myapps.ron.family_recipes.network.MyCallback;
+import com.myapps.ron.family_recipes.utils.MyCallback;
 import com.myapps.ron.family_recipes.recycler.RecipesAdapterHelper;
 import com.myapps.ron.family_recipes.recycler.RecipesDiffCallback;
 import com.myapps.ron.family_recipes.utils.GlideApp;

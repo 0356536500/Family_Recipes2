@@ -1,4 +1,4 @@
-package com.myapps.ron.family_recipes.network;
+package com.myapps.ron.family_recipes.network.modelTO;
 
 import com.google.gson.annotations.SerializedName;
 import com.myapps.ron.family_recipes.model.RecipeEntity;
@@ -22,8 +22,8 @@ public class RecipeTO {
     private String name;
     @SerializedName("description")
     private String description;
-    @SerializedName("createdAt")
-    private String createdAt;
+    @SerializedName("creationDate")
+    private String creationDate;
     @SerializedName("lastModifiedAt")
     private String lastModifiedAt;
     @SerializedName("recipeFile")
@@ -49,7 +49,7 @@ public class RecipeTO {
             this.id = recipe.getId();
             this.name = recipe.getName();
             this.description = recipe.getDescription();
-            this.createdAt = recipe.getCreatedAt();
+            this.creationDate = recipe.getCreationDate();
             this.lastModifiedAt = recipe.getLastModifiedAt();
             this.recipeFile = recipe.getRecipeFile();
             this.uploader = recipe.getUploader();
@@ -71,7 +71,7 @@ public class RecipeTO {
         rv.setId(this.id);
         rv.setName(this.name);
         rv.setDescription(this.description);
-        rv.setCreatedAt(this.createdAt);
+        rv.setCreationDate(this.creationDate);
         rv.setLastModifiedAt(this.lastModifiedAt);
         rv.setRecipeFile(this.recipeFile);
         rv.setUploader(this.uploader);
@@ -102,7 +102,7 @@ public class RecipeTO {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, createdAt, lastModifiedAt, recipeFile, uploader, categories, comments, foodFiles, likes);
+        return Objects.hash(id, name, description, creationDate, lastModifiedAt, recipeFile, uploader, categories, comments, foodFiles, likes);
     }
 
     public String getId() {
@@ -133,14 +133,14 @@ public class RecipeTO {
         this.description = description;
     }
 
-    public String getCreatedAt() {
-        if(createdAt != null)
-            return createdAt;
+    public String getCreationDate() {
+        if(creationDate != null)
+            return creationDate;
         return com.myapps.ron.family_recipes.network.Constants.DEFAULT_UPDATED_TIME;
     }
 
-    public void setCreatedAt(String createdAt) {
-        this.createdAt = createdAt;
+    public void setCreationDate(String creationDate) {
+        this.creationDate = creationDate;
     }
 
     public String getLastModifiedAt() {
@@ -209,7 +209,7 @@ public class RecipeTO {
                 ", id='" + id + '\'' +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
-                ", createdAt='" + createdAt + '\'' +
+                ", creationDate='" + creationDate + '\'' +
                 ", lastModifiedAt='" + lastModifiedAt + '\'' +
                 ", recipeFile='" + recipeFile + '\'' +
                 ", uploader='" + uploader + '\'' +

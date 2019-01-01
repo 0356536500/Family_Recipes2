@@ -10,11 +10,11 @@ import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.dal.db.RecipesDBHelper;
 import com.myapps.ron.family_recipes.dal.storage.StorageWrapper;
 import com.myapps.ron.family_recipes.model.RecipeEntity;
-import com.myapps.ron.family_recipes.network.RecipeTO;
+import com.myapps.ron.family_recipes.network.modelTO.RecipeTO;
 import com.myapps.ron.family_recipes.network.APICallsHandler;
 import com.myapps.ron.family_recipes.network.Constants;
 import com.myapps.ron.family_recipes.network.MiddleWareForNetwork;
-import com.myapps.ron.family_recipes.network.MyCallback;
+import com.myapps.ron.family_recipes.utils.MyCallback;
 import com.myapps.ron.family_recipes.network.cognito.AppHelper;
 
 import java.io.File;
@@ -68,6 +68,25 @@ public class RecipeViewModel extends ViewModel {
         return infoForUser;
     }
 
+
+    public void loadRecipe(Context context, RecipeEntity recipeEntity) {
+        if(MiddleWareForNetwork.checkInternetConnection(context)) {
+            APICallsHandler.getOneRecipe(recipeEntity.getId(), AppHelper.getAccessToken(), result -> {
+                if(result != null) {
+                    RecipeEntity rv = result.toEntity();
+                    rv.setMeLike(recipeEntity.getMeLike());
+                    setRecipe(rv);
+                } else {
+                    setRecipe(recipeEntity);
+                    setInfo(context.getString(R.string.load_error_message));
+                }
+            });
+        }
+        else {
+            setRecipe(recipeEntity);
+            setInfo(context.getString(R.string.no_internet_message));
+        }
+    }
 
     public void changeLike(final Context context, final RecipeEntity recipe) {
         if(MiddleWareForNetwork.checkInternetConnection(context)) {

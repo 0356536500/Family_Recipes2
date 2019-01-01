@@ -5,13 +5,20 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.google.android.flexbox.FlexboxLayout;
+import com.myapps.ron.family_recipes.dal.Injection;
 import com.myapps.ron.family_recipes.model.Category;
 import com.myapps.ron.family_recipes.network.APICallsHandler;
 import com.myapps.ron.family_recipes.network.cognito.AppHelper;
+import com.myapps.ron.family_recipes.services.GetAllRecipesService;
 import com.myapps.ron.family_recipes.viewmodels.DataViewModel;
+import com.myapps.ron.family_recipes.viewmodels.MainRecipesViewModel;
+import com.myapps.ron.family_recipes.viewmodels.ViewModelFactory;
 import com.myapps.ron.searchfilter.adapter.FilterAdapter;
 import com.myapps.ron.searchfilter.listener.FilterListener;
 import com.myapps.ron.searchfilter.widget.Filter;
@@ -29,19 +36,37 @@ import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProviders;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.schedulers.Schedulers;
 
 public class TestActivity extends AppCompatActivity implements FilterListener<Category> {
 
     private final String TAG = getClass().getSimpleName();
 
-    @BindView(R.id.flexBox_layout)
+    //@BindView(R.id.flexBox_layout)
     FlexboxLayout flexboxLayout;
 
     FlexboxLayout.LayoutParams layoutParams;
 
-    @BindView(R.id.test_filters)
+    //@BindView(R.id.test_filters)
     Filter<Category> mFilter;
     private List<Category> tags;
+
+    @BindView(R.id.test_textView)
+    TextView textView;
+
+    @BindView(R.id.test_editText)
+    EditText editText;
+
+    @BindView(R.id.test_button)
+    Button button;
+
+    private ViewModelFactory mViewModelFactory;
+
+    private MainRecipesViewModel mViewModel;
+
+    private final CompositeDisposable mDisposable = new CompositeDisposable();
 
 
     @Override protected void onCreate(Bundle savedInstanceState) {
@@ -50,9 +75,56 @@ public class TestActivity extends AppCompatActivity implements FilterListener<Ca
 
         ButterKnife.bind(this);
 
-        new Handler().postDelayed(this::createMoreViews, 1000);
+        mViewModelFactory = Injection.provideViewModelFactory(this);
+        mViewModel = ViewModelProviders.of(this, mViewModelFactory).get(MainRecipesViewModel.class);
 
+        /*new Handler().postDelayed(this::createMoreViews, 1000);*/
+
+        //loadRecipes();
+
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        // Subscribe to the emissions of the recipe name from the view model.
+        // Update the recipe name text view, at every onNext emission.
+        // In case of error, log the exception.
+        mDisposable.add(mViewModel.getRecipeName("0")
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(recipeName -> textView.setText(recipeName),
+                        throwable -> Log.e(TAG, "Unable to update recipe name", throwable)));
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        // clear all the subscriptions
+        mDisposable.clear();
+    }
+
+    public void updateRecipeName(View view) {
+        String recipeName = editText.getText().toString();
+        // Disable the update button until the recipe name update has been done
+        button.setEnabled(false);
+        // Subscribe to updating the recipe name.
+        // Re-enable the button once the recipe name has been updated
+        mDisposable.add(mViewModel.updateRecipeName(recipeName)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(() -> button.setEnabled(true),
+                        throwable -> Log.e(TAG, "Unable to update recipe name", throwable)));
+    }
+
+    private void loadRecipes() {
+        GetAllRecipesService.startActionGetAllRecipes(this);
+    }
+
+    private void loadCategories() {
         DataViewModel viewModel = ViewModelProviders.of(this).get(DataViewModel.class);
+
         viewModel.getCategories().observe(this, categories -> {
             /*for (Category category: categories) {
                 Log.e(TAG, category.toString());
@@ -79,16 +151,6 @@ public class TestActivity extends AppCompatActivity implements FilterListener<Ca
         //the text to show when there's no selected items
         mFilter.setCustomTextView(getString(R.string.str_all_selected));
         mFilter.build();
-    }
-
-    private void getCategories() {
-        APICallsHandler.getAllCategories("0", AppHelper.getAccessToken(), result -> {
-            if (result != null) {
-                for (Category cat: result) {
-                    Log.e(TAG, cat.toString());
-                }
-            }
-        });
     }
 
     private void createMoreViews() {

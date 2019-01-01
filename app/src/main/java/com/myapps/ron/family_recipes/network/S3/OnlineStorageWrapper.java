@@ -4,7 +4,7 @@ import android.content.Context;
 
 import com.myapps.ron.family_recipes.dal.storage.ExternalStorageHelper;
 import com.myapps.ron.family_recipes.network.Constants;
-import com.myapps.ron.family_recipes.network.MyCallback;
+import com.myapps.ron.family_recipes.utils.MyCallback;
 
 public class OnlineStorageWrapper {
 

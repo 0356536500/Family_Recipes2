@@ -5,6 +5,8 @@ import android.util.Log;
 
 import com.google.gson.JsonObject;
 import com.myapps.ron.family_recipes.model.Category;
+import com.myapps.ron.family_recipes.network.modelTO.RecipeTO;
+import com.myapps.ron.family_recipes.utils.MyCallback;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -39,25 +41,29 @@ public class APICallsHandler {
         return retrofit;
     }
 
-    /*public static void getOneRecipe(String token) {
+    public static void getOneRecipe(String id, String token, MyCallback<RecipeTO> callback) {
         RecipeInterface service = getRetrofitInstance().create(RecipeInterface.class);
-        Call<Recipe> call = service.getOneRecipe(token);
+        Call<RecipeTO> call = service.getOneRecipe(token, id);
 
-        call.enqueue(new Callback<Recipe>() {
+        call.enqueue(new Callback<RecipeTO>() {
             @Override
-            public void onResponse(@NotNull Call<Recipe> call, @NotNull Response<Recipe> response) {
+            public void onResponse(@NotNull Call<RecipeTO> call, @NotNull Response<RecipeTO> response) {
                 String body = response.body() != null ? response.body().toString() : "null";
                 Log.i(TAG, body);
-                //generateDataList(response.body());
+                if (response.code() == STATUS_OK) {
+                    RecipeTO recipe = response.body();
+                    callback.onFinished(recipe);
+                } else {
+                    callback.onFinished(null);
+                }
             }
 
             @Override
-            public void onFailure(@NotNull Call<Recipe> call, @NotNull Throwable t) {
+            public void onFailure(@NotNull Call<RecipeTO> call, @NotNull Throwable t) {
                 Log.e(TAG, "error getting one recipe");
-                //Toast.makeText(MainActivity.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
             }
         });
-    }*/
+    }
 
     public static void getAllRecipes(String date, String token, final MyCallback<List<RecipeTO>> callback) {
         /*Map<String, String> headers = new HashMap<>();
@@ -265,5 +271,26 @@ public class APICallsHandler {
             Log.e(TAG, e.getMessage());
             return null;
         }
+    }
+
+    public static ApiResponse<List<RecipeTO>> getAllRecipesSync(String date, String startKey, int limit, String token) {
+        RecipeInterface service = getRetrofitInstance().create(RecipeInterface.class);
+        Call<List<RecipeTO>> call = service.getAllRecipesPagination(token, date, startKey, limit);
+
+        try {
+            Response<List<RecipeTO>> response = call.execute();
+            Log.e(TAG, "response code for getAllRecipesSync, " + response.code());
+            Log.e(TAG, "response getAllRecipesSync:\n" + response.body());
+
+            ApiResponse<List<RecipeTO>> rv = new ApiResponse<>();
+            rv.setData(response.body());
+            rv.setLastKey(response.headers().get(Constants.HEADER_LAST_EVAL_KEY));
+            return rv;
+
+        } catch (IOException e) {
+            Log.e(TAG, e.getMessage());
+            return null;
+        }
+
     }
 }

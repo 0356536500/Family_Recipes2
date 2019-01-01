@@ -37,13 +37,13 @@ public class RecipesDBHelper extends MyDBHelper{
         values.put(KEY_ID, recipe.getId());
         values.put(KEY_NAME, recipe.getName());
         values.put(KEY_DESC, recipe.getDescription());
-        values.put(KEY_CREATED, recipe.getCreatedAt());
+        values.put(KEY_CREATED, recipe.getCreationDate());
         values.put(KEY_MODIFIED, recipe.getLastModifiedAt());
         values.put(KEY_FILE, recipe.getRecipeFile());
         values.put(KEY_UPLOADER, recipe.getUploader());
-        values.put(KEY_CATEGORIES, recipe.getStringCategories());
-        values.put(KEY_COMMENTS, recipe.getStringComments());
-        values.put(KEY_FOOD, recipe.getStringFoodFiles());
+        values.put(KEY_CATEGORIES, recipe.getCategoriesToString());
+        values.put(KEY_COMMENTS, recipe.getCommentsToString());
+        values.put(KEY_FOOD, recipe.getFoodFilesToString());
         values.put(KEY_LIKES, recipe.getLikes());
         values.put(KEY_ME_LIKE, recipe.getMeLike());
 
@@ -114,7 +114,7 @@ public class RecipesDBHelper extends MyDBHelper{
                 recipe.setId(cursor.getString(0));
                 recipe.setName(cursor.getString(1));
                 recipe.setDescription(cursor.getString(2));
-                recipe.setCreatedAt(cursor.getString(3));
+                recipe.setCreationDate(cursor.getString(3));
                 recipe.setLastModifiedAt(cursor.getString(4));
                 recipe.setRecipeFile(cursor.getString(5));
                 recipe.setUploader(cursor.getString(6));
@@ -175,9 +175,9 @@ public class RecipesDBHelper extends MyDBHelper{
         values.put(KEY_DESC, recipe.getDescription());
         values.put(KEY_MODIFIED, recipe.getLastModifiedAt());
         values.put(KEY_FILE, recipe.getRecipeFile());
-        values.put(KEY_CATEGORIES, recipe.getStringCategories());
-        values.put(KEY_COMMENTS, recipe.getStringComments());
-        values.put(KEY_FOOD, recipe.getStringFoodFiles());
+        values.put(KEY_CATEGORIES, recipe.getCategoriesToString());
+        values.put(KEY_COMMENTS, recipe.getCommentsToString());
+        values.put(KEY_FOOD, recipe.getFoodFilesToString());
         values.put(KEY_LIKES, recipe.getLikes());
 
         // updating row
@@ -191,9 +191,9 @@ public class RecipesDBHelper extends MyDBHelper{
         ContentValues values = new ContentValues();
         //values.put(KEY_DESC, recipe.getDescription());
         values.put(KEY_MODIFIED, recipe.getLastModifiedAt());
-        //values.put(KEY_CATEGORIES, recipe.getStringCategories());
-        values.put(KEY_COMMENTS, recipe.getStringComments());
-        //values.put(KEY_FOOD, recipe.getStringFoodFiles());
+        //values.put(KEY_CATEGORIES, recipe.getCategoriesToString());
+        values.put(KEY_COMMENTS, recipe.getCommentsToString());
+        //values.put(KEY_FOOD, recipe.getFoodFilesToString());
         values.put(KEY_LIKES, recipe.getLikes());
         values.put(KEY_ME_LIKE, recipe.getMeLike());
 

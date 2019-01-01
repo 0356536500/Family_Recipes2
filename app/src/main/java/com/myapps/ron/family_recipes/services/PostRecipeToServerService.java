@@ -9,8 +9,8 @@ import android.util.Log;
 
 import com.myapps.ron.family_recipes.model.RecipeEntity;
 import com.myapps.ron.family_recipes.network.APICallsHandler;
-import com.myapps.ron.family_recipes.network.MyCallback;
-import com.myapps.ron.family_recipes.network.RecipeTO;
+import com.myapps.ron.family_recipes.utils.MyCallback;
+import com.myapps.ron.family_recipes.network.modelTO.RecipeTO;
 import com.myapps.ron.family_recipes.network.S3.OnlineStorageWrapper;
 import com.myapps.ron.family_recipes.network.cognito.AppHelper;
 import com.myapps.ron.family_recipes.utils.Constants;

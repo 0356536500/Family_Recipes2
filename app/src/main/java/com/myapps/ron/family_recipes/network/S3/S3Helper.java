@@ -9,7 +9,7 @@ import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferState;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
-import com.myapps.ron.family_recipes.network.MyCallback;
+import com.myapps.ron.family_recipes.utils.MyCallback;
 
 import java.io.File;
 import java.io.IOException;

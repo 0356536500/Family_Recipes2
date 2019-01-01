@@ -23,8 +23,8 @@
         android:theme="@style/AppTheme.Light">
         <activity
             android:name=".ui.activities.SplashActivity"
-            android:theme="@style/AppTheme.Launcher"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.Launcher">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -58,7 +58,6 @@
             android:label="@string/title_activity_create_recipe"
             android:parentActivityName=".ui.activities.MainActivity"
             android:screenOrientation="portrait"
-
             android:windowSoftInputMode="adjustPan">
 
             <!--
@@ -78,8 +77,7 @@
         <activity
             android:name=".ui.activities.ForgotPasswordActivity"
             android:label="@string/title_activity_forgot_password" />
-        <activity
-            android:name=".TestActivity">
+        <activity android:name=".TestActivity">
 
             <!--
             <intent-filter>
@@ -98,8 +96,11 @@
         <activity
             android:name=".ui.activities.SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:parentActivityName=".ui.activities.MainActivity">
-        </activity>
+            android:parentActivityName=".ui.activities.MainActivity"></activity>
+
+        <service
+            android:name=".services.GetAllRecipesService"
+            android:exported="false"></service>
     </application>
 
 </manifest>

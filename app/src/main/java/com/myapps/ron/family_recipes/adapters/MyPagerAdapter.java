@@ -13,7 +13,7 @@ import android.view.ViewGroup;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.dal.storage.StorageWrapper;
 import com.myapps.ron.family_recipes.model.RecipeEntity;
-import com.myapps.ron.family_recipes.network.MyCallback;
+import com.myapps.ron.family_recipes.utils.MyCallback;
 import com.myapps.ron.family_recipes.utils.GlideApp;
 
 import java.io.File;

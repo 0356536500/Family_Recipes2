@@ -212,7 +212,7 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
                         changedLike = true;
                     }
                     // user posted a comment
-                    if (!RecipeActivity.this.recipe.getStringComments().equals(recipe.getStringComments())) {
+                    if (!RecipeActivity.this.recipe.getCommentsToString().equals(recipe.getCommentsToString())) {
                         postedComment = true;
                     }
 

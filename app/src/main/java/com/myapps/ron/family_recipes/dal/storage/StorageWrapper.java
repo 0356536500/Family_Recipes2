@@ -2,13 +2,11 @@ package com.myapps.ron.family_recipes.dal.storage;
 
 import android.content.Context;
 import android.os.Environment;
-import android.text.Html;
-import android.text.Spanned;
 import android.util.Log;
 
 import com.myapps.ron.family_recipes.network.Constants;
 import com.myapps.ron.family_recipes.network.MiddleWareForNetwork;
-import com.myapps.ron.family_recipes.network.MyCallback;
+import com.myapps.ron.family_recipes.utils.MyCallback;
 import com.myapps.ron.family_recipes.network.S3.OnlineStorageWrapper;
 import com.myapps.ron.family_recipes.utils.DateUtil;
 
@@ -16,9 +14,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
 import java.util.TimeZone;
 
 public class StorageWrapper {
