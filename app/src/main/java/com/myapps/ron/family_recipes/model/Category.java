@@ -1,3 +1,4 @@
+/*
 package com.myapps.ron.family_recipes.model;
 
 import android.graphics.Color;
@@ -56,9 +57,11 @@ public class Category implements FilterModel, Parcelable {
         this.color = color;
     }
 
-    /*public void setIntColor(int color) {
+    */
+/*public void setIntColor(int color) {
         this.color = "#" + Integer.toHexString(color & 0x00ffffff);
-    }*/
+    }*//*
+
 
     public int getIntColor() {
         if (!color.equals(""))
@@ -221,3 +224,4 @@ public class Category implements FilterModel, Parcelable {
 
     }
 }
+*/

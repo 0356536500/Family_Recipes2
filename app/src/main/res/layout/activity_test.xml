@@ -6,7 +6,27 @@
     android:layout_height="match_parent"
     tools:context=".TestActivity">
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatEditText
+        android:id="@+id/test_editText"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="10dp"
+        android:textAlignment="center"
+        android:inputType="textShortMessage"
+        android:hint="recipe name"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/test_recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/test_editText"
+        android:nestedScrollingEnabled="true"
+        android:scrollbars="vertical"
+        android:clipToPadding="false" />
+    <!--<TextView
         android:id="@+id/test_textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -32,7 +52,7 @@
         android:layout_centerHorizontal="true"
         android:onClick="updateRecipeName"
         android:layout_marginTop="20dp"
-        android:text="Update" />
+        android:text="Update" />-->
 
     <!--<ScrollView
         android:layout_width="match_parent"

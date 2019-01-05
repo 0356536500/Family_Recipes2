@@ -4,7 +4,7 @@ import android.os.StrictMode;
 import android.util.Log;
 
 import com.google.gson.JsonObject;
-import com.myapps.ron.family_recipes.model.Category;
+import com.myapps.ron.family_recipes.model.CategoryEntity;
 import com.myapps.ron.family_recipes.network.modelTO.RecipeTO;
 import com.myapps.ron.family_recipes.utils.MyCallback;
 
@@ -187,18 +187,18 @@ public class APICallsHandler {
         });
     }
 
-    public static void getAllCategories(String date, String token, final MyCallback<List<Category>> callback) {
+    public static void getAllCategories(String date, String token, final MyCallback<List<CategoryEntity>> callback) {
         RecipeInterface service = getRetrofitInstance().create(RecipeInterface.class);
-        Call<List<Category>> call = service.getAllCategories(token, date);
+        Call<List<CategoryEntity>> call = service.getAllCategories(token, date);
 
-        call.enqueue(new Callback<List<Category>>() {
+        call.enqueue(new Callback<List<CategoryEntity>>() {
             @Override
-            public void onResponse(@NotNull Call<List<Category>> call, @NotNull Response<List<Category>> response) {
+            public void onResponse(@NotNull Call<List<CategoryEntity>> call, @NotNull Response<List<CategoryEntity>> response) {
                 String body = response.body() != null ? response.body().toString() : "null";
 
                 if (response.code() == STATUS_OK) {
                     Log.i(TAG, body);
-                    List<Category> list = response.body();
+                    List<CategoryEntity> list = response.body();
                     callback.onFinished(list);
                 }
                 else {
@@ -212,7 +212,7 @@ public class APICallsHandler {
             }
 
             @Override
-            public void onFailure(@NotNull Call<List<Category>> call, @NotNull Throwable t) {
+            public void onFailure(@NotNull Call<List<CategoryEntity>> call, @NotNull Throwable t) {
                 Log.e(TAG, "error getting all recipes. message: " + t.getMessage());
                 callback.onFinished(null);
                 //Toast.makeText(MainActivity.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();

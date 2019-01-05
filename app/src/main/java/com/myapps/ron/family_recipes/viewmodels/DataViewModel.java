@@ -11,7 +11,7 @@ import android.util.Log;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.dal.db.CategoriesDBHelper;
 import com.myapps.ron.family_recipes.dal.db.RecipesDBHelper;
-import com.myapps.ron.family_recipes.model.Category;
+import com.myapps.ron.family_recipes.model.CategoryEntity;
 import com.myapps.ron.family_recipes.model.RecipeEntity;
 import com.myapps.ron.family_recipes.network.modelTO.RecipeTO;
 import com.myapps.ron.family_recipes.network.APICallsHandler;
@@ -29,7 +29,7 @@ import java.util.List;
 public class DataViewModel extends ViewModel {
     private MutableLiveData<List<RecipeEntity>> recipeList = new MutableLiveData<>(); // list of recipes from api
     private MutableLiveData<List<RecipeEntity>> favoriteList = new MutableLiveData<>(); // list of recipes local db
-    private MutableLiveData<List<Category>> categoryList = new MutableLiveData<>(); // list of newCategories from api
+    private MutableLiveData<List<CategoryEntity>> categoryList = new MutableLiveData<>(); // list of newCategories from api
     private MutableLiveData<Boolean> canInitBothRecyclerAndFilters = new MutableLiveData<>();
 
     private MutableLiveData<String> infoFromLastFetch = new MutableLiveData<>(); // info about new or modified data from last fetch from api
@@ -153,11 +153,11 @@ public class DataViewModel extends ViewModel {
     //endregion
 
     //region newCategories
-    public LiveData<List<Category>> getCategories() {
+    public LiveData<List<CategoryEntity>> getCategories() {
         return categoryList;
     }
 
-    private void setCategories(List<Category> items) {
+    private void setCategories(List<CategoryEntity> items) {
         categoryList.setValue(items);
     }
 
@@ -165,9 +165,9 @@ public class DataViewModel extends ViewModel {
         if(MiddleWareForNetwork.checkInternetConnection(context)) {
             if (DateUtil.shouldUpdateCategories(context)) {
                 final String time = DateUtil.getUTCTime();
-                APICallsHandler.getAllCategories(DateUtil.getLastUpdateTime(context), AppHelper.getAccessToken(), new MyCallback<List<Category>>() {
+                APICallsHandler.getAllCategories(DateUtil.getLastUpdateTime(context), AppHelper.getAccessToken(), new MyCallback<List<CategoryEntity>>() {
                     @Override
-                    public void onFinished(List<Category> result) {
+                    public void onFinished(List<CategoryEntity> result) {
                         //PostRecipeToServerService.startActionPostRecipe(context, new ArrayList<>(result), time);
                         if (result != null) {
                             if (result.isEmpty())
@@ -202,11 +202,11 @@ public class DataViewModel extends ViewModel {
     class MyAsyncCategoriesUpdate extends AsyncTask<Void, Void, Boolean> {
 
         private Context context;
-        private List<Category> newCategoriesList;
+        private List<CategoryEntity> newCategoriesList;
         private CategoriesDBHelper dbHelper;
         private int newCategories, modifiedCategories;
 
-        MyAsyncCategoriesUpdate(Context context, List<Category> categories) {
+        MyAsyncCategoriesUpdate(Context context, List<CategoryEntity> categories) {
             this.context = context;
             this.dbHelper = new CategoriesDBHelper(context);
             this.newCategoriesList = categories;
@@ -216,9 +216,9 @@ public class DataViewModel extends ViewModel {
 
         @Override
         protected Boolean doInBackground(Void... voids) {
-            List<Category> oldCategories = dbHelper.getAllCategories();
+            List<CategoryEntity> oldCategories = dbHelper.getAllCategories();
 
-            for (Category item : newCategoriesList) {
+            for (CategoryEntity item : newCategoriesList) {
                 int oldIndex = oldCategories.indexOf(item);
                 if (oldIndex >= 0) {
                     Log.e(getClass().getSimpleName(), "category exists: " + item.toString());
@@ -268,7 +268,7 @@ public class DataViewModel extends ViewModel {
         setFavorites(dbHelper.getFavoriteRecipes(orderBy));
     }
 
-    public List<Category> loadFavoritesCategories(final Context context) {
+    public List<CategoryEntity> loadFavoritesCategories(final Context context) {
         CategoriesDBHelper dbHelper = new CategoriesDBHelper(context);
         setCategories(dbHelper.getAllCategories());
         return dbHelper.getAllCategories();

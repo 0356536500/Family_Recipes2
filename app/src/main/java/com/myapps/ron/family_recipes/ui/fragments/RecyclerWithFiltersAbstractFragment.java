@@ -22,7 +22,7 @@ import android.widget.Toast;
 import com.myapps.ron.family_recipes.MyDividerItemDecoration;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.adapters.RecipesAdapter;
-import com.myapps.ron.family_recipes.model.Category;
+import com.myapps.ron.family_recipes.model.CategoryEntity;
 import com.myapps.ron.family_recipes.model.RecipeEntity;
 import com.myapps.ron.family_recipes.recycler.MyRecyclerScroll;
 import com.myapps.ron.family_recipes.ui.activities.MainActivity;
@@ -61,7 +61,7 @@ import static android.app.Activity.RESULT_OK;
 /**
  * Created by ronginat on 18/12/2018.
  */
-public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment implements RecipesAdapter.RecipesAdapterListener, FilterListener<Category> {
+public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment implements RecipesAdapter.RecipesAdapterListener, FilterListener<CategoryEntity> {
 
     protected final String TAG = getClass().getSimpleName();
 
@@ -72,8 +72,8 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
 
     private int filterBackgroundColor, filterTextColor;
 
-    Filter<Category> mFilter;
-    List<Category> tags;
+    Filter<CategoryEntity> mFilter;
+    List<CategoryEntity> tags;
     protected List<RecipeEntity> recipes;
 
     SwipeRefreshLayout swipeRefreshLayout;
@@ -465,9 +465,9 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
         filterTextColor = textValue.data;
     }
 
-    private List<String> convertCategoriesToString(ArrayList<Category> arrayList) {
+    private List<String> convertCategoriesToString(ArrayList<CategoryEntity> arrayList) {
         List<String> results = new ArrayList<>();
-        for (Category cat: arrayList) {
+        for (CategoryEntity cat: arrayList) {
             results.add(cat.getText());
         }
         return results;
@@ -476,12 +476,12 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
     // region SearchFilter listeners
 
     @Override
-    public void onFilterDeselected(Category category) {
+    public void onFilterDeselected(CategoryEntity category) {
 
     }
 
     @Override
-    public void onFilterSelected(Category item) {
+    public void onFilterSelected(CategoryEntity item) {
         if (item.getText().equals(tags.get(0).getText())) {
             mFilter.deselectAll();
             mFilter.collapse();
@@ -490,7 +490,7 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
-    public void onFiltersSelected(@NotNull ArrayList<Category> arrayList) {
+    public void onFiltersSelected(@NotNull ArrayList<CategoryEntity> arrayList) {
         //List<Recipe> oldList = new ArrayList<>(mAdapter.getCurrentList());
         final List<String> newTags = convertCategoriesToString(arrayList);
         new Handler().postDelayed(new Runnable() {
@@ -512,15 +512,15 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
     // endregion
 
 
-    class Adapter extends FilterAdapter<Category> {
+    class Adapter extends FilterAdapter<CategoryEntity> {
 
-        Adapter(@NonNull List<? extends Category> items) {
+        Adapter(@NonNull List<? extends CategoryEntity> items) {
             super(items);
         }
 
         @NotNull
         @Override
-        public FilterItem createView(Category item, Category parent) {
+        public FilterItem createView(CategoryEntity item, CategoryEntity parent) {
             FilterItem filterItem = new FilterItem(activity);
 
             filterItem.setTextColor(filterTextColor);

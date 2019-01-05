@@ -14,7 +14,7 @@ import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.myapps.ron.family_recipes.R;
-import com.myapps.ron.family_recipes.model.Category;
+import com.myapps.ron.family_recipes.model.CategoryEntity;
 import com.myapps.ron.family_recipes.network.Constants;
 import com.myapps.ron.family_recipes.ui.activities.PostRecipeActivity;
 import com.myapps.ron.family_recipes.utils.MyFragment;
@@ -39,14 +39,14 @@ import androidx.lifecycle.ViewModelProviders;
 /**
  * Created by ronginat on 29/10/2018.
  */
-public class FirstStepFragment extends MyFragment implements FilterListener<Category> {
+public class FirstStepFragment extends MyFragment implements FilterListener<CategoryEntity> {
 
     private View view;
     private FrameLayout parent;
     //private RelativeLayout floater;
     private AppCompatEditText editTextName, editTextDesc;
-    private Filter<Category> mFilter;
-    private List<Category> allTags;
+    private Filter<CategoryEntity> mFilter;
+    private List<CategoryEntity> allTags;
     private List<String> tags;
 
     private String name, desc;
@@ -143,9 +143,9 @@ public class FirstStepFragment extends MyFragment implements FilterListener<Cate
 
     private void initViewModel() {
         viewModel =  ViewModelProviders.of(activity).get(PostRecipeViewModel.class);
-        viewModel.getCategories().observe(this, new Observer<List<Category>>() {
+        viewModel.getCategories().observe(this, new Observer<List<CategoryEntity>>() {
             @Override
-            public void onChanged(@Nullable List<Category> categories) {
+            public void onChanged(@Nullable List<CategoryEntity> categories) {
                 if(categories != null) {
                     allTags = new ArrayList<>(categories);
                     loadFiltersColor();
@@ -255,18 +255,18 @@ public class FirstStepFragment extends MyFragment implements FilterListener<Cate
         return valid;
     }
 
-    private List<String> convertCategoriesToString(@Nullable ArrayList<Category> arrayList) {
+    private List<String> convertCategoriesToString(@Nullable ArrayList<CategoryEntity> arrayList) {
         if (arrayList == null)
             return  null;
         List<String> results = new ArrayList<>();
-        for (Category cat: arrayList) {
+        for (CategoryEntity cat: arrayList) {
             results.add(cat.getText());
         }
         return results;
     }
 
     @Override
-    public void onFiltersSelected(@NotNull ArrayList<Category> filters) {
+    public void onFiltersSelected(@NotNull ArrayList<CategoryEntity> filters) {
         tags = convertCategoriesToString(filters);
     }
 
@@ -276,7 +276,7 @@ public class FirstStepFragment extends MyFragment implements FilterListener<Cate
     }
 
     @Override
-    public void onFilterSelected(Category item) {
+    public void onFilterSelected(CategoryEntity item) {
         if (item.getText().equals(allTags.get(0).getText())) {
             mFilter.deselectAll();
             mFilter.collapse();
@@ -284,20 +284,20 @@ public class FirstStepFragment extends MyFragment implements FilterListener<Cate
     }
 
     @Override
-    public void onFilterDeselected(Category item) {
+    public void onFilterDeselected(CategoryEntity item) {
 
     }
 
 
-    class Adapter extends FilterAdapter<Category> {
+    class Adapter extends FilterAdapter<CategoryEntity> {
 
-        Adapter(@NonNull List<? extends Category> items) {
+        Adapter(@NonNull List<? extends CategoryEntity> items) {
             super(items);
         }
 
         @NotNull
         @Override
-        public FilterItem createView(Category item, Category parent) {
+        public FilterItem createView(CategoryEntity item, CategoryEntity parent) {
             FilterItem filterItem = new FilterItem(activity);
 
             filterItem.setTextColor(filterTextColor);

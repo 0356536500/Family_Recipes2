@@ -21,7 +21,7 @@ import android.widget.TextView;
 
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.dal.storage.StorageWrapper;
-import com.myapps.ron.family_recipes.model.Category;
+import com.myapps.ron.family_recipes.model.CategoryEntity;
 import com.myapps.ron.family_recipes.model.RecipeEntity;
 import com.myapps.ron.family_recipes.utils.MyCallback;
 import com.myapps.ron.family_recipes.recycler.RecipesAdapterHelper;
@@ -43,7 +43,7 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
     private List<RecipeEntity> recipeListFiltered;
     private List<String> tags; // filters the user chose
 
-    private List<Category> categoryList;
+    private List<CategoryEntity> categoryList;
 
     private String mLastQuery = "";
     private RecipesAdapterListener listener;
@@ -84,7 +84,7 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
     }
 
 
-    public RecipesAdapter(Context context, List<RecipeEntity> recipeList, List<Category> categoryList, RecipesAdapterListener listener) {
+    public RecipesAdapter(Context context, List<RecipeEntity> recipeList, List<CategoryEntity> categoryList, RecipesAdapterListener listener) {
         this.context = context;
         this.listener = listener;
         this.categoryList = categoryList;
@@ -96,7 +96,7 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
         this.random = new Random();
     }
 
-    public void setCategoryList(List<Category> categoryList) {
+    public void setCategoryList(List<CategoryEntity> categoryList) {
         this.categoryList = categoryList;
     }
 

@@ -2,23 +2,21 @@ package com.myapps.ron.family_recipes;
 
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Handler;
+import android.text.Editable;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import com.google.android.flexbox.FlexboxLayout;
 import com.myapps.ron.family_recipes.dal.Injection;
-import com.myapps.ron.family_recipes.model.Category;
-import com.myapps.ron.family_recipes.network.APICallsHandler;
-import com.myapps.ron.family_recipes.network.cognito.AppHelper;
+import com.myapps.ron.family_recipes.model.CategoryEntity;
+import com.myapps.ron.family_recipes.model.RecipeEntity;
+import com.myapps.ron.family_recipes.recycler.PagedRecipesAdapter;
 import com.myapps.ron.family_recipes.services.GetAllRecipesService;
 import com.myapps.ron.family_recipes.viewmodels.DataViewModel;
-import com.myapps.ron.family_recipes.viewmodels.MainRecipesViewModel;
-import com.myapps.ron.family_recipes.viewmodels.ViewModelFactory;
+import com.myapps.ron.family_recipes.viewmodels.NewViewModel;
 import com.myapps.ron.searchfilter.adapter.FilterAdapter;
 import com.myapps.ron.searchfilter.listener.FilterListener;
 import com.myapps.ron.searchfilter.widget.Filter;
@@ -34,13 +32,14 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import io.reactivex.android.schedulers.AndroidSchedulers;
+import butterknife.OnTextChanged;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.schedulers.Schedulers;
 
-public class TestActivity extends AppCompatActivity implements FilterListener<Category> {
+public class TestActivity extends AppCompatActivity implements FilterListener<CategoryEntity> {
 
     private final String TAG = getClass().getSimpleName();
 
@@ -50,21 +49,24 @@ public class TestActivity extends AppCompatActivity implements FilterListener<Ca
     FlexboxLayout.LayoutParams layoutParams;
 
     //@BindView(R.id.test_filters)
-    Filter<Category> mFilter;
-    private List<Category> tags;
+    Filter<CategoryEntity> mFilter;
+    private List<CategoryEntity> tags;
+    private String orderBy = RecipeEntity.KEY_CREATED;
 
-    @BindView(R.id.test_textView)
+    //@BindView(R.id.test_textView)
     TextView textView;
 
     @BindView(R.id.test_editText)
     EditText editText;
 
-    @BindView(R.id.test_button)
+    //@BindView(R.id.test_button)
     Button button;
 
-    private ViewModelFactory mViewModelFactory;
+    @BindView(R.id.test_recyclerView)
+    RecyclerView recyclerView;
 
-    private MainRecipesViewModel mViewModel;
+
+    private NewViewModel mViewModel;
 
     private final CompositeDisposable mDisposable = new CompositeDisposable();
 
@@ -75,13 +77,38 @@ public class TestActivity extends AppCompatActivity implements FilterListener<Ca
 
         ButterKnife.bind(this);
 
-        mViewModelFactory = Injection.provideViewModelFactory(this);
-        mViewModel = ViewModelProviders.of(this, mViewModelFactory).get(MainRecipesViewModel.class);
+        mViewModel = ViewModelProviders.of(this, Injection.provideViewModelFactory(this)).get(NewViewModel.class);
+
+        PagedRecipesAdapter mAdapter = new PagedRecipesAdapter();
+        mViewModel.getData().observe(this, list -> {
+            Log.e(TAG, "observed list, size = " + list.size());
+            mAdapter.submitList(list);
+        });
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+        recyclerView.setLayoutManager(mLayoutManager);
+        recyclerView.setAdapter(mAdapter);
+
+        mViewModel.searchQuery(null, RecipeEntity.KEY_CREATED, null);
+
 
         /*new Handler().postDelayed(this::createMoreViews, 1000);*/
 
         //loadRecipes();
 
+    }
+
+    @OnTextChanged(R.id.test_editText)
+    public void onTextChanged(Editable editable) {
+        if (editable != null) {
+            String text = editable.toString();
+            mViewModel.searchQuery(text, orderBy, null);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mViewModel.getData().removeObservers(this);
     }
 
     @Override
@@ -90,11 +117,11 @@ public class TestActivity extends AppCompatActivity implements FilterListener<Ca
         // Subscribe to the emissions of the recipe name from the view model.
         // Update the recipe name text view, at every onNext emission.
         // In case of error, log the exception.
-        mDisposable.add(mViewModel.getRecipeName("0")
+        /*mDisposable.add(mViewModel.getRecipeName("0")
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(recipeName -> textView.setText(recipeName),
-                        throwable -> Log.e(TAG, "Unable to update recipe name", throwable)));
+                        throwable -> Log.e(TAG, "Unable to update recipe name", throwable)));*/
     }
 
     @Override
@@ -105,7 +132,7 @@ public class TestActivity extends AppCompatActivity implements FilterListener<Ca
         mDisposable.clear();
     }
 
-    public void updateRecipeName(View view) {
+    /*public void updateRecipeName(View view) {
         String recipeName = editText.getText().toString();
         // Disable the update button until the recipe name update has been done
         button.setEnabled(false);
@@ -116,7 +143,7 @@ public class TestActivity extends AppCompatActivity implements FilterListener<Ca
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(() -> button.setEnabled(true),
                         throwable -> Log.e(TAG, "Unable to update recipe name", throwable)));
-    }
+    }*/
 
     private void loadRecipes() {
         GetAllRecipesService.startActionGetAllRecipes(this);
@@ -131,7 +158,7 @@ public class TestActivity extends AppCompatActivity implements FilterListener<Ca
             }*/
             if (categories != null) {
                 tags = new ArrayList<>(categories);
-                tags.add(0, new Category.CategoryBuilder()
+                tags.add(0, new CategoryEntity.CategoryBuilder()
                         .name(getString(R.string.str_all_selected))
                         .color(ContextCompat.getColor(this, R.color.search_filter_text_light))
                         .build());
@@ -176,7 +203,7 @@ public class TestActivity extends AppCompatActivity implements FilterListener<Ca
 
 
     @Override
-    public void onFiltersSelected(@Nullable @NotNull ArrayList<Category> filters) {
+    public void onFiltersSelected(@Nullable @NotNull ArrayList<CategoryEntity> filters) {
 
     }
 
@@ -186,7 +213,7 @@ public class TestActivity extends AppCompatActivity implements FilterListener<Ca
     }
 
     @Override
-    public void onFilterSelected(Category item) {
+    public void onFilterSelected(CategoryEntity item) {
         if (item.getText().equals(tags.get(0).getText())) {
             mFilter.deselectAll();
             mFilter.collapse();
@@ -194,19 +221,19 @@ public class TestActivity extends AppCompatActivity implements FilterListener<Ca
     }
 
     @Override
-    public void onFilterDeselected(Category item) {
+    public void onFilterDeselected(CategoryEntity item) {
 
     }
 
-    class Adapter extends FilterAdapter<Category> {
+    class Adapter extends FilterAdapter<CategoryEntity> {
 
-        Adapter(@NonNull List<? extends Category> items) {
+        Adapter(@NonNull List<? extends CategoryEntity> items) {
             super(items);
         }
 
         @NotNull
         @Override
-        public FilterItem createView(Category item, Category parent) {
+        public FilterItem createView(CategoryEntity item, CategoryEntity parent) {
             FilterItem filterItem = new FilterItem(TestActivity.this);
 
             filterItem.setTextColor(ContextCompat.getColor(TestActivity.this, R.color.search_filter_text_light));

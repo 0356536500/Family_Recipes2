@@ -12,7 +12,7 @@ import android.widget.Toast;
 
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.adapters.RecipesAdapter;
-import com.myapps.ron.family_recipes.model.Category;
+import com.myapps.ron.family_recipes.model.CategoryEntity;
 import com.myapps.ron.family_recipes.model.RecipeEntity;
 import com.myapps.ron.family_recipes.viewmodels.DataViewModel;
 import com.myapps.ron.searchfilter.listener.FilterListener;
@@ -20,7 +20,7 @@ import com.myapps.ron.searchfilter.listener.FilterListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AllRecipesFragment extends RecyclerWithFiltersAbstractFragment implements RecipesAdapter.RecipesAdapterListener, FilterListener<Category> {
+public class AllRecipesFragment extends RecyclerWithFiltersAbstractFragment implements RecipesAdapter.RecipesAdapterListener, FilterListener<CategoryEntity> {
 
     @Override
     protected void initAfterViewCreated() {
@@ -65,13 +65,13 @@ public class AllRecipesFragment extends RecyclerWithFiltersAbstractFragment impl
                     mAdapter.updateRecipes(recipes, recipes != null && !recipes.isEmpty());
             }
         });
-        viewModel.getCategories().observe(this, new Observer<List<Category>>() {
+        viewModel.getCategories().observe(this, new Observer<List<CategoryEntity>>() {
             @Override
-            public void onChanged(@Nullable List<Category> categories) {
+            public void onChanged(@Nullable List<CategoryEntity> categories) {
                 if (categories != null) {
                     Log.e(TAG, "in category observer. categories != null");
                     tags = new ArrayList<>(categories);
-                    tags.add(0, new Category.CategoryBuilder()
+                    tags.add(0, new CategoryEntity.CategoryBuilder()
                             .name(getString(R.string.str_all_selected))
                             .color(ContextCompat.getColor(activity, R.color.search_filter_text_light))
                             .build());

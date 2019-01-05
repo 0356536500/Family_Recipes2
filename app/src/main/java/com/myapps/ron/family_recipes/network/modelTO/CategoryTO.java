@@ -74,9 +74,9 @@ public class CategoryTO {
         this.categories = categories;
     }
 
-    public boolean hasSubCategories() {
+    /*public boolean hasSubCategories() {
         return categories != null && !categories.isEmpty();
-    }
+    }*/
 
 
     @Override

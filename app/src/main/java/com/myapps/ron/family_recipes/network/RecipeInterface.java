@@ -1,7 +1,7 @@
 package com.myapps.ron.family_recipes.network;
 
 import com.google.gson.JsonObject;
-import com.myapps.ron.family_recipes.model.Category;
+import com.myapps.ron.family_recipes.model.CategoryEntity;
 import com.myapps.ron.family_recipes.network.modelTO.RecipeTO;
 
 import java.util.List;
@@ -68,7 +68,7 @@ public interface RecipeInterface {
 
     //region categories
     @GET(categories)
-    Call<List<Category>> getAllCategories(
+    Call<List<CategoryEntity>> getAllCategories(
             @Header(Constants.AUTHORIZATION) String auth,
             @Query(Constants.DATE_QUERY) String date
     );

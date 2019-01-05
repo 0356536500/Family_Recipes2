@@ -5,7 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.myapps.ron.family_recipes.model.Category;
+import com.myapps.ron.family_recipes.model.CategoryEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +43,7 @@ public class CategoriesDBHelper extends MyDBHelper{
      * CRUD(Create, Read, Update, Delete) Operations
      */
 
-    public void insertCategory(Category category) {
+    public void insertCategory(CategoryEntity category) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -58,15 +58,15 @@ public class CategoriesDBHelper extends MyDBHelper{
         db.close(); // Closing database connection
     }
 
-    public Category getCategory(String id){
+    public CategoryEntity getCategory(String id){
         SQLiteDatabase db = this.getReadableDatabase();
         //                                  new String[]{CAT_KEY_ID,CAT_KEY_ID}
         Cursor cursor = db.query(TABLE_CATEGORIES, null, CAT_KEY_ID +"=?",
                 new String[]{String.valueOf(id)},null,null,null,null);
-        Category temp = null;
+        CategoryEntity temp = null;
         if(cursor != null) {
             cursor.moveToFirst();
-            temp = new Category.CategoryBuilder()
+            temp = new CategoryEntity.CategoryBuilder()
                     .name(cursor.getString(cursor.getColumnIndex(CAT_KEY_ID)))
                     .color(cursor.getString(cursor.getColumnIndex(CAT_KEY_COLOR)))
                     .categories(cursor.getString(cursor.getColumnIndex(CAT_KEY_CATS)))
@@ -78,9 +78,9 @@ public class CategoriesDBHelper extends MyDBHelper{
     }
 
     // Getting All Records
-    public List<Category> getAllCategories() {
+    public List<CategoryEntity> getAllCategories() {
         String selectQuery = "SELECT  * FROM " + TABLE_CATEGORIES;
-        List<Category> categoryList = new ArrayList<>();
+        List<CategoryEntity> categoryList = new ArrayList<>();
 
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
@@ -89,7 +89,7 @@ public class CategoriesDBHelper extends MyDBHelper{
             // looping through all rows and adding to list
             if (cursor.moveToFirst()) {
                 do {
-                    Category category = new Category.CategoryBuilder()
+                    CategoryEntity category = new CategoryEntity.CategoryBuilder()
                             .name(cursor.getString(cursor.getColumnIndex(CAT_KEY_ID)))
                             .color(cursor.getString(cursor.getColumnIndex(CAT_KEY_COLOR)))
                             .categories(cursor.getString(cursor.getColumnIndex(CAT_KEY_CATS)))
@@ -108,7 +108,7 @@ public class CategoriesDBHelper extends MyDBHelper{
     }
 
 
-    public int updateCategoryServerChanges(Category category) {
+    public int updateCategoryServerChanges(CategoryEntity category) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -168,7 +168,7 @@ public class CategoriesDBHelper extends MyDBHelper{
         db.close();
     }
 
-    public void deleteCategory(Category category) {
+    public void deleteCategory(CategoryEntity category) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_CATEGORIES, CAT_KEY_ID + "=?", new String[]{ category.getName() });
         db.close();

@@ -35,8 +35,7 @@ public class CategoryEntity implements FilterModel {
     private String name;
     @ColumnInfo(name = KEY_COLOR)
     private String color;
-    @Ignore
-    //@ColumnInfo(name = KEY_CATEGORIES)
+    @ColumnInfo(name = KEY_CATEGORIES)
     private List<CategoryEntity> categories;
 
     private static final Gson gson = new Gson();
@@ -147,7 +146,7 @@ public class CategoryEntity implements FilterModel {
 
     @Override
     public String toString() {
-        return "Category{" +
+        return "CategoryEntity{" +
                 "name='" + name + '\'' +
                 ", categories=" + categories +
                 ", color=" + color +

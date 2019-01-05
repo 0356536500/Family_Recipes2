@@ -30,34 +30,45 @@ import static com.myapps.ron.family_recipes.utils.Constants.TRUE;
 @Entity(tableName = "recipes"/*, indices = { @Index(value = {"name", "description"}), @Index("categories") }*/)
 public class RecipeEntity implements Parcelable{
 
+    public static final String KEY_ID = "id";
+    public static final String KEY_NAME = "name";
+    public static final String KEY_DESCRIPTION = "description";
+    public static final String KEY_CATEGORIES = "categories";
+    public static final String KEY_CREATED = "creationDate";
+    public static final String KEY_MODIFIED = "lastModifiedAt";
+    public static final String KEY_UPLOADER = "uploader";
+    public static final String KEY_FOOD_FILES = "foodFiles";
+    public static final String KEY_LIKES = "likes";
+    public static final String KEY_FAVORITE = "meLike";
+
     @Ignore
     public static String image = "https://api.androidhive.info/json/images/keanu.jpg";
 
     @NonNull
     @PrimaryKey
-    @ColumnInfo(name = "id")
+    @ColumnInfo(name = KEY_ID)
     private String id;
-    @ColumnInfo(name = "name")
+    @ColumnInfo(name = KEY_NAME)
     private String name;
-    @ColumnInfo(name = "description")
+    @ColumnInfo(name = KEY_DESCRIPTION)
     private String description;
-    @ColumnInfo(name = "creationDate")
+    @ColumnInfo(name = KEY_CREATED)
     private String creationDate;
-    @ColumnInfo(name = "lastModifiedAt")
+    @ColumnInfo(name = KEY_MODIFIED)
     private String lastModifiedAt;
     @ColumnInfo(name = "recipeFile")
     private String recipeFile;
     @ColumnInfo(name = "uploader")
     private String uploader;
-    @ColumnInfo(name = "categories")
+    @ColumnInfo(name = KEY_CATEGORIES)
     private List<String> categories;
     @ColumnInfo(name = "comments")
     private List<RecipeEntity.Comment> comments;
     @ColumnInfo(name = "foodFiles")
     private List<String> foodFiles;
-    @ColumnInfo(name = "likes")
+    @ColumnInfo(name = KEY_LIKES)
     private int likes;
-    @ColumnInfo(name = "meLike")
+    @ColumnInfo(name = KEY_FAVORITE)
     private int meLike;
 
 
@@ -177,7 +188,6 @@ public class RecipeEntity implements Parcelable{
                 && getMeLike() == other.getMeLike();*/
     }
 
-    //@TypeConverter
     public String getCategoriesToString() {
         if (getCategories() != null)
             return gson.toJson(getCategories());
@@ -195,7 +205,6 @@ public class RecipeEntity implements Parcelable{
         }
     }
 
-    //@TypeConverter
     public String getCommentsToString() {
         if (getComments() != null)
             return gson.toJson(getComments());
@@ -213,7 +222,6 @@ public class RecipeEntity implements Parcelable{
         }
     }
 
-    //@TypeConverter
     public String getFoodFilesToString() {
         if (getFoodFiles() != null)
             return gson.toJson(getFoodFiles());
@@ -507,7 +515,7 @@ public class RecipeEntity implements Parcelable{
             return this;
         }
 
-        public RecipeEntity.RecipeBuilder createdAt (String createdAt) {
+        public RecipeEntity.RecipeBuilder creationDate(String createdAt) {
             this.builderCreatedAt = createdAt;
             return this;
         }

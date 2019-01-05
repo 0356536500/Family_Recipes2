@@ -1,6 +1,8 @@
 package com.myapps.ron.family_recipes.viewmodels;
 
-import com.myapps.ron.family_recipes.dal.RecipeDataSource;
+import com.myapps.ron.family_recipes.dal.repository.RecipeRepository;
+
+import java.lang.reflect.InvocationTargetException;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
@@ -11,17 +13,22 @@ import androidx.lifecycle.ViewModelProvider;
  */
 public class ViewModelFactory implements ViewModelProvider.Factory {
 
-    private final RecipeDataSource mDataSource;
+    private final RecipeRepository mDataSource;
 
-    public ViewModelFactory(RecipeDataSource dataSource) {
-        this.mDataSource = dataSource;
+    public ViewModelFactory(RecipeRepository recipeRepository) {
+        this.mDataSource = recipeRepository;
     }
 
     @NonNull
     @Override
     public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
-        if (modelClass.isAssignableFrom(MainRecipesViewModel.class)) {
-            return (T) new MainRecipesViewModel(mDataSource);
+        if (modelClass.isAssignableFrom(NewViewModel.class)) {
+            try {
+                return modelClass.getConstructor(RecipeRepository.class).newInstance(mDataSource);
+                //return (T) new NewViewModel(mDataSource);
+            } catch (ClassCastException | IllegalAccessException | NoSuchMethodException | InstantiationException | InvocationTargetException e) {
+                throw new RuntimeException("Cannot create an instance of " + modelClass, e);
+            }
         }
         throw new IllegalArgumentException("UnKnown ViewModel class");
     }
