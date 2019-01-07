@@ -8,8 +8,7 @@ import com.myapps.ron.family_recipes.model.QueryModel;
 import com.myapps.ron.family_recipes.model.RecipeEntity;
 import com.myapps.ron.family_recipes.model.RecipeMinimal;
 
-import java.util.List;
-
+import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
@@ -30,7 +29,7 @@ public class NewViewModel extends ViewModel {
     //private final LiveData<PagedList<RecipeMinimal>> data;
     //Applying transformation to get RepoSearchResults for the given Search Query
     private LiveData<RepoSearchResults> repoResults = Transformations.map(queryLiveData,
-            input -> repository.search(input));
+            input -> repository.query(input));
 
     //Applying transformation to get Live PagedList<Repo> from the RepoSearchResult
     private LiveData<PagedList<RecipeMinimal>> data = Transformations.switchMap(repoResults,
@@ -51,7 +50,10 @@ public class NewViewModel extends ViewModel {
 
             @Override
             public void onTick(long l) {
-                QueryModel filter = new QueryModel(RecipeEntity.KEY_CREATED, "" + idInt++);
+                QueryModel filter = new QueryModel.Builder().
+                        order(RecipeEntity.KEY_CREATED)
+                        .search("" + idInt++)
+                        .build();
                 queryLiveData.setValue(filter);
                 /*Disposable disposable = recipeRepository.getRecipe(idStr + idInt)
                         .subscribeOn(Schedulers.computation())
@@ -77,19 +79,9 @@ public class NewViewModel extends ViewModel {
         return data;
     }
 
-    private String wrapQueryWithPercent(String query) {
-        if (query != null && !"".equals(query))
-            return "%" + query + "%";
-        return "%";
-    }
 
-    /**
-     * Search a repository based on a query string.
-     */
-    public void searchQuery(String query, String orderBy, List<String> categories) {
-        queryLiveData.postValue(new QueryModel(
-                wrapQueryWithPercent(query),
-                orderBy));
+    public void applyQuery(@NonNull QueryModel queryModel) {
+        queryLiveData.postValue(queryModel);
     }
 
     public void fetchRecipesFromServer() {

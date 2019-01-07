@@ -146,8 +146,8 @@ public class RecipeEntity implements Parcelable{
 
         boolean cats = getCategoriesToString().equals(other.getCategoriesToString());
 
-        /*boolean cats = categories == null && other.getCategories() == null;
-        if (categories != null && other.getCategories() != null)
+        /*boolean cats = categories == null && other.getFilters() == null;
+        if (categories != null && other.getFilters() != null)
             cats = getCategoriesToString().equals(other.getCategoriesToString());*/
 
         boolean created = getCreationDate() == null && other.getCreationDate() == null;
@@ -181,7 +181,7 @@ public class RecipeEntity implements Parcelable{
                 && file && images && comments && likes && meLikes;
 
         /*return getId().equals(other.getId()) && getName().equals(other.getName()) && getDescription().equals(other.getDescription())
-                && getUploader().equals(other.getUploader()) && getCategories().equals(other.getCategories())
+                && getUploader().equals(other.getUploader()) && getFilters().equals(other.getFilters())
                 && getCreationDate().equals(other.getCreationDate()) && getLastModifiedAt().equals(other.getLastModifiedAt())
                 //&& getRecipeFile().equals(other.getRecipeFile()) && getComments().equals(other.getComments())
                 && getFoodFiles().equals(other.getFoodFiles()) && getLikes() == other.getLikes()
@@ -496,6 +496,8 @@ public class RecipeEntity implements Parcelable{
         private String builderFoodFiles;
         private int builderLikes;
 
+        private List<String> builderListCategories;
+
         private boolean builderMeLike;
 
         public RecipeBuilder() {}
@@ -540,6 +542,11 @@ public class RecipeEntity implements Parcelable{
             return this;
         }
 
+        public RecipeEntity.RecipeBuilder categories (List<String> categories) {
+            this.builderListCategories = categories;
+            return this;
+        }
+
         public RecipeEntity.RecipeBuilder commentsJson (String commentsJson) {
             this.builderComments = commentsJson;
             return this;
@@ -572,6 +579,21 @@ public class RecipeEntity implements Parcelable{
             recipe.setStringCategories(builderCategories);
             recipe.setStringComments(builderComments);
             recipe.setStringFoodFiles(builderFoodFiles);
+            recipe.setLikes(builderLikes);
+            recipe.setMeLike(builderMeLike ? TRUE : FALSE);
+
+            return recipe;
+        }
+
+
+        public RecipeEntity buildTest() {
+            RecipeEntity recipe = new RecipeEntity();
+            recipe.setId(builderId);
+            recipe.setName(builderName);
+            recipe.setDescription(builderDescription);
+            recipe.setCreationDate(builderCreatedAt);
+            recipe.setLastModifiedAt(builderLastModifiedAt);
+            recipe.setCategories(builderListCategories);
             recipe.setLikes(builderLikes);
             recipe.setMeLike(builderMeLike ? TRUE : FALSE);
 

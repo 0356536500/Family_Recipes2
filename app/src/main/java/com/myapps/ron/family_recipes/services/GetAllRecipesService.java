@@ -8,9 +8,11 @@ import android.os.AsyncTask;
 import android.os.StrictMode;
 import android.util.Log;
 
+import com.myapps.ron.family_recipes.dal.Injection;
 import com.myapps.ron.family_recipes.dal.db.RecipesDBHelper;
+import com.myapps.ron.family_recipes.dal.repository.RecipeRepository;
 import com.myapps.ron.family_recipes.network.APICallsHandler;
-import com.myapps.ron.family_recipes.network.ApiResponse;
+import com.myapps.ron.family_recipes.network.APIResponse;
 import com.myapps.ron.family_recipes.network.MiddleWareForNetwork;
 import com.myapps.ron.family_recipes.network.modelTO.RecipeTO;
 import com.myapps.ron.family_recipes.network.cognito.AppHelper;
@@ -111,12 +113,13 @@ public class GetAllRecipesService extends IntentService {
     private void handleActionGetAllRecipes() {
         Log.e(TAG, "handleActionGetAllRecipes");
         asyncRecipeUpdateList = Collections.synchronizedList(new ArrayList<>());
+        final RecipeRepository  repository = Injection.provideRecipeRepository(getApplicationContext());
         String lastKey = null;
         if (!MiddleWareForNetwork.checkInternetConnection(getApplicationContext()))
             return;
         final String time = DateUtil.getUTCTime();
         do {
-            ApiResponse<List<RecipeTO>> response = APICallsHandler.getAllRecipesSync(
+            APIResponse<List<RecipeTO>> response = APICallsHandler.getAllRecipesSync(
                     DateUtil.getLastUpdateTime(getApplicationContext()), lastKey, 50, AppHelper.getAccessToken());
 
             if (response != null) {
@@ -124,9 +127,10 @@ public class GetAllRecipesService extends IntentService {
                 Log.e(TAG, "response data length: " + response.getData().size());
                 lastKey = response.getLastKey();
 
-                MyAsyncRecipeUpdate asyncRecipeUpdate = new MyAsyncRecipeUpdate(getApplicationContext(), response.getData());
+                repository.updateFromServer(response.getData());
+                /*MyAsyncRecipeUpdate asyncRecipeUpdate = new MyAsyncRecipeUpdate(getApplicationContext(), response.getData());
                 asyncRecipeUpdate.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                asyncRecipeUpdateList.add(asyncRecipeUpdate);
+                asyncRecipeUpdateList.add(asyncRecipeUpdate);*/
 
             }
         }

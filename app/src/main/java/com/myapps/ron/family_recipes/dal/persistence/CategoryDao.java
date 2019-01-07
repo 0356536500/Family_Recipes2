@@ -19,6 +19,9 @@ public interface CategoryDao {
     List<CategoryEntity> getAllCategories();
 
     @Insert
+    Completable insertCategories(List<CategoryEntity> categoryEntities);
+
+    @Insert
     Completable insertCategories(CategoryEntity... categoryEntities);
 
     @Insert

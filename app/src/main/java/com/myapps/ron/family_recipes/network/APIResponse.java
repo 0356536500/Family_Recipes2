@@ -5,11 +5,11 @@ import java.util.List;
 /**
  * Created by ronginat on 31/12/2018.
  */
-public class ApiResponse<T> {
+public class APIResponse<T> {
     private T data;
     private String lastKey;
 
-    ApiResponse() {
+    APIResponse() {
 
     }
 

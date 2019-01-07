@@ -8,7 +8,7 @@ import androidx.paging.PagedList;
 /**
  * Created by ronginat on 05/01/2019.
  *
- * RepoSearchResult from a search, which contains LiveData<PagedList<Repo>> holding query data
+ * RepoSearchResult from a search, which contains LiveData<PagedList<Repo>> holding search data
  */
 public class RepoSearchResults {
 

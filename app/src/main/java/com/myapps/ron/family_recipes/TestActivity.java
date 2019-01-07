@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.google.android.flexbox.FlexboxLayout;
 import com.myapps.ron.family_recipes.dal.Injection;
 import com.myapps.ron.family_recipes.model.CategoryEntity;
+import com.myapps.ron.family_recipes.model.QueryModel;
 import com.myapps.ron.family_recipes.model.RecipeEntity;
 import com.myapps.ron.family_recipes.recycler.PagedRecipesAdapter;
 import com.myapps.ron.family_recipes.services.GetAllRecipesService;
@@ -25,6 +26,7 @@ import com.myapps.ron.searchfilter.widget.FilterItem;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -88,12 +90,16 @@ public class TestActivity extends AppCompatActivity implements FilterListener<Ca
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setAdapter(mAdapter);
 
-        mViewModel.searchQuery(null, RecipeEntity.KEY_CREATED, null);
+        mViewModel.applyQuery(
+                new QueryModel.Builder()
+                        .order(orderBy)
+                        .build()
+        );
 
 
         /*new Handler().postDelayed(this::createMoreViews, 1000);*/
 
-        //loadRecipes();
+        loadRecipes();
 
     }
 
@@ -101,7 +107,14 @@ public class TestActivity extends AppCompatActivity implements FilterListener<Ca
     public void onTextChanged(Editable editable) {
         if (editable != null) {
             String text = editable.toString();
-            mViewModel.searchQuery(text, orderBy, null);
+            List<String> list = Arrays.asList(text.split(" "));
+            mViewModel.applyQuery(
+                    new QueryModel.Builder()
+                            .order(orderBy)
+                            //.search(text)
+                            .filters(list)
+                            .build()
+            );
         }
     }
 

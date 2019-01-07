@@ -69,7 +69,7 @@ public class Category implements FilterModel, Parcelable {
         return Color.parseColor(Constants.DEFAULT_COLOR);
     }
 
-    public List<Category> getCategories() {
+    public List<Category> getFilters() {
         return categories;
     }
 
@@ -82,7 +82,7 @@ public class Category implements FilterModel, Parcelable {
     }
 
     public String getStringCategories() {
-        return gson.toJson(getCategories());
+        return gson.toJson(getFilters());
     }
 
     public void setStringCategories(String categories) {

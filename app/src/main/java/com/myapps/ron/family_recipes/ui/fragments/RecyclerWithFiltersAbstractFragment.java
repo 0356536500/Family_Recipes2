@@ -209,7 +209,7 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
                     mAdapter.updateRecipes(recipes, recipes != null && !recipes.isEmpty());
             }
         });
-        viewModel.getCategories().observe(this, new Observer<List<Category>>() {
+        viewModel.getFilters().observe(this, new Observer<List<Category>>() {
             @Override
             public void onChanged(@Nullable List<Category> categories) {
                 if(categories != null) {
@@ -295,7 +295,7 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
             menu.findItem(R.id.action_search).setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
                 @Override
                 public boolean onMenuItemActionExpand(MenuItem item) {
-                    Log.e(TAG, "expanded, query: " + lastQuery);
+                    Log.e(TAG, "expanded, search: " + lastQuery);
                     searchView.setQuery(lastQuery, false);
                     return true;
                 }
@@ -306,11 +306,11 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
                 }
             });
 
-            // listening to search query text change
+            // listening to search search text change
             searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                 @Override
                 public boolean onQueryTextSubmit(String query) {
-                    // filter recycler view when query submitted
+                    // filter recycler view when search submitted
                     MenuItem searchMenuItem = activity.getSearchMenuItem();
                     if (searchMenuItem != null) {
                         searchMenuItem.collapseActionView();

@@ -273,7 +273,7 @@ public class APICallsHandler {
         }
     }
 
-    public static ApiResponse<List<RecipeTO>> getAllRecipesSync(String date, String startKey, int limit, String token) {
+    public static APIResponse<List<RecipeTO>> getAllRecipesSync(String date, String startKey, int limit, String token) {
         RecipeInterface service = getRetrofitInstance().create(RecipeInterface.class);
         Call<List<RecipeTO>> call = service.getAllRecipesPagination(token, date, startKey, limit);
 
@@ -282,7 +282,7 @@ public class APICallsHandler {
             Log.e(TAG, "response code for getAllRecipesSync, " + response.code());
             Log.e(TAG, "response getAllRecipesSync:\n" + response.body());
 
-            ApiResponse<List<RecipeTO>> rv = new ApiResponse<>();
+            APIResponse<List<RecipeTO>> rv = new APIResponse<>();
             rv.setData(response.body());
             rv.setLastKey(response.headers().get(Constants.HEADER_LAST_EVAL_KEY));
             return rv;

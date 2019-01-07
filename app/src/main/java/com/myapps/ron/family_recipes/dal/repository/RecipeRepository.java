@@ -12,11 +12,11 @@ import com.myapps.ron.family_recipes.network.modelTO.RecipeTO;
 import java.util.List;
 import java.util.concurrent.Executor;
 
+import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.paging.DataSource;
 import androidx.paging.LivePagedListBuilder;
 import androidx.paging.PagedList;
-import io.reactivex.Flowable;
 import io.reactivex.Single;
 import io.reactivex.observers.DisposableMaybeObserver;
 
@@ -28,18 +28,22 @@ public class RecipeRepository {
     private final RecipeDao recipeDao;
     private final Executor executor;
 
+    private PagedList.Config pagedConfig;
+
     public RecipeRepository(RecipeDao recipeDao, Executor executor) {
         this.recipeDao = recipeDao;
         this.executor = executor;
+        this.pagedConfig = new PagedList.Config.Builder()
+                .setPageSize(15)
+                .setPrefetchDistance(50)
+                .setEnablePlaceholders(true)
+                .build();
     }
 
     public Single<RecipeEntity> getRecipe(String id) {
         return recipeDao.getRecipe(id);
     }
 
-    /*public Flowable<List<RecipeMinimal>> getAllRecipes() {
-        return recipeDao.getAllRecipesMinimalOrdered(RecipeEntity.KEY_CREATED);
-    }*/
 
     /*public DataSource.Factory<Integer, RecipeMinimal> getRecipesDataMinimalOrdered(String order) {
         switch (order) {
@@ -54,45 +58,57 @@ public class RecipeRepository {
         }
     }*/
 
-    public RepoSearchResults search(QueryModel query) {
-
-        PagedList.Config pagedConfig = new PagedList.Config.Builder()
-                .setPageSize(15)
-                .setPrefetchDistance(50)
-                .setEnablePlaceholders(true)
-                .build();
-
+    /**
+     * Query the repository
+     *
+     * @param query - order of the items to be fetched,
+     * search a base LIKE search with string,
+     * filters a complex LIKE search that searching for array containing this array
+     */
+    public RepoSearchResults query(@NonNull QueryModel query) {
         DataSource.Factory<Integer, RecipeMinimal> dataSource;
 
+        String search = query.getSQLSearch();
+        String order = query.getOrderBy();
+        String filters = query.getSQLFilters();
 
-        dataSource =
-                 recipeDao.getAllRecipesSearchedOrdered(query.getQuery(), query.getOrderBy());
-                //recipeDao.getAllRecipesOrdered(query.getOrderBy());
+        Log.e(getClass().getSimpleName(), order);
+        Log.e(getClass().getSimpleName(), search);
+        Log.e(getClass().getSimpleName(), filters);
 
-        /*DataSource.Factory<Integer, RecipeMinimal> filteredData = dataSource.map(input -> {
-            if(input.getCategories() != null) {
-                if (input.getCategories().containsAll(query.getCategories()))
-                    return input;
-            }
-        return null;
-        });*/
-
+        if (query.isFavorites()) {
+            dataSource = switchCaseOrderFavorites(search, filters, order);
+        } else
+            dataSource = switchCaseOrder(search, filters, order);
 
          LiveData<PagedList<RecipeMinimal>> data = new LivePagedListBuilder<>(dataSource, pagedConfig)
                  .build();
 
          return new RepoSearchResults(data);
-        /*switch (order) {
-            case RecipeEntity.KEY_CREATED:
-                return recipeDao.getRecipesDataMinimalOrderByCreation();
-            case  RecipeEntity.KEY_MODIFIED:
-                return recipeDao.getRecipesDataMinimalOrderByModified();
-            case RecipeEntity.KEY_LIKES:
-                return recipeDao.getRecipesDataMinimalOrderByLikes();
-            default:
-                return recipeDao.getRecipesDataMinimalOrderByCreation();
-        }*/
     }
+
+    private DataSource.Factory<Integer, RecipeMinimal> switchCaseOrder(String search, String filters, String order) {
+        switch (order) {
+            case RecipeEntity.KEY_MODIFIED:
+                return recipeDao.findAllByNameLikeOrDescriptionLikeAndCategoriesLikeOrderByLastModified(search, filters);
+            case RecipeEntity.KEY_LIKES:
+                return recipeDao.findAllByNameLikeOrDescriptionLikeAndCategoriesLikeOrderByPopularity(search, filters);
+            default:
+                return recipeDao.findAllByNameLikeOrDescriptionLikeAndCategoriesLikeOrderByCreationDate(search, filters);
+        }
+    }
+
+    private DataSource.Factory<Integer, RecipeMinimal> switchCaseOrderFavorites(String search, String filters, String order) {
+        switch (order) {
+            case RecipeEntity.KEY_MODIFIED:
+                return recipeDao.findAllFavoritesByNameLikeOrDescriptionLikeAndCategoriesLikeOrderByLastModified(search, filters);
+            case RecipeEntity.KEY_LIKES:
+                return recipeDao.findAllFavoritesByNameLikeOrDescriptionLikeAndCategoriesLikeOrderByPopularity(search, filters);
+            default:
+                return recipeDao.findAllFavoritesByNameLikeOrDescriptionLikeAndCategoriesLikeOrderByCreationDate(search, filters);
+        }
+    }
+
 
     /**
      * update from local user
