@@ -147,8 +147,8 @@ public class StorageWrapper {
             bitmap.recycle();
         }
 
-        if (requestCode == CHOOSING_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
-            fileUri = data.getData();
+        if (requestCode == CHOOSING_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getPagedRecipes() != null) {
+            fileUri = data.getPagedRecipes();
             try {
                 bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), fileUri);
             } catch (IOException e) {

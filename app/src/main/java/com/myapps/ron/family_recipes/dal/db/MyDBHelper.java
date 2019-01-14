@@ -24,7 +24,7 @@ public class MyDBHelper extends SQLiteOpenHelper {
     static final String KEY_FILE = "recipeFile";
     static final String KEY_UPLOADER = "uploader";
     static final String KEY_CATEGORIES = "categories";
-    static final String KEY_COMMENTS = "comments";
+    //static final String KEY_COMMENTS = "comments";
     static final String KEY_FOOD = "foodFiles";
     static final String KEY_LIKES = "likes";
     static final String KEY_ME_LIKE = "meLike";
@@ -43,7 +43,7 @@ public class MyDBHelper extends SQLiteOpenHelper {
             + KEY_FILE + " TEXT,"
             + KEY_UPLOADER + " TEXT,"
             + KEY_CATEGORIES + " TEXT,"
-            + KEY_COMMENTS + " TEXT,"
+            //+ KEY_COMMENTS + " TEXT,"
             + KEY_FOOD + " TEXT,"
             + KEY_LIKES + " INTEGER,"
             + KEY_ME_LIKE + " INTEGER " + ")";

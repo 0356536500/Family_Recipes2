@@ -2,12 +2,16 @@ package com.myapps.ron.family_recipes.network;
 
 import com.google.gson.JsonObject;
 import com.myapps.ron.family_recipes.model.CategoryEntity;
+import com.myapps.ron.family_recipes.network.modelTO.CategoryTO;
+import com.myapps.ron.family_recipes.network.modelTO.CommentTO;
 import com.myapps.ron.family_recipes.network.modelTO.RecipeTO;
 
 import java.util.List;
 import java.util.Map;
 
+import io.reactivex.Observable;
 import retrofit2.Call;
+import retrofit2.Response;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 
@@ -32,13 +36,19 @@ public interface RecipeInterface {
 
 
     @GET(oneRecipe)
-    Call<RecipeTO> getOneRecipe(
+    Call<List<CommentTO>> getOneRecipe(
             @Header(Constants.AUTHORIZATION) String token,
             @Path(Constants.ID_QUERY) String id
     );
     //region recipes
     @GET(recipes)
     Call<List<RecipeTO>> getAllRecipes(
+            @Header(Constants.AUTHORIZATION) String auth,
+            @Query(Constants.DATE_QUERY) String date
+    );
+
+    @GET(recipes)
+    Observable<Response<List<RecipeTO>>> getAllRecipesObservable(
             @Header(Constants.AUTHORIZATION) String auth,
             @Query(Constants.DATE_QUERY) String date
     );
@@ -68,7 +78,13 @@ public interface RecipeInterface {
 
     //region categories
     @GET(categories)
-    Call<List<CategoryEntity>> getAllCategories(
+    Call<List<CategoryTO>> getAllCategories(
+            @Header(Constants.AUTHORIZATION) String auth,
+            @Query(Constants.DATE_QUERY) String date
+    );
+
+    @GET(categories)
+    Observable<Response<List<CategoryTO>>> getAllCategoriesObservable(
             @Header(Constants.AUTHORIZATION) String auth,
             @Query(Constants.DATE_QUERY) String date
     );

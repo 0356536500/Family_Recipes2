@@ -42,7 +42,7 @@ public class RecipesDBHelper extends MyDBHelper{
         values.put(KEY_FILE, recipe.getRecipeFile());
         values.put(KEY_UPLOADER, recipe.getUploader());
         values.put(KEY_CATEGORIES, recipe.getCategoriesToString());
-        values.put(KEY_COMMENTS, recipe.getCommentsToString());
+        //values.put(KEY_COMMENTS, recipe.getCommentsToString());
         values.put(KEY_FOOD, recipe.getFoodFilesToString());
         values.put(KEY_LIKES, recipe.getLikes());
         values.put(KEY_ME_LIKE, recipe.getMeLike());
@@ -68,7 +68,7 @@ public class RecipesDBHelper extends MyDBHelper{
                     .recipeFile(cursor.getString(cursor.getColumnIndex(KEY_FILE)))
                     .uploader(cursor.getString(cursor.getColumnIndex(KEY_UPLOADER)))
                     .categoriesJson(cursor.getString(cursor.getColumnIndex(KEY_CATEGORIES)))
-                    .commentsJson(cursor.getString(cursor.getColumnIndex(KEY_COMMENTS)))
+                    //.commentsJson(cursor.getString(cursor.getColumnIndex(KEY_COMMENTS)))
                     .foodFilesJson(cursor.getString(cursor.getColumnIndex(KEY_FOOD)))
                     .likes(cursor.getInt(cursor.getColumnIndex(KEY_LIKES)))
                     .meLike(cursor.getInt(cursor.getColumnIndex(KEY_ME_LIKE)) == TRUE)
@@ -97,6 +97,19 @@ public class RecipesDBHelper extends MyDBHelper{
         if (cursor.moveToFirst()) {
             do {
                 RecipeEntity recipe = new RecipeEntity.RecipeBuilder()
+                        .id(cursor.getString(cursor.getColumnIndex(KEY_ID)))
+                        .name(cursor.getString(cursor.getColumnIndex(KEY_NAME)))
+                        .description(cursor.getString(cursor.getColumnIndex(KEY_DESC)))
+                        .creationDate(cursor.getString(cursor.getColumnIndex(KEY_CREATED)))
+                        .lastModifiedAt(cursor.getString(cursor.getColumnIndex(KEY_MODIFIED)))
+                        .recipeFile(cursor.getString(cursor.getColumnIndex(KEY_FILE)))
+                        .uploader(cursor.getString(cursor.getColumnIndex(KEY_UPLOADER)))
+                        .categoriesJson(cursor.getString(cursor.getColumnIndex(KEY_CATEGORIES)))
+                        .foodFilesJson(cursor.getString(cursor.getColumnIndex(KEY_FOOD)))
+                        .likes(cursor.getInt(cursor.getColumnIndex(KEY_LIKES)))
+                        .meLike(cursor.getInt(cursor.getColumnIndex(KEY_ME_LIKE)) == TRUE)
+                        .build();
+                /*RecipeEntity recipe = new RecipeEntity.RecipeBuilder()
                         .id(cursor.getString(0))
                         .name(cursor.getString(1))
                         .description(cursor.getString(2))
@@ -106,10 +119,10 @@ public class RecipesDBHelper extends MyDBHelper{
                         .uploader(cursor.getString(6))
                         .categoriesJson(cursor.getString(7))
                         .commentsJson(cursor.getString(8))
-                        .foodFilesJson(cursor.getString(9))
+                        .foodFilesJson(cursor.getString(cursor.getColumnIndex(KEY_FOOD)))
                         .likes(cursor.getInt(10))
                         .meLike(cursor.getInt(11) == TRUE)
-                        .build();
+                        .build();*/
                 /*Recipe recipe = new Recipe();
                 recipe.setId(cursor.getString(0));
                 recipe.setName(cursor.getString(1));
@@ -176,7 +189,7 @@ public class RecipesDBHelper extends MyDBHelper{
         values.put(KEY_MODIFIED, recipe.getLastModifiedAt());
         values.put(KEY_FILE, recipe.getRecipeFile());
         values.put(KEY_CATEGORIES, recipe.getCategoriesToString());
-        values.put(KEY_COMMENTS, recipe.getCommentsToString());
+        //values.put(KEY_COMMENTS, recipe.getCommentsToString());
         values.put(KEY_FOOD, recipe.getFoodFilesToString());
         values.put(KEY_LIKES, recipe.getLikes());
 
@@ -192,7 +205,7 @@ public class RecipesDBHelper extends MyDBHelper{
         //values.put(KEY_DESC, recipe.getDescription());
         values.put(KEY_MODIFIED, recipe.getLastModifiedAt());
         //values.put(KEY_CATEGORIES, recipe.getCategoriesToString());
-        values.put(KEY_COMMENTS, recipe.getCommentsToString());
+        //values.put(KEY_COMMENTS, recipe.getCommentsToString());
         //values.put(KEY_FOOD, recipe.getFoodFilesToString());
         values.put(KEY_LIKES, recipe.getLikes());
         values.put(KEY_ME_LIKE, recipe.getMeLike());

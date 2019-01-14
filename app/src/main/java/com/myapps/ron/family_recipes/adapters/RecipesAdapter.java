@@ -3,18 +3,10 @@ package com.myapps.ron.family_recipes.adapters;
 import android.content.Context;
 import android.graphics.PorterDuff;
 import android.net.Uri;
-
-import androidx.annotation.NonNull;
-import androidx.swiperefreshlayout.widget.CircularProgressDrawable;
-import androidx.recyclerview.widget.DiffUtil;
-import androidx.appcompat.widget.AppCompatImageView;
-import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Filter;
-import android.widget.Filterable;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -23,29 +15,29 @@ import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.dal.storage.StorageWrapper;
 import com.myapps.ron.family_recipes.model.CategoryEntity;
 import com.myapps.ron.family_recipes.model.RecipeEntity;
-import com.myapps.ron.family_recipes.utils.MyCallback;
+import com.myapps.ron.family_recipes.model.RecipeMinimal;
 import com.myapps.ron.family_recipes.recycler.RecipesAdapterHelper;
-import com.myapps.ron.family_recipes.recycler.RecipesDiffCallback;
 import com.myapps.ron.family_recipes.utils.GlideApp;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.widget.AppCompatImageView;
+import androidx.paging.PagedListAdapter;
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.CircularProgressDrawable;
 
-public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHolder>
-        implements Filterable {
+
+public class RecipesAdapter extends PagedListAdapter<RecipeMinimal, RecipesAdapter.MyViewHolder> {
     private int[] colors;
     private Random random;
     private Context context;
-    private List<RecipeEntity> recipeList;
-    private List<RecipeEntity> recipeListFiltered;
-    private List<String> tags; // filters the user chose
 
     private List<CategoryEntity> categoryList;
 
-    private String mLastQuery = "";
     private RecipesAdapterListener listener;
     //private StorageWrapper storageWrapper;
 
@@ -54,50 +46,66 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
         AppCompatImageView thumbnail;
         HorizontalScrollView horizontalScrollView;
 
-        MyViewHolder(View view) {
-            super(view);
-            name = view.findViewById(R.id.name);
-            description = view.findViewById(R.id.description);
-            thumbnail = view.findViewById(R.id.thumbnail);
-            uploader = view.findViewById(R.id.uploader);
-            numberOfLikes = view.findViewById(R.id.number_of_likes);
-            horizontalScrollView = view.findViewById(R.id.categories_scroll_container);
+        MyViewHolder(View itemView) {
+            super(itemView);
+            name = itemView.findViewById(R.id.name);
+            description = itemView.findViewById(R.id.description);
+            thumbnail = itemView.findViewById(R.id.thumbnail);
+            uploader = itemView.findViewById(R.id.uploader);
+            numberOfLikes = itemView.findViewById(R.id.number_of_likes);
+            horizontalScrollView = itemView.findViewById(R.id.categories_scroll_container);
 
-            itemView.setTag(this);
+            this.itemView.setTag(this);
 
-            view.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    // send selected contact in callback
-                    listener.onItemSelected(recipeListFiltered.get(getAdapterPosition()));
-                }
-            });
+            itemView.setOnClickListener(view ->
+                    listener.onItemSelected(getItem(getAdapterPosition())));
 
-            thumbnail.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    listener.onImageClicked(recipeListFiltered.get(getAdapterPosition()));
-                }
-            });
+            thumbnail.setOnClickListener(view ->
+                    listener.onImageClicked(getItem((getAdapterPosition()))));
 
+        }
+
+        void bindTo(RecipeMinimal recipe) {
+            if (recipe.getName() != null)
+                this.name.setText(recipe.getName());
+            else
+                this.name.setText(com.myapps.ron.family_recipes.utils.Constants.DEFAULT_RECIPE_NAME);
+
+            if (recipe.getDescription() != null)
+                this.description.setText(recipe.getDescription());
+            else
+                this.description.setText(com.myapps.ron.family_recipes.utils.Constants.DEFAULT_RECIPE_DESC);
+
+            if (recipe.getUploader() != null)
+                this.uploader.setText(recipe.getUploader());
+            else
+                this.uploader.setText(com.myapps.ron.family_recipes.utils.Constants.DEFAULT_RECIPE_UPLOADER);
+
+            this.numberOfLikes.setText(String.valueOf(recipe.getLikes()));
+
+            //inflate categories
+            if (categoryList != null)
+                inflateCategories(this, recipe);
+            //inflateCategories(this, recipe);
+
+            //load image of the food or default if not exists
+            loadImage(this, recipe);
         }
     }
 
 
-    public RecipesAdapter(Context context, List<RecipeEntity> recipeList, List<CategoryEntity> categoryList, RecipesAdapterListener listener) {
+    public RecipesAdapter(Context context, RecipesAdapterListener listener) {
+        super(DIFF_CALLBACK);
         this.context = context;
         this.listener = listener;
-        this.categoryList = categoryList;
-        this.recipeList = recipeList;
-        this.recipeListFiltered = recipeList;
-        this.tags = new ArrayList<>();
-        //this.storageWrapper = StorageWrapper.getInstance(context);
+
         this.colors = context.getResources().getIntArray(R.array.colors);
         this.random = new Random();
     }
 
     public void setCategoryList(List<CategoryEntity> categoryList) {
         this.categoryList = categoryList;
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -111,39 +119,19 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, final int position) {
-        final RecipeEntity recipe = recipeListFiltered.get(position);
-
-        if (recipe.getName() != null)
-            holder.name.setText(recipe.getName());
-        else
-            holder.name.setText(com.myapps.ron.family_recipes.utils.Constants.DEFAULT_RECIPE_NAME);
-
-        if (recipe.getDescription() != null)
-            holder.description.setText(recipe.getDescription());
-        else
-            holder.description.setText(com.myapps.ron.family_recipes.utils.Constants.DEFAULT_RECIPE_DESC);
-
-        if (recipe.getUploader() != null)
-            holder.uploader.setText(recipe.getUploader());
-        else
-            holder.uploader.setText(com.myapps.ron.family_recipes.utils.Constants.DEFAULT_RECIPE_UPLOADER);
-
-        holder.numberOfLikes.setText(String.valueOf(recipe.getLikes()));
-
-        //inflate categories
-        inflateCategories(holder, recipe);
-
-        //load image of the food or default if not exists
-        loadImage(holder, recipe);
-
-
-        /*final RequestOptions requestOptions = new RequestOptions();
-        requestOptions.placeholder(circularProgressDrawable);
-        //requestOptions.placeholder(android.R.drawable.progress_indeterminate_horizontal);// R.drawable.ic_placeholder);
-        requestOptions.error(android.R.drawable.stat_notify_error);// ic_error);*/
+        final RecipeMinimal recipe = getItem(position);
+        if (recipe != null) {
+            holder.bindTo(recipe);
+        } else {
+            // Null defines a placeholder item - PagedListAdapter automatically
+            // invalidates this row when the actual object is loaded from the
+            // database.
+            Log.e(getClass().getSimpleName(), "bind with null object");
+            //holder.clear();
+        }
     }
 
-    private void inflateCategories(MyViewHolder holder, RecipeEntity recipe) {
+    private void inflateCategories(MyViewHolder holder, RecipeMinimal recipe) {
         if (recipe.getCategories() != null && !recipe.getCategories().isEmpty()) {
             /*LinearLayout internalWrapper = new LinearLayout(context);
             internalWrapper.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
@@ -180,27 +168,24 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
         }
     }
 
-    private void loadImage(final MyViewHolder holder, final RecipeEntity recipe) {
+    private void loadImage(final MyViewHolder holder, final RecipeMinimal recipe) {
         if(recipe.getFoodFiles() != null && recipe.getFoodFiles().size() > 0) {
-            StorageWrapper.getThumbFile(context, recipe.getFoodFiles().get(0), new MyCallback<String>() {
-                @Override
-                public void onFinished(String path) {
-                    if(path != null) {
-                        CircularProgressDrawable circularProgressDrawable = new CircularProgressDrawable(context);
-                        circularProgressDrawable.setStrokeWidth(5f);
-                        circularProgressDrawable.setCenterRadius(35f);
-                        circularProgressDrawable.start();
+            //.apply(RequestOptions.circleCropTransform())
+            StorageWrapper.getThumbFile(context, recipe.getFoodFiles().get(0), path -> {
+                if(path != null) {
+                    CircularProgressDrawable circularProgressDrawable = new CircularProgressDrawable(context);
+                    circularProgressDrawable.setStrokeWidth(5f);
+                    circularProgressDrawable.setCenterRadius(35f);
+                    circularProgressDrawable.start();
 
-                        GlideApp.with(context)
-                                .load(Uri.fromFile(new File(path)))
-                                .placeholder(circularProgressDrawable)
-                                //.apply(requestOptions)
-                                .into(holder.thumbnail);
-                    }
-                    else
-                        loadDefaultImage(holder);
+                    GlideApp.with(context)
+                            .load(Uri.fromFile(new File(path)))
+                            .placeholder(circularProgressDrawable)
+                            //.apply(requestOptions)
+                            .into(holder.thumbnail);
                 }
-                //.apply(RequestOptions.circleCropTransform())
+                else
+                    loadDefaultImage(holder);
             });
         }
         else {
@@ -239,141 +224,38 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.MyViewHo
                 .into(holder.thumbnail);
     }
 
+    private int lastSize = 0;
     @Override
     public int getItemCount() {
-        return recipeListFiltered.size();
+        if (getCurrentList() == null)
+            return 0;
+        if (lastSize != getCurrentList().size()) {
+            lastSize = getCurrentList().size();
+            listener.onCurrentSizeChanged(lastSize);
+        }
+        return getCurrentList().size();
     }
 
-    @Override
-    public Filter getFilter() {
-        return new Filter() {
-            @Override
-            protected FilterResults performFiltering(CharSequence charSequence) {
-                List<RecipeEntity> filteredList;
-                String charString = mLastQuery;
-                if(charSequence != null){
-                    charString = charSequence.toString();
-                    mLastQuery = charString;
-                }
-                if (charString.isEmpty() && (tags == null || tags.isEmpty())) {
-                    filteredList = new ArrayList<>(recipeList);
-                } else {
-                    filteredList = new ArrayList<>();
-                    for (RecipeEntity row : recipeList) {
-
-                        // name match condition. this might differ depending on your requirement
-                        // here we are looking for name or description number match
-                        if ((row.getName().toLowerCase().contains(charString.toLowerCase())
-                                || row.getDescription().contains(charString))
-                                && row.hasTags(tags)) {
-                            filteredList.add(row);
-                        }
-                    }
-
-                    //recipeListFiltered = filteredList;
+    private static DiffUtil.ItemCallback<RecipeMinimal> DIFF_CALLBACK =
+            new DiffUtil.ItemCallback<RecipeMinimal>() {
+                // Recipe details may have changed if reloaded from the database,
+                // but ID is fixed.
+                @Override
+                public boolean areItemsTheSame(RecipeMinimal oldRecipe, RecipeMinimal newRecipe) {
+                    return oldRecipe.getId().equals(newRecipe.getId());
                 }
 
-                FilterResults filterResults = new FilterResults();
-                filterResults.values = filteredList;
-                return filterResults;
-            }
+                @Override
+                public boolean areContentsTheSame(RecipeMinimal oldRecipe,
+                                                  RecipeMinimal newRecipe) {
+                    return oldRecipe.equals(newRecipe);
+                }
+            };
 
-            @Override
-            protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
-                //Log.e("adapter", "update from filter");
-                if(filterResults.values != null)
-                    updateRecipes((ArrayList<RecipeEntity>) filterResults.values, false);
-                //notifyDataSetChanged();
-            }
-        };
-    }
-
-/*
-    public List<Recipe> getCurrentList() {
-        return recipeListFiltered;
-    }
-*/
-
-    public void updateTags(List<String> newTags) {
-        //tags.clear();
-        if (newTags != null)
-            tags = new ArrayList<>(newTags);
-        else
-            tags = null;
-            //tags.addAll(newTags);
-        getFilter().filter(null);
-        /*List<Recipe> filteredList = new ArrayList<>();
-        for (Recipe row : recipeListFiltered) {
-            if (row.hasTags(tags)) {
-                filteredList.add(row);
-            }
-        }
-        updateRecipes(filteredList);*/
-    }
-
-    public void updateRecipes(List<RecipeEntity> list, boolean addedRecipes) {
-        if (list == null)
-            return;
-        Log.e(getClass().getSimpleName(), "update recipes, added = " + addedRecipes +"\n " + list.toString());
-        if (this.recipeListFiltered == null || this.recipeListFiltered.isEmpty()){
-            this.recipeListFiltered = new ArrayList<>(list);
-            notifyDataSetChanged();
-
-        } else {
-            List<RecipeEntity> oldTemp;
-            if (addedRecipes) {
-                oldTemp = recipeList;
-                recipeList = list;
-                recipeListFiltered = recipeList;
-
-            } else {
-                oldTemp = recipeListFiltered;
-                recipeListFiltered = list;
-                listener.onCurrentSizeChanged(recipeListFiltered.size());
-            }
-
-            DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new RecipesDiffCallback(oldTemp, list));
-            diffResult.dispatchUpdatesTo(this);
-
-            if (addedRecipes)
-                getFilter().filter(null);
-        }
-    }
-
-    public void updateRecipesOrder(List<RecipeEntity> list) {
-        if (list == null)
-            return;
-        if (this.recipeListFiltered == null || this.recipeListFiltered.isEmpty()){
-            this.recipeListFiltered = new ArrayList<>(list);
-            notifyDataSetChanged();
-        }
-        else {
-            List<RecipeEntity> oldTemp = recipeList;
-            recipeList = list;
-            recipeListFiltered = recipeList;
-
-            DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new RecipesDiffCallback(oldTemp, list));
-            diffResult.dispatchUpdatesTo(this);
-
-            getFilter().filter(null);
-        }
-    }
-
-    public void updateOneRecipe(RecipeEntity recipe) {
-        //List<Recipe> newList = new ArrayList<>(recipeList);
-
-        int index = recipeList.indexOf(recipe);
-        if(index >= 0) {
-            recipeList.set(index, recipe);
-
-            notifyItemChanged(index);
-        }
-        //updateRecipes(newList, true);
-    }
 
     public interface RecipesAdapterListener {
-        void onItemSelected(RecipeEntity recipe);
-        void onImageClicked(RecipeEntity recipe);
+        void onItemSelected(RecipeMinimal recipe);
+        void onImageClicked(RecipeMinimal recipe);
         void onCurrentSizeChanged(int size);
     }
 }

@@ -26,12 +26,11 @@ public class FavoritesRecipesFragment extends RecyclerWithFiltersAbstractFragmen
     @Override
     protected void initAfterViewCreated() {
         swipeRefreshLayout.setEnabled(false);
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                viewModel.loadLocalFavoritesOrdered(activity, com.myapps.ron.family_recipes.dal.Constants.SORT_RECENT);
-            }
-        }, 500);
+        queryModel.setOrderBy(RecipeEntity.KEY_CREATED);
+        queryModel.setFavorites(true);
+        new Handler().postDelayed(() ->
+                viewModel.applyQuery(queryModel), 500);
+                //viewModel.loadLocalFavoritesOrdered(activity, com.myapps.ron.family_recipes.dal.Constants.SORT_RECENT), 500);
     }
 
     @Override
@@ -41,47 +40,34 @@ public class FavoritesRecipesFragment extends RecyclerWithFiltersAbstractFragmen
     @Override
     protected void initViewModel() {
         viewModel =  ViewModelProviders.of(activity).get(DataViewModel.class);
-        viewModel.getFavorites().observe(this, new Observer<List<RecipeEntity>>() {
-            @Override
-            public void onChanged(@Nullable List<RecipeEntity> recipes) {
-                //Toast.makeText(activity, "get recipes from DAL", Toast.LENGTH_SHORT).show();
-                Log.e(TAG, "in favorite recipes observer");
-                if(recipes != null) {
-                    Log.e(TAG, recipes.toString());
-                    if (mFilter != null)
-                        mFilter.setCustomTextView(getString(R.string.number_of_recipes_indicator, recipes.size()));
-                    //Log.e(TAG, "update from fragment");
-                    if (mAdapter == null) {
-                        mAdapter = new RecipesAdapter(activity, recipes, tags, FavoritesRecipesFragment.this);
-                        recyclerView.setAdapter(mAdapter);
-                    } else
-                        mAdapter.updateRecipes(recipes, !recipes.isEmpty());
-                }
+        viewModel.getPagedRecipes().observe(this, recipes -> {
+            //Toast.makeText(activity, "get recipes from DAL", Toast.LENGTH_SHORT).show();
+            Log.e(TAG, "in favorite recipes observer");
+            if(recipes != null) {
+                Log.e(TAG, recipes.toString());
+                /*if (mFilter != null)
+                    mFilter.setCustomTextView(getString(R.string.number_of_recipes_indicator, recipes.size()));*/
+                //Log.e(TAG, "update from fragment");
+                mAdapter.submitList(recipes);
             }
         });
         // already have values from AllRecipesFragment
-        viewModel.getCategories().observe(this, new Observer<List<CategoryEntity>>() {
-            @Override
-            public void onChanged(@Nullable List<CategoryEntity> categories) {
-                Log.e(TAG, "in categories observer");
-                if(categories != null) {
-                    Log.e(TAG, categories.toString());
-                    tags = new ArrayList<>(categories);
-                    tags.add(0, new CategoryEntity.CategoryBuilder()
-                            .name(getString(R.string.str_all_selected))
-                            .color(ContextCompat.getColor(activity, R.color.search_filter_text_light))
-                            .build());
-                    loadFiltersColor();
-                    initCategories();
-                }
+        viewModel.getCategories().observe(this, categories -> {
+            Log.e(TAG, "in categories observer");
+            if(categories != null) {
+                Log.e(TAG, categories.toString());
+                tags = new ArrayList<>(categories);
+                tags.add(0, new CategoryEntity.CategoryBuilder()
+                        .name(getString(R.string.str_all_selected))
+                        .color(ContextCompat.getColor(activity, R.color.search_filter_text_light))
+                        .build());
+                loadFiltersColor();
+                initCategories();
             }
         });
-        viewModel.getInfoFromLastFetch().observe(this, new Observer<String>() {
-            @Override
-            public void onChanged(@Nullable String s) {
-                if (s != null)
-                    Toast.makeText(activity, s, Toast.LENGTH_LONG).show();
-            }
+        viewModel.getInfoFromLastFetch().observe(this, s -> {
+            if (s != null)
+                Toast.makeText(activity, s, Toast.LENGTH_LONG).show();
         });
     }
 }

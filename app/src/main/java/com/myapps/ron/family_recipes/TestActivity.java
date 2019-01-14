@@ -16,6 +16,7 @@ import com.myapps.ron.family_recipes.model.QueryModel;
 import com.myapps.ron.family_recipes.model.RecipeEntity;
 import com.myapps.ron.family_recipes.recycler.PagedRecipesAdapter;
 import com.myapps.ron.family_recipes.services.GetAllRecipesService;
+import com.myapps.ron.family_recipes.viewmodels.CategoriesViewModel;
 import com.myapps.ron.family_recipes.viewmodels.DataViewModel;
 import com.myapps.ron.family_recipes.viewmodels.NewViewModel;
 import com.myapps.ron.searchfilter.adapter.FilterAdapter;
@@ -96,14 +97,17 @@ public class TestActivity extends AppCompatActivity implements FilterListener<Ca
                         .build()
         );
 
+        mViewModel.fetchRecipesFromServer(this);
+
+
 
         /*new Handler().postDelayed(this::createMoreViews, 1000);*/
 
-        loadRecipes();
+        //loadRecipes();
 
     }
 
-    @OnTextChanged(R.id.test_editText)
+    /*@OnTextChanged(R.id.test_editText)
     public void onTextChanged(Editable editable) {
         if (editable != null) {
             String text = editable.toString();
@@ -116,13 +120,13 @@ public class TestActivity extends AppCompatActivity implements FilterListener<Ca
                             .build()
             );
         }
-    }
+    }*/
 
-    @Override
+    /*@Override
     protected void onDestroy() {
         super.onDestroy();
-        mViewModel.getData().removeObservers(this);
-    }
+        mViewModel.getPagedRecipes().removeObservers(this);
+    }*/
 
     @Override
     protected void onStart() {
@@ -133,7 +137,7 @@ public class TestActivity extends AppCompatActivity implements FilterListener<Ca
         /*mDisposable.add(mViewModel.getRecipeName("0")
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(recipeName -> textView.setText(recipeName),
+                .subscribe(recipeName -> textView.setMessage(recipeName),
                         throwable -> Log.e(TAG, "Unable to update recipe name", throwable)));*/
     }
 
@@ -146,7 +150,7 @@ public class TestActivity extends AppCompatActivity implements FilterListener<Ca
     }
 
     /*public void updateRecipeName(View view) {
-        String recipeName = editText.getText().toString();
+        String recipeName = editText.getMessage().toString();
         // Disable the update button until the recipe name update has been done
         button.setEnabled(false);
         // Subscribe to updating the recipe name.

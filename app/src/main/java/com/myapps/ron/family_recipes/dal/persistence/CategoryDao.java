@@ -4,10 +4,13 @@ import com.myapps.ron.family_recipes.model.CategoryEntity;
 
 import java.util.List;
 
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import io.reactivex.Completable;
+import io.reactivex.Maybe;
 
 /**
  * Created by ronginat on 02/01/2019.
@@ -16,13 +19,16 @@ import io.reactivex.Completable;
 public interface CategoryDao {
 
     @Query("SELECT * FROM " + AppDatabases.TABLE_CATEGORIES)
-    List<CategoryEntity> getAllCategories();
+    LiveData<List<CategoryEntity>> getAllCategories();
 
-    @Insert
-    Completable insertCategories(List<CategoryEntity> categoryEntities);
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    Completable insertAll(List<CategoryEntity> categoryEntities);
 
-    @Insert
-    Completable insertCategories(CategoryEntity... categoryEntities);
+    /*@Query("SELECT * FROM " + AppDatabases.TABLE_CATEGORIES + " WHERE " + CategoryEntity.KEY_NAME + " = :name")
+    Maybe<CategoryEntity> getCategory(String name);*/
+
+    /*@Insert(onConflict = OnConflictStrategy.REPLACE)
+    Completable insertAll(CategoryEntity... categoryEntities);*/
 
     @Insert
     void insertCategory(CategoryEntity categoryEntity);

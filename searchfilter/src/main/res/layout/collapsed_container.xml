@@ -32,7 +32,7 @@
             android:layout_gravity="center"
             android:textColor="#827f93"
             android:textSize="18sp"
-            tools:text="All categories" />
+            tools:message="All categories" />
     </FrameLayout>
 
 

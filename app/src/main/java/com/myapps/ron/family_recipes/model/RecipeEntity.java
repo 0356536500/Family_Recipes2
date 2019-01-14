@@ -62,8 +62,8 @@ public class RecipeEntity implements Parcelable{
     private String uploader;
     @ColumnInfo(name = KEY_CATEGORIES)
     private List<String> categories;
-    @ColumnInfo(name = "comments")
-    private List<RecipeEntity.Comment> comments;
+    //@ColumnInfo(name = "comments")
+    //private List<RecipeEntity.Comment> comments;
     @ColumnInfo(name = "foodFiles")
     private List<String> foodFiles;
     @ColumnInfo(name = KEY_LIKES)
@@ -97,11 +97,11 @@ public class RecipeEntity implements Parcelable{
         this.uploader = in.readString();
 
         categories = new ArrayList<>();
-        comments = new ArrayList<>();
+        //comments = new ArrayList<>();
         foodFiles = new ArrayList<>();
 
         in.readList(this.categories, String.class.getClassLoader());
-        in.readList(this.comments, RecipeEntity.Comment.class.getClassLoader());
+        //in.readList(this.comments, RecipeEntity.Comment.class.getClassLoader());
         in.readList(this.foodFiles, String.class.getClassLoader());
 
         this.likes = in.readInt();
@@ -119,7 +119,7 @@ public class RecipeEntity implements Parcelable{
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, creationDate, lastModifiedAt, recipeFile, uploader, categories, comments, foodFiles, likes, meLike);
+        return Objects.hash(id, name, description, creationDate, lastModifiedAt, recipeFile, uploader, categories/*, comments*/, foodFiles, likes, meLike);
     }
 
     /**
@@ -168,17 +168,17 @@ public class RecipeEntity implements Parcelable{
         if (getFoodFiles() != null && other.getFoodFiles() != null)
             images = getFoodFilesToString().equals(other.getFoodFilesToString());*/
 
-        boolean comments = getCommentsToString().equals(other.getCommentsToString());
+        //boolean comments = getCommentsToString().equals(other.getCommentsToString());
 
         /*boolean comments = getComments() == null && other.getComments() == null;
         if (getComments() != null && other.getComments() != null)
             comments = getCommentsToString().equals(other.getCommentsToString());*/
 
         boolean likes = getLikes() == other.getLikes();
-        boolean meLikes = getMeLike() == other.getMeLike();
+        //boolean meLikes = getMeLike() == other.getMeLike();
 
         return ids && names && descriptions && uploaders && cats && created && modified
-                && file && images && comments && likes && meLikes;
+                && file && images /*&& comments*/ && likes/* && meLikes*/;
 
         /*return getId().equals(other.getId()) && getName().equals(other.getName()) && getDescription().equals(other.getDescription())
                 && getUploader().equals(other.getUploader()) && getFilters().equals(other.getFilters())
@@ -205,13 +205,13 @@ public class RecipeEntity implements Parcelable{
         }
     }
 
-    public String getCommentsToString() {
+    /*public String getCommentsToString() {
         if (getComments() != null)
             return gson.toJson(getComments());
         return "";
-    }
+    }*/
 
-    public void setStringComments(String comments) {
+    /*public void setStringComments(String comments) {
         if (comments == null) {
             setComments(null);
         } else {
@@ -220,7 +220,7 @@ public class RecipeEntity implements Parcelable{
             List<RecipeEntity.Comment> value = gson.fromJson(comments, type);
             setComments(value);
         }
-    }
+    }*/
 
     public String getFoodFilesToString() {
         if (getFoodFiles() != null)
@@ -311,13 +311,13 @@ public class RecipeEntity implements Parcelable{
         this.categories = categories;
     }
 
-    public List<RecipeEntity.Comment> getComments() {
+    /*public List<RecipeEntity.Comment> getComments() {
         return comments;
-    }
+    }*/
 
-    public void setComments(List<RecipeEntity.Comment> comments) {
+    /*public void setComments(List<RecipeEntity.Comment> comments) {
         this.comments = comments;
-    }
+    }*/
 
     public List<String> getFoodFiles() {
         return foodFiles;
@@ -366,7 +366,7 @@ public class RecipeEntity implements Parcelable{
                 ", recipeFile='" + recipeFile + '\'' +
                 ", uploader='" + uploader + '\'' +
                 ", categories=" + categories +
-                ", comments=" + comments +
+                //", comments=" + comments +
                 ", foodFiles=" + foodFiles +
                 ", likes=" + likes +
                 ", meLike=" + meLike +
@@ -388,13 +388,13 @@ public class RecipeEntity implements Parcelable{
         dest.writeString(this.recipeFile);
         dest.writeString(this.uploader);
         dest.writeList(this.categories);
-        dest.writeList(this.comments);
+        //dest.writeList(this.comments);
         dest.writeList(this.foodFiles);
         dest.writeInt(this.likes);
         dest.writeInt(this.meLike);
     }
 
-    public static class Comment implements Parcelable {
+    /*public static class Comment implements Parcelable {
         private String text;
         private String user;
         private String date;
@@ -481,7 +481,7 @@ public class RecipeEntity implements Parcelable{
             dest.writeString(this.text);
             dest.writeString(this.date);
         }
-    }
+    }*/
 
     public static class RecipeBuilder {
         private String builderId;
@@ -492,7 +492,7 @@ public class RecipeEntity implements Parcelable{
         private String builderRecipeFile;
         private String builderUploader;
         private String builderCategories;
-        private String builderComments;
+        //private String builderComments;
         private String builderFoodFiles;
         private int builderLikes;
 
@@ -547,10 +547,10 @@ public class RecipeEntity implements Parcelable{
             return this;
         }
 
-        public RecipeEntity.RecipeBuilder commentsJson (String commentsJson) {
+        /*public RecipeEntity.RecipeBuilder commentsJson (String commentsJson) {
             this.builderComments = commentsJson;
             return this;
-        }
+        }*/
 
         public RecipeEntity.RecipeBuilder foodFilesJson (String foodFilesJson) {
             this.builderFoodFiles = foodFilesJson;
@@ -577,7 +577,7 @@ public class RecipeEntity implements Parcelable{
             recipe.setRecipeFile(builderRecipeFile);
             recipe.setUploader(builderUploader);
             recipe.setStringCategories(builderCategories);
-            recipe.setStringComments(builderComments);
+            //recipe.setStringComments(builderComments);
             recipe.setStringFoodFiles(builderFoodFiles);
             recipe.setLikes(builderLikes);
             recipe.setMeLike(builderMeLike ? TRUE : FALSE);

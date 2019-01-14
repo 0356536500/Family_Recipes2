@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.adapters.RecipesAdapter;
+import com.myapps.ron.family_recipes.dal.Injection;
 import com.myapps.ron.family_recipes.model.CategoryEntity;
 import com.myapps.ron.family_recipes.model.RecipeEntity;
 import com.myapps.ron.family_recipes.viewmodels.DataViewModel;
@@ -26,13 +27,12 @@ public class AllRecipesFragment extends RecyclerWithFiltersAbstractFragment impl
     protected void initAfterViewCreated() {
         setRefreshLayout();
 
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                firstLoadingProgressBar.setVisibility(View.VISIBLE);
-                activity.fetchCategories();
-                activity.fetchRecipes(orderBy);
-            }
+        new Handler().postDelayed(() -> {
+            firstLoadingProgressBar.setVisibility(View.VISIBLE);
+            viewModel.fetchFromServer(getContext());
+            viewModel.applyQuery(queryModel);
+            /*activity.fetchCategories();
+            activity.fetchRecipes(orderBy);*/
         }, 500);
     }
 
@@ -44,65 +44,36 @@ public class AllRecipesFragment extends RecyclerWithFiltersAbstractFragment impl
 
     @Override
     protected void initViewModel() {
-        viewModel = ViewModelProviders.of(activity).get(DataViewModel.class);
-        viewModel.getRecipes().observe(this, new Observer<List<RecipeEntity>>() {
-            @Override
-            public void onChanged(@Nullable List<RecipeEntity> recipesList) {
-                //Toast.makeText(activity, "get recipes from DAL", Toast.LENGTH_SHORT).show();
-                /*String log = "null";
-                if (recipes != null)
-                    log = recipes.toString();
-                Log.e(TAG, "getAllRecipes from db.\n" + log);*/
-                Log.e(TAG, String.valueOf("in recipes observer. recipes != null"));
+        viewModel =  ViewModelProviders.of(this, Injection.provideViewModelFactory(activity)).get(DataViewModel.class);
+        //viewModel = ViewModelProviders.of(activity).get(DataViewModel.class);
+        viewModel.getPagedRecipes().observe(this, recipesList -> {
 
-                firstLoadingProgressBar.setVisibility(View.GONE);
-                swipeRefreshLayout.setRefreshing(false);
-                recipes = recipesList;
+            Log.e(TAG, String.valueOf("in recipes observer."));
 
-                viewModel.setRecipesReady(true);
-                //Log.e(TAG, "update from fragment");
-                if (mAdapter != null)
-                    mAdapter.updateRecipes(recipes, recipes != null && !recipes.isEmpty());
+            firstLoadingProgressBar.setVisibility(View.GONE);
+            swipeRefreshLayout.setRefreshing(false);
+
+            if (recipesList != null)
+                mAdapter.submitList(recipesList);
+        });
+
+        viewModel.getCategories().observe(this, categories -> {
+            if (categories != null) {
+                tags = new ArrayList<>(categories);
+                tags.add(0, new CategoryEntity.CategoryBuilder()
+                        .name(getString(R.string.str_all_selected))
+                        .color(ContextCompat.getColor(activity, R.color.search_filter_text_light))
+                        .build());
+                loadFiltersColor();
+                initCategories();
+                mAdapter.setCategoryList(categories);
             }
         });
-        viewModel.getCategories().observe(this, new Observer<List<CategoryEntity>>() {
-            @Override
-            public void onChanged(@Nullable List<CategoryEntity> categories) {
-                if (categories != null) {
-                    Log.e(TAG, "in category observer. categories != null");
-                    tags = new ArrayList<>(categories);
-                    tags.add(0, new CategoryEntity.CategoryBuilder()
-                            .name(getString(R.string.str_all_selected))
-                            .color(ContextCompat.getColor(activity, R.color.search_filter_text_light))
-                            .build());
-                    loadFiltersColor();
 
-                    viewModel.setCategoriesReady(true);
-                }
-            }
-        });
-        viewModel.getCanInitBothRecyclerAndFilters().observe(this, new Observer<Boolean>() {
-            @Override
-            public void onChanged(Boolean value) {
-                if (value) {
-                    Log.e(TAG, "in both observer");
-                    initCategories();
-                    if (mFilter != null &&  recipes != null)
-                        mFilter.setCustomTextView(getString(R.string.number_of_recipes_indicator, recipes.size()));
-                    if (mAdapter == null) {
-                        mAdapter = new RecipesAdapter(activity, recipes, tags, AllRecipesFragment.this);
-                        recyclerView.setAdapter(mAdapter);
-                    }
-                    viewModel.getCanInitBothRecyclerAndFilters().removeObserver(this);
-                }
-            }
-        });
-        viewModel.getInfoFromLastFetch().observe(this, new Observer<String>() {
-            @Override
-            public void onChanged(@Nullable String s) {
-                if (s != null)
-                    Toast.makeText(activity, s, Toast.LENGTH_SHORT).show();
-            }
+        viewModel.getInfoFromLastFetch().observe(this, s -> {
+            swipeRefreshLayout.setRefreshing(false);
+            if (s != null && !s.equals(""))
+                Toast.makeText(activity, s, Toast.LENGTH_SHORT).show();
         });
     }
 }

@@ -4,7 +4,8 @@ import android.os.StrictMode;
 import android.util.Log;
 
 import com.google.gson.JsonObject;
-import com.myapps.ron.family_recipes.model.CategoryEntity;
+import com.myapps.ron.family_recipes.network.modelTO.CategoryTO;
+import com.myapps.ron.family_recipes.network.modelTO.CommentTO;
 import com.myapps.ron.family_recipes.network.modelTO.RecipeTO;
 import com.myapps.ron.family_recipes.utils.MyCallback;
 
@@ -16,16 +17,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.reactivex.Observable;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class APICallsHandler {
 
     private static final String TAG = APICallsHandler.class.getSimpleName();
-    private static Retrofit retrofit;
+    private static Retrofit retrofit, rxRetrofit;
 
     private static final int STATUS_OK = 200;
     private static final int STATUS_NOT_MODIFIED = 304;
@@ -41,26 +44,37 @@ public class APICallsHandler {
         return retrofit;
     }
 
-    public static void getOneRecipe(String id, String token, MyCallback<RecipeTO> callback) {
-        RecipeInterface service = getRetrofitInstance().create(RecipeInterface.class);
-        Call<RecipeTO> call = service.getOneRecipe(token, id);
+    private static Retrofit getReactiveRetrofitInstance() {
+        if (rxRetrofit == null) {
+            rxRetrofit = new retrofit2.Retrofit.Builder()
+                    .baseUrl(Constants.BASE_URL)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
+        }
+        return rxRetrofit;
+    }
 
-        call.enqueue(new Callback<RecipeTO>() {
+    public static void getOneRecipe(String id, String token, MyCallback<List<CommentTO>> callback) {
+        RecipeInterface service = getRetrofitInstance().create(RecipeInterface.class);
+        Call<List<CommentTO>> call = service.getOneRecipe(token, id);
+
+        call.enqueue(new Callback<List<CommentTO>>() {
             @Override
-            public void onResponse(@NotNull Call<RecipeTO> call, @NotNull Response<RecipeTO> response) {
+            public void onResponse(@NotNull Call<List<CommentTO>> call, @NotNull Response<List<CommentTO>> response) {
                 String body = response.body() != null ? response.body().toString() : "null";
                 Log.i(TAG, body);
                 if (response.code() == STATUS_OK) {
-                    RecipeTO recipe = response.body();
-                    callback.onFinished(recipe);
+                    List<CommentTO> comments = response.body();
+                    callback.onFinished(comments);
                 } else {
                     callback.onFinished(null);
                 }
             }
 
             @Override
-            public void onFailure(@NotNull Call<RecipeTO> call, @NotNull Throwable t) {
-                Log.e(TAG, "error getting one recipe");
+            public void onFailure(@NotNull Call<List<CommentTO>> call, @NotNull Throwable t) {
+                Log.e(TAG, "error getting recipe comments", t);
             }
         });
     }
@@ -187,18 +201,18 @@ public class APICallsHandler {
         });
     }
 
-    public static void getAllCategories(String date, String token, final MyCallback<List<CategoryEntity>> callback) {
+    public static void getAllCategories(String date, String token, final MyCallback<List<CategoryTO>> callback) {
         RecipeInterface service = getRetrofitInstance().create(RecipeInterface.class);
-        Call<List<CategoryEntity>> call = service.getAllCategories(token, date);
+        Call<List<CategoryTO>> call = service.getAllCategories(token, date);
 
-        call.enqueue(new Callback<List<CategoryEntity>>() {
+        call.enqueue(new Callback<List<CategoryTO>>() {
             @Override
-            public void onResponse(@NotNull Call<List<CategoryEntity>> call, @NotNull Response<List<CategoryEntity>> response) {
+            public void onResponse(@NotNull Call<List<CategoryTO>> call, @NotNull Response<List<CategoryTO>> response) {
                 String body = response.body() != null ? response.body().toString() : "null";
 
                 if (response.code() == STATUS_OK) {
                     Log.i(TAG, body);
-                    List<CategoryEntity> list = response.body();
+                    List<CategoryTO> list = response.body();
                     callback.onFinished(list);
                 }
                 else {
@@ -212,7 +226,7 @@ public class APICallsHandler {
             }
 
             @Override
-            public void onFailure(@NotNull Call<List<CategoryEntity>> call, @NotNull Throwable t) {
+            public void onFailure(@NotNull Call<List<CategoryTO>> call, @NotNull Throwable t) {
                 Log.e(TAG, "error getting all recipes. message: " + t.getMessage());
                 callback.onFinished(null);
                 //Toast.makeText(MainActivity.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
@@ -281,10 +295,12 @@ public class APICallsHandler {
             Response<List<RecipeTO>> response = call.execute();
             Log.e(TAG, "response code for getAllRecipesSync, " + response.code());
             Log.e(TAG, "response getAllRecipesSync:\n" + response.body());
-
-            APIResponse<List<RecipeTO>> rv = new APIResponse<>();
-            rv.setData(response.body());
-            rv.setLastKey(response.headers().get(Constants.HEADER_LAST_EVAL_KEY));
+            APIResponse<List<RecipeTO>> rv = null;
+            if (response.code() == STATUS_OK) {
+                rv = new APIResponse<>();
+                rv.setData(response.body());
+                rv.setLastKey(response.headers().get(Constants.HEADER_LAST_EVAL_KEY));
+            }
             return rv;
 
         } catch (IOException e) {
@@ -293,4 +309,19 @@ public class APICallsHandler {
         }
 
     }
+
+    // region Observable
+
+    public static Observable<Response<List<CategoryTO>>> getAllCategoriesObservable(String date, String token) {
+        RecipeInterface service = getReactiveRetrofitInstance().create(RecipeInterface.class);
+
+        return service.getAllCategoriesObservable(token, date);
+    }
+
+    public static Observable<Response<List<RecipeTO>>> getAllRecipesObservable(String date, String token) {
+        RecipeInterface service = getReactiveRetrofitInstance().create(RecipeInterface.class);
+        return service.getAllRecipesObservable(token, date);
+    }
+
+    // endregion
 }

@@ -1,5 +1,6 @@
 package com.myapps.ron.family_recipes.viewmodels;
 
+import android.content.Context;
 import android.os.CountDownTimer;
 
 import com.myapps.ron.family_recipes.dal.repository.RecipeRepository;
@@ -7,6 +8,7 @@ import com.myapps.ron.family_recipes.dal.repository.RepoSearchResults;
 import com.myapps.ron.family_recipes.model.QueryModel;
 import com.myapps.ron.family_recipes.model.RecipeEntity;
 import com.myapps.ron.family_recipes.model.RecipeMinimal;
+import com.myapps.ron.family_recipes.services.GetAllRecipesService;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
@@ -43,36 +45,6 @@ public class NewViewModel extends ViewModel {
     //@Inject
     public NewViewModel(RecipeRepository recipeRepository) {
         this.repository = recipeRepository;
-
-        new CountDownTimer(10000, 1000) {
-            String idStr = "recipe";
-            int idInt = 0;
-
-            @Override
-            public void onTick(long l) {
-                QueryModel filter = new QueryModel.Builder().
-                        order(RecipeEntity.KEY_CREATED)
-                        .search("" + idInt++)
-                        .build();
-                queryLiveData.setValue(filter);
-                /*Disposable disposable = recipeRepository.getRecipe(idStr + idInt)
-                        .subscribeOn(Schedulers.computation())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe((recipe, throwable) -> {
-                            if (recipe != null) {
-                                recipe.setName("updateFromViewMode" + idInt);
-                                repository.insertOrUpdateRecipe(recipe);
-                                idInt++;
-                            } else
-                                Log.e(getClass().getSimpleName(), "getOneRecipe" + throwable.getMessage());
-                        });*/
-            }
-
-            @Override
-            public void onFinish() {
-
-            }
-        };//.start();
     }
 
     public LiveData<PagedList<RecipeMinimal>> getData() {
@@ -84,8 +56,12 @@ public class NewViewModel extends ViewModel {
         queryLiveData.postValue(queryModel);
     }
 
-    public void fetchRecipesFromServer() {
+    public void fetchRecipesFromServerJustedLoggedIn(Context context) {
+        GetAllRecipesService.startActionGetAllRecipes(context);
+    }
 
+    public void fetchRecipesFromServer(Context context) {
+        repository.fetchRecipesReactive(context);
     }
 
 

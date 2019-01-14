@@ -9,7 +9,9 @@ import android.util.Log;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.dal.db.RecipesDBHelper;
 import com.myapps.ron.family_recipes.dal.storage.StorageWrapper;
+import com.myapps.ron.family_recipes.model.CommentEntity;
 import com.myapps.ron.family_recipes.model.RecipeEntity;
+import com.myapps.ron.family_recipes.network.modelTO.CommentTO;
 import com.myapps.ron.family_recipes.network.modelTO.RecipeTO;
 import com.myapps.ron.family_recipes.network.APICallsHandler;
 import com.myapps.ron.family_recipes.network.Constants;
@@ -18,7 +20,9 @@ import com.myapps.ron.family_recipes.utils.MyCallback;
 import com.myapps.ron.family_recipes.network.cognito.AppHelper;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.myapps.ron.family_recipes.utils.Constants.FALSE;
@@ -32,6 +36,7 @@ import static com.myapps.ron.family_recipes.utils.Constants.TRUE;
  */
 public class RecipeViewModel extends ViewModel {
     private final MutableLiveData<RecipeEntity> recipe = new MutableLiveData<>(); // current recipe on the screen
+    private final MutableLiveData<List<CommentEntity>> comments = new MutableLiveData<>(); // current recipe on the screen
     private MutableLiveData<String> recipePath = new MutableLiveData<>();
     private MutableLiveData<String> imagePath = new MutableLiveData<>();
     private MutableLiveData<String> infoForUser = new MutableLiveData<>();
@@ -42,6 +47,14 @@ public class RecipeViewModel extends ViewModel {
 
     public LiveData<RecipeEntity> getRecipe() {
         return recipe;
+    }
+
+    private void setComments(List<CommentEntity> items) {
+        comments.setValue(items);
+    }
+
+    public LiveData<List<CommentEntity>> getComments() {
+        return comments;
     }
 
     private void setRecipePath(String item) {
@@ -69,15 +82,17 @@ public class RecipeViewModel extends ViewModel {
     }
 
 
-    public void loadRecipe(Context context, RecipeEntity recipeEntity) {
+    public void loadComments(Context context, RecipeEntity recipeEntity) {
         if(MiddleWareForNetwork.checkInternetConnection(context)) {
-            APICallsHandler.getOneRecipe(recipeEntity.getId(), AppHelper.getAccessToken(), result -> {
-                if(result != null) {
-                    RecipeEntity rv = result.toEntity();
-                    rv.setMeLike(recipeEntity.getMeLike());
-                    setRecipe(rv);
+            APICallsHandler.getOneRecipe(recipeEntity.getId(), AppHelper.getAccessToken(), results -> {
+                if(results != null) {
+                    List<CommentEntity> rv = new ArrayList<>();
+                    for (CommentTO to: results) {
+                        rv.add(to.toEntity());
+                    }
+                    setComments(rv);
                 } else {
-                    setRecipe(recipeEntity);
+                    setComments(null);
                     setInfo(context.getString(R.string.load_error_message));
                 }
             });
@@ -115,7 +130,7 @@ public class RecipeViewModel extends ViewModel {
             if(MiddleWareForNetwork.checkInternetConnection(context)) {
                 Map<String, Object> attrs = new HashMap<>();
                 Map<String, String> commentMap = new HashMap<>();
-                commentMap.put(Constants.COMMENT_TEXT, text);
+                commentMap.put(Constants.COMMENT_MESSAGE, text);
                 commentMap.put(Constants.COMMENT_USER, AppHelper.getCurrUser());
                 attrs.put(Constants.COMMENTS, commentMap);
                 Log.e("viewModel", "before posting comment:\n" + attrs);

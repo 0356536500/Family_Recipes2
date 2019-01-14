@@ -3,6 +3,7 @@ package com.myapps.ron.family_recipes.dal.persistence;
 import android.content.Context;
 import android.util.Log;
 
+import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.model.CategoryEntity;
 import com.myapps.ron.family_recipes.model.RecipeEntity;
 import com.myapps.ron.family_recipes.utils.DateUtil;
@@ -13,6 +14,7 @@ import java.util.Random;
 import java.util.concurrent.Executors;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
@@ -44,6 +46,21 @@ public abstract class AppDatabases extends RoomDatabase {
                             AppDatabases.class, DATABASE_NAME)
                             .fallbackToDestructiveMigration()
                             .allowMainThreadQueries()
+                            /*.addCallback(new Callback() {
+                                @Override
+                                public void onCreate(@NonNull SupportSQLiteDatabase db) {
+                                    super.onCreate(db);
+                                    Executors.newSingleThreadScheduledExecutor().execute(() ->
+                                            getInstance(context)
+                                                    .categoriesDao()
+                                                    .insertCategory(
+                                                            new CategoryEntity.CategoryBuilder()
+                                                                    .name(context.getString(R.string.str_all_selected))
+                                                                    .color(ContextCompat.getColor(context, R.color.search_filter_text_light))
+                                                                    .build()
+                                                ));
+                                }
+                            })*/
                             /*.addCallback(new Callback() {
                                 *//*@Override
                                 public void onCreate(@NonNull SupportSQLiteDatabase db) {

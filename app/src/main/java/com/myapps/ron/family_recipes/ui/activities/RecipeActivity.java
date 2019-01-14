@@ -212,9 +212,9 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
                         changedLike = true;
                     }
                     // user posted a comment
-                    if (!RecipeActivity.this.recipe.getCommentsToString().equals(recipe.getCommentsToString())) {
+                    /*if (!RecipeActivity.this.recipe.getCommentsToString().equals(recipe.getCommentsToString())) {
                         postedComment = true;
-                    }
+                    }*/
 
                     RecipeActivity.this.recipe = recipe;
                     if (changedLike) {
@@ -341,7 +341,7 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
     }
 
     private void loadComments() {
-        if (this.recipe.getComments() != null) {
+        /*if (this.recipe.getComments() != null) {
             textViewCommentTitle.setText(getString(R.string.comments, recipe.getComments().size()));
 
             if (mAdapter == null) {
@@ -351,7 +351,7 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
             } else {
                 mAdapter.setComments(this.recipe.getComments());
             }
-        }
+        }*/
     }
 
     private void loadRecipeHtml(String path) {
@@ -404,7 +404,7 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
     private View.OnClickListener postCommentListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            //Toast.makeText(getApplicationContext(), postCommentEditText.getText(), Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getApplicationContext(), postCommentEditText.getMessage(), Toast.LENGTH_SHORT).show();
             if (postCommentEditText.getText() != null) {
                 viewModel.postComment(getApplicationContext(), recipe, postCommentEditText.getText().toString());
                 if (postCommentEditText.getText().length() > 0) {

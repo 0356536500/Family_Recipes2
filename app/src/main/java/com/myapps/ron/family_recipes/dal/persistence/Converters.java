@@ -3,9 +3,10 @@ package com.myapps.ron.family_recipes.dal.persistence;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.myapps.ron.family_recipes.model.CategoryEntity;
-import com.myapps.ron.family_recipes.model.RecipeEntity;
+import com.myapps.ron.family_recipes.network.modelTO.CategoryTO;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
 
 import androidx.room.TypeConverter;
@@ -27,7 +28,7 @@ public class Converters {
         return gson.fromJson(value, type);
     }
 
-    @TypeConverter
+    /*@TypeConverter
     public List<RecipeEntity.Comment> fromStringToComments(String comments) {
         Type type = new TypeToken<List<RecipeEntity.Comment>>() {
         }.getType();
@@ -37,7 +38,7 @@ public class Converters {
     @TypeConverter
     public static String ListCommentToString(List<RecipeEntity.Comment> list) {
         return gson.toJson(list);
-    }
+    }*/
 
     @TypeConverter
     public static String ListToString(List<String> list) {
@@ -59,6 +60,17 @@ public class Converters {
     @TypeConverter
     public static String ListCategoriesToString(List<CategoryEntity> list) {
         return gson.toJson(list);
+    }
+
+    @TypeConverter
+    public static List<CategoryEntity> fromCategoryTOList(List<CategoryTO> list) {
+        List<CategoryEntity> entities = new ArrayList<>();
+        if (list != null) {
+            for (CategoryTO to: list) {
+                entities.add(to.toEntity());
+            }
+        }
+        return entities;
     }
 
     // endregion

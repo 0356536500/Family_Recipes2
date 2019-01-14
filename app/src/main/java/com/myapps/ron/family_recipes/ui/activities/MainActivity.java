@@ -34,6 +34,7 @@ import android.widget.Toast;
 
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUser;
 import com.myapps.ron.family_recipes.R;
+import com.myapps.ron.family_recipes.dal.Injection;
 import com.myapps.ron.family_recipes.network.MiddleWareForNetwork;
 import com.myapps.ron.family_recipes.network.cognito.AppHelper;
 import com.myapps.ron.family_recipes.ui.fragments.AllRecipesFragment;
@@ -85,17 +86,13 @@ public class MainActivity extends MyBaseActivity {
         initFragments();
         isRTL = isRTL();
 
-        viewModel =  ViewModelProviders.of(this).get(DataViewModel.class);
+        viewModel =  ViewModelProviders.of(this, Injection.provideViewModelFactory(this)).get(DataViewModel.class);
+        //viewModel = ViewModelProviders.of(this).get(DataViewModel.class);
 
-        viewModel.setRecipesReady(false);
-        viewModel.setCategoriesReady(false);
+        /*viewModel.setRecipesReady(false);
+        viewModel.setCategoriesReady(false);*/
 
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                startWithDefaultFragment();
-            }
-        }, 100);
+        new Handler().postDelayed(this::startWithDefaultFragment, 100);
         // white background notification bar
         //whiteNotificationBar(recyclerView);
 
@@ -344,24 +341,16 @@ public class MainActivity extends MyBaseActivity {
 
     // Handle when the a navigation item is selected
     private void setNavDrawer() {
-        navDrawer.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull final MenuItem item) {
-                // set item as selected to persist highlight
-                item.setChecked(true);
-                if (getSupportActionBar() != null)
-                    getSupportActionBar().setTitle(item.getTitle());
-                // close drawer when item is tapped
-                mDrawer.closeDrawers();
+        navDrawer.setNavigationItemSelectedListener(item -> {
+            // set item as selected to persist highlight
+            item.setChecked(true);
+            if (getSupportActionBar() != null)
+                getSupportActionBar().setTitle(item.getTitle());
+            // close drawer when item is tapped
+            mDrawer.closeDrawers();
 
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        performAction(item);
-                    }
-                }, 500);
-                return true;
-            }
+            new Handler().postDelayed(() -> performAction(item), 500);
+            return true;
         });
     }
 

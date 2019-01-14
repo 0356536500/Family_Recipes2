@@ -3,7 +3,6 @@ package com.myapps.ron.family_recipes.ui.fragments;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -23,7 +22,9 @@ import com.myapps.ron.family_recipes.MyDividerItemDecoration;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.adapters.RecipesAdapter;
 import com.myapps.ron.family_recipes.model.CategoryEntity;
+import com.myapps.ron.family_recipes.model.QueryModel;
 import com.myapps.ron.family_recipes.model.RecipeEntity;
+import com.myapps.ron.family_recipes.model.RecipeMinimal;
 import com.myapps.ron.family_recipes.recycler.MyRecyclerScroll;
 import com.myapps.ron.family_recipes.ui.activities.MainActivity;
 import com.myapps.ron.family_recipes.ui.activities.RecipeActivity;
@@ -43,7 +44,6 @@ import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.SearchView;
 import androidx.core.content.ContextCompat;
@@ -55,6 +55,10 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -78,7 +82,7 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
 
     SwipeRefreshLayout swipeRefreshLayout;
     SwipeRefreshLayout.OnRefreshListener onRefreshListener;
-    RecyclerView recyclerView;
+    private RecyclerView recyclerView;
     RecipesAdapter mAdapter;
 
     protected DataViewModel viewModel;
@@ -88,12 +92,26 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
 
     ProgressBar firstLoadingProgressBar;
 
+    private CompositeDisposable compositeDisposable = new CompositeDisposable();
+    QueryModel queryModel;
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        queryModel = new QueryModel.Builder()
+                .order(RecipeEntity.KEY_CREATED)
+                .build();
         activity = (MainActivity)getActivity();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (compositeDisposable != null && !compositeDisposable.isDisposed()) {
+            compositeDisposable.dispose();
+        }
     }
 
     @Override
@@ -119,7 +137,7 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
     public void onDetach() {
         Log.e(TAG, "on detach");
         super.onDetach();
-        parent.removeAllViews();
+        //parent.removeAllViews();
     }
 
     @Override
@@ -134,7 +152,7 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
                              @Nullable Bundle savedInstanceState) {
         Log.e(TAG, "on createView");
         if (parent == null) {
-            Log.e(TAG, "on createView mFilter was null");
+            Log.e(TAG, "on createView parent was null");
             view = inflater.inflate(R.layout.content_main_recipes, container, false);
             parent = (FrameLayout) view;
         }
@@ -258,25 +276,20 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
                 }
             }
         });
+        mAdapter = new RecipesAdapter(activity, this);
+        recyclerView.setAdapter(mAdapter);
     }
 
     void setRefreshLayout() {
-        onRefreshListener = new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                if(mayRefresh) {
-                    activity.fetchRecipes(orderBy);
-                    mayRefresh = false;
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            mayRefresh = true;
-                        }
-                    }, Constants.REFRESH_DELAY);
-                } else {
-                    Toast.makeText(activity, R.string.refresh_error_message, Toast.LENGTH_SHORT).show();
-                    swipeRefreshLayout.setRefreshing(false);
-                }
+        onRefreshListener = () -> {
+            if(mayRefresh) {
+                viewModel.fetchFromServer(getContext());
+                //activity.fetchRecipes(orderBy);
+                mayRefresh = false;
+                new Handler().postDelayed(() -> mayRefresh = true, Constants.REFRESH_DELAY);
+            } else {
+                Toast.makeText(activity, R.string.refresh_error_message, Toast.LENGTH_SHORT).show();
+                swipeRefreshLayout.setRefreshing(false);
             }
         };
         swipeRefreshLayout.setOnRefreshListener(onRefreshListener);
@@ -317,14 +330,16 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
                     }
                     Toast.makeText(activity, "Submitted, " + query, Toast.LENGTH_SHORT).show();
                     lastQuery = query;
-                    mAdapter.getFilter().filter(query);
+                    queryModel.setSearch(lastQuery);
+                    viewModel.applyQuery(queryModel);
                     return true;
                 }
 
                 @Override
                 public boolean onQueryTextChange(String query) {
                     // filter recycler view when text is changed
-                    mAdapter.getFilter().filter(query);
+                    queryModel.setSearch(query);
+                    viewModel.applyQuery(queryModel);
                     return false;
                 }
             });
@@ -360,30 +375,27 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
         final PopupMenu popup = new PopupMenu(activity, activity.findViewById(R.id.action_sort));
 
         // This activity implements OnMenuItemClickListener
-        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                String mPrevOrder = orderBy;
-                orderBy = "";
-                switch (item.getItemId()) {
-                    case R.id.sort_action_recent:
-                        orderBy = com.myapps.ron.family_recipes.dal.Constants.SORT_RECENT;
-                        break;
-                    case R.id.sort_action_popular:
-                        orderBy = com.myapps.ron.family_recipes.dal.Constants.SORT_POPULAR;
-                        break;
-                    case R.id.sort_action_last_modified:
-                        orderBy = com.myapps.ron.family_recipes.dal.Constants.SORT_MODIFIED;
-                        break;
-                }
-                if (orderBy != null) {
-                    if (!orderBy.equals(mPrevOrder)) {
-                        mAdapter.updateRecipesOrder(viewModel.loadLocalRecipesOrdered(activity, orderBy));
-                    }
-                }
-                return true;
+        popup.setOnMenuItemClickListener(item -> {
+            String mPrevOrder = orderBy;
+            orderBy = "";
+            switch (item.getItemId()) {
+                case R.id.sort_action_recent:
+                    orderBy = com.myapps.ron.family_recipes.dal.Constants.SORT_RECENT;
+                    break;
+                case R.id.sort_action_popular:
+                    orderBy = com.myapps.ron.family_recipes.dal.Constants.SORT_POPULAR;
+                    break;
+                case R.id.sort_action_last_modified:
+                    orderBy = com.myapps.ron.family_recipes.dal.Constants.SORT_MODIFIED;
+                    break;
             }
-
+            if (orderBy != null) {
+                if (!orderBy.equals(mPrevOrder)) {
+                    queryModel.setOrderBy(orderBy);
+                    viewModel.applyQuery(queryModel);
+                }
+            }
+            return true;
         });
         popup.inflate(R.menu.sort_menu);
         popup.show();
@@ -413,14 +425,20 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
 
     // region Recycler Listener
     @Override
-    public void onItemSelected(RecipeEntity recipe) {
-        Intent intent = new Intent(activity, RecipeActivity.class);
-        intent.putExtra(Constants.RECIPE, recipe);
-        startActivityForResult(intent, Constants.RECIPE_ACTIVITY_CODE);
+    public void onItemSelected(RecipeMinimal recipeMinimal) {
+        Disposable disposable = viewModel.getRecipe(recipeMinimal.getId())
+                .observeOn(AndroidSchedulers.mainThread())
+                .observeOn(Schedulers.io())
+                .subscribe(recipeEntity -> {
+                    Intent intent = new Intent(activity, RecipeActivity.class);
+                    intent.putExtra(Constants.RECIPE, recipeEntity);
+                    startActivityForResult(intent, Constants.RECIPE_ACTIVITY_CODE);
+                }, error -> Log.e(TAG, error.getMessage()));
+        compositeDisposable.add(disposable);
     }
 
     @Override
-    public void onImageClicked(RecipeEntity recipe) {
+    public void onImageClicked(RecipeMinimal recipeMinimal) {
         FragmentTransaction ft = activity.getSupportFragmentManager().beginTransaction();
         Fragment prev = activity.getSupportFragmentManager().findFragmentByTag("dialog");
         if (prev != null) {
@@ -429,11 +447,17 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
         ft.addToBackStack(null);
 
         // Create and show the dialog.
-        DialogFragment newFragment = new PagerDialogFragment();
-        Bundle bundle = new Bundle();
-        bundle.putParcelable(Constants.RECIPE, recipe);
-        newFragment.setArguments(bundle);
-        newFragment.show(ft, "dialog");
+        Disposable disposable = viewModel.getRecipe(recipeMinimal.getId())
+                .observeOn(AndroidSchedulers.mainThread())
+                .observeOn(Schedulers.io())
+                .subscribe(recipeEntity -> {
+                    DialogFragment newFragment = new PagerDialogFragment();
+                    Bundle bundle = new Bundle();
+                    bundle.putParcelable(Constants.RECIPE, recipeEntity);
+                    newFragment.setArguments(bundle);
+                    newFragment.show(ft, "dialog");
+                }, error -> Log.e(TAG, error.getMessage()));
+        compositeDisposable.add(disposable);
     }
 
     @Override
@@ -451,7 +475,7 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
             if(resultCode == RESULT_OK) {
                 //mAdapter.updateRecipes(new RecipesDBHelper(this).getAllRecipes());
                 RecipeEntity updatedRecipe = data.getParcelableExtra(Constants.RECIPE);
-                mAdapter.updateOneRecipe(updatedRecipe);
+                //mAdapter.updateOneRecipe(updatedRecipe);
             }
         }
     }
@@ -488,16 +512,13 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void onFiltersSelected(@NotNull ArrayList<CategoryEntity> arrayList) {
         //List<Recipe> oldList = new ArrayList<>(mAdapter.getCurrentList());
         final List<String> newTags = convertCategoriesToString(arrayList);
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                mAdapter.updateTags(newTags);
-            }
+        new Handler().postDelayed(() -> {
+            queryModel.setFilters(newTags);
+            viewModel.applyQuery(queryModel);
         }, 500);
 
         //calculateDiff(oldList, mAdapter.getCurrentList());
@@ -505,8 +526,8 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
 
     @Override
     public void onNothingSelected() {
-        if (mAdapter != null)
-            mAdapter.updateTags(null);
+        queryModel.setFilters(null);
+        viewModel.applyQuery(queryModel);
     }
 
     // endregion

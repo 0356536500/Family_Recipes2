@@ -2,7 +2,7 @@ package com.myapps.ron.family_recipes.recycler;
 
 import androidx.recyclerview.widget.DiffUtil;
 
-import com.myapps.ron.family_recipes.model.RecipeEntity.Comment;
+import com.myapps.ron.family_recipes.model.CommentEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,10 +11,10 @@ import java.util.List;
  * Created by ronginat on 09/12/2018.
  */
 public class CommentsDiffCallback extends DiffUtil.Callback {
-    private List<Comment> oldComments;
-    private List<Comment> newComments;
+    private List<CommentEntity> oldComments;
+    private List<CommentEntity> newComments;
 
-    public CommentsDiffCallback(List<Comment> oldRecipes, List<Comment> newRecipes) {
+    public CommentsDiffCallback(List<CommentEntity> oldRecipes, List<CommentEntity> newRecipes) {
         this.oldComments = new ArrayList<>(oldRecipes);
         this.newComments = new ArrayList<>(newRecipes);
     }

@@ -83,7 +83,7 @@
             android:layout_marginBottom="16dp"
             android:background="@drawable/background_button_round"
             android:fontFamily="@font/open_sans_extrabold"
-            android:text="@string/create_recipe_next"
+            android:message="@string/create_recipe_next"
             android:textSize="22sp" />-->
 
     </RelativeLayout>

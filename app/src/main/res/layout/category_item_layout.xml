@@ -28,6 +28,6 @@
         android:textColor="@color/white"
         android:textSize="@dimen/item_desc_text_size"
         android:fontFamily="@font/open_sans"
-        android:text="category" />
+        android:message="category" />
 
 </RelativeLayout>-->

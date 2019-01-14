@@ -48,7 +48,7 @@
             android:layout_centerInParent="true"
             android:padding="10dp"
             android:layout_gravity="center"
-            android:text="Test filter item"
+            android:message="Test filter item"
             android:textColor="@android:color/white"
             android:textSize="16sp" />
 

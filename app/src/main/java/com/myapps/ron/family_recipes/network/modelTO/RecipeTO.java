@@ -32,8 +32,8 @@ public class RecipeTO {
     private String uploader;
     @SerializedName("categories")
     private List<String> categories;
-    @SerializedName("comments")
-    private List<RecipeTO.Comment> comments;
+    //@SerializedName("comments")
+    //private List<RecipeTO.Comment> comments;
     @SerializedName("foodFiles")
     private List<String> foodFiles;
     @SerializedName("likes")
@@ -54,12 +54,12 @@ public class RecipeTO {
             this.recipeFile = recipe.getRecipeFile();
             this.uploader = recipe.getUploader();
             this.categories = recipe.getCategories();
-            if (recipe.getComments() != null) {
+            /*if (recipe.getComments() != null) {
                 this.comments = new ArrayList<>();
                 for (RecipeEntity.Comment comment: recipe.getComments()) {
                     this.comments.add(new Comment(comment));
                 }
-            }
+            }*/
             this.foodFiles = recipe.getFoodFiles();
             this.likes = recipe.getLikes();
         }
@@ -76,14 +76,14 @@ public class RecipeTO {
         rv.setRecipeFile(this.recipeFile);
         rv.setUploader(this.uploader);
         rv.setCategories(this.categories);
-        List<RecipeEntity.Comment> commentsRv = null;
+        /*List<RecipeEntity.Comment> commentsRv = null;
         if (this.comments != null) {
             commentsRv = new ArrayList<>();
             for (Comment comment: this.comments) {
                 commentsRv.add(comment.toEntity());
             }
         }
-        rv.setComments(commentsRv);
+        rv.setComments(commentsRv);*/
         rv.setFoodFiles(this.foodFiles);
         rv.setLikes(this.likes);
 
@@ -102,7 +102,7 @@ public class RecipeTO {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, creationDate, lastModifiedAt, recipeFile, uploader, categories, comments, foodFiles, likes);
+        return Objects.hash(id, name, description, creationDate, lastModifiedAt, recipeFile, uploader, categories/*, comments*/, foodFiles, likes);
     }
 
     public String getId() {
@@ -177,13 +177,13 @@ public class RecipeTO {
         this.categories = categories;
     }
 
-    public List<RecipeTO.Comment> getComments() {
+    /*public List<RecipeTO.Comment> getComments() {
         return comments;
     }
 
     public void setComments(List<RecipeTO.Comment> comments) {
         this.comments = comments;
-    }
+    }*/
 
     public List<String> getFoodFiles() {
         return foodFiles;
@@ -204,7 +204,7 @@ public class RecipeTO {
 
     @Override
     public String toString() {
-        return "Recipe{" +
+        return "RecipeTO{" +
                 "image='" + image + '\'' +
                 ", id='" + id + '\'' +
                 ", name='" + name + '\'' +
@@ -214,15 +214,15 @@ public class RecipeTO {
                 ", recipeFile='" + recipeFile + '\'' +
                 ", uploader='" + uploader + '\'' +
                 ", categories=" + categories +
-                ", comments=" + comments +
+                //", comments=" + comments +
                 ", foodFiles=" + foodFiles +
                 ", likes=" + likes +
                 '}';
     }
 
 
-    public static class Comment {
-        @SerializedName("text")
+    /*public static class Comment {
+        @SerializedName("message")
         private String text;
         @SerializedName("user")
         private String user;
@@ -299,6 +299,6 @@ public class RecipeTO {
             return Objects.hash(text, user, date);
         }
 
-    }
+    }*/
 
 }

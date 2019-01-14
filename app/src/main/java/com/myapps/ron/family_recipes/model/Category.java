@@ -101,13 +101,13 @@ public class Category implements FilterModel, Parcelable {
 
         if (!getColor().equals(tag.getColor()))
             return false;
-        return getText().equals(tag.getText());
+        return getMessage().equals(tag.getMessage());
     }
 
     public boolean fartherEquals(Category tag) {
         if (!getColor().equals(tag.getColor()))
             return false;
-        if (!getText().equals(tag.getText()))
+        if (!getMessage().equals(tag.getMessage()))
             return false;
 
         if (categories != null && tag.categories != null) {
@@ -125,14 +125,14 @@ public class Category implements FilterModel, Parcelable {
 
     @Override
     public int hashCode() {
-        int result = getText().hashCode();
+        int result = getMessage().hashCode();
         result = 31 * result + getIntColor();
         return result;
     }
 
     @NotNull
     @Override
-    public String getText() {
+    public String getMessage() {
         return getName();
     }
 

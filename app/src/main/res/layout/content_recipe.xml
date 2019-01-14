@@ -125,7 +125,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:background="@drawable/background_button_round_send_comment"
-                    android:text="Send"/>
+                    android:message="Send"/>
             </android.support.design.widget.CoordinatorLayout>-->
 
 
@@ -135,7 +135,7 @@
             android:id="@+id/recipe_textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/large_text" />-->
+            android:message="@string/large_text" />-->
 
     </LinearLayout>
 

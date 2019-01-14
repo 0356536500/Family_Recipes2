@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.myapps.ron.family_recipes.R;
-import com.myapps.ron.family_recipes.model.RecipeEntity.Comment;
+import com.myapps.ron.family_recipes.model.CommentEntity;
 import com.myapps.ron.family_recipes.recycler.CommentsDiffCallback;
 import com.myapps.ron.family_recipes.utils.DateUtil;
 
@@ -20,7 +20,7 @@ import java.util.List;
  */
 public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.MyViewHolder> {
 
-    private List<Comment> commentList;
+    private List<CommentEntity> commentList;
 
     class MyViewHolder extends RecyclerView.ViewHolder {
         TextView sender, comment, time;
@@ -33,7 +33,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.MyView
         }
     }
 
-    public CommentsAdapter(List<Comment> commentList) {
+    public CommentsAdapter(List<CommentEntity> commentList) {
         this.commentList = commentList;
     }
 
@@ -46,10 +46,10 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.MyView
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-        Comment comment = commentList.get(position);
+        CommentEntity comment = commentList.get(position);
 
         holder.sender.setText(comment.getUser());
-        holder.comment.setText(comment.getText());
+        holder.comment.setText(comment.getMessage());
         holder.time.setText(DateUtil.getDateFromDateTime(comment.getDate()));
     }
 
@@ -59,9 +59,9 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.MyView
     }
 
 
-    public void setComments(List<Comment> commentList) {
+    public void setComments(List<CommentEntity> commentList) {
         if (commentList != null) {
-            List<Comment> oldTemp = this.commentList;
+            List<CommentEntity> oldTemp = this.commentList;
             this.commentList = commentList;
             DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new CommentsDiffCallback(oldTemp, commentList));
             diffResult.dispatchUpdatesTo(this);

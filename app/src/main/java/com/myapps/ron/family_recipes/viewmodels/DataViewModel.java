@@ -1,9 +1,17 @@
 package com.myapps.ron.family_recipes.viewmodels;
 
 import android.annotation.SuppressLint;
+
+import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
+import androidx.paging.PagedList;
+import io.reactivex.Single;
+import io.reactivex.disposables.CompositeDisposable;
+
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -11,15 +19,23 @@ import android.util.Log;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.dal.db.CategoriesDBHelper;
 import com.myapps.ron.family_recipes.dal.db.RecipesDBHelper;
+import com.myapps.ron.family_recipes.dal.repository.CategoryRepository;
+import com.myapps.ron.family_recipes.dal.repository.RecipeRepository;
+import com.myapps.ron.family_recipes.dal.repository.RepoSearchResults;
 import com.myapps.ron.family_recipes.model.CategoryEntity;
+import com.myapps.ron.family_recipes.model.QueryModel;
 import com.myapps.ron.family_recipes.model.RecipeEntity;
+import com.myapps.ron.family_recipes.model.RecipeMinimal;
+import com.myapps.ron.family_recipes.network.modelTO.CategoryTO;
 import com.myapps.ron.family_recipes.network.modelTO.RecipeTO;
 import com.myapps.ron.family_recipes.network.APICallsHandler;
 import com.myapps.ron.family_recipes.network.MiddleWareForNetwork;
+import com.myapps.ron.family_recipes.services.GetAllRecipesService;
 import com.myapps.ron.family_recipes.utils.MyCallback;
 import com.myapps.ron.family_recipes.network.cognito.AppHelper;
 import com.myapps.ron.family_recipes.utils.DateUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -27,12 +43,98 @@ import java.util.List;
  * loads all recipes, updates local db and server time.
  */
 public class DataViewModel extends ViewModel {
+    private RecipeRepository recipeRepository;
+    private CategoryRepository categoryRepository;
+
+    private MutableLiveData<QueryModel> queryLiveData = new MutableLiveData<>();
+    //Applying transformation to get RepoSearchResults for the given Search Query
+    private LiveData<RepoSearchResults> repoResults = Transformations.map(queryLiveData,
+            input -> recipeRepository.query(input));
+
+    //Applying transformation to get Live PagedList<Repo> from the RepoSearchResult
+    private LiveData<PagedList<RecipeMinimal>> pagedRecipes = Transformations.switchMap(repoResults,
+            RepoSearchResults::getData
+    );
+
+    private MutableLiveData<List<CategoryEntity>> categoryList = new MutableLiveData<>(); // list of newCategories from api
+
+    private MutableLiveData<String> infoFromLastFetch = new MutableLiveData<>(); // info about new or modified pagedRecipes from last fetch from api
+    private CompositeDisposable compositeDisposable;
+
+    private Observer<List<CategoryEntity>> categoryObserver =
+            listLiveData -> categoryList.setValue(listLiveData);
+
+    public DataViewModel(RecipeRepository recipeRepository, CategoryRepository categoryRepository) {
+        this.recipeRepository = recipeRepository;
+        this.categoryRepository = categoryRepository;
+
+        this.compositeDisposable = new CompositeDisposable();
+        compositeDisposable.add(this.recipeRepository.dispatchInfo.subscribe(infoFromLastFetch::postValue));
+        compositeDisposable.add(this.categoryRepository.dispatchInfo.subscribe(infoFromLastFetch::postValue));
+
+        categoryRepository.getAllCategories().observeForever(categoryObserver);
+    }
+
+
+    public LiveData<PagedList<RecipeMinimal>> getPagedRecipes() {
+        return pagedRecipes;
+    }
+
+
+    public void applyQuery(@NonNull QueryModel queryModel) {
+        queryLiveData.postValue(queryModel);
+    }
+
+
+    public void fetchFromServerJustedLoggedIn(Context context) {
+        GetAllRecipesService.startActionGetAllRecipes(context);
+        categoryRepository.fetchCategoriesReactive(context);
+    }
+
+    public void fetchFromServer(Context context) {
+        recipeRepository.fetchRecipesReactive(context);
+        categoryRepository.fetchCategoriesReactive(context);
+    }
+
+    public Single<RecipeEntity> getRecipe(String id) {
+        return recipeRepository.getRecipe(id);
+    }
+
+    public LiveData<List<CategoryEntity>> getCategories() {
+        return categoryList;
+    }
+
+
+
+
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        compositeDisposable.clear();
+        categoryRepository.getAllCategories().removeObserver(categoryObserver);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     private MutableLiveData<List<RecipeEntity>> recipeList = new MutableLiveData<>(); // list of recipes from api
     private MutableLiveData<List<RecipeEntity>> favoriteList = new MutableLiveData<>(); // list of recipes local db
-    private MutableLiveData<List<CategoryEntity>> categoryList = new MutableLiveData<>(); // list of newCategories from api
     private MutableLiveData<Boolean> canInitBothRecyclerAndFilters = new MutableLiveData<>();
 
-    private MutableLiveData<String> infoFromLastFetch = new MutableLiveData<>(); // info about new or modified data from last fetch from api
+
 
     private boolean recipesReady = false, categoriesReady = false;
 
@@ -153,21 +255,21 @@ public class DataViewModel extends ViewModel {
     //endregion
 
     //region newCategories
-    public LiveData<List<CategoryEntity>> getCategories() {
+    public LiveData<List<CategoryEntity>> getCategories1() {
         return categoryList;
     }
 
     private void setCategories(List<CategoryEntity> items) {
-        categoryList.setValue(items);
+        /*categoryList.setValue(items);*/
     }
 
     public void loadCategories(final Context context) {
         if(MiddleWareForNetwork.checkInternetConnection(context)) {
             if (DateUtil.shouldUpdateCategories(context)) {
                 final String time = DateUtil.getUTCTime();
-                APICallsHandler.getAllCategories(DateUtil.getLastUpdateTime(context), AppHelper.getAccessToken(), new MyCallback<List<CategoryEntity>>() {
+                APICallsHandler.getAllCategories(DateUtil.getLastUpdateTime(context), AppHelper.getAccessToken(), new MyCallback<List<CategoryTO>>() {
                     @Override
-                    public void onFinished(List<CategoryEntity> result) {
+                    public void onFinished(List<CategoryTO> result) {
                         //PostRecipeToServerService.startActionPostRecipe(context, new ArrayList<>(result), time);
                         if (result != null) {
                             if (result.isEmpty())
@@ -206,10 +308,16 @@ public class DataViewModel extends ViewModel {
         private CategoriesDBHelper dbHelper;
         private int newCategories, modifiedCategories;
 
-        MyAsyncCategoriesUpdate(Context context, List<CategoryEntity> categories) {
+        MyAsyncCategoriesUpdate(Context context, List<CategoryTO> categories) {
             this.context = context;
             this.dbHelper = new CategoriesDBHelper(context);
-            this.newCategoriesList = categories;
+            if (categories != null) {
+                this.newCategoriesList = new ArrayList<>();
+                for (CategoryTO to: categories) {
+                    this.newCategoriesList.add(to.toEntity());
+                }
+            }
+            //this.newCategoriesList = categories;
             this.newCategories = 0;
             this.modifiedCategories = 0;
         }

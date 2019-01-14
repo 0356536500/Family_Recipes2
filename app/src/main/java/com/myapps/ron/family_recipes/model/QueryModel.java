@@ -37,6 +37,22 @@ public class QueryModel {
         return filters;
     }
 
+    public void setSearch(String search) {
+        this.search = search;
+    }
+
+    public void setOrderBy(String orderBy) {
+        this.orderBy = orderBy;
+    }
+
+    public void setFilters(List<String> filters) {
+        this.filters = filters;
+    }
+
+    public void setFavorites(boolean favorites) {
+        this.favorites = favorites;
+    }
+
     public String getSQLSearch() {
         return wrapQueryWithPercent(search);
     }

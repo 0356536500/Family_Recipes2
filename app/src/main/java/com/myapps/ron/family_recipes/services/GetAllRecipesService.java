@@ -2,8 +2,8 @@ package com.myapps.ron.family_recipes.services;
 
 import android.annotation.SuppressLint;
 import android.app.IntentService;
-import android.content.Intent;
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.StrictMode;
 import android.util.Log;
@@ -14,12 +14,10 @@ import com.myapps.ron.family_recipes.dal.repository.RecipeRepository;
 import com.myapps.ron.family_recipes.network.APICallsHandler;
 import com.myapps.ron.family_recipes.network.APIResponse;
 import com.myapps.ron.family_recipes.network.MiddleWareForNetwork;
-import com.myapps.ron.family_recipes.network.modelTO.RecipeTO;
 import com.myapps.ron.family_recipes.network.cognito.AppHelper;
+import com.myapps.ron.family_recipes.network.modelTO.RecipeTO;
 import com.myapps.ron.family_recipes.utils.DateUtil;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -102,7 +100,7 @@ public class GetAllRecipesService extends IntentService {
         StrictMode.setThreadPolicy(policy);
     }
 
-    private List<MyAsyncRecipeUpdate> asyncRecipeUpdateList;
+    private List<MyAsyncRecipeUpdate> asyncRecipeUpdateList = null;
     private AtomicInteger newTotalRecipes = new AtomicInteger(0);
     private AtomicInteger modifiedTotalRecipes =  new AtomicInteger(0);
 
@@ -112,7 +110,7 @@ public class GetAllRecipesService extends IntentService {
      */
     private void handleActionGetAllRecipes() {
         Log.e(TAG, "handleActionGetAllRecipes");
-        asyncRecipeUpdateList = Collections.synchronizedList(new ArrayList<>());
+        //asyncRecipeUpdateList = Collections.synchronizedList(new ArrayList<>());
         final RecipeRepository  repository = Injection.provideRecipeRepository(getApplicationContext());
         String lastKey = null;
         if (!MiddleWareForNetwork.checkInternetConnection(getApplicationContext()))
@@ -127,8 +125,8 @@ public class GetAllRecipesService extends IntentService {
                 Log.e(TAG, "response data length: " + response.getData().size());
                 lastKey = response.getLastKey();
 
-                repository.updateFromServer(response.getData());
-                /*MyAsyncRecipeUpdate asyncRecipeUpdate = new MyAsyncRecipeUpdate(getApplicationContext(), response.getData());
+                repository.updateFromServer(getApplicationContext(), response.getData());
+                /*MyAsyncRecipeUpdate asyncRecipeUpdate = new MyAsyncRecipeUpdate(getApplicationContext(), response.getPagedRecipes());
                 asyncRecipeUpdate.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                 asyncRecipeUpdateList.add(asyncRecipeUpdate);*/
 
