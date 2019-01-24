@@ -4,7 +4,6 @@ import com.google.gson.annotations.SerializedName;
 import com.myapps.ron.family_recipes.model.RecipeEntity;
 import com.myapps.ron.family_recipes.utils.Constants;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -24,8 +23,8 @@ public class RecipeTO {
     private String description;
     @SerializedName("creationDate")
     private String creationDate;
-    @SerializedName("lastModifiedAt")
-    private String lastModifiedAt;
+    @SerializedName("lastModifiedDate")
+    private String lastModifiedDate;
     @SerializedName("recipeFile")
     private String recipeFile;
     @SerializedName("uploader")
@@ -50,7 +49,7 @@ public class RecipeTO {
             this.name = recipe.getName();
             this.description = recipe.getDescription();
             this.creationDate = recipe.getCreationDate();
-            this.lastModifiedAt = recipe.getLastModifiedAt();
+            this.lastModifiedDate = recipe.getLastModifiedDate();
             this.recipeFile = recipe.getRecipeFile();
             this.uploader = recipe.getUploader();
             this.categories = recipe.getCategories();
@@ -72,7 +71,7 @@ public class RecipeTO {
         rv.setName(this.name);
         rv.setDescription(this.description);
         rv.setCreationDate(this.creationDate);
-        rv.setLastModifiedAt(this.lastModifiedAt);
+        rv.setLastModifiedDate(this.lastModifiedDate);
         rv.setRecipeFile(this.recipeFile);
         rv.setUploader(this.uploader);
         rv.setCategories(this.categories);
@@ -102,7 +101,7 @@ public class RecipeTO {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, creationDate, lastModifiedAt, recipeFile, uploader, categories/*, comments*/, foodFiles, likes);
+        return Objects.hash(id, name, description, creationDate, lastModifiedDate, recipeFile, uploader, categories/*, comments*/, foodFiles, likes);
     }
 
     public String getId() {
@@ -143,12 +142,12 @@ public class RecipeTO {
         this.creationDate = creationDate;
     }
 
-    public String getLastModifiedAt() {
-        return lastModifiedAt;
+    public String getLastModifiedDate() {
+        return lastModifiedDate;
     }
 
-    public void setLastModifiedAt(String lastModifiedAt) {
-        this.lastModifiedAt = lastModifiedAt;
+    public void setLastModifiedDate(String lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
     }
 
     public String getRecipeFile() {
@@ -210,7 +209,7 @@ public class RecipeTO {
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", creationDate='" + creationDate + '\'' +
-                ", lastModifiedAt='" + lastModifiedAt + '\'' +
+                ", lastModifiedDate='" + lastModifiedDate + '\'' +
                 ", recipeFile='" + recipeFile + '\'' +
                 ", uploader='" + uploader + '\'' +
                 ", categories=" + categories +

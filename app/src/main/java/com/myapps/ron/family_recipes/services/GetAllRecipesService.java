@@ -1,15 +1,12 @@
 package com.myapps.ron.family_recipes.services;
 
-import android.annotation.SuppressLint;
 import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.StrictMode;
 import android.util.Log;
 
 import com.myapps.ron.family_recipes.dal.Injection;
-import com.myapps.ron.family_recipes.dal.db.RecipesDBHelper;
 import com.myapps.ron.family_recipes.dal.repository.RecipeRepository;
 import com.myapps.ron.family_recipes.network.APICallsHandler;
 import com.myapps.ron.family_recipes.network.APIResponse;
@@ -45,9 +42,9 @@ public class GetAllRecipesService extends IntentService {
 
     @Override
     public void onDestroy() {
-        if (asyncRecipeUpdateList != null)
+        /*if (asyncRecipeUpdateList != null)
             for (MyAsyncRecipeUpdate asyncRecipeUpdate: asyncRecipeUpdateList)
-                asyncRecipeUpdate.cancel(false);
+                asyncRecipeUpdate.cancel(false);*/
         super.onDestroy();
     }
 
@@ -100,7 +97,7 @@ public class GetAllRecipesService extends IntentService {
         StrictMode.setThreadPolicy(policy);
     }
 
-    private List<MyAsyncRecipeUpdate> asyncRecipeUpdateList = null;
+    //private List<MyAsyncRecipeUpdate> asyncRecipeUpdateList = null;
     private AtomicInteger newTotalRecipes = new AtomicInteger(0);
     private AtomicInteger modifiedTotalRecipes =  new AtomicInteger(0);
 
@@ -125,7 +122,7 @@ public class GetAllRecipesService extends IntentService {
                 Log.e(TAG, "response data length: " + response.getData().size());
                 lastKey = response.getLastKey();
 
-                repository.updateFromServer(getApplicationContext(), response.getData());
+                repository.updateFromServer(response.getData(), null);
                 /*MyAsyncRecipeUpdate asyncRecipeUpdate = new MyAsyncRecipeUpdate(getApplicationContext(), response.getPagedRecipes());
                 asyncRecipeUpdate.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                 asyncRecipeUpdateList.add(asyncRecipeUpdate);*/
@@ -145,7 +142,7 @@ public class GetAllRecipesService extends IntentService {
         throw new UnsupportedOperationException("Not yet implemented");
     }*/
 
-    @SuppressLint("StaticFieldLeak")
+    /*@SuppressLint("StaticFieldLeak")
     class MyAsyncRecipeUpdate extends AsyncTask<Void, Void, Boolean> {
         private int newRecipes, modifiedRecipes;
         private List<RecipeTO> recipes;
@@ -184,12 +181,9 @@ public class GetAllRecipesService extends IntentService {
                 newTotalRecipes.addAndGet(newRecipes);
                 modifiedTotalRecipes.addAndGet(modifiedRecipes);
             }
-            /*if(aBoolean) {
-                setRecipes(dbHelper.getAllRecipes(orderBy));
-                setInfoFromLastFetch(context.getString(R.string.message_from_fetch_recipes, newRecipes, modifiedRecipes));
-            }*/
+
         }
-    }
+    }*/
 
 
 }

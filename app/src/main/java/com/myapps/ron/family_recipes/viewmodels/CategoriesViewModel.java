@@ -20,7 +20,7 @@ public class CategoriesViewModel extends ViewModel {
     public CategoriesViewModel(CategoryRepository categoryRepository) {
         this.repository = categoryRepository;
 
-        categories = this.repository.getAllCategories();
+        categories = this.repository.getAllCategoriesLiveData();
     }
 
     public void loadCategories(Context context) {

@@ -24,7 +24,6 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableCompletableObserver;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
-import retrofit2.HttpException;
 import retrofit2.Response;
 
 /**
@@ -53,7 +52,11 @@ public class CategoryRepository {
         this.dispatchInfo = PublishSubject.create();
     }
 
-    public LiveData<List<CategoryEntity>> getAllCategories() {
+    public LiveData<List<CategoryEntity>> getAllCategoriesLiveData() {
+        return categoryDao.getAllCategoriesLiveData();
+    }
+
+    public List<CategoryEntity> getAllCategories() {
         return categoryDao.getAllCategories();
     }
 

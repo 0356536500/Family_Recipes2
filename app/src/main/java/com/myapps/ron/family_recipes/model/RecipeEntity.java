@@ -15,10 +15,8 @@ import java.util.Objects;
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
-import androidx.room.Fts4;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
-import androidx.room.TypeConverter;
 
 import static com.myapps.ron.family_recipes.utils.Constants.FALSE;
 import static com.myapps.ron.family_recipes.utils.Constants.TRUE;
@@ -35,7 +33,7 @@ public class RecipeEntity implements Parcelable{
     public static final String KEY_DESCRIPTION = "description";
     public static final String KEY_CATEGORIES = "categories";
     public static final String KEY_CREATED = "creationDate";
-    public static final String KEY_MODIFIED = "lastModifiedAt";
+    public static final String KEY_MODIFIED = "lastModifiedDate";
     public static final String KEY_UPLOADER = "uploader";
     public static final String KEY_FOOD_FILES = "foodFiles";
     public static final String KEY_LIKES = "likes";
@@ -55,16 +53,14 @@ public class RecipeEntity implements Parcelable{
     @ColumnInfo(name = KEY_CREATED)
     private String creationDate;
     @ColumnInfo(name = KEY_MODIFIED)
-    private String lastModifiedAt;
+    private String lastModifiedDate;
     @ColumnInfo(name = "recipeFile")
     private String recipeFile;
-    @ColumnInfo(name = "uploader")
+    @ColumnInfo(name = KEY_UPLOADER)
     private String uploader;
     @ColumnInfo(name = KEY_CATEGORIES)
     private List<String> categories;
-    //@ColumnInfo(name = "comments")
-    //private List<RecipeEntity.Comment> comments;
-    @ColumnInfo(name = "foodFiles")
+    @ColumnInfo(name = KEY_FOOD_FILES)
     private List<String> foodFiles;
     @ColumnInfo(name = KEY_LIKES)
     private int likes;
@@ -92,7 +88,7 @@ public class RecipeEntity implements Parcelable{
         this.name = in.readString();
         this.description = in.readString();
         this.creationDate = in.readString();
-        this.lastModifiedAt = in.readString();
+        this.lastModifiedDate = in.readString();
         this.recipeFile = in.readString();
         this.uploader = in.readString();
 
@@ -119,7 +115,7 @@ public class RecipeEntity implements Parcelable{
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, creationDate, lastModifiedAt, recipeFile, uploader, categories/*, comments*/, foodFiles, likes, meLike);
+        return Objects.hash(id, name, description, creationDate, lastModifiedDate, recipeFile, uploader, categories/*, comments*/, foodFiles, likes, meLike);
     }
 
     /**
@@ -154,9 +150,9 @@ public class RecipeEntity implements Parcelable{
         if (getCreationDate() != null && other.getCreationDate() != null)
             created = getCreationDate().equals(other.getCreationDate());
 
-        boolean modified = getLastModifiedAt() == null && other.getLastModifiedAt() == null;
-        if (getLastModifiedAt() != null && other.getLastModifiedAt() != null)
-            modified = getLastModifiedAt().equals(other.getLastModifiedAt());
+        boolean modified = getLastModifiedDate() == null && other.getLastModifiedDate() == null;
+        if (getLastModifiedDate() != null && other.getLastModifiedDate() != null)
+            modified = getLastModifiedDate().equals(other.getLastModifiedDate());
 
         boolean file = getRecipeFile() == null && other.getRecipeFile() == null;
         if (getRecipeFile() != null && other.getRecipeFile() != null)
@@ -170,10 +166,6 @@ public class RecipeEntity implements Parcelable{
 
         //boolean comments = getCommentsToString().equals(other.getCommentsToString());
 
-        /*boolean comments = getComments() == null && other.getComments() == null;
-        if (getComments() != null && other.getComments() != null)
-            comments = getCommentsToString().equals(other.getCommentsToString());*/
-
         boolean likes = getLikes() == other.getLikes();
         //boolean meLikes = getMeLike() == other.getMeLike();
 
@@ -182,7 +174,7 @@ public class RecipeEntity implements Parcelable{
 
         /*return getId().equals(other.getId()) && getName().equals(other.getName()) && getDescription().equals(other.getDescription())
                 && getUploader().equals(other.getUploader()) && getFilters().equals(other.getFilters())
-                && getCreationDate().equals(other.getCreationDate()) && getLastModifiedAt().equals(other.getLastModifiedAt())
+                && getCreationDate().equals(other.getCreationDate()) && getLastModifiedDate().equals(other.getLastModifiedDate())
                 //&& getRecipeFile().equals(other.getRecipeFile()) && getComments().equals(other.getComments())
                 && getFoodFiles().equals(other.getFoodFiles()) && getLikes() == other.getLikes()
                 && getMeLike() == other.getMeLike();*/
@@ -204,23 +196,6 @@ public class RecipeEntity implements Parcelable{
             setCategories(value);
         }
     }
-
-    /*public String getCommentsToString() {
-        if (getComments() != null)
-            return gson.toJson(getComments());
-        return "";
-    }*/
-
-    /*public void setStringComments(String comments) {
-        if (comments == null) {
-            setComments(null);
-        } else {
-            Type type = new TypeToken<List<RecipeEntity.Comment>>() {
-            }.getType();
-            List<RecipeEntity.Comment> value = gson.fromJson(comments, type);
-            setComments(value);
-        }
-    }*/
 
     public String getFoodFilesToString() {
         if (getFoodFiles() != null)
@@ -277,12 +252,12 @@ public class RecipeEntity implements Parcelable{
         this.creationDate = creationDate;
     }
 
-    public String getLastModifiedAt() {
-        return lastModifiedAt;
+    public String getLastModifiedDate() {
+        return lastModifiedDate;
     }
 
-    public void setLastModifiedAt(String lastModifiedAt) {
-        this.lastModifiedAt = lastModifiedAt;
+    public void setLastModifiedDate(String lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
     }
 
     public String getRecipeFile() {
@@ -310,14 +285,6 @@ public class RecipeEntity implements Parcelable{
     public void setCategories(List<String> categories) {
         this.categories = categories;
     }
-
-    /*public List<RecipeEntity.Comment> getComments() {
-        return comments;
-    }*/
-
-    /*public void setComments(List<RecipeEntity.Comment> comments) {
-        this.comments = comments;
-    }*/
 
     public List<String> getFoodFiles() {
         return foodFiles;
@@ -362,11 +329,10 @@ public class RecipeEntity implements Parcelable{
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", creationDate='" + creationDate + '\'' +
-                ", lastModifiedAt='" + lastModifiedAt + '\'' +
+                ", lastModifiedDate='" + lastModifiedDate + '\'' +
                 ", recipeFile='" + recipeFile + '\'' +
                 ", uploader='" + uploader + '\'' +
                 ", categories=" + categories +
-                //", comments=" + comments +
                 ", foodFiles=" + foodFiles +
                 ", likes=" + likes +
                 ", meLike=" + meLike +
@@ -384,104 +350,15 @@ public class RecipeEntity implements Parcelable{
         dest.writeString(this.name);
         dest.writeString(this.description);
         dest.writeString(this.creationDate);
-        dest.writeString(this.lastModifiedAt);
+        dest.writeString(this.lastModifiedDate);
         dest.writeString(this.recipeFile);
         dest.writeString(this.uploader);
         dest.writeList(this.categories);
-        //dest.writeList(this.comments);
         dest.writeList(this.foodFiles);
         dest.writeInt(this.likes);
         dest.writeInt(this.meLike);
     }
 
-    /*public static class Comment implements Parcelable {
-        private String text;
-        private String user;
-        private String date;
-
-        public Comment(){
-        }
-
-        Comment(Parcel in) {
-            user = in.readString();
-            text = in.readString();
-            date = in.readString();
-        }
-
-        public static final Creator<RecipeEntity.Comment> CREATOR = new Creator<RecipeEntity.Comment>() {
-            @Override
-            public RecipeEntity.Comment createFromParcel(Parcel in) {
-                return new RecipeEntity.Comment(in);
-            }
-
-            @Override
-            public RecipeEntity.Comment[] newArray(int size) {
-                return new RecipeEntity.Comment[size];
-            }
-        };
-
-        public String getText() {
-            return text;
-        }
-
-        public void setText(String text) {
-            this.text = text;
-        }
-
-        public String getUser() {
-            return user;
-        }
-
-        public void setUser(String user) {
-            this.user = user;
-        }
-
-        public String getDate() {
-            return date;
-        }
-
-        public void setDate(String date) {
-            this.date = date;
-        }
-
-        @Override
-        public String toString() {
-            if (text == null || user == null || date == null)
-                return "null";
-            return "Comment{" +
-                    "text='" + text + '\'' +
-                    ", user='" + user + '\'' +
-                    ", date='" + date + '\'' +
-                    '}';
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            RecipeEntity.Comment comment = (RecipeEntity.Comment) o;
-            return this.text.equals(comment.text) &&
-                    this.user.equals(comment.user) &&
-                    this.date.equals(comment.date);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(text, user, date);
-        }
-
-        @Override
-        public int describeContents() {
-            return 0;
-        }
-
-        @Override
-        public void writeToParcel(Parcel dest, int i) {
-            dest.writeString(this.user);
-            dest.writeString(this.text);
-            dest.writeString(this.date);
-        }
-    }*/
 
     public static class RecipeBuilder {
         private String builderId;
@@ -573,7 +450,7 @@ public class RecipeEntity implements Parcelable{
             recipe.setName(builderName);
             recipe.setDescription(builderDescription);
             recipe.setCreationDate(builderCreatedAt);
-            recipe.setLastModifiedAt(builderLastModifiedAt);
+            recipe.setLastModifiedDate(builderLastModifiedAt);
             recipe.setRecipeFile(builderRecipeFile);
             recipe.setUploader(builderUploader);
             recipe.setStringCategories(builderCategories);
@@ -592,7 +469,7 @@ public class RecipeEntity implements Parcelable{
             recipe.setName(builderName);
             recipe.setDescription(builderDescription);
             recipe.setCreationDate(builderCreatedAt);
-            recipe.setLastModifiedAt(builderLastModifiedAt);
+            recipe.setLastModifiedDate(builderLastModifiedAt);
             recipe.setCategories(builderListCategories);
             recipe.setLikes(builderLikes);
             recipe.setMeLike(builderMeLike ? TRUE : FALSE);

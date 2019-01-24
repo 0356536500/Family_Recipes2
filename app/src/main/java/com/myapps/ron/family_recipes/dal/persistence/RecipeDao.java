@@ -61,7 +61,7 @@ public interface RecipeDao {
     @Query("SELECT " + recipeMinimalFields + " FROM " + AppDatabases.TABLE_RECIPES + " WHERE (("
             + RecipeEntity.KEY_NAME + " LIKE :search) OR ("
             + RecipeEntity.KEY_DESCRIPTION + " LIKE :search)) AND "
-            + RecipeEntity.KEY_CATEGORIES + " LIKE :filters ORDER BY lastModifiedAt DESC")
+            + RecipeEntity.KEY_CATEGORIES + " LIKE :filters ORDER BY lastModifiedDate DESC")
     DataSource.Factory<Integer, RecipeMinimal> findAllByNameLikeOrDescriptionLikeAndCategoriesLikeOrderByLastModified(
             String search, String filters);
 
@@ -100,7 +100,7 @@ public interface RecipeDao {
             + RecipeEntity.KEY_DESCRIPTION + " LIKE :search)) AND "
             + RecipeEntity.KEY_CATEGORIES + " LIKE :filters AND "
             + RecipeEntity.KEY_FAVORITE + " = " + Constants.TRUE
-            + " ORDER BY lastModifiedAt DESC")
+            + " ORDER BY lastModifiedDate DESC")
     DataSource.Factory<Integer, RecipeMinimal> findAllFavoritesByNameLikeOrDescriptionLikeAndCategoriesLikeOrderByLastModified(
             String search, String filters);
 

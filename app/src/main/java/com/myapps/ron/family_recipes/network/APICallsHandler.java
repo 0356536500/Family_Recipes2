@@ -219,7 +219,7 @@ public class APICallsHandler {
                     if (response.code() == STATUS_NOT_MODIFIED) {
                         callback.onFinished(new ArrayList<>());
                     }
-                    Log.e(TAG, "getAllCategories, code = " + response.code() + "\n body: " + body);
+                    Log.e(TAG, "getAllCategoriesLiveData, code = " + response.code() + "\n body: " + body);
                 }
 
                 //generateDataList(response.body());
@@ -320,7 +320,12 @@ public class APICallsHandler {
 
     public static Observable<Response<List<RecipeTO>>> getAllRecipesObservable(String date, String token) {
         RecipeInterface service = getReactiveRetrofitInstance().create(RecipeInterface.class);
-        return service.getAllRecipesObservable(token, date);
+        return service.getAllRecipesObservable(token, date, null, null);
+    }
+
+    public static Observable<Response<List<RecipeTO>>> getAllRecipesObservable(String date, int limit, String startKey, String token) {
+        RecipeInterface service = getReactiveRetrofitInstance().create(RecipeInterface.class);
+        return service.getAllRecipesObservable(token, date, startKey, limit);
     }
 
     // endregion

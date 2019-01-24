@@ -277,18 +277,18 @@ public class MainActivity extends MyBaseActivity {
 
     //endregion
 
-    public void fetchRecipes(String orderBy) {
+    /*public void fetchRecipes(String orderBy) {
         lastOrderBy = orderBy;
         viewModel.loadRecipes(this, orderBy);
-    }
+    }*/
 
-    public void fetchRecipes() {
+    /*public void fetchRecipes() {
         viewModel.loadRecipes(this, lastOrderBy);
-    }
+    }*/
 
-    public void fetchCategories() {
+    /*public void fetchCategories() {
         viewModel.loadCategories(this);
-    }
+    }*/
 
     public Menu getMenu() {
         return menu;
@@ -542,7 +542,7 @@ public class MainActivity extends MyBaseActivity {
                         boolean update = intent.getBooleanExtra("refresh", false);
                         Toast.makeText(MainActivity.this, intent.getStringExtra("message"), Toast.LENGTH_SHORT).show();
                         if (update) {
-                            fetchRecipes();
+                            //fetchRecipes();
                             //Toast.makeText(MainActivity.this, "recipe uploaded successfully!", Toast.LENGTH_SHORT).show();
                         } //else
                             //Toast.makeText(MainActivity.this, "failed to post the recipe", Toast.LENGTH_SHORT).show();

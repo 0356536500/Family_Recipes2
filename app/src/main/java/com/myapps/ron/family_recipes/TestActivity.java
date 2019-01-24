@@ -183,7 +183,7 @@ public class TestActivity extends AppCompatActivity implements FilterListener<Ca
             }
         });
 
-        viewModel.loadFavoritesCategories(this);
+        //viewModel.loadFavoritesCategories(this);
     }
 
     protected void initCategories() {

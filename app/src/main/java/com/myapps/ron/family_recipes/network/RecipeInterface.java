@@ -50,7 +50,9 @@ public interface RecipeInterface {
     @GET(recipes)
     Observable<Response<List<RecipeTO>>> getAllRecipesObservable(
             @Header(Constants.AUTHORIZATION) String auth,
-            @Query(Constants.DATE_QUERY) String date
+            @Query(Constants.DATE_QUERY) String date,
+            @Query(Constants.EXCLUSIVE_START_KEY_QUERY) String startKey,
+            @Query(Constants.LIMIT_QUERY) Integer limit
     );
 
     @GET(recipes)

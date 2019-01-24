@@ -19,7 +19,10 @@ import io.reactivex.Maybe;
 public interface CategoryDao {
 
     @Query("SELECT * FROM " + AppDatabases.TABLE_CATEGORIES)
-    LiveData<List<CategoryEntity>> getAllCategories();
+    LiveData<List<CategoryEntity>> getAllCategoriesLiveData();
+
+    @Query("SELECT * FROM " + AppDatabases.TABLE_CATEGORIES)
+    List<CategoryEntity> getAllCategories();
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     Completable insertAll(List<CategoryEntity> categoryEntities);

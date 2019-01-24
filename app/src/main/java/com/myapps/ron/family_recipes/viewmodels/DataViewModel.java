@@ -1,6 +1,17 @@
 package com.myapps.ron.family_recipes.viewmodels;
 
-import android.annotation.SuppressLint;
+import android.content.Context;
+
+import com.myapps.ron.family_recipes.dal.repository.CategoryRepository;
+import com.myapps.ron.family_recipes.dal.repository.RecipeRepository;
+import com.myapps.ron.family_recipes.dal.repository.RepoSearchResults;
+import com.myapps.ron.family_recipes.model.CategoryEntity;
+import com.myapps.ron.family_recipes.model.QueryModel;
+import com.myapps.ron.family_recipes.model.RecipeEntity;
+import com.myapps.ron.family_recipes.model.RecipeMinimal;
+import com.myapps.ron.family_recipes.services.GetAllRecipesService;
+
+import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
@@ -11,32 +22,6 @@ import androidx.lifecycle.ViewModel;
 import androidx.paging.PagedList;
 import io.reactivex.Single;
 import io.reactivex.disposables.CompositeDisposable;
-
-import android.content.Context;
-import android.os.AsyncTask;
-import android.util.Log;
-
-import com.myapps.ron.family_recipes.R;
-import com.myapps.ron.family_recipes.dal.db.CategoriesDBHelper;
-import com.myapps.ron.family_recipes.dal.db.RecipesDBHelper;
-import com.myapps.ron.family_recipes.dal.repository.CategoryRepository;
-import com.myapps.ron.family_recipes.dal.repository.RecipeRepository;
-import com.myapps.ron.family_recipes.dal.repository.RepoSearchResults;
-import com.myapps.ron.family_recipes.model.CategoryEntity;
-import com.myapps.ron.family_recipes.model.QueryModel;
-import com.myapps.ron.family_recipes.model.RecipeEntity;
-import com.myapps.ron.family_recipes.model.RecipeMinimal;
-import com.myapps.ron.family_recipes.network.modelTO.CategoryTO;
-import com.myapps.ron.family_recipes.network.modelTO.RecipeTO;
-import com.myapps.ron.family_recipes.network.APICallsHandler;
-import com.myapps.ron.family_recipes.network.MiddleWareForNetwork;
-import com.myapps.ron.family_recipes.services.GetAllRecipesService;
-import com.myapps.ron.family_recipes.utils.MyCallback;
-import com.myapps.ron.family_recipes.network.cognito.AppHelper;
-import com.myapps.ron.family_recipes.utils.DateUtil;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * class for use by MainActivity.
@@ -72,7 +57,7 @@ public class DataViewModel extends ViewModel {
         compositeDisposable.add(this.recipeRepository.dispatchInfo.subscribe(infoFromLastFetch::postValue));
         compositeDisposable.add(this.categoryRepository.dispatchInfo.subscribe(infoFromLastFetch::postValue));
 
-        categoryRepository.getAllCategories().observeForever(categoryObserver);
+        categoryRepository.getAllCategoriesLiveData().observeForever(categoryObserver);
     }
 
 
@@ -104,14 +89,16 @@ public class DataViewModel extends ViewModel {
         return categoryList;
     }
 
-
+    public LiveData<String> getInfoFromLastFetch() {
+        return infoFromLastFetch;
+    }
 
 
     @Override
     protected void onCleared() {
         super.onCleared();
         compositeDisposable.clear();
-        categoryRepository.getAllCategories().removeObserver(categoryObserver);
+        categoryRepository.getAllCategoriesLiveData().removeObserver(categoryObserver);
     }
 
 
@@ -130,7 +117,7 @@ public class DataViewModel extends ViewModel {
 
 
 
-    private MutableLiveData<List<RecipeEntity>> recipeList = new MutableLiveData<>(); // list of recipes from api
+   /* private MutableLiveData<List<RecipeEntity>> recipeList = new MutableLiveData<>(); // list of recipes from api
     private MutableLiveData<List<RecipeEntity>> favoriteList = new MutableLiveData<>(); // list of recipes local db
     private MutableLiveData<Boolean> canInitBothRecyclerAndFilters = new MutableLiveData<>();
 
@@ -152,9 +139,7 @@ public class DataViewModel extends ViewModel {
         infoFromLastFetch.setValue(item);
     }
 
-    public LiveData<String> getInfoFromLastFetch() {
-        return infoFromLastFetch;
-    }
+
 
     private void setCanInitBothRecyclerAndFilters(boolean value) {
         canInitBothRecyclerAndFilters.setValue(value);
@@ -260,14 +245,14 @@ public class DataViewModel extends ViewModel {
     }
 
     private void setCategories(List<CategoryEntity> items) {
-        /*categoryList.setValue(items);*/
+        *//*categoryList.setValue(items);*//*
     }
 
     public void loadCategories(final Context context) {
         if(MiddleWareForNetwork.checkInternetConnection(context)) {
             if (DateUtil.shouldUpdateCategories(context)) {
                 final String time = DateUtil.getUTCTime();
-                APICallsHandler.getAllCategories(DateUtil.getLastUpdateTime(context), AppHelper.getAccessToken(), new MyCallback<List<CategoryTO>>() {
+                APICallsHandler.getAllCategoriesLiveData(DateUtil.getLastUpdateTime(context), AppHelper.getAccessToken(), new MyCallback<List<CategoryTO>>() {
                     @Override
                     public void onFinished(List<CategoryTO> result) {
                         //PostRecipeToServerService.startActionPostRecipe(context, new ArrayList<>(result), time);
@@ -297,7 +282,7 @@ public class DataViewModel extends ViewModel {
 
     private void loadLocalCategories(final Context context) {
         CategoriesDBHelper dbHelper = new CategoriesDBHelper(context);
-        setCategories(dbHelper.getAllCategories());
+        setCategories(dbHelper.getAllCategoriesLiveData());
     }
 
     @SuppressLint("StaticFieldLeak")
@@ -324,7 +309,7 @@ public class DataViewModel extends ViewModel {
 
         @Override
         protected Boolean doInBackground(Void... voids) {
-            List<CategoryEntity> oldCategories = dbHelper.getAllCategories();
+            List<CategoryEntity> oldCategories = dbHelper.getAllCategoriesLiveData();
 
             for (CategoryEntity item : newCategoriesList) {
                 int oldIndex = oldCategories.indexOf(item);
@@ -342,9 +327,9 @@ public class DataViewModel extends ViewModel {
                     newCategories++;
 
                 Log.e(getClass().getSimpleName(), "inserting category: " + item.toString());
-                /*if(dbHelper.categoryExists(item.getName()))
+                *//*if(dbHelper.categoryExists(item.getName()))
                     dbHelper.updateCategoryServerChanges(item);
-                else*/
+                else*//*
                 dbHelper.insertCategory(item);
             }
             return true;
@@ -354,7 +339,7 @@ public class DataViewModel extends ViewModel {
         protected void onPostExecute(Boolean aBoolean) {
             super.onPostExecute(aBoolean);
             if(aBoolean) {
-                setCategories(dbHelper.getAllCategories());
+                setCategories(dbHelper.getAllCategoriesLiveData());
                 setInfoFromLastFetch(context.getString(R.string.message_from_fetch_categories, newCategories, modifiedCategories));
             }
         }
@@ -378,9 +363,9 @@ public class DataViewModel extends ViewModel {
 
     public List<CategoryEntity> loadFavoritesCategories(final Context context) {
         CategoriesDBHelper dbHelper = new CategoriesDBHelper(context);
-        setCategories(dbHelper.getAllCategories());
-        return dbHelper.getAllCategories();
-    }
+        setCategories(dbHelper.getAllCategoriesLiveData());
+        return dbHelper.getAllCategoriesLiveData();
+    }*/
 
 
     //endregion

@@ -7,7 +7,6 @@ import android.content.Context;
 import android.util.Log;
 
 import com.myapps.ron.family_recipes.R;
-import com.myapps.ron.family_recipes.dal.db.RecipesDBHelper;
 import com.myapps.ron.family_recipes.dal.storage.StorageWrapper;
 import com.myapps.ron.family_recipes.model.CommentEntity;
 import com.myapps.ron.family_recipes.model.RecipeEntity;
@@ -113,10 +112,10 @@ public class RecipeViewModel extends ViewModel {
                 public void onFinished(RecipeTO result) {
                     RecipeEntity rv = result.toEntity();
                     rv.setMeLike(!recipe.isUserLiked() ? TRUE : FALSE);
-                    RecipesDBHelper dbHelper = new RecipesDBHelper(context);
+                    /*RecipesDBHelper dbHelper = new RecipesDBHelper(context);
                     dbHelper.updateRecipeUserChanges(rv);
                     Log.e("viewModel", dbHelper.getRecipe(recipe.getId()).toString());
-                    setRecipe(dbHelper.getRecipe(recipe.getId()));
+                    setRecipe(dbHelper.getRecipe(recipe.getId()));*/
                 }
             });
         }
@@ -139,11 +138,11 @@ public class RecipeViewModel extends ViewModel {
                     public void onFinished(RecipeTO result) {
                         RecipeEntity rv = result.toEntity();
                         rv.setMeLike(recipe.isUserLiked() ? TRUE : FALSE);
-                        RecipesDBHelper dbHelper = new RecipesDBHelper(context);
+                        /*RecipesDBHelper dbHelper = new RecipesDBHelper(context);
                         dbHelper.updateRecipeUserChanges(rv);
                         Log.e("viewModel", dbHelper.getRecipe(recipe.getId()).toString());
                         setRecipe(dbHelper.getRecipe(recipe.getId()));
-                        setInfo(context.getString(R.string.post_comment_succeeded));
+                        setInfo(context.getString(R.string.post_comment_succeeded));*/
                     }
                 });
             } else {

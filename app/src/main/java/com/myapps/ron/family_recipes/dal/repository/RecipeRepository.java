@@ -1,6 +1,7 @@
 package com.myapps.ron.family_recipes.dal.repository;
 
 import android.content.Context;
+import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -11,6 +12,7 @@ import com.myapps.ron.family_recipes.model.QueryModel;
 import com.myapps.ron.family_recipes.model.RecipeEntity;
 import com.myapps.ron.family_recipes.model.RecipeMinimal;
 import com.myapps.ron.family_recipes.network.APICallsHandler;
+import com.myapps.ron.family_recipes.network.Constants;
 import com.myapps.ron.family_recipes.network.MiddleWareForNetwork;
 import com.myapps.ron.family_recipes.network.cognito.AppHelper;
 import com.myapps.ron.family_recipes.network.modelTO.RecipeTO;
@@ -18,7 +20,6 @@ import com.myapps.ron.family_recipes.utils.DateUtil;
 
 import java.util.List;
 import java.util.concurrent.Executor;
-import java.util.concurrent.atomic.AtomicIntegerArray;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
@@ -40,6 +41,8 @@ import retrofit2.Response;
  */
 public class RecipeRepository {
     private final String TAG = getClass().getSimpleName();
+    private final long DELAYED_DISPATCH = 2000;
+    private final int LIMIT = 100;
 
     private final RecipeDao recipeDao;
     private final Executor executor;
@@ -151,8 +154,11 @@ public class RecipeRepository {
         executor.execute(() -> recipeDao.insertAll(AppDatabases.generateData(name, size)));
     }
 
-    public void updateFromServer(Context context, List<RecipeTO> list) {
+    public void updateFromServer(List<RecipeTO> list, AddedModifiedSize addedModifiedSize) {
         if (list != null) {
+            if (list.isEmpty()) {
+                return;
+            }
             Log.e(TAG, "recipes from server, " + list.toString());
         } else {
             Log.e(TAG, "recipes from server, null");
@@ -160,9 +166,8 @@ public class RecipeRepository {
         }
         executor.execute(() -> {
             // first cell is for added and second cell is for modified recipes
-            AtomicIntegerArray addedModifiedSize = new AtomicIntegerArray(3);
             for (RecipeTO fromServer: list) {
-                Log.e(TAG, "updateFromServer, " + fromServer.toString());
+                Log.e(TAG, "updateFromServer, id = " + fromServer.getId());
                 recipeDao.isRecipeExists(fromServer.getId()).subscribe(new DisposableMaybeObserver<RecipeEntity>() {
                     RecipeEntity update = fromServer.toEntity();
                     @Override
@@ -173,13 +178,11 @@ public class RecipeRepository {
                         if (!update.identical(recipeEntity)) {
                             update.setMeLike(recipeEntity.getMeLike());
                             recipeDao.updateRecipe(update);
-                            addedModifiedSize.incrementAndGet(1);
+                            addedModifiedSize.incrementModified();
                             dispose();
                         }
 
-                        addedModifiedSize.incrementAndGet(2);
-                        if (addedModifiedSize.get(2) == list.size())
-                            dispatchInfo.onNext(context.getString(R.string.message_from_fetch_categories, addedModifiedSize.get(0), addedModifiedSize.get(1)));
+                        addedModifiedSize.incrementSize();
 
                         dispose();
                     }
@@ -197,10 +200,8 @@ public class RecipeRepository {
                         // insert a new recipe
                         Log.e(TAG, "updateFromServer, recipe not found, id " + fromServer.getId());
                         recipeDao.insertRecipe(fromServer.toEntity());
-                        addedModifiedSize.incrementAndGet(0);
-                        addedModifiedSize.incrementAndGet(2);
-                        if (addedModifiedSize.get(2) == list.size())
-                            dispatchInfo.onNext(context.getString(R.string.message_from_fetch_categories, addedModifiedSize.get(0), addedModifiedSize.get(1)));
+                        addedModifiedSize.incrementAdded();
+                        addedModifiedSize.incrementSize();
 
                         dispose();
                     }
@@ -215,16 +216,98 @@ public class RecipeRepository {
         if(MiddleWareForNetwork.checkInternetConnection(context)) {
             final String time = DateUtil.getUTCTime();
 
-            Observable<Response<List<RecipeTO>>> categoryObservable = APICallsHandler
-                    .getAllRecipesObservable(DateUtil.getLastUpdateTime(context), AppHelper.getAccessToken());
-            Disposable disposable = categoryObservable
+            String lastUpdate = "0";//DateUtil.getLastUpdateTime(context);
+
+            Observable<Response<List<RecipeTO>>> recipeObservable = APICallsHandler
+                    .getAllRecipesObservable(lastUpdate, LIMIT, null, AppHelper.getAccessToken());
+            Disposable disposable = recipeObservable
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(next -> {
                         if (next.code() == 200) {
-                            updateFromServer(context, next.body());
+                            Log.e(TAG, "fetch recipes, status 200");
+                            final AddedModifiedSize addedModifiedSize = new AddedModifiedSize();
+                            updateFromServer(next.body(), addedModifiedSize);
+                            String lastKey = next.headers().get(Constants.HEADER_LAST_EVAL_KEY);
+                            if (lastKey != null && !lastKey.isEmpty())
+                                // there are more updated recipes
+                                fetchMoreRecipesReactive(context, lastKey, lastUpdate, addedModifiedSize, time);
+                            else {
+                                //there are no more recipes
+                                delayedDispatch(context, addedModifiedSize);
+                                DateUtil.updateServerTime(context, time);
+                                compositeDisposable.clear();
+                            }
                         } else if (next.code() == 304) {
-                            dispatchInfo.onNext("");
+                            DateUtil.updateServerTime(context, time);
+                            dispatchInfo.onNext(context.getString(R.string.message_from_fetch_recipes_not_modified));
+                            compositeDisposable.clear();
+                        } else
+                            dispatchInfo.onNext(context.getString(R.string.load_error_message));
+                        Log.e(TAG, "response code, " + next.code());
+
+                        //DateUtil.updateServerTime(context, time);
+                    }, error -> Toast.makeText(context, context.getString(R.string.load_error_message) + "\n" + error.getMessage(), Toast.LENGTH_SHORT).show());
+
+            compositeDisposable.add(disposable);
+        }
+    }
+
+    // make more api calls with pagination if necessary, using lastEvaluatedKey header from api response
+    private void fetchMoreRecipesReactive(final Context context, @NonNull String lastKey, String lastUpdate, final AddedModifiedSize addedModifiedSize, final String currentTimeStamp) {
+        if(MiddleWareForNetwork.checkInternetConnection(context)) {
+            Observable<Response<List<RecipeTO>>> recipeObservable = APICallsHandler
+                    .getAllRecipesObservable(lastUpdate, LIMIT, lastKey, AppHelper.getAccessToken());
+            Disposable disposable = recipeObservable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(next -> {
+                        if (next.code() == 200) {
+                            Log.e(TAG, "more recipes, status 200");
+                            updateFromServer(next.body(), addedModifiedSize);
+                            String lastEvalKey = next.headers().get(Constants.HEADER_LAST_EVAL_KEY);
+                            if (lastEvalKey != null && !lastEvalKey.isEmpty())
+                                // there are more updated recipes
+                                fetchMoreRecipesReactive(context, lastEvalKey, lastUpdate, addedModifiedSize, currentTimeStamp);
+                            else {
+                                //there are no more recipes
+                                delayedDispatch(context, addedModifiedSize);
+                                DateUtil.updateServerTime(context, currentTimeStamp);
+                                compositeDisposable.clear();
+                            }
+                        }
+                        Log.e(TAG, "response code, " + next.code());
+
+                    }, error -> Toast.makeText(context, context.getString(R.string.load_error_message) + "\n" + error.getMessage(), Toast.LENGTH_SHORT).show());
+
+            compositeDisposable.add(disposable);
+        }
+    }
+
+    private void delayedDispatch(final Context context, final AddedModifiedSize addedModifiedSize) {
+        new Handler().postDelayed(() ->
+                        dispatchInfo.onNext(
+                                context.getString(
+                                        R.string.message_from_fetch_categories,
+                                        addedModifiedSize.added,
+                                        addedModifiedSize.modified)),
+                DELAYED_DISPATCH);
+    }
+
+    /*public void fetchRecipesReactive1(final Context context) {
+        if(MiddleWareForNetwork.checkInternetConnection(context)) {
+            final String time = DateUtil.getUTCTime();
+
+            Observable<Response<List<RecipeTO>>> recipeObservable = APICallsHandler
+                    .getAllRecipesObservable(DateUtil.getLastUpdateTime(context), AppHelper.getAccessToken());
+            Disposable disposable = recipeObservable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(next -> {
+                        if (next.code() == 200) {
+                            //updateFromServer(context, next.body());
+                        } else if (next.code() == 304) {
+                            dispatchInfo.onNext(context.getString(R.string.message_from_fetch_recipes_not_modified));
                         }
                         Log.e(TAG, "response code, " + next.code());
 
@@ -233,9 +316,26 @@ public class RecipeRepository {
 
             compositeDisposable.add(disposable);
         }
-    }
+    }*/
 
     public void deleteAllRecipes() {
         executor.execute(recipeDao::deleteAllRecipes);
+    }
+
+
+    class AddedModifiedSize {
+        private int added, modified, size;
+
+        synchronized void incrementAdded() {
+            added++;
+        }
+
+        synchronized void incrementModified() {
+            modified++;
+        }
+
+        synchronized void incrementSize() {
+            size++;
+        }
     }
 }

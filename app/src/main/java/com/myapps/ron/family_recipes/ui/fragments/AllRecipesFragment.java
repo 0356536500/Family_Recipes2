@@ -1,11 +1,6 @@
 package com.myapps.ron.family_recipes.ui.fragments;
 
-import androidx.core.content.ContextCompat;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
 import android.os.Handler;
-import androidx.annotation.Nullable;
-
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -14,12 +9,13 @@ import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.adapters.RecipesAdapter;
 import com.myapps.ron.family_recipes.dal.Injection;
 import com.myapps.ron.family_recipes.model.CategoryEntity;
-import com.myapps.ron.family_recipes.model.RecipeEntity;
 import com.myapps.ron.family_recipes.viewmodels.DataViewModel;
 import com.myapps.ron.searchfilter.listener.FilterListener;
 
 import java.util.ArrayList;
-import java.util.List;
+
+import androidx.core.content.ContextCompat;
+import androidx.lifecycle.ViewModelProviders;
 
 public class AllRecipesFragment extends RecyclerWithFiltersAbstractFragment implements RecipesAdapter.RecipesAdapterListener, FilterListener<CategoryEntity> {
 

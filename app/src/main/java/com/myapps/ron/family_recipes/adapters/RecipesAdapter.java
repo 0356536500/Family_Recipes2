@@ -241,13 +241,14 @@ public class RecipesAdapter extends PagedListAdapter<RecipeMinimal, RecipesAdapt
                 // Recipe details may have changed if reloaded from the database,
                 // but ID is fixed.
                 @Override
-                public boolean areItemsTheSame(RecipeMinimal oldRecipe, RecipeMinimal newRecipe) {
+                public boolean areItemsTheSame(@NonNull RecipeMinimal oldRecipe,
+                                               @NonNull RecipeMinimal newRecipe) {
                     return oldRecipe.getId().equals(newRecipe.getId());
                 }
 
                 @Override
-                public boolean areContentsTheSame(RecipeMinimal oldRecipe,
-                                                  RecipeMinimal newRecipe) {
+                public boolean areContentsTheSame(@NonNull RecipeMinimal oldRecipe,
+                                                  @NonNull RecipeMinimal newRecipe) {
                     return oldRecipe.equals(newRecipe);
                 }
             };
