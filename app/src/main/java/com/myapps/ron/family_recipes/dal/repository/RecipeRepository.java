@@ -156,6 +156,7 @@ public class RecipeRepository {
             Log.e(TAG, "recipes from server, " + list.toString());
         } else {
             Log.e(TAG, "recipes from server, null");
+            return;
         }
         executor.execute(() -> {
             // first cell is for added and second cell is for modified recipes

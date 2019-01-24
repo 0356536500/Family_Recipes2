@@ -41,7 +41,7 @@ dependencies {
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.preference:preference:1.1.0-alpha02'
 
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.0-alpha2'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.0-alpha3'
 
     // region LifeCycle
     def lifecycle_version = "2.0.0"
@@ -100,7 +100,7 @@ dependencies {
     // endregion*/
 
     // region ButterKnife - binding library
-    def butterKnife_version = "9.0.0-rc3"
+    def butterKnife_version = "10.0.0"
     implementation "com.jakewharton:butterknife:$butterKnife_version"
     annotationProcessor "com.jakewharton:butterknife-compiler:$butterKnife_version"
 
