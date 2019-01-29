@@ -26,6 +26,7 @@ import androidx.lifecycle.LiveData;
 import androidx.paging.DataSource;
 import androidx.paging.LivePagedListBuilder;
 import androidx.paging.PagedList;
+import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -35,6 +36,9 @@ import io.reactivex.observers.DisposableMaybeObserver;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
 import retrofit2.Response;
+
+import static com.myapps.ron.family_recipes.utils.Constants.FALSE;
+import static com.myapps.ron.family_recipes.utils.Constants.TRUE;
 
 /**
  * Created by ronginat on 02/01/2019.
@@ -73,6 +77,10 @@ public class RecipeRepository {
 
     public Single<RecipeEntity> getRecipe(String id) {
         return recipeDao.getRecipe(id);
+    }
+
+    public Flowable<RecipeEntity> getObservableRecipe(String id) {
+        return recipeDao.getObservableRecipe(id);
     }
 
 
@@ -216,7 +224,7 @@ public class RecipeRepository {
         if(MiddleWareForNetwork.checkInternetConnection(context)) {
             final String time = DateUtil.getUTCTime();
 
-            String lastUpdate = "0";//DateUtil.getLastUpdateTime(context);
+            String lastUpdate = DateUtil.getLastUpdateTime(context);
 
             Observable<Response<List<RecipeTO>>> recipeObservable = APICallsHandler
                     .getAllRecipesObservable(lastUpdate, LIMIT, null, AppHelper.getAccessToken());
@@ -225,7 +233,7 @@ public class RecipeRepository {
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(next -> {
                         if (next.code() == 200) {
-                            Log.e(TAG, "fetch recipes, status 200");
+                            Log.e(TAG, "fetch recipes, " + next.body());
                             final AddedModifiedSize addedModifiedSize = new AddedModifiedSize();
                             updateFromServer(next.body(), addedModifiedSize);
                             String lastKey = next.headers().get(Constants.HEADER_LAST_EVAL_KEY);
@@ -242,8 +250,10 @@ public class RecipeRepository {
                             DateUtil.updateServerTime(context, time);
                             dispatchInfo.onNext(context.getString(R.string.message_from_fetch_recipes_not_modified));
                             compositeDisposable.clear();
-                        } else
-                            dispatchInfo.onNext(context.getString(R.string.load_error_message));
+                        } else {
+                            dispatchInfo.onNext(context.getString(R.string.load_error_message) + next.message());
+                            compositeDisposable.clear();
+                        }
                         Log.e(TAG, "response code, " + next.code());
 
                         //DateUtil.updateServerTime(context, time);
@@ -317,6 +327,11 @@ public class RecipeRepository {
             compositeDisposable.add(disposable);
         }
     }*/
+
+    public void changeLike(String id, boolean like) {
+        executor.execute(() ->
+                recipeDao.updateLikeRecipe(id, like ? TRUE : FALSE));
+    }
 
     public void deleteAllRecipes() {
         executor.execute(recipeDao::deleteAllRecipes);

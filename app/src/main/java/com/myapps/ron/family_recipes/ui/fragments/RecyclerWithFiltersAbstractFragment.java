@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -55,6 +56,7 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
@@ -124,7 +126,7 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
     }
 
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(@NonNull Context context) {
         Log.e(TAG, "on attach");
         super.onAttach(context);
         /*if (parent != null) {
@@ -160,7 +162,7 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
     }
 
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View itemView, @Nullable Bundle savedInstanceState) {
         Log.e(TAG, "on viewCreated");
         if (mFilter == null) {
             Log.e(TAG, "on viewCreated mFilter was null");
@@ -252,12 +254,9 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
 
     // region init Views
     private void initRecycler() {
-        //List<Recipe> recipeList = new ArrayList<>(viewModel.loadLocalRecipesOrdered(activity, com.myapps.ron.family_recipes.dal.Constants.SORT_RECENT));
-        //mAdapter = new RecipesAdapter(activity, recipeList, this);
-
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(activity.getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        //recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.addItemDecoration(new MyDividerItemDecoration(activity, DividerItemDecoration.VERTICAL, 36));
         //recyclerView.setAdapter(mAdapter);
         recyclerView.setItemAnimator(new FiltersListItemAnimator());
@@ -281,6 +280,13 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
     }
 
     void setRefreshLayout() {
+        /*ProgressBar progressBar = new ProgressBar(activity, null, android.R.attr.progressBarStyleLarge);
+        progressBar.setIndeterminate(true);
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
+        params.gravity = Gravity.CENTER;
+        ((FrameLayout)view.findViewById(R.id.main_container)).addView(progressBar, params);
+        progressBar.setVisibility(View.VISIBLE);*/
         onRefreshListener = () -> {
             if(mayRefresh) {
                 viewModel.fetchFromServer(getContext());

@@ -55,9 +55,9 @@ public class APICallsHandler {
         return rxRetrofit;
     }
 
-    public static void getOneRecipe(String id, String token, MyCallback<List<CommentTO>> callback) {
+    public static void getRecipeComments(String id, String token, MyCallback<List<CommentTO>> callback) {
         RecipeInterface service = getRetrofitInstance().create(RecipeInterface.class);
-        Call<List<CommentTO>> call = service.getOneRecipe(token, id);
+        Call<List<CommentTO>> call = service.getRecipeComments(token, id);
 
         call.enqueue(new Callback<List<CommentTO>>() {
             @Override
@@ -167,7 +167,7 @@ public class APICallsHandler {
         return fields;
     }
 
-    public static void patchRecipe(Map<String, Object> attributes, String id, String token, final MyCallback<RecipeTO> callback) {
+    public static void patchRecipe(Map<String, Object> attributes, String id, String token, final MyCallback<Boolean> callback) {
         Map<String, String> headers = new HashMap<>();
         headers.put(Constants.CONTENT_TYPE, "application/json");
         headers.put(Constants.AUTHORIZATION, token);
@@ -176,25 +176,26 @@ public class APICallsHandler {
         //body.put(Constants.NUM_FILES_TO_UPLOAD, String.valueOf(numOfFiles));
 
         RecipeInterface service = getRetrofitInstance().create(RecipeInterface.class);
-        Call<RecipeTO> call = service.patchRecipe(headers, id, attributes);
+        Call<Void> call = service.patchRecipe(headers, id, attributes);
 
-        call.enqueue(new Callback<RecipeTO>() {
+        call.enqueue(new Callback<Void>() {
             @Override
-            public void onResponse(@NotNull Call<RecipeTO> call, @NotNull Response<RecipeTO> response) {
-                String body = response.body() != null ? response.body().toString() : "null";
+            public void onResponse(@NotNull Call<Void> call, @NotNull Response<Void> response) {
+                //String body = response.body() != null ? response.body().toString() : "null";
+                Log.i(TAG, "patchRecipe code, " + response.code());
 
                 if (response.code() == STATUS_OK) {
-                    Log.i(TAG, body);
-                    RecipeTO recipe = response.body();
-                    callback.onFinished(recipe);
+                    //RecipeTO recipe = response.body();
+                    callback.onFinished(true);
                 }
                 else {
-                    Log.e(TAG, "error patchRecipe, code = " + response.code() + "\n body: " + body);
+                    Log.e(TAG, "error patchRecipe, code = " + response.code() + "\n message: " + response.message());
+                    callback.onFinished(false);
                 }
             }
 
             @Override
-            public void onFailure(@NotNull Call<RecipeTO> call, @NotNull Throwable t) {
+            public void onFailure(@NotNull Call<Void> call, @NotNull Throwable t) {
                 Log.e(TAG, "error patching recipe. message: " + t.getMessage());
                 //Toast.makeText(MainActivity.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
             }
@@ -318,10 +319,10 @@ public class APICallsHandler {
         return service.getAllCategoriesObservable(token, date);
     }
 
-    public static Observable<Response<List<RecipeTO>>> getAllRecipesObservable(String date, String token) {
+    /*public static Observable<Response<List<RecipeTO>>> getAllRecipesObservable(String date, String token) {
         RecipeInterface service = getReactiveRetrofitInstance().create(RecipeInterface.class);
         return service.getAllRecipesObservable(token, date, null, null);
-    }
+    }*/
 
     public static Observable<Response<List<RecipeTO>>> getAllRecipesObservable(String date, int limit, String startKey, String token) {
         RecipeInterface service = getReactiveRetrofitInstance().create(RecipeInterface.class);

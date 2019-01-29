@@ -13,8 +13,8 @@ public class CommentTO {
     private String message;
     @SerializedName("user")
     private String user;
-    @SerializedName("date")
-    private String date;
+    @SerializedName("creationDate")
+    private String creationDate;
 
     public CommentTO() {
         super();
@@ -25,7 +25,7 @@ public class CommentTO {
         if (comment != null) {
             this.message = comment.getMessage();
             this.user = comment.getUser();
-            this.date = comment.getDate();
+            this.creationDate = comment.getDate();
         }
     }
 
@@ -33,7 +33,7 @@ public class CommentTO {
         CommentEntity entity = new CommentEntity();
         entity.setMessage(this.message);
         entity.setUser(this.user);
-        entity.setDate(this.date);
+        entity.setDate(this.creationDate);
         return entity;
     }
 
@@ -53,22 +53,22 @@ public class CommentTO {
         this.user = user;
     }
 
-    public String getDate() {
-        return date;
+    public String getCreationDate() {
+        return creationDate;
     }
 
-    public void setDate(String date) {
-        this.date = date;
+    public void setCreationDate(String creationDate) {
+        this.creationDate = creationDate;
     }
 
     @Override
     public String toString() {
-        if (message == null || user == null || date == null)
+        if (message == null || user == null || creationDate == null)
             return "null";
         return "CommentTO{" +
                 "message='" + message + '\'' +
                 ", user='" + user + '\'' +
-                ", date='" + date + '\'' +
+                ", creationDate='" + creationDate + '\'' +
                 '}';
     }
 
@@ -79,11 +79,11 @@ public class CommentTO {
         CommentTO comment = (CommentTO) o;
         return this.message.equals(comment.message) &&
                 this.user.equals(comment.user) &&
-                this.date.equals(comment.date);
+                this.creationDate.equals(comment.creationDate);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(message, user, date);
+        return Objects.hash(message, user, creationDate);
     }
 }

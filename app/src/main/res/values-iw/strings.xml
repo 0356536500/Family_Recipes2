@@ -68,6 +68,7 @@
     <string name="no_internet_message">אין חיבור לרשת</string>
     <string name="post_comment_error">אי אפשר לשלוח הודעה ריקה</string>
     <string name="comments">תגובות (%1$d)</string>
+    <string name="no_comments">תגובות (0)</string>
     <string name="post_comment_hint">תגובה חדשה</string>
     <string name="post_comment_succeeded">ההודעה נשלחה בהצלחה</string>
 

@@ -71,6 +71,7 @@
     <string name="no_internet_message">Not connected to internet</string>
     <string name="post_comment_error">Can\'t send empty message</string>
     <string name="comments">Comments (%1$d)</string>
+    <string name="no_comments">Comments (0)</string>
     <string name="post_comment_hint">Type a message</string>
     <string name="post_comment_succeeded">Message posted successfully</string>
 

@@ -236,7 +236,7 @@ public class RecipeTO {
             if (comment != null) {
                 this.text = comment.getText();
                 this.user = comment.getUser();
-                this.date = comment.getDate();
+                this.date = comment.getCreationDate();
             }
         }
 
@@ -244,7 +244,7 @@ public class RecipeTO {
             RecipeEntity.Comment entity = new RecipeEntity.Comment();
             entity.setText(this.text);
             entity.setUser(this.user);
-            entity.setDate(this.date);
+            entity.setCreationDate(this.date);
             return entity;
         }
 
@@ -264,11 +264,11 @@ public class RecipeTO {
             this.user = user;
         }
 
-        public String getDate() {
+        public String getCreationDate() {
             return date;
         }
 
-        public void setDate(String date) {
+        public void setCreationDate(String date) {
             this.date = date;
         }
 

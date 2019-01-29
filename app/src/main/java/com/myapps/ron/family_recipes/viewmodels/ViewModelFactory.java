@@ -29,7 +29,7 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
     @NonNull
     @Override
     public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
-        if (modelClass.isAssignableFrom(NewViewModel.class)) {
+        if (modelClass.isAssignableFrom(RecipeViewModel.class)) {
             try {
                 return modelClass.getConstructor(RecipeRepository.class).newInstance(mDataSource1);
                 //return (T) new NewViewModel(mDataSource1);

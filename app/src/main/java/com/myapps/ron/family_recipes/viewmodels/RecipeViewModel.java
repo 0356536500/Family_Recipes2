@@ -3,15 +3,20 @@ package com.myapps.ron.family_recipes.viewmodels;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
+
 import android.content.Context;
 import android.util.Log;
 
 import com.myapps.ron.family_recipes.R;
+import com.myapps.ron.family_recipes.dal.repository.RecipeRepository;
 import com.myapps.ron.family_recipes.dal.storage.StorageWrapper;
 import com.myapps.ron.family_recipes.model.CommentEntity;
 import com.myapps.ron.family_recipes.model.RecipeEntity;
 import com.myapps.ron.family_recipes.network.modelTO.CommentTO;
-import com.myapps.ron.family_recipes.network.modelTO.RecipeTO;
 import com.myapps.ron.family_recipes.network.APICallsHandler;
 import com.myapps.ron.family_recipes.network.Constants;
 import com.myapps.ron.family_recipes.network.MiddleWareForNetwork;
@@ -34,18 +39,19 @@ import static com.myapps.ron.family_recipes.utils.Constants.TRUE;
  * - add comment
  */
 public class RecipeViewModel extends ViewModel {
-    private final MutableLiveData<RecipeEntity> recipe = new MutableLiveData<>(); // current recipe on the screen
+    //private final MutableLiveData<RecipeEntity> recipe = new MutableLiveData<>(); // current recipe on the screen
     private final MutableLiveData<List<CommentEntity>> comments = new MutableLiveData<>(); // current recipe on the screen
+    private final MutableLiveData<Boolean> isUserLiked = new MutableLiveData<>();
     private MutableLiveData<String> recipePath = new MutableLiveData<>();
     private MutableLiveData<String> imagePath = new MutableLiveData<>();
-    private MutableLiveData<String> infoForUser = new MutableLiveData<>();
+    private MutableLiveData<Integer> infoForUser = new MutableLiveData<>();
 
-    private void setRecipe(RecipeEntity item) {
+    /*private void setRecipe(RecipeEntity item) {
         recipe.setValue(item);
-    }
+    }*/
 
-    public LiveData<RecipeEntity> getRecipe() {
-        return recipe;
+    public LiveData<Boolean> isUserLiked() {
+        return isUserLiked;
     }
 
     private void setComments(List<CommentEntity> items) {
@@ -72,18 +78,45 @@ public class RecipeViewModel extends ViewModel {
         return imagePath;
     }
 
-    private void setInfo(String item) {
+    private void setInfo(int item) {
         infoForUser.setValue(item);
     }
 
-    public LiveData<String> getInfo() {
+    public LiveData<Integer> getInfo() {
         return infoForUser;
     }
 
+    private CompositeDisposable compositeDisposable = new CompositeDisposable();
+    private RecipeRepository recipeRepository;
+    private String recipeId;
+    private RecipeEntity recipe;
 
-    public void loadComments(Context context, RecipeEntity recipeEntity) {
+    public RecipeViewModel(RecipeRepository recipeRepository) {
+        this.recipeRepository = recipeRepository;
+    }
+
+    public void setInitialRecipe(RecipeEntity initialRecipe) {
+        this.recipe = initialRecipe;
+        this.recipeId = initialRecipe.getId();
+        isUserLiked.setValue(initialRecipe.isUserLiked());
+        Disposable disposable = this.recipeRepository.getObservableRecipe(recipe.getId())
+                .observeOn(AndroidSchedulers.mainThread())
+                .observeOn(Schedulers.io())
+                .subscribe(recipeEntity -> {
+                    Log.e(getClass().getSimpleName(), "in recipe observer, " + recipeEntity);
+                    //if user like had changed
+                    if (this.recipe.isUserLiked() != recipeEntity.isUserLiked())
+                        this.isUserLiked.setValue(recipeEntity.isUserLiked());
+
+                    this.recipe = recipeEntity;
+                }, error -> Log.e(getClass().getSimpleName(), error.getMessage()));
+        compositeDisposable.add(disposable);
+    }
+
+
+    public void loadComments(Context context) {
         if(MiddleWareForNetwork.checkInternetConnection(context)) {
-            APICallsHandler.getOneRecipe(recipeEntity.getId(), AppHelper.getAccessToken(), results -> {
+            APICallsHandler.getRecipeComments(recipe.getId(), AppHelper.getAccessToken(), results -> {
                 if(results != null) {
                     List<CommentEntity> rv = new ArrayList<>();
                     for (CommentTO to: results) {
@@ -92,39 +125,34 @@ public class RecipeViewModel extends ViewModel {
                     setComments(rv);
                 } else {
                     setComments(null);
-                    setInfo(context.getString(R.string.load_error_message));
+                    setInfo(R.string.load_error_message);
                 }
             });
         }
         else {
-            setRecipe(recipeEntity);
-            setInfo(context.getString(R.string.no_internet_message));
+            //setRecipe(recipeEntity);
+            setInfo(R.string.no_internet_message);
         }
     }
 
-    public void changeLike(final Context context, final RecipeEntity recipe) {
+    public void changeLike(final Context context) {
         if(MiddleWareForNetwork.checkInternetConnection(context)) {
             Map<String, Object> attrs = new HashMap<>();
             String likeStr = recipe.isUserLiked() ? "unlike" : "like";
             attrs.put(Constants.LIKES, likeStr);
-            APICallsHandler.patchRecipe(attrs, recipe.getId(), AppHelper.getAccessToken(), new MyCallback<RecipeTO>() {
-                @Override
-                public void onFinished(RecipeTO result) {
-                    RecipeEntity rv = result.toEntity();
-                    rv.setMeLike(!recipe.isUserLiked() ? TRUE : FALSE);
-                    /*RecipesDBHelper dbHelper = new RecipesDBHelper(context);
-                    dbHelper.updateRecipeUserChanges(rv);
-                    Log.e("viewModel", dbHelper.getRecipe(recipe.getId()).toString());
-                    setRecipe(dbHelper.getRecipe(recipe.getId()));*/
-                }
+            APICallsHandler.patchRecipe(attrs, recipe.getId(), AppHelper.getAccessToken(), result -> {
+                if (result) // status 200
+                    recipeRepository.changeLike(recipeId, !recipe.isUserLiked());
+                else // status <> 200
+                    setInfo(R.string.load_error_message);
             });
         }
         else {
-            setInfo(context.getString(R.string.no_internet_message));
+            setInfo(R.string.no_internet_message);
         }
     }
 
-    public void postComment(final Context context, final RecipeEntity recipe, String text) {
+    public void postComment(final Context context, String text) {
         if (!"".equals(text)) {
             if(MiddleWareForNetwork.checkInternetConnection(context)) {
                 Map<String, Object> attrs = new HashMap<>();
@@ -133,27 +161,21 @@ public class RecipeViewModel extends ViewModel {
                 commentMap.put(Constants.COMMENT_USER, AppHelper.getCurrUser());
                 attrs.put(Constants.COMMENTS, commentMap);
                 Log.e("viewModel", "before posting comment:\n" + attrs);
-                APICallsHandler.patchRecipe(attrs, recipe.getId(), AppHelper.getAccessToken(), new MyCallback<RecipeTO>() {
-                    @Override
-                    public void onFinished(RecipeTO result) {
-                        RecipeEntity rv = result.toEntity();
-                        rv.setMeLike(recipe.isUserLiked() ? TRUE : FALSE);
-                        /*RecipesDBHelper dbHelper = new RecipesDBHelper(context);
-                        dbHelper.updateRecipeUserChanges(rv);
-                        Log.e("viewModel", dbHelper.getRecipe(recipe.getId()).toString());
-                        setRecipe(dbHelper.getRecipe(recipe.getId()));
-                        setInfo(context.getString(R.string.post_comment_succeeded));*/
-                    }
+                APICallsHandler.patchRecipe(attrs, recipe.getId(), AppHelper.getAccessToken(), result -> {
+                    if (result) // status 200
+                        loadComments(context);
+                    else // status <> 200
+                        setInfo(R.string.load_error_message);
                 });
             } else {
-                setInfo(context.getString(R.string.no_internet_message));
+                setInfo(R.string.no_internet_message);
             }
         } else {
-            setInfo(context.getString(R.string.post_comment_error));
+            setInfo(R.string.post_comment_error);
         }
     }
 
-    public void loadRecipeContent(final Context context, final RecipeEntity recipe) {
+    public void loadRecipeContent(final Context context) {
             if(recipe.getRecipeFile() != null && !recipe.getRecipeFile().equals("\"\"")) {
                 StorageWrapper.getRecipeFile(context, recipe.getRecipeFile(), new MyCallback<String>() {
                     @Override
@@ -168,30 +190,29 @@ public class RecipeViewModel extends ViewModel {
                             }
                         }
                         else {
-                            setInfo(context.getString(R.string.no_internet_message));
+                            setInfo(R.string.no_internet_message);
                             setRecipePath(null);
                         }
                     }
                 });
             }
             else {
-                setInfo(context.getString(R.string.recipe_not_in_server));
+                setInfo(R.string.recipe_not_in_server);
                 setRecipePath(null);
             }
     }
 
-    public void loadRecipeFoodImage(final Context context, final RecipeEntity recipe) {
-        if(MiddleWareForNetwork.checkInternetConnection(context)) {
-            if (recipe.getFoodFiles() != null && recipe.getFoodFiles().size() > 0) {
-                StorageWrapper.getFoodFile(context, recipe.getFoodFiles().get(0), new MyCallback<String>() {
-                    @Override
-                    public void onFinished(String path) {
-                        setImagePath(path);
-                    }
-                });
-            }
+    public void loadRecipeFoodImage(final Context context) {
+        if (recipe.getFoodFiles() != null && recipe.getFoodFiles().size() > 0) {
+            StorageWrapper.getFoodFile(context, recipe.getFoodFiles().get(0), this::setImagePath);
         } else {
             setImagePath(null);
         }
+    }
+
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        compositeDisposable.clear();
     }
 }

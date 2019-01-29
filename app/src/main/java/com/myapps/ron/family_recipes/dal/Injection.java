@@ -31,7 +31,7 @@ public class Injection {
     }
 
     private static Executor getExecutor(int poolSize) {
-        return Executors.newScheduledThreadPool(poolSize);
+        return Executors.newFixedThreadPool(poolSize);
     }
 
     public static ViewModelFactory provideViewModelFactory(Context context) {

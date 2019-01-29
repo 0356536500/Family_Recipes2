@@ -48,7 +48,7 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/recipe_activity_margin"
                 android:fontFamily="@font/open_sans_bold"
-                android:text="@string/comments"
+                android:text="@string/no_comments"
                 android:textColor="?android:textColorPrimary"
                 android:textSize="@dimen/comment_primary"/>
 
@@ -65,7 +65,6 @@
                 android:id="@+id/recycler_comments"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:nestedScrollingEnabled="true"
                 android:scrollbars="vertical" >
             </androidx.recyclerview.widget.RecyclerView>
 

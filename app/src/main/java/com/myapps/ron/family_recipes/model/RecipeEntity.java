@@ -125,7 +125,7 @@ public class RecipeEntity implements Parcelable{
      */
     public boolean identical(RecipeEntity other) {
         boolean ids = getId() == null && other.getId() == null;
-        if (id != null && other.getId() != null)
+        if (/*id != null && */other.getId() != null)
             ids = getId().equals(other.getId());
 
         boolean names = getName() == null && other.getName() == null;

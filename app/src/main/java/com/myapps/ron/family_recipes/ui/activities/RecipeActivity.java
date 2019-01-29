@@ -7,7 +7,7 @@ import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import androidx.annotation.Nullable;
+
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -39,6 +39,8 @@ import android.widget.Toast;
 import com.myapps.ron.family_recipes.MyDividerItemDecoration;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.adapters.CommentsAdapter;
+import com.myapps.ron.family_recipes.dal.Injection;
+import com.myapps.ron.family_recipes.model.CommentEntity;
 import com.myapps.ron.family_recipes.model.RecipeEntity;
 import com.myapps.ron.family_recipes.ui.fragments.PagerDialogFragment;
 import com.myapps.ron.family_recipes.utils.Constants;
@@ -48,6 +50,7 @@ import com.myapps.ron.family_recipes.viewmodels.RecipeViewModel;
 import com.myapps.ron.searchfilter.animator.FiltersListItemAnimator;
 
 import java.io.File;
+import java.util.List;
 
 public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOffsetChangedListener {
 
@@ -64,11 +67,12 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
     private RecipeEntity recipe;
     private TextView textViewCommentTitle;
     private RecipeViewModel viewModel;
-    private Observer<RecipeEntity> recipeObserver;//, commentObserver;
+    //private Observer<RecipeEntity> recipeObserver;
+    //private Observer<List<CommentEntity>> commentObserver;
 
     private ViewGroup commentsLayout;
-    private RecyclerView recyclerView;
-    private CommentsAdapter mAdapter;
+    private RecyclerView commentsRecyclerView;
+    private CommentsAdapter commentsAdapter;
     private AppCompatButton postCommentButton;
     private AppCompatEditText postCommentEditText;
     private ProgressBar postCommentProgressBar;
@@ -125,7 +129,7 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
         progressBar = findViewById(R.id.recipe_content_progressBar);
         myWebView = findViewById(R.id.recipe_content_webView);
         commentsLayout = findViewById(R.id.recipe_content_comments_layout);
-        recyclerView = findViewById(R.id.recycler_comments);
+        commentsRecyclerView = findViewById(R.id.recycler_comments);
         textViewCommentTitle = findViewById(R.id.textView_comments_title);
         postCommentButton = findViewById(R.id.recipe_content_post_button);
         postCommentEditText = findViewById(R.id.recipe_content_post_editText);
@@ -133,7 +137,7 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
     }
 
     private void initUI() {
-        loadLikeDrawable();
+        //loadLikeDrawable();
         setSupportActionBar(toolbar);
         // toolbar fancy stuff
         initToolbar();
@@ -153,12 +157,7 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
 
         //getSupportActionBar().setTitle(R.string.toolbar_title);
 
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                exit();
-            }
-        });
+        toolbar.setNavigationOnClickListener(v -> exit());
 
         appBarLayout.addOnOffsetChangedListener(this);
 
@@ -169,124 +168,123 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
         //collapsingToolbarLayout.setContentScrimColor(toolbarCollapsedColor);
         setTitle(recipe.getName());
 
-        collapsingToolbarLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                Fragment prev = getSupportFragmentManager().findFragmentByTag("dialog");
-                if (prev != null) {
-                    ft.remove(prev);
-                }
-                ft.addToBackStack(null);
-
-                // Create and show the dialog.
-                DialogFragment newFragment = new PagerDialogFragment();
-                Bundle bundle = new Bundle();
-                bundle.putParcelable(Constants.RECIPE, recipe);
-                newFragment.setArguments(bundle);
-                newFragment.show(ft, "dialog");
+        collapsingToolbarLayout.setOnClickListener(view -> {
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            Fragment prev = getSupportFragmentManager().findFragmentByTag("dialog");
+            if (prev != null) {
+                ft.remove(prev);
             }
+            ft.addToBackStack(null);
+
+            // Create and show the dialog.
+            DialogFragment newFragment = new PagerDialogFragment();
+            Bundle bundle = new Bundle();
+            bundle.putParcelable(Constants.RECIPE, recipe);
+            newFragment.setArguments(bundle);
+            newFragment.show(ft, "dialog");
         });
     }
 
     private void initRecycler() {
-        //mAdapter = new CommentsAdapter(this.recipe.getComments());
+        //commentsAdapter = new CommentsAdapter(this.recipe.getComments());
 
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
-        recyclerView.setLayoutManager(mLayoutManager);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.addItemDecoration(new MyDividerItemDecoration(this, DividerItemDecoration.VERTICAL, 4));
-        //recyclerView.setAdapter(mAdapter);
-        recyclerView.setItemAnimator(new FiltersListItemAnimator());
+        commentsRecyclerView.setLayoutManager(mLayoutManager);
+        commentsRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        commentsRecyclerView.addItemDecoration(new MyDividerItemDecoration(this, DividerItemDecoration.VERTICAL, 4));
+        //commentsRecyclerView.setAdapter(commentsAdapter);
+        commentsRecyclerView.setItemAnimator(new FiltersListItemAnimator());
     }
 
     private void initViewModel() {
-        viewModel = ViewModelProviders.of(this).get(RecipeViewModel.class);
-        recipeObserver = new Observer<RecipeEntity>() {
-            @Override
-            public void onChanged(@Nullable RecipeEntity recipe) {
-                if (recipe != null) {
-                    boolean changedLike = false, postedComment = false;
-                    // user changed like value
-                    if (RecipeActivity.this.recipe.isUserLiked() != recipe.isUserLiked()) {
-                        changedLike = true;
-                    }
-                    // user posted a comment
-                    /*if (!RecipeActivity.this.recipe.getCommentsToString().equals(recipe.getCommentsToString())) {
-                        postedComment = true;
-                    }*/
+        viewModel =  ViewModelProviders.of(this, Injection.provideViewModelFactory(this)).get(RecipeViewModel.class);
+        //viewModel = ViewModelProviders.of(this).get(RecipeViewModel.class);
+        viewModel.setInitialRecipe(recipe);
 
-                    RecipeActivity.this.recipe = recipe;
-                    if (changedLike) {
-                        loadLikeDrawable();
-                        like.setEnabled(true);
-                    }
-                    if (postedComment) {
-                        loadComments();
-                        postCommentEditText.setText("");
-                        postCommentButton.setEnabled(true);
-                        postCommentButton.animate().alpha(1f).setDuration(animationDuration).start();
-                        postCommentProgressBar.animate().alpha(0f).setDuration(animationDuration).withEndAction(new Runnable() {
-                            @Override
-                            public void run() {
-                                postCommentProgressBar.setVisibility(View.INVISIBLE);
-                            }
-                        }).start();
-                    }
+        viewModel.getComments().observe(this, comments -> {
+            if (comments != null) {
+                postCommentEditText.setText("");
+                postCommentButton.setEnabled(true);
+                postCommentButton.animate().alpha(1f).setDuration(animationDuration).start();
+                postCommentProgressBar.animate().alpha(0f).setDuration(animationDuration).withEndAction(() ->
+                        postCommentProgressBar.setVisibility(View.INVISIBLE)).start();
+                textViewCommentTitle.setText(getString(R.string.comments, comments.size()));
+                commentsAdapter.setComments(comments);
+            }
+        });
+
+        viewModel.isUserLiked().observe(this, this::loadLikeDrawable);
+
+        /*recipeObserver = recipe -> {
+            if (recipe != null) {
+                boolean changedLike = false;//, postedComment = false;
+                // user changed like value
+                if (RecipeActivity.this.recipe.isUserLiked() != recipe.isUserLiked()) {
+                    changedLike = true;
                 }
-            }
-        };
+                // user posted a comment
+                *//*if (!RecipeActivity.this.recipe.getCommentsToString().equals(recipe.getCommentsToString())) {
+                    postedComment = true;
+                }*//*
 
-        viewModel.getRecipe().observe(this, recipeObserver);
-        viewModel.getRecipePath().observe(this, new Observer<String>() {
-            @Override
-            public void onChanged(@Nullable String s) {
-                if (s != null)
-                    loadRecipeHtml(s);
-                progressBar.hide();
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        commentsLayout.setVisibility(View.VISIBLE);
-                    }
-                }, 1500);
-            }
-        });
-        viewModel.getImagePath().observe(this, new Observer<String>() {
-            @Override
-            public void onChanged(@Nullable String path) {
-                if (path != null) {
-                    Log.e(TAG, "found path: " + path);
-                    CircularProgressDrawable circularProgressDrawable = new CircularProgressDrawable(getBaseContext());
-                    circularProgressDrawable.setStrokeWidth(5f);
-                    circularProgressDrawable.setCenterRadius(35f);
-                    circularProgressDrawable.start();
-
-                    GlideApp.with(getApplicationContext())
-                            .asDrawable()
-                            .load(Uri.fromFile(new File(path)))
-                            .placeholder(circularProgressDrawable)
-                            .error(android.R.drawable.stat_notify_error)
-                            .into(imageViewCollapsingImage);
-                }
-            }
-        });
-        viewModel.getInfo().observe(this, new Observer<String>() {
-            @Override
-            public void onChanged(@Nullable String message) {
-                if (message != null)
-                    Toast.makeText(RecipeActivity.this, message, Toast.LENGTH_LONG).show();
-            }
-        });
-
-        /*commentObserver = new Observer<Recipe>() {
-            @Override
-            public void onChanged(@Nullable Recipe recipe) {
                 RecipeActivity.this.recipe = recipe;
-                //TOD_O handle comments
-                viewModel.getRecipe().removeObserver(commentObserver);
+                if (changedLike) {
+                    loadLikeDrawable();
+                    like.setEnabled(true);
+                }
+                *//*if (postedComment) {
+                    loadComments();
+                    postCommentEditText.setText("");
+                    postCommentButton.setEnabled(true);
+                    postCommentButton.animate().alpha(1f).setDuration(animationDuration).start();
+                    postCommentProgressBar.animate().alpha(0f).setDuration(animationDuration).withEndAction(new Runnable() {
+                        @Override
+                        public void run() {
+                            postCommentProgressBar.setVisibility(View.INVISIBLE);
+                        }
+                    }).start();
+                }*//*
             }
         };*/
+
+        /*commentObserver = comments -> {
+            if (comments != null) {
+                postCommentEditText.setText("");
+                postCommentButton.setEnabled(true);
+                postCommentButton.animate().alpha(1f).setDuration(animationDuration).start();
+                postCommentProgressBar.animate().alpha(0f).setDuration(animationDuration).withEndAction(() ->
+                        postCommentProgressBar.setVisibility(View.INVISIBLE)).start();
+            }
+        };*/
+
+        //viewModel.getRecipe().observe(this, recipeObserver);
+        viewModel.getRecipePath().observe(this, s -> {
+            if (s != null)
+                loadRecipeHtml(s);
+            progressBar.hide();
+            new Handler().postDelayed(() ->
+                    commentsLayout.setVisibility(View.VISIBLE), 1500);
+        });
+        viewModel.getImagePath().observe(this, path -> {
+            if (path != null) {
+                Log.e(TAG, "found path: " + path);
+                CircularProgressDrawable circularProgressDrawable = new CircularProgressDrawable(getBaseContext());
+                circularProgressDrawable.setStrokeWidth(5f);
+                circularProgressDrawable.setCenterRadius(35f);
+                circularProgressDrawable.start();
+
+                GlideApp.with(getApplicationContext())
+                        .asDrawable()
+                        .load(Uri.fromFile(new File(path)))
+                        .placeholder(circularProgressDrawable)
+                        .error(android.R.drawable.stat_notify_error)
+                        .into(imageViewCollapsingImage);
+            }
+        });
+        viewModel.getInfo().observe(this, messageId -> {
+            if (messageId != null)
+                Toast.makeText(RecipeActivity.this, messageId, Toast.LENGTH_LONG).show();
+        });
     }
 
     @Override
@@ -311,10 +309,10 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
         return super.onOptionsItemSelected(item);
     }
 
-    private void loadLikeDrawable() {
+    private void loadLikeDrawable(boolean isUserLiked) {
         Log.e(TAG, recipe.toString());
         String message;
-        if(recipe.isUserLiked()) {
+        if(isUserLiked) {
             Log.e(TAG, "showing full heart");
             like.setImageResource(R.drawable.ic_favorite_red_36dp);
             //like.setImageDrawable(getResources().getDrawable(R.drawable.ic_favorite_red_36dp));
@@ -333,23 +331,34 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
     }
 
     private void loadRecipe() {
-        viewModel.loadRecipeContent(this, recipe);
-        viewModel.loadRecipeFoodImage(this, recipe);
+        viewModel.loadRecipeContent(this);
+        viewModel.loadRecipeFoodImage(this);
+        viewModel.loadComments(this);
         //loadImage();
-        loadComments();
+        initCommentsRecycler();
         //loadRecipeHtml();
+    }
+
+    private void initCommentsRecycler() {
+        commentsAdapter = new CommentsAdapter();
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
+        commentsRecyclerView.setLayoutManager(mLayoutManager);
+        //recyclerView.setItemAnimator(new DefaultItemAnimator());
+        commentsRecyclerView.addItemDecoration(new MyDividerItemDecoration(this, DividerItemDecoration.VERTICAL, 36));
+        commentsRecyclerView.setItemAnimator(new FiltersListItemAnimator());
+        commentsRecyclerView.setAdapter(commentsAdapter);
     }
 
     private void loadComments() {
         /*if (this.recipe.getComments() != null) {
             textViewCommentTitle.setText(getString(R.string.comments, recipe.getComments().size()));
 
-            if (mAdapter == null) {
-                mAdapter = new CommentsAdapter(this.recipe.getComments());
-                recyclerView.setAdapter(mAdapter);
+            if (commentsAdapter == null) {
+                commentsAdapter = new CommentsAdapter(this.recipe.getComments());
+                commentsRecyclerView.setAdapter(commentsAdapter);
 
             } else {
-                mAdapter.setComments(this.recipe.getComments());
+                commentsAdapter.setComments(this.recipe.getComments());
             }
         }*/
     }
@@ -405,8 +414,8 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
         @Override
         public void onClick(View view) {
             //Toast.makeText(getApplicationContext(), postCommentEditText.getMessage(), Toast.LENGTH_SHORT).show();
-            if (postCommentEditText.getText() != null) {
-                viewModel.postComment(getApplicationContext(), recipe, postCommentEditText.getText().toString());
+            if (commentValidationCheck()) {
+                viewModel.postComment(getApplicationContext(), postCommentEditText.getText().toString());
                 if (postCommentEditText.getText().length() > 0) {
                     postCommentButton.setEnabled(false);
                     postCommentProgressBar.setVisibility(View.VISIBLE);
@@ -417,12 +426,20 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
         }
     };
 
+    private boolean commentValidationCheck() {
+        if (postCommentEditText.getText() != null) {
+            String text = postCommentEditText.getText().toString();
+            return text.length() > 0 && !text.startsWith(" ");
+        }
+        return false;
+    }
+
     public void doLike(View view) {
         //recipe.setMeLike(!recipe.getMeLike());
         //if(MiddleWareForNetwork.checkInternetConnection(this))
         like.setEnabled(false);
         //viewModel.getRecipe().observe(this, recipeObserver);
-        viewModel.changeLike(getApplicationContext(), recipe);
+        viewModel.changeLike(this);
         /*String message;
         // do like
         loadRecipeContent();
@@ -455,27 +472,24 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
 
     @Override
     public void onOffsetChanged(final AppBarLayout appBarLayout, final int verticalOffset) {
-        appBarLayout.post(new Runnable() {
-            @Override
-            public void run() {
-                if(menuItemShare == null)
-                    return;
-                if (Math.abs(verticalOffset) == appBarLayout.getTotalScrollRange()) {
-                    // Collapsed
-                    menuItemShare.setIcon(R.drawable.ic_share_collapsed_24dp);
-                    if (toolbar.getNavigationIcon() != null) {
-                        toolbar.getNavigationIcon().setColorFilter(navigationCollapsedColor, PorterDuff.Mode.SRC_ATOP);
-                    }
-                } else if (verticalOffset == 0) {
-                    // Expanded
-                    menuItemShare.setIcon(R.drawable.ic_share_expanded_24dp);
-                    if (toolbar.getNavigationIcon() != null) {
-                        toolbar.getNavigationIcon().setColorFilter(navigationExpandedColor, PorterDuff.Mode.SRC_ATOP);
-                    }
-                } /*else {
-                            // Somewhere in between
-                }*/
-            }
+        appBarLayout.post(() -> {
+            if(menuItemShare == null)
+                return;
+            if (Math.abs(verticalOffset) == appBarLayout.getTotalScrollRange()) {
+                // Collapsed
+                menuItemShare.setIcon(R.drawable.ic_share_collapsed_24dp);
+                if (toolbar.getNavigationIcon() != null) {
+                    toolbar.getNavigationIcon().setColorFilter(navigationCollapsedColor, PorterDuff.Mode.SRC_ATOP);
+                }
+            } else if (verticalOffset == 0) {
+                // Expanded
+                menuItemShare.setIcon(R.drawable.ic_share_expanded_24dp);
+                if (toolbar.getNavigationIcon() != null) {
+                    toolbar.getNavigationIcon().setColorFilter(navigationExpandedColor, PorterDuff.Mode.SRC_ATOP);
+                }
+            } /*else {
+                        // Somewhere in between
+            }*/
         });
     }
 }

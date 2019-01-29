@@ -1,7 +1,6 @@
 package com.myapps.ron.family_recipes.network;
 
 import com.google.gson.JsonObject;
-import com.myapps.ron.family_recipes.model.CategoryEntity;
 import com.myapps.ron.family_recipes.network.modelTO.CategoryTO;
 import com.myapps.ron.family_recipes.network.modelTO.CommentTO;
 import com.myapps.ron.family_recipes.network.modelTO.RecipeTO;
@@ -29,14 +28,14 @@ public interface RecipeInterface {
     /*String recipesGET = Constants.URL_RECIPES + "/{" + Constants.DATE_QUERY + "}";
     String recipesPOST = Constants.URL_RECIPES;
     String recipesUpdate = Constants.URL_RECIPES + "/{" + Constants.ID_QUERY + "}";*/
-    String oneRecipe = Constants.URL_RECIPES + "/{" + Constants.ID_QUERY + "}";
+    String recipeComments = Constants.URL_RECIPES + "/{" + Constants.ID_QUERY + "}";
     String recipes = Constants.URL_RECIPES;
     String categories = Constants.URL_CATEGORIES;// + "/{" + Constants.DATE_QUERY + "}";
     String food = Constants.URL_FOOD;
 
 
-    @GET(oneRecipe)
-    Call<List<CommentTO>> getOneRecipe(
+    @GET(recipeComments)
+    Call<List<CommentTO>> getRecipeComments(
             @Header(Constants.AUTHORIZATION) String token,
             @Path(Constants.ID_QUERY) String id
     );
@@ -70,7 +69,7 @@ public interface RecipeInterface {
     );
 
     @PATCH(recipes)
-    Call<RecipeTO> patchRecipe(
+    Call<Void> patchRecipe(
             @HeaderMap Map<String, String> headers,
             @Query(Constants.ID_QUERY) String id,
             @Body Map<String, Object> body

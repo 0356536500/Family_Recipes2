@@ -23,19 +23,17 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.MyView
     private List<CommentEntity> commentList;
 
     class MyViewHolder extends RecyclerView.ViewHolder {
-        TextView sender, comment, time;
+        TextView sender, message, time;
 
         MyViewHolder(View view) {
             super(view);
             sender = view.findViewById(R.id.sender);
-            comment = view.findViewById(R.id.comment);
+            message = view.findViewById(R.id.message);
             time = view.findViewById(R.id.time_text);
         }
     }
 
-    public CommentsAdapter(List<CommentEntity> commentList) {
-        this.commentList = commentList;
-    }
+    public CommentsAdapter() { }
 
     @NonNull
     @Override
@@ -49,7 +47,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.MyView
         CommentEntity comment = commentList.get(position);
 
         holder.sender.setText(comment.getUser());
-        holder.comment.setText(comment.getMessage());
+        holder.message.setText(comment.getMessage());
         holder.time.setText(DateUtil.getDateFromDateTime(comment.getDate()));
     }
 

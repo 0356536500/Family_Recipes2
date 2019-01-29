@@ -6,6 +6,7 @@ import com.myapps.ron.family_recipes.utils.Constants;
 
 import java.util.List;
 
+import androidx.lifecycle.LiveData;
 import androidx.paging.DataSource;
 import androidx.room.Dao;
 import androidx.room.Delete;
@@ -14,6 +15,7 @@ import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 import io.reactivex.Completable;
+import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
 
@@ -119,6 +121,9 @@ public interface RecipeDao {
 
     @Query("SELECT * FROM " + AppDatabases.TABLE_RECIPES + " where " + RecipeEntity.KEY_ID + " = :id")
     Single<RecipeEntity> getRecipe(String id);
+
+    @Query("SELECT * FROM " + AppDatabases.TABLE_RECIPES + " where " + RecipeEntity.KEY_ID + " = :id")
+    Flowable<RecipeEntity> getObservableRecipe(String id);
 
     @Query("SELECT * FROM " + AppDatabases.TABLE_RECIPES + " where " + RecipeEntity.KEY_ID + " = :id")
     Maybe<RecipeEntity> isRecipeExists(String id);

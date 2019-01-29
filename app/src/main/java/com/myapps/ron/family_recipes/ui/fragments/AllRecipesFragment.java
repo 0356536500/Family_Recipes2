@@ -66,10 +66,10 @@ public class AllRecipesFragment extends RecyclerWithFiltersAbstractFragment impl
             }
         });
 
-        viewModel.getInfoFromLastFetch().observe(this, s -> {
+        viewModel.getInfoFromLastFetch().observe(this, message -> {
             swipeRefreshLayout.setRefreshing(false);
-            if (s != null && !s.equals(""))
-                Toast.makeText(activity, s, Toast.LENGTH_SHORT).show();
+            if (message != null && !message.equals(""))
+                Toast.makeText(activity, message, Toast.LENGTH_SHORT).show();
         });
     }
 }
