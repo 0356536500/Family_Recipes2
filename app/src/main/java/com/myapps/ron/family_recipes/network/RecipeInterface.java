@@ -28,13 +28,19 @@ public interface RecipeInterface {
     /*String recipesGET = Constants.URL_RECIPES + "/{" + Constants.DATE_QUERY + "}";
     String recipesPOST = Constants.URL_RECIPES;
     String recipesUpdate = Constants.URL_RECIPES + "/{" + Constants.ID_QUERY + "}";*/
-    String recipeComments = Constants.URL_RECIPES + "/{" + Constants.ID_QUERY + "}";
+    String recipeWithID = Constants.URL_RECIPES + "/{" + Constants.ID_QUERY + "}";
     String recipes = Constants.URL_RECIPES;
     String categories = Constants.URL_CATEGORIES;// + "/{" + Constants.DATE_QUERY + "}";
     String food = Constants.URL_FOOD;
 
 
-    @GET(recipeComments)
+    @GET(recipeWithID)
+    Observable<Response<RecipeTO>> getRecipeObservable(
+            @Header(Constants.AUTHORIZATION) String token,
+            @Path(Constants.ID_QUERY) String id
+    );
+
+    @GET(recipeWithID + "/" + Constants.COMMENTS)
     Call<List<CommentTO>> getRecipeComments(
             @Header(Constants.AUTHORIZATION) String token,
             @Path(Constants.ID_QUERY) String id
@@ -68,10 +74,11 @@ public interface RecipeInterface {
             @Body Map<String, Object> body
     );
 
-    @PATCH(recipes)
+    @PATCH(recipeWithID)
     Call<Void> patchRecipe(
             @HeaderMap Map<String, String> headers,
-            @Query(Constants.ID_QUERY) String id,
+            @Path(Constants.ID_QUERY) String id,
+            @Query(Constants.LAST_MODIFIED_QUERY) String lastModifiedDate,
             @Body Map<String, Object> body
     );
 

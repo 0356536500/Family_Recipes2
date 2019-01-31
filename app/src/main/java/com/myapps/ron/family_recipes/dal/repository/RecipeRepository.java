@@ -2,6 +2,7 @@ package com.myapps.ron.family_recipes.dal.repository;
 
 import android.content.Context;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -33,10 +34,12 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableMaybeObserver;
+import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
 import retrofit2.Response;
 
+import static com.myapps.ron.family_recipes.network.APICallsHandler.STATUS_OK;
 import static com.myapps.ron.family_recipes.utils.Constants.FALSE;
 import static com.myapps.ron.family_recipes.utils.Constants.TRUE;
 
@@ -45,6 +48,7 @@ import static com.myapps.ron.family_recipes.utils.Constants.TRUE;
  */
 public class RecipeRepository {
     private final String TAG = getClass().getSimpleName();
+    @SuppressWarnings("FieldCanBeLocal")
     private final long DELAYED_DISPATCH = 2000;
     private final int LIMIT = 100;
 
@@ -230,7 +234,8 @@ public class RecipeRepository {
                     .getAllRecipesObservable(lastUpdate, LIMIT, null, AppHelper.getAccessToken());
             Disposable disposable = recipeObservable
                     .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
+                    .observeOn(Schedulers.from(executor))
+                    //.observeOn(AndroidSchedulers.mainThread())
                     .subscribe(next -> {
                         if (next.code() == 200) {
                             Log.e(TAG, "fetch recipes, " + next.body());
@@ -270,7 +275,8 @@ public class RecipeRepository {
                     .getAllRecipesObservable(lastUpdate, LIMIT, lastKey, AppHelper.getAccessToken());
             Disposable disposable = recipeObservable
                     .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
+                    .observeOn(Schedulers.from(executor))
+                    //.observeOn(AndroidSchedulers.mainThread())
                     .subscribe(next -> {
                         if (next.code() == 200) {
                             Log.e(TAG, "more recipes, status 200");
@@ -295,13 +301,26 @@ public class RecipeRepository {
     }
 
     private void delayedDispatch(final Context context, final AddedModifiedSize addedModifiedSize) {
-        new Handler().postDelayed(() ->
+        executor.execute(() -> {
+            try {
+                Thread.sleep(DELAYED_DISPATCH);
+                dispatchInfo.onNext(
+                        context.getString(
+                                R.string.message_from_fetch_recipes,
+                                addedModifiedSize.added,
+                                addedModifiedSize.modified));
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
+
+        /*new Handler().postDelayed(() ->
                         dispatchInfo.onNext(
                                 context.getString(
-                                        R.string.message_from_fetch_categories,
+                                        R.string.message_from_fetch_recipes,
                                         addedModifiedSize.added,
                                         addedModifiedSize.modified)),
-                DELAYED_DISPATCH);
+                DELAYED_DISPATCH);*/
     }
 
     /*public void fetchRecipesReactive1(final Context context) {
@@ -329,8 +348,50 @@ public class RecipeRepository {
     }*/
 
     public void changeLike(String id, boolean like) {
+        executor.execute(() -> {
+            recipeDao.updateLikeRecipe(id, like ? TRUE : FALSE);
+            compositeDisposable.add(APICallsHandler.getRecipeObservable(id, AppHelper.getAccessToken())
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(Schedulers.from(executor))
+                    .subscribe(response -> {
+                        Log.e(TAG, "get one recipe code = " + response.code());
+                        if (response.code() == STATUS_OK)
+                            updateFromServerAfterLike(response.body());
+                    }, throwable -> Log.e(TAG, "error when getting updated recipe after like\n" + throwable.getMessage())));
+        });
+    }
+
+    private void updateFromServerAfterLike(RecipeTO updatedFromServer) {
+        if (updatedFromServer == null) {
+            Log.e(TAG, "recipe from server, null");
+            return;
+        }
         executor.execute(() ->
-                recipeDao.updateLikeRecipe(id, like ? TRUE : FALSE));
+                recipeDao.getRecipe(updatedFromServer.getId())
+                        .subscribe(new DisposableSingleObserver<RecipeEntity>() {
+                            RecipeEntity update = updatedFromServer.toEntity();
+                            @Override
+                            public void onSuccess(RecipeEntity recipeEntity) {
+                                // found a recipe
+                                // update it and save the current 'like' of the user
+                                //Log.e(TAG, "updateFromServer, found, id " + updatedFromServer.getId());
+                                if (!update.identical(recipeEntity)) {
+                                    update.setMeLike(recipeEntity.getMeLike());
+                                    recipeDao.updateRecipe(update);
+                                    dispose();
+                                }
+
+                                dispose();
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+                                dispatchInfo.onNext(e.getMessage());
+                                Log.e("updateFromServer", e.getMessage(), e);
+                                dispose();
+                            }
+                        })
+        );
     }
 
     public void deleteAllRecipes() {

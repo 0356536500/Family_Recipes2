@@ -1,13 +1,5 @@
 package com.myapps.ron.family_recipes.viewmodels;
 
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
-
 import android.content.Context;
 import android.util.Log;
 
@@ -16,12 +8,12 @@ import com.myapps.ron.family_recipes.dal.repository.RecipeRepository;
 import com.myapps.ron.family_recipes.dal.storage.StorageWrapper;
 import com.myapps.ron.family_recipes.model.CommentEntity;
 import com.myapps.ron.family_recipes.model.RecipeEntity;
-import com.myapps.ron.family_recipes.network.modelTO.CommentTO;
 import com.myapps.ron.family_recipes.network.APICallsHandler;
 import com.myapps.ron.family_recipes.network.Constants;
 import com.myapps.ron.family_recipes.network.MiddleWareForNetwork;
-import com.myapps.ron.family_recipes.utils.MyCallback;
 import com.myapps.ron.family_recipes.network.cognito.AppHelper;
+import com.myapps.ron.family_recipes.network.modelTO.CommentTO;
+import com.myapps.ron.family_recipes.utils.MyCallback;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -29,8 +21,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.myapps.ron.family_recipes.utils.Constants.FALSE;
-import static com.myapps.ron.family_recipes.utils.Constants.TRUE;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModel;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * class for use by RecipeActivity.
@@ -46,9 +43,9 @@ public class RecipeViewModel extends ViewModel {
     private MutableLiveData<String> imagePath = new MutableLiveData<>();
     private MutableLiveData<Integer> infoForUser = new MutableLiveData<>();
 
-    /*private void setRecipe(RecipeEntity item) {
-        recipe.setValue(item);
-    }*/
+    public RecipeEntity getRecipe() {
+        return this.recipe;
+    }
 
     public LiveData<Boolean> isUserLiked() {
         return isUserLiked;
@@ -88,7 +85,6 @@ public class RecipeViewModel extends ViewModel {
 
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
     private RecipeRepository recipeRepository;
-    private String recipeId;
     private RecipeEntity recipe;
 
     public RecipeViewModel(RecipeRepository recipeRepository) {
@@ -97,11 +93,10 @@ public class RecipeViewModel extends ViewModel {
 
     public void setInitialRecipe(RecipeEntity initialRecipe) {
         this.recipe = initialRecipe;
-        this.recipeId = initialRecipe.getId();
         isUserLiked.setValue(initialRecipe.isUserLiked());
         Disposable disposable = this.recipeRepository.getObservableRecipe(recipe.getId())
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .observeOn(Schedulers.io())
                 .subscribe(recipeEntity -> {
                     Log.e(getClass().getSimpleName(), "in recipe observer, " + recipeEntity);
                     //if user like had changed
@@ -140,9 +135,9 @@ public class RecipeViewModel extends ViewModel {
             Map<String, Object> attrs = new HashMap<>();
             String likeStr = recipe.isUserLiked() ? "unlike" : "like";
             attrs.put(Constants.LIKES, likeStr);
-            APICallsHandler.patchRecipe(attrs, recipe.getId(), AppHelper.getAccessToken(), result -> {
+            APICallsHandler.patchRecipe(attrs, recipe.getId(), recipe.getLastModifiedDate(), AppHelper.getAccessToken(), result -> {
                 if (result) // status 200
-                    recipeRepository.changeLike(recipeId, !recipe.isUserLiked());
+                    recipeRepository.changeLike(recipe.getId(), !recipe.isUserLiked());
                 else // status <> 200
                     setInfo(R.string.load_error_message);
             });
@@ -153,25 +148,21 @@ public class RecipeViewModel extends ViewModel {
     }
 
     public void postComment(final Context context, String text) {
-        if (!"".equals(text)) {
-            if(MiddleWareForNetwork.checkInternetConnection(context)) {
-                Map<String, Object> attrs = new HashMap<>();
-                Map<String, String> commentMap = new HashMap<>();
-                commentMap.put(Constants.COMMENT_MESSAGE, text);
-                commentMap.put(Constants.COMMENT_USER, AppHelper.getCurrUser());
-                attrs.put(Constants.COMMENTS, commentMap);
-                Log.e("viewModel", "before posting comment:\n" + attrs);
-                APICallsHandler.patchRecipe(attrs, recipe.getId(), AppHelper.getAccessToken(), result -> {
-                    if (result) // status 200
-                        loadComments(context);
-                    else // status <> 200
-                        setInfo(R.string.load_error_message);
-                });
-            } else {
-                setInfo(R.string.no_internet_message);
-            }
+        if(MiddleWareForNetwork.checkInternetConnection(context)) {
+            Map<String, Object> attrs = new HashMap<>();
+            attrs.put(Constants.COMMENTS, text);
+            Log.e("viewModel", "before posting comment:\n" + attrs);
+            APICallsHandler.patchRecipe(attrs, recipe.getId(), recipe.getLastModifiedDate(), AppHelper.getAccessToken(), result -> {
+                if (result) // status 200
+                    loadComments(context);
+                else { // status <> 200
+                    setComments(null);
+                    setInfo(R.string.load_error_message);
+                }
+            });
         } else {
-            setInfo(R.string.post_comment_error);
+            setComments(null);
+            setInfo(R.string.no_internet_message);
         }
     }
 

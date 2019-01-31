@@ -30,7 +30,7 @@ public class APICallsHandler {
     private static final String TAG = APICallsHandler.class.getSimpleName();
     private static Retrofit retrofit, rxRetrofit;
 
-    private static final int STATUS_OK = 200;
+    public static final int STATUS_OK = 200;
     private static final int STATUS_NOT_MODIFIED = 304;
     //private static final String BASE_URL = "https://jsonplaceholder.typicode.com";
 
@@ -63,10 +63,10 @@ public class APICallsHandler {
             @Override
             public void onResponse(@NotNull Call<List<CommentTO>> call, @NotNull Response<List<CommentTO>> response) {
                 String body = response.body() != null ? response.body().toString() : "null";
-                Log.i(TAG, body);
+                Log.e(TAG, body);
                 if (response.code() == STATUS_OK) {
-                    List<CommentTO> comments = response.body();
-                    callback.onFinished(comments);
+                    //List<CommentTO> comments = response.body();
+                    callback.onFinished(response.body());
                 } else {
                     callback.onFinished(null);
                 }
@@ -167,7 +167,7 @@ public class APICallsHandler {
         return fields;
     }
 
-    public static void patchRecipe(Map<String, Object> attributes, String id, String token, final MyCallback<Boolean> callback) {
+    public static void patchRecipe(Map<String, Object> attributes, String id, String lastModifiedDate, String token, final MyCallback<Boolean> callback) {
         Map<String, String> headers = new HashMap<>();
         headers.put(Constants.CONTENT_TYPE, "application/json");
         headers.put(Constants.AUTHORIZATION, token);
@@ -176,7 +176,7 @@ public class APICallsHandler {
         //body.put(Constants.NUM_FILES_TO_UPLOAD, String.valueOf(numOfFiles));
 
         RecipeInterface service = getRetrofitInstance().create(RecipeInterface.class);
-        Call<Void> call = service.patchRecipe(headers, id, attributes);
+        Call<Void> call = service.patchRecipe(headers, id, lastModifiedDate, attributes);
 
         call.enqueue(new Callback<Void>() {
             @Override
@@ -189,7 +189,12 @@ public class APICallsHandler {
                     callback.onFinished(true);
                 }
                 else {
-                    Log.e(TAG, "error patchRecipe, code = " + response.code() + "\n message: " + response.message());
+                    try {
+                        if (response.errorBody() != null)
+                            Log.e(TAG, "error patchRecipe, code = " + response.code() + "\n errorBody: " + response.errorBody().string());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                     callback.onFinished(false);
                 }
             }
@@ -312,6 +317,12 @@ public class APICallsHandler {
     }
 
     // region Observable
+
+    public static Observable<Response<RecipeTO>> getRecipeObservable(String id, String token) {
+        RecipeInterface service = getReactiveRetrofitInstance().create(RecipeInterface.class);
+
+        return service.getRecipeObservable(token, id);
+    }
 
     public static Observable<Response<List<CategoryTO>>> getAllCategoriesObservable(String date, String token) {
         RecipeInterface service = getReactiveRetrofitInstance().create(RecipeInterface.class);

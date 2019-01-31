@@ -2,6 +2,8 @@ package com.myapps.ron.family_recipes.model;
 
 import java.util.Objects;
 
+import androidx.annotation.NonNull;
+
 /**
  * Created by ronginat on 14/01/2019.
  */
@@ -37,6 +39,7 @@ public class CommentEntity {
         this.date = date;
     }
 
+    @NonNull
     @Override
     public String toString() {
         if (message == null || user == null || date == null)

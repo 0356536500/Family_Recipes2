@@ -436,6 +436,7 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
                 .observeOn(AndroidSchedulers.mainThread())
                 .observeOn(Schedulers.io())
                 .subscribe(recipeEntity -> {
+                    Log.e(TAG, recipeEntity.toString());
                     Intent intent = new Intent(activity, RecipeActivity.class);
                     intent.putExtra(Constants.RECIPE, recipeEntity);
                     startActivityForResult(intent, Constants.RECIPE_ACTIVITY_CODE);

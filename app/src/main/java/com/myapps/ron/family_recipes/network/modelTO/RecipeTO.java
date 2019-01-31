@@ -7,13 +7,15 @@ import com.myapps.ron.family_recipes.utils.Constants;
 import java.util.List;
 import java.util.Objects;
 
+import androidx.annotation.NonNull;
+
 
 /**
  * Created by ronginat on 31/12/2018.
  */
 public class RecipeTO {
 
-    public static String image = "https://api.androidhive.info/json/images/keanu.jpg";
+    //public static String image = "https://api.androidhive.info/json/images/keanu.jpg";
 
     @SerializedName("id")
     private String id;
@@ -31,8 +33,6 @@ public class RecipeTO {
     private String uploader;
     @SerializedName("categories")
     private List<String> categories;
-    //@SerializedName("comments")
-    //private List<RecipeTO.Comment> comments;
     @SerializedName("foodFiles")
     private List<String> foodFiles;
     @SerializedName("likes")
@@ -176,14 +176,6 @@ public class RecipeTO {
         this.categories = categories;
     }
 
-    /*public List<RecipeTO.Comment> getComments() {
-        return comments;
-    }
-
-    public void setComments(List<RecipeTO.Comment> comments) {
-        this.comments = comments;
-    }*/
-
     public List<String> getFoodFiles() {
         return foodFiles;
     }
@@ -201,11 +193,11 @@ public class RecipeTO {
     }
 
 
+    @NonNull
     @Override
     public String toString() {
         return "RecipeTO{" +
-                "image='" + image + '\'' +
-                ", id='" + id + '\'' +
+                "id='" + id + '\'' +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", creationDate='" + creationDate + '\'' +
@@ -213,91 +205,9 @@ public class RecipeTO {
                 ", recipeFile='" + recipeFile + '\'' +
                 ", uploader='" + uploader + '\'' +
                 ", categories=" + categories +
-                //", comments=" + comments +
                 ", foodFiles=" + foodFiles +
                 ", likes=" + likes +
                 '}';
     }
-
-
-    /*public static class Comment {
-        @SerializedName("message")
-        private String text;
-        @SerializedName("user")
-        private String user;
-        @SerializedName("date")
-        private String date;
-
-        Comment() {
-        }
-
-        Comment(RecipeEntity.Comment comment) {
-            this();
-            if (comment != null) {
-                this.text = comment.getText();
-                this.user = comment.getUser();
-                this.date = comment.getCreationDate();
-            }
-        }
-
-        RecipeEntity.Comment toEntity() {
-            RecipeEntity.Comment entity = new RecipeEntity.Comment();
-            entity.setText(this.text);
-            entity.setUser(this.user);
-            entity.setCreationDate(this.date);
-            return entity;
-        }
-
-        public String getText() {
-            return text;
-        }
-
-        public void setText(String text) {
-            this.text = text;
-        }
-
-        public String getUser() {
-            return user;
-        }
-
-        public void setUser(String user) {
-            this.user = user;
-        }
-
-        public String getCreationDate() {
-            return date;
-        }
-
-        public void setCreationDate(String date) {
-            this.date = date;
-        }
-
-        @Override
-        public String toString() {
-            if (text == null || user == null || date == null)
-                return "null";
-            return "CommentTO{" +
-                    "text='" + text + '\'' +
-                    ", user='" + user + '\'' +
-                    ", date='" + date + '\'' +
-                    '}';
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            RecipeTO.Comment comment = (RecipeTO.Comment) o;
-            return this.text.equals(comment.text) &&
-                    this.user.equals(comment.user) &&
-                    this.date.equals(comment.date);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(text, user, date);
-        }
-
-    }*/
 
 }

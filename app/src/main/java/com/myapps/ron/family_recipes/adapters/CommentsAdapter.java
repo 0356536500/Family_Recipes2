@@ -3,6 +3,8 @@ package com.myapps.ron.family_recipes.adapters;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +15,7 @@ import com.myapps.ron.family_recipes.model.CommentEntity;
 import com.myapps.ron.family_recipes.recycler.CommentsDiffCallback;
 import com.myapps.ron.family_recipes.utils.DateUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -33,7 +36,9 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.MyView
         }
     }
 
-    public CommentsAdapter() { }
+    public CommentsAdapter() {
+        this.commentList = new ArrayList<>();
+    }
 
     @NonNull
     @Override
@@ -53,17 +58,18 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.MyView
 
     @Override
     public int getItemCount() {
-        return commentList.size();
+        if (commentList != null)
+            return commentList.size();
+        return 0;
     }
 
 
     public void setComments(List<CommentEntity> commentList) {
         if (commentList != null) {
-            List<CommentEntity> oldTemp = this.commentList;
-            this.commentList = commentList;
-            DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new CommentsDiffCallback(oldTemp, commentList));
-            diffResult.dispatchUpdatesTo(this);
-            //notifyDataSetChanged();
+                List<CommentEntity> oldTemp = this.commentList;
+                this.commentList = commentList;
+                DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new CommentsDiffCallback(oldTemp, commentList));
+                diffResult.dispatchUpdatesTo(this);
         }
     }
 }

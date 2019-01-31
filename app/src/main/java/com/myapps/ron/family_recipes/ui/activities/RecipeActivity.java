@@ -1,29 +1,10 @@
 package com.myapps.ron.family_recipes.ui.activities;
 
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-
-import com.google.android.material.appbar.AppBarLayout;
-import com.google.android.material.appbar.CollapsingToolbarLayout;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
-import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.swiperefreshlayout.widget.CircularProgressDrawable;
-import androidx.core.widget.ContentLoadingProgressBar;
-import androidx.appcompat.widget.AppCompatButton;
-import androidx.appcompat.widget.AppCompatEditText;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.appcompat.widget.Toolbar;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Menu;
@@ -36,11 +17,14 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.appbar.CollapsingToolbarLayout;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 import com.myapps.ron.family_recipes.MyDividerItemDecoration;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.adapters.CommentsAdapter;
 import com.myapps.ron.family_recipes.dal.Injection;
-import com.myapps.ron.family_recipes.model.CommentEntity;
 import com.myapps.ron.family_recipes.model.RecipeEntity;
 import com.myapps.ron.family_recipes.ui.fragments.PagerDialogFragment;
 import com.myapps.ron.family_recipes.utils.Constants;
@@ -50,7 +34,20 @@ import com.myapps.ron.family_recipes.viewmodels.RecipeViewModel;
 import com.myapps.ron.searchfilter.animator.FiltersListItemAnimator;
 
 import java.io.File;
-import java.util.List;
+
+import androidx.appcompat.widget.AppCompatButton;
+import androidx.appcompat.widget.AppCompatEditText;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.widget.ContentLoadingProgressBar;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.CircularProgressDrawable;
 
 public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOffsetChangedListener {
 
@@ -67,8 +64,6 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
     private RecipeEntity recipe;
     private TextView textViewCommentTitle;
     private RecipeViewModel viewModel;
-    //private Observer<RecipeEntity> recipeObserver;
-    //private Observer<List<CommentEntity>> commentObserver;
 
     private ViewGroup commentsLayout;
     private RecyclerView commentsRecyclerView;
@@ -183,6 +178,13 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
             newFragment.setArguments(bundle);
             newFragment.show(ft, "dialog");
         });
+
+        // progressBar in expanded toolbar background, till image is loaded
+        CircularProgressDrawable circularProgressDrawable = new CircularProgressDrawable(getBaseContext());
+        circularProgressDrawable.setStrokeWidth(10f);
+        circularProgressDrawable.setCenterRadius(80f);
+        circularProgressDrawable.start();
+        imageViewCollapsingImage.setImageDrawable(circularProgressDrawable);
     }
 
     private void initRecycler() {
@@ -197,17 +199,16 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
     }
 
     private void initViewModel() {
-        viewModel =  ViewModelProviders.of(this, Injection.provideViewModelFactory(this)).get(RecipeViewModel.class);
+        viewModel = ViewModelProviders.of(this, Injection.provideViewModelFactory(this)).get(RecipeViewModel.class);
         //viewModel = ViewModelProviders.of(this).get(RecipeViewModel.class);
-        viewModel.setInitialRecipe(recipe);
 
         viewModel.getComments().observe(this, comments -> {
+            postCommentEditText.setText("");
+            postCommentButton.setEnabled(true);
+            postCommentButton.animate().alpha(1f).setDuration(animationDuration).start();
+            postCommentProgressBar.animate().alpha(0f).setDuration(animationDuration).withEndAction(() ->
+                    postCommentProgressBar.setVisibility(View.INVISIBLE)).start();
             if (comments != null) {
-                postCommentEditText.setText("");
-                postCommentButton.setEnabled(true);
-                postCommentButton.animate().alpha(1f).setDuration(animationDuration).start();
-                postCommentProgressBar.animate().alpha(0f).setDuration(animationDuration).withEndAction(() ->
-                        postCommentProgressBar.setVisibility(View.INVISIBLE)).start();
                 textViewCommentTitle.setText(getString(R.string.comments, comments.size()));
                 commentsAdapter.setComments(comments);
             }
@@ -215,52 +216,9 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
 
         viewModel.isUserLiked().observe(this, this::loadLikeDrawable);
 
-        /*recipeObserver = recipe -> {
-            if (recipe != null) {
-                boolean changedLike = false;//, postedComment = false;
-                // user changed like value
-                if (RecipeActivity.this.recipe.isUserLiked() != recipe.isUserLiked()) {
-                    changedLike = true;
-                }
-                // user posted a comment
-                *//*if (!RecipeActivity.this.recipe.getCommentsToString().equals(recipe.getCommentsToString())) {
-                    postedComment = true;
-                }*//*
-
-                RecipeActivity.this.recipe = recipe;
-                if (changedLike) {
-                    loadLikeDrawable();
-                    like.setEnabled(true);
-                }
-                *//*if (postedComment) {
-                    loadComments();
-                    postCommentEditText.setText("");
-                    postCommentButton.setEnabled(true);
-                    postCommentButton.animate().alpha(1f).setDuration(animationDuration).start();
-                    postCommentProgressBar.animate().alpha(0f).setDuration(animationDuration).withEndAction(new Runnable() {
-                        @Override
-                        public void run() {
-                            postCommentProgressBar.setVisibility(View.INVISIBLE);
-                        }
-                    }).start();
-                }*//*
-            }
-        };*/
-
-        /*commentObserver = comments -> {
-            if (comments != null) {
-                postCommentEditText.setText("");
-                postCommentButton.setEnabled(true);
-                postCommentButton.animate().alpha(1f).setDuration(animationDuration).start();
-                postCommentProgressBar.animate().alpha(0f).setDuration(animationDuration).withEndAction(() ->
-                        postCommentProgressBar.setVisibility(View.INVISIBLE)).start();
-            }
-        };*/
-
-        //viewModel.getRecipe().observe(this, recipeObserver);
-        viewModel.getRecipePath().observe(this, s -> {
-            if (s != null)
-                loadRecipeHtml(s);
+        viewModel.getRecipePath().observe(this, path -> {
+            if (path != null)
+                loadRecipeHtml(path);
             progressBar.hide();
             new Handler().postDelayed(() ->
                     commentsLayout.setVisibility(View.VISIBLE), 1500);
@@ -268,15 +226,22 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
         viewModel.getImagePath().observe(this, path -> {
             if (path != null) {
                 Log.e(TAG, "found path: " + path);
-                CircularProgressDrawable circularProgressDrawable = new CircularProgressDrawable(getBaseContext());
+                /*CircularProgressDrawable circularProgressDrawable = new CircularProgressDrawable(getBaseContext());
                 circularProgressDrawable.setStrokeWidth(5f);
                 circularProgressDrawable.setCenterRadius(35f);
-                circularProgressDrawable.start();
+                circularProgressDrawable.start();*/
 
                 GlideApp.with(getApplicationContext())
                         .asDrawable()
                         .load(Uri.fromFile(new File(path)))
-                        .placeholder(circularProgressDrawable)
+                        //.placeholder(circularProgressDrawable)
+                        .error(android.R.drawable.stat_notify_error)
+                        .into(imageViewCollapsingImage);
+            } else {
+                //TODO: load default picture
+                GlideApp.with(getApplicationContext())
+                        .asDrawable()
+                        .load(RecipeEntity.image)
                         .error(android.R.drawable.stat_notify_error)
                         .into(imageViewCollapsingImage);
             }
@@ -313,13 +278,13 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
         Log.e(TAG, recipe.toString());
         String message;
         if(isUserLiked) {
-            Log.e(TAG, "showing full heart");
+            //Log.e(TAG, "showing full heart");
             like.setImageResource(R.drawable.ic_favorite_red_36dp);
             //like.setImageDrawable(getResources().getDrawable(R.drawable.ic_favorite_red_36dp));
             message = "like";
         }
         else {
-            Log.e(this.getClass().getSimpleName(), "showing empty heart");
+            //Log.e(this.getClass().getSimpleName(), "showing empty heart");
             like.setImageResource(R.drawable.ic_favorite_border_red_36dp);
             //like.setImageDrawable(getResources().getDrawable(R.drawable.ic_favorite_border_red_36dp));
             message = "unlike";
@@ -331,6 +296,8 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
     }
 
     private void loadRecipe() {
+        viewModel.setInitialRecipe(recipe);
+
         viewModel.loadRecipeContent(this);
         viewModel.loadRecipeFoodImage(this);
         viewModel.loadComments(this);
@@ -347,20 +314,6 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
         commentsRecyclerView.addItemDecoration(new MyDividerItemDecoration(this, DividerItemDecoration.VERTICAL, 36));
         commentsRecyclerView.setItemAnimator(new FiltersListItemAnimator());
         commentsRecyclerView.setAdapter(commentsAdapter);
-    }
-
-    private void loadComments() {
-        /*if (this.recipe.getComments() != null) {
-            textViewCommentTitle.setText(getString(R.string.comments, recipe.getComments().size()));
-
-            if (commentsAdapter == null) {
-                commentsAdapter = new CommentsAdapter(this.recipe.getComments());
-                commentsRecyclerView.setAdapter(commentsAdapter);
-
-            } else {
-                commentsAdapter.setComments(this.recipe.getComments());
-            }
-        }*/
     }
 
     private void loadRecipeHtml(String path) {
@@ -414,53 +367,31 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
         @Override
         public void onClick(View view) {
             //Toast.makeText(getApplicationContext(), postCommentEditText.getMessage(), Toast.LENGTH_SHORT).show();
-            if (commentValidationCheck()) {
+            if (postCommentEditText.getText() != null && commentValidationCheck(postCommentEditText.getText().toString())) {
                 viewModel.postComment(getApplicationContext(), postCommentEditText.getText().toString());
-                if (postCommentEditText.getText().length() > 0) {
-                    postCommentButton.setEnabled(false);
-                    postCommentProgressBar.setVisibility(View.VISIBLE);
-                    postCommentButton.animate().alpha(0f).setDuration(animationDuration).start();
-                    postCommentProgressBar.animate().alpha(1f).setDuration(animationDuration).start();
-                }
-            }
+
+                postCommentButton.setEnabled(false);
+                postCommentProgressBar.setVisibility(View.VISIBLE);
+                postCommentButton.animate().alpha(0f).setDuration(animationDuration).start();
+                postCommentProgressBar.animate().alpha(1f).setDuration(animationDuration).start();
+
+            } else
+                Toast.makeText(getApplicationContext(), R.string.post_comment_error, Toast.LENGTH_SHORT).show();
         }
     };
 
-    private boolean commentValidationCheck() {
-        if (postCommentEditText.getText() != null) {
-            String text = postCommentEditText.getText().toString();
-            return text.length() > 0 && !text.startsWith(" ");
-        }
-        return false;
+    private boolean commentValidationCheck(String text) {
+        return text.length() > 0 && !text.startsWith(" ");
     }
 
     public void doLike(View view) {
-        //recipe.setMeLike(!recipe.getMeLike());
-        //if(MiddleWareForNetwork.checkInternetConnection(this))
         like.setEnabled(false);
-        //viewModel.getRecipe().observe(this, recipeObserver);
         viewModel.changeLike(this);
-        /*String message;
-        // do like
-        loadRecipeContent();
-        if((int)view.getTag() == R.drawable.ic_favorite_border_red_36dp) {
-            like.setImageDrawable(getResources().getDrawable(R.drawable.ic_favorite_red_36dp));
-            like.setTag(R.drawable.ic_favorite_red_36dp);
-            message = "like";
-        }
-        // do unlike
-        else {
-            like.setImageDrawable(getResources().getDrawable(R.drawable.ic_favorite_border_red_36dp));
-            like.setTag(R.drawable.ic_favorite_border_red_36dp);
-            message = "unlike";
-        }
-            Snackbar.make(view, message, Snackbar.LENGTH_SHORT)
-                    .setAction("Action", null).show();*/
     }
 
     private void exit() {
         Intent intent = new Intent();
-        intent.putExtra(Constants.RECIPE, this.recipe);
+        intent.putExtra(Constants.RECIPE, viewModel.getRecipe());
         setResult(RESULT_OK, intent);
         finish();
     }
