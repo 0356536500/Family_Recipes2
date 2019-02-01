@@ -75,12 +75,21 @@ public interface RecipeInterface {
     );
 
     @PATCH(recipeWithID)
-    Call<Void> patchRecipe(
+    Call<RecipeTO> patchRecipe(
             @HeaderMap Map<String, String> headers,
             @Path(Constants.ID_QUERY) String id,
             @Query(Constants.LAST_MODIFIED_QUERY) String lastModifiedDate,
             @Body Map<String, Object> body
     );
+
+    @POST(recipeWithID + "/" + Constants.COMMENTS)
+    Call<Void> postComment(
+            @HeaderMap Map<String, String> headers,
+            @Path(Constants.ID_QUERY) String id,
+            @Query(Constants.LAST_MODIFIED_QUERY) String lastModifiedDate,
+            @Body Map<String, Object> body
+    );
+
 
     //endregion
 

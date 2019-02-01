@@ -275,7 +275,7 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
     }
 
     private void loadLikeDrawable(boolean isUserLiked) {
-        Log.e(TAG, recipe.toString());
+        //Log.e(TAG, recipe.toString());
         String message;
         if(isUserLiked) {
             //Log.e(TAG, "showing full heart");
@@ -293,6 +293,7 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
             Snackbar.make(like, message, Snackbar.LENGTH_SHORT)
                     .setAction("Action", null).show();
         showLikeMessage = true;
+        like.setEnabled(true);
     }
 
     private void loadRecipe() {

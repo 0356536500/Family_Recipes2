@@ -139,7 +139,7 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
     public void onDetach() {
         Log.e(TAG, "on detach");
         super.onDetach();
-        //parent.removeAllViews();
+        parent.removeAllViews();
     }
 
     @Override
@@ -430,18 +430,22 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
     // endregion
 
     // region Recycler Listener
+    private Disposable onItemSelectedDisposable;
     @Override
     public void onItemSelected(RecipeMinimal recipeMinimal) {
-        Disposable disposable = viewModel.getRecipe(recipeMinimal.getId())
+        Log.e(TAG, "onItemSelected, " + recipeMinimal);
+        onItemSelectedDisposable = viewModel.getRecipe(recipeMinimal.getId())
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .observeOn(Schedulers.io())
                 .subscribe(recipeEntity -> {
-                    Log.e(TAG, recipeEntity.toString());
+                    Log.e(TAG, "onItemSelected observer" + recipeEntity.toString());
                     Intent intent = new Intent(activity, RecipeActivity.class);
                     intent.putExtra(Constants.RECIPE, recipeEntity);
                     startActivityForResult(intent, Constants.RECIPE_ACTIVITY_CODE);
+                    if (onItemSelectedDisposable != null)
+                        onItemSelectedDisposable.dispose();
                 }, error -> Log.e(TAG, error.getMessage()));
-        compositeDisposable.add(disposable);
+        //compositeDisposable.add(disposable);
     }
 
     @Override
@@ -455,8 +459,8 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
 
         // Create and show the dialog.
         Disposable disposable = viewModel.getRecipe(recipeMinimal.getId())
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .observeOn(Schedulers.io())
                 .subscribe(recipeEntity -> {
                     DialogFragment newFragment = new PagerDialogFragment();
                     Bundle bundle = new Bundle();

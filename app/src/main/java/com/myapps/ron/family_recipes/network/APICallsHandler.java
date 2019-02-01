@@ -167,7 +167,7 @@ public class APICallsHandler {
         return fields;
     }
 
-    public static void patchRecipe(Map<String, Object> attributes, String id, String lastModifiedDate, String token, final MyCallback<Boolean> callback) {
+    public static void patchRecipe(Map<String, Object> attributes, String id, String lastModifiedDate, String token, final MyCallback<RecipeTO> callback) {
         Map<String, String> headers = new HashMap<>();
         headers.put(Constants.CONTENT_TYPE, "application/json");
         headers.put(Constants.AUTHORIZATION, token);
@@ -176,13 +176,50 @@ public class APICallsHandler {
         //body.put(Constants.NUM_FILES_TO_UPLOAD, String.valueOf(numOfFiles));
 
         RecipeInterface service = getRetrofitInstance().create(RecipeInterface.class);
-        Call<Void> call = service.patchRecipe(headers, id, lastModifiedDate, attributes);
+        Call<RecipeTO> call = service.patchRecipe(headers, id, lastModifiedDate, attributes);
+
+        call.enqueue(new Callback<RecipeTO>() {
+            @Override
+            public void onResponse(@NotNull Call<RecipeTO> call, @NotNull Response<RecipeTO> response) {
+                //String body = response.body() != null ? response.body().toString() : "null";
+                Log.i(TAG, "patchRecipe code, " + response.code());
+
+                if (response.code() == STATUS_OK) {
+                    //RecipeTO recipe = response.body();
+                    callback.onFinished(response.body());
+                }
+                else {
+                    try {
+                        if (response.errorBody() != null)
+                            Log.e(TAG, "error patchRecipe, code = " + response.code() + "\n errorBody: " + response.errorBody().string());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    callback.onFinished(null);
+                }
+            }
+
+            @Override
+            public void onFailure(@NotNull Call<RecipeTO> call, @NotNull Throwable t) {
+                Log.e(TAG, "error patching recipe. message: " + t.getMessage());
+                //Toast.makeText(MainActivity.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    public static void postComment(Map<String, Object> attributes, String id, String lastModifiedDate, String token, final MyCallback<Boolean> callback) {
+        Map<String, String> headers = new HashMap<>();
+        headers.put(Constants.CONTENT_TYPE, "application/json");
+        headers.put(Constants.AUTHORIZATION, token);
+
+        RecipeInterface service = getRetrofitInstance().create(RecipeInterface.class);
+        Call<Void> call = service.postComment(headers, id, lastModifiedDate, attributes);
 
         call.enqueue(new Callback<Void>() {
             @Override
             public void onResponse(@NotNull Call<Void> call, @NotNull Response<Void> response) {
                 //String body = response.body() != null ? response.body().toString() : "null";
-                Log.i(TAG, "patchRecipe code, " + response.code());
+                Log.i(TAG, "postComment code, " + response.code());
 
                 if (response.code() == STATUS_OK) {
                     //RecipeTO recipe = response.body();
@@ -191,7 +228,7 @@ public class APICallsHandler {
                 else {
                     try {
                         if (response.errorBody() != null)
-                            Log.e(TAG, "error patchRecipe, code = " + response.code() + "\n errorBody: " + response.errorBody().string());
+                            Log.e(TAG, "error postComment, code = " + response.code() + "\n errorBody: " + response.errorBody().string());
                     } catch (IOException e) {
                         e.printStackTrace();
                     }

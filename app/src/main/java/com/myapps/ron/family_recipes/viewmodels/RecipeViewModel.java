@@ -29,6 +29,9 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
+import static com.myapps.ron.family_recipes.utils.Constants.FALSE;
+import static com.myapps.ron.family_recipes.utils.Constants.TRUE;
+
 /**
  * class for use by RecipeActivity.
  * PatchRecipe methods:
@@ -98,7 +101,7 @@ public class RecipeViewModel extends ViewModel {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(recipeEntity -> {
-                    Log.e(getClass().getSimpleName(), "in recipe observer, " + recipeEntity);
+                    //Log.e(getClass().getSimpleName(), "in recipe observer, " + recipeEntity);
                     //if user like had changed
                     if (this.recipe.isUserLiked() != recipeEntity.isUserLiked())
                         this.isUserLiked.setValue(recipeEntity.isUserLiked());
@@ -136,8 +139,11 @@ public class RecipeViewModel extends ViewModel {
             String likeStr = recipe.isUserLiked() ? "unlike" : "like";
             attrs.put(Constants.LIKES, likeStr);
             APICallsHandler.patchRecipe(attrs, recipe.getId(), recipe.getLastModifiedDate(), AppHelper.getAccessToken(), result -> {
-                if (result) // status 200
-                    recipeRepository.changeLike(recipe.getId(), !recipe.isUserLiked());
+                if (result != null && recipe.getId().equals(result.getId())) { // status 200
+                    RecipeEntity update = result.toEntity();
+                    update.setMeLike(!recipe.isUserLiked() ? TRUE : FALSE);
+                    recipeRepository.updateRecipe(update);
+                }
                 else // status <> 200
                     setInfo(R.string.load_error_message);
             });
@@ -150,9 +156,9 @@ public class RecipeViewModel extends ViewModel {
     public void postComment(final Context context, String text) {
         if(MiddleWareForNetwork.checkInternetConnection(context)) {
             Map<String, Object> attrs = new HashMap<>();
-            attrs.put(Constants.COMMENTS, text);
-            Log.e("viewModel", "before posting comment:\n" + attrs);
-            APICallsHandler.patchRecipe(attrs, recipe.getId(), recipe.getLastModifiedDate(), AppHelper.getAccessToken(), result -> {
+            attrs.put(Constants.COMMENT, text);
+            //Log.e("viewModel", "before posting comment:\n" + attrs);
+            APICallsHandler.postComment(attrs, recipe.getId(), recipe.getLastModifiedDate(), AppHelper.getAccessToken(), result -> {
                 if (result) // status 200
                     loadComments(context);
                 else { // status <> 200

@@ -145,7 +145,7 @@ public interface RecipeDao {
     @Update
     void updateRecipes(RecipeEntity... recipeEntities);
 
-    @Update
+    @Update(onConflict = OnConflictStrategy.REPLACE)
     void updateRecipe(RecipeEntity recipeEntity);
 
     @Query("UPDATE " + AppDatabases.TABLE_RECIPES + " SET meLike = :meLike where " + RecipeEntity.KEY_ID + " = :id")

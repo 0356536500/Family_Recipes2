@@ -324,8 +324,8 @@ public class RecipeEntity implements Parcelable{
     @Override
     public String toString() {
         return "Recipe{" +
-                "image='" + image + '\'' +
-                ", id='" + id + '\'' +
+                //"image='" + image + '\'' +
+                "id='" + id + '\'' +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", creationDate='" + creationDate + '\'' +

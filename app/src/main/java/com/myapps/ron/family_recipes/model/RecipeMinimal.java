@@ -95,4 +95,12 @@ public class RecipeMinimal {
     public int hashCode() {
         return Objects.hash(id, name, description, uploader, categories, foodFiles, likes);
     }
+
+    @Override
+    public String toString() {
+        return "RecipeMinimal{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                '}';
+    }
 }

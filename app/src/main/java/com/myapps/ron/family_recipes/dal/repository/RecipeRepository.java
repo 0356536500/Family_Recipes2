@@ -162,6 +162,11 @@ public class RecipeRepository {
                 recipeDao.insertRecipe(recipeEntity));
     }
 
+    public void updateRecipe(RecipeEntity recipeEntity) {
+        executor.execute(() ->
+                recipeDao.updateRecipe(recipeEntity));
+    }
+
     public void insertQuery(String name, int size) {
         executor.execute(() -> recipeDao.insertAll(AppDatabases.generateData(name, size)));
     }
