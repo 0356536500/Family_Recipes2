@@ -2,9 +2,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.myapps.ron.family_recipes.ui.activities.RecipeActivity">
+
+    <item
+        android:id="@+id/action_add_photo"
+        android:title="@string/action_add_photo"
+        app:showAsAction="never" />
+    <!--android:icon="@drawable/ic_share_expanded_24dp"-->
+
     <item
         android:id="@+id/action_share"
-        android:icon="@drawable/ic_share_expanded_24dp"
         android:title="@string/action_share"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="never" />
+    <!--android:icon="@drawable/ic_share_expanded_24dp"-->
 </menu>

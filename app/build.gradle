@@ -36,7 +36,7 @@ dependencies {
     // androidx library
     implementation 'androidx.appcompat:appcompat:1.1.0-alpha01'
     implementation 'com.google.android.material:material:1.1.0-alpha02'
-    implementation 'androidx.recyclerview:recyclerview:1.1.0-alpha01'
+    implementation 'androidx.recyclerview:recyclerview:1.1.0-alpha02'
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.preference:preference:1.1.0-alpha02'
@@ -69,7 +69,7 @@ dependencies {
     // endregion
 
     // region Paging library
-    def paging_version = "2.1.0-rc01"
+    def paging_version = "2.1.0"
 
     implementation "androidx.paging:paging-runtime:$paging_version" // use -ktx for Kotlin
 

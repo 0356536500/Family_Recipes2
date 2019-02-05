@@ -7,6 +7,7 @@ public class Constants {
     public static final String DEFAULT_RECIPE_PATH = "/recipe/default.html";
 
     public static final String ACTION_UPDATE_FROM_SERVICE = "update_from_service";
+    public static final String ACTION_UPLOAD_IMAGES_SERVICE = "upload_images_service";
 
     public static final int RECIPE_ACTIVITY_CODE = 0;
     public static final int POST_RECIPE_ACTIVITY_CODE = 1;

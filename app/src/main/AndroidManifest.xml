@@ -79,13 +79,11 @@
             android:label="@string/title_activity_forgot_password" />
         <activity android:name=".TestActivity">
 
-            <!--
-            <intent-filter>
+            <!--<intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-            -->
+            </intent-filter>-->
 
         </activity>
 
@@ -96,11 +94,21 @@
         <activity
             android:name=".ui.activities.SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:parentActivityName=".ui.activities.MainActivity"></activity>
+            android:parentActivityName=".ui.activities.MainActivity"/>
 
         <service
             android:name=".services.GetAllRecipesService"
-            android:exported="false"></service>
+            android:exported="false"/>
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="com.myapps.ron.family_recipes"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths"/>
+        </provider>
     </application>
 
 </manifest>

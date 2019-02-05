@@ -198,6 +198,19 @@
         <item name="colorPrimary">@color/toolbar_background</item>
     </style>
 
+    <!-- Style for pick image dialog -->
+    <style name="option" >
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingStart">15dp</item>
+        <item name="android:paddingEnd">15dp</item>
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingBottom">10dp</item>
+        <item name="android:gravity">center</item>
+        <!--<item name="android:textColor">@color/option_text_selector</item>-->
+
+    </style>
+
     <!--<style name="CustomDialogAnimation">
         <item name="android:windowEnterAnimation">@android:anim/fade_in</item>
         <item name="android:windowExitAnimation">@android:anim/fade_out</item>

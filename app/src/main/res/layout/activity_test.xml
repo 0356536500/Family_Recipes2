@@ -6,77 +6,10 @@
     android:layout_height="match_parent"
     tools:context=".TestActivity">
 
-    <androidx.appcompat.widget.AppCompatEditText
-        android:id="@+id/test_editText"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="10dp"
-        android:textAlignment="center"
-        android:inputType="textShortMessage"
-        android:hint="recipe name"/>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/test_recyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/test_editText"
-        android:nestedScrollingEnabled="true"
-        android:scrollbars="vertical"
-        android:clipToPadding="false" />
-    <!--<TextView
-        android:id="@+id/test_textView"
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/test_imageView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:message="test"
-        android:textSize="20sp"/>
+        android:layout_centerInParent="true" />
 
-    <EditText
-        android:id="@+id/test_editText"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/test_textView"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp"
-        android:textAlignment="center"
-        android:hint="recipe name"/>
-
-    <Button
-        android:id="@+id/test_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/test_editText"
-        android:layout_centerHorizontal="true"
-        android:onClick="updateRecipeName"
-        android:layout_marginTop="20dp"
-        android:message="Update" />-->
-
-    <!--<ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:scrollbars="vertical">
-
-        <com.google.android.flexbox.FlexboxLayout
-            android:id="@+id/flexBox_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:flexWrap="wrap"
-            app:flexDirection="row"
-            app:alignItems="flex_start"
-            app:alignContent="flex_start"
-            app:justifyContent="flex_start"
-            tools:context=".TestActivity">
-
-        </com.google.android.flexbox.FlexboxLayout>
-    </ScrollView>
-
-    <com.myapps.ron.searchfilter.widget.Filter
-        android:id="@+id/test_filters"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:collapsedBackground="?attr/toolbarBackgroundPrimary"
-        app:expandedBackground="?attr/toolbarBackgroundPrimary"/>-->
 </RelativeLayout>

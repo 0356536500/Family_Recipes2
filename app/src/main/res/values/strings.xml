@@ -1,4 +1,5 @@
 <resources>
+    <string name="appPackage" translatable="false">com.myapps.ron.family_recipes</string>
     <string name="app_name">Family Recipes</string>
     <!-- Menu and Navigation drawer-->
     <string name="action_settings">Settings</string>
@@ -6,6 +7,7 @@
     <string name="action_search">Search</string>
     <string name="action_filter">Filter</string>
     <string name="action_share">Share</string>
+    <string name="action_add_photo">Add Photo</string>
     <string name="action_refresh">Refresh</string>
     <string name="action_sort_toggle">Sort By</string>
     <string name="search_hint">Type name…</string>
@@ -74,6 +76,10 @@
     <string name="no_comments">Comments (0)</string>
     <string name="post_comment_hint">Type a message</string>
     <string name="post_comment_succeeded">Message posted successfully</string>
+    <string name="alert_dialog_upload_photos_confirmation">Confirmation</string>
+    <string name="alert_dialog_upload_photos_cancel">Cancel</string>
+    <string name="alert_dialog_upload_photos_finish">Upload %1$d images</string>
+    <string name="alert_dialog_upload_photos_take_more">More</string>
 
     <!-- CreateRecipe Activity -->
     <string name="post_recipe_name">Recipe name</string>
@@ -142,6 +148,14 @@
     <!--
     <string name="create_recipe_">Not connected to internet</string>
 -->
+
+    <!-- pick image dialog -->
+    <string name="pick_image_dialog_camera">Camera</string>
+    <string name="pick_image_dialog_gallery">Gallery</string>
+    <string name="pick_image_dialog_choose">Choose</string>
+    <string name="pick_image_dialog_cancel">Cancel</string>
+
+
 
 
     <string-array name="job_titles">

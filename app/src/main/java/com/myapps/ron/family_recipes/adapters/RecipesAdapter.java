@@ -2,7 +2,6 @@ package com.myapps.ron.family_recipes.adapters;
 
 import android.content.Context;
 import android.graphics.PorterDuff;
-import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,7 +18,6 @@ import com.myapps.ron.family_recipes.model.RecipeMinimal;
 import com.myapps.ron.family_recipes.recycler.RecipesAdapterHelper;
 import com.myapps.ron.family_recipes.utils.GlideApp;
 
-import java.io.File;
 import java.util.List;
 import java.util.Random;
 
@@ -179,7 +177,7 @@ public class RecipesAdapter extends PagedListAdapter<RecipeMinimal, RecipesAdapt
                     circularProgressDrawable.start();
 
                     GlideApp.with(context)
-                            .load(Uri.fromFile(new File(path)))
+                            .load(path)
                             .placeholder(circularProgressDrawable)
                             //.apply(requestOptions)
                             .into(holder.thumbnail);

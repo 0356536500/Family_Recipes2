@@ -44,6 +44,16 @@
 
     <include layout="@layout/content_recipe" />
 
+    <ProgressBar
+        android:id="@+id/recipe_upload_images_progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        android:indeterminateTint="?android:colorControlActivated"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="15dp"/>
+
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/recipe_like"
         android:layout_width="wrap_content"

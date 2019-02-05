@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.os.StrictMode;
 import android.util.Log;
 
+import com.myapps.ron.family_recipes.dal.storage.StorageWrapper;
 import com.myapps.ron.family_recipes.model.RecipeEntity;
 import com.myapps.ron.family_recipes.network.APICallsHandler;
 import com.myapps.ron.family_recipes.utils.MyCallback;
@@ -65,10 +66,10 @@ public class PostRecipeToServerService extends IntentService {
      * @see IntentService
      */
     // TODO: Customize helper method
-    public static void startActionPostImages(Context context, String id, ArrayList<String> files) {
+    public static void startActionPostImages(Context context, String id, List<String> files) {
         Intent intent = new Intent(context, PostRecipeToServerService.class);
         intent.setAction(ACTION_POST_IMAGES);
-        intent.putStringArrayListExtra(EXTRA_PARAM1, files);
+        intent.putStringArrayListExtra(EXTRA_PARAM1, new ArrayList<>(files));
         intent.putExtra(EXTRA_PARAM2, id);
         context.startService(intent);
     }
@@ -85,7 +86,8 @@ public class PostRecipeToServerService extends IntentService {
             } else if (ACTION_POST_IMAGES.equals(action)) {
                 final List<String> files = intent.getStringArrayListExtra(EXTRA_PARAM1);
                 String id = intent.getStringExtra(EXTRA_PARAM2);
-                handleActionPostImagesSync(id, files);
+                handleActionPostImagesSync(id, compressFiles(files));
+                deleteLocalFiles(files);
             }
         }
     }
@@ -113,12 +115,7 @@ public class PostRecipeToServerService extends IntentService {
                             uploadFoodFilesSync(recipe.getId(), recipe.getFoodFiles());
                         } else {
                             //no images to upload
-                            new Handler().postDelayed(new Runnable() {
-                                @Override
-                                public void run() {
-                                    sendIntentToUser(false, "recipe uploaded");
-                                }
-                            }, 2500);
+                            new Handler().postDelayed(() -> sendIntentToUser(false, "recipe uploaded"), 2500);
                         }
                     }
                     else
@@ -129,7 +126,10 @@ public class PostRecipeToServerService extends IntentService {
             }
         });
 
-        deleteAllLocalFiles(recipe);
+        deleteLocalFiles(recipe.getFoodFiles());
+        List<String> recipeFile = new ArrayList<>();
+        recipeFile.add(recipe.getRecipeFile());
+        deleteLocalFiles(recipeFile);
     }
 
 
@@ -145,12 +145,7 @@ public class PostRecipeToServerService extends IntentService {
                 Log.e(TAG, "uploading file #" + i);
                 OnlineStorageWrapper.uploadFoodFileSync(urlsForFood.get(i), foodFiles.get(i));
             }
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    sendIntentToUser(true, "images uploaded");
-                }
-            }, 2500);
+            new Handler().postDelayed(() -> sendIntentToUser(true, "images uploaded"), 2500);
         }
         Log.e(TAG, "urls are null");
     }
@@ -163,21 +158,61 @@ public class PostRecipeToServerService extends IntentService {
         sendBroadcast(intent);
     }
 
-    private void deleteAllLocalFiles(RecipeEntity recipe) {
-        if (recipe.getFoodFiles() != null && !recipe.getFoodFiles().isEmpty()) {
-            for (int i = 0; i < recipe.getFoodFiles().size(); i++) {
-                new File(recipe.getFoodFiles().get(i)).delete();
-            }
-        }
-        new File(recipe.getRecipeFile()).delete();
+    private void sendIntentUploadImagesFinishedToUser(boolean finish) {
+        Intent intent = new Intent();
+        intent.setAction(Constants.ACTION_UPLOAD_IMAGES_SERVICE);
+        intent.putExtra("flag", finish);
+        sendBroadcast(intent);
     }
 
+    private void deleteLocalFiles(List<String> files) {
+        if (files != null && !files.isEmpty()) {
+            for (int i = 0; i < files.size(); i++) {
+                new File(files.get(i)).delete();
+            }
+        }
+        //new File(recipe.getRecipeFile()).delete();
+    }
+
+    private List<String> compressFiles(List<String> paths) {
+        List<String> compressedFiles = null;
+        if (paths != null) {
+            compressedFiles = new ArrayList<>();
+            for (String path: paths) {
+                String compressedPath = StorageWrapper.compressFile(this, path);
+                if (compressedPath != null) {
+                    compressedFiles.add(compressedPath);
+                    File compressedFile = new File(compressedPath);
+                    Log.e(TAG, "compressed file bytes = " + compressedFile.length());
+                    compressedFile.deleteOnExit();
+                }
+            }
+        }
+        return compressedFiles;
+    }
 
     /**
      * Handle action Baz in the provided background thread with the provided
      * parameters.
      */
-    private void handleActionPostImagesSync(String id, List<String> localPaths) {
-        uploadFoodFilesSync(id, localPaths);
+    private void handleActionPostImagesSync(String id, List<String> foodFiles) {
+        //uploadFoodFilesSync(id, localPaths);
+        Log.e(TAG, "handle post images");
+        Log.e(TAG, "id = " + id + "\n files: " + foodFiles);
+        //Synchronous request with retrofit 2.0
+        List<String> urlsForFood = APICallsHandler.requestUrlsForFoodPicturesSync(id, foodFiles, AppHelper.getAccessToken());
+        if (urlsForFood != null) {
+            //upload the images to s3
+            Log.e(TAG, "urls: " + urlsForFood);
+            for (int i = 0; i < urlsForFood.size() && i < foodFiles.size(); i++) {
+                Log.e(TAG, "uploading file #" + i);
+                OnlineStorageWrapper.uploadFoodFileSync(urlsForFood.get(i), foodFiles.get(i));
+            }
+            sendIntentUploadImagesFinishedToUser(true);
+        } else {
+            Log.e(TAG, "urls are nulls");
+            sendIntentUploadImagesFinishedToUser(false);
+        }
+        deleteLocalFiles(foodFiles);
     }
 }

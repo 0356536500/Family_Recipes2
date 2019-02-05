@@ -1,6 +1,7 @@
 package com.myapps.ron.family_recipes.network.S3;
 
 import android.content.Context;
+import android.net.Uri;
 
 import com.myapps.ron.family_recipes.dal.storage.ExternalStorageHelper;
 import com.myapps.ron.family_recipes.network.Constants;
@@ -40,21 +41,21 @@ public class OnlineStorageWrapper {
 
     //region downloads
 
-    private static void downloadFile(Context context, String key, String rootPath, String dir, final MyCallback<String> callback) {
+    private static void downloadFile(Context context, String key, String dir, final MyCallback<Uri> callback) {
         S3Helper s3 = S3Helper.getInstance(context);
-        s3.downloadFile(key, rootPath, dir, callback);
+        s3.downloadFile(context, key, dir, callback);
     }
 
-    public static void downloadThumbFile(Context context, String key, final MyCallback<String> callback) {
-        downloadFile(context, key, ExternalStorageHelper.getFilesRootPath(context), Constants.THUMB_DIR, callback);
+    public static void downloadThumbFile(Context context, String key, final MyCallback<Uri> callback) {
+        downloadFile(context, key, Constants.THUMB_DIR, callback);
     }
 
-    public static void downloadFoodFile(Context context, String key, final MyCallback<String> callback) {
-        downloadFile(context, key, ExternalStorageHelper.getFilesRootPath(context), Constants.FOOD_DIR, callback);
+    public static void downloadFoodFile(Context context, String key, final MyCallback<Uri> callback) {
+        downloadFile(context, key, Constants.FOOD_DIR, callback);
     }
 
-    public static void downloadRecipeFile(Context context, String key, final MyCallback<String> callback) {
-        downloadFile(context, key, ExternalStorageHelper.getFilesRootPath(context), Constants.RECIPES_DIR, callback);
+    public static void downloadRecipeFile(Context context, String key, final MyCallback<Uri> callback) {
+        downloadFile(context, key, Constants.RECIPES_DIR, callback);
     }
 
     //endregion

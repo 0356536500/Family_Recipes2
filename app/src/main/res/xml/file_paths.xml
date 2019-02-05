@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+    <external-path name="my_images" path="Android/data/com.myapps.ron.family_recipes/files/Pictures" />
+    <external-path name="recipes" path="Android/data/com.myapps.ron.family_recipes/files/recipes" />
+    <external-path name="thumbnails" path="Android/data/com.myapps.ron.family_recipes/files/thumbnails" />
+    <external-path name="my_food_images" path="Android/data/com.myapps.ron.family_recipes/files/food-pictures" />
+</paths>

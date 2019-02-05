@@ -1,6 +1,7 @@
 package com.myapps.ron.family_recipes.viewmodels;
 
 import android.content.Context;
+import android.net.Uri;
 import android.util.Log;
 
 import com.myapps.ron.family_recipes.R;
@@ -43,7 +44,7 @@ public class RecipeViewModel extends ViewModel {
     private final MutableLiveData<List<CommentEntity>> comments = new MutableLiveData<>(); // current recipe on the screen
     private final MutableLiveData<Boolean> isUserLiked = new MutableLiveData<>();
     private MutableLiveData<String> recipePath = new MutableLiveData<>();
-    private MutableLiveData<String> imagePath = new MutableLiveData<>();
+    private MutableLiveData<Uri> imagePath = new MutableLiveData<>();
     private MutableLiveData<Integer> infoForUser = new MutableLiveData<>();
 
     public RecipeEntity getRecipe() {
@@ -70,11 +71,11 @@ public class RecipeViewModel extends ViewModel {
         return recipePath;
     }
 
-    private void setImagePath(String item) {
+    private void setImagePath(Uri item) {
         imagePath.setValue(item);
     }
 
-    public LiveData<String> getImagePath() {
+    public LiveData<Uri> getImagePath() {
         return imagePath;
     }
 
@@ -174,22 +175,14 @@ public class RecipeViewModel extends ViewModel {
 
     public void loadRecipeContent(final Context context) {
             if(recipe.getRecipeFile() != null && !recipe.getRecipeFile().equals("\"\"")) {
-                StorageWrapper.getRecipeFile(context, recipe.getRecipeFile(), new MyCallback<String>() {
-                    @Override
-                    public void onFinished(String path) {
-                        Log.e(getClass().getSimpleName(), "return from getRecipeFile");
-                        if(path != null) {
-                            Log.e(getClass().getSimpleName(), "path != null");
-                            File file = new File(path);
-                            if (file.exists()) {
-                                Log.e(getClass().getSimpleName(), "file exists");
-                                setRecipePath(Constants.FILE_PREFIX + file.getAbsolutePath());
-                            }
-                        }
-                        else {
-                            setInfo(R.string.no_internet_message);
-                            setRecipePath(null);
-                        }
+                StorageWrapper.getRecipeFile(context, recipe.getRecipeFile(), path -> {
+                    //Log.e(getClass().getSimpleName(), "return from getRecipeFile");
+                    if(path != null) {
+                        setRecipePath(Constants.FILE_PREFIX + path.getPath());
+                    }
+                    else {
+                        setInfo(R.string.no_internet_message);
+                        setRecipePath(null);
                     }
                 });
             }

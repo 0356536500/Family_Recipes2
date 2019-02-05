@@ -2,10 +2,6 @@ package com.myapps.ron.family_recipes.adapters;
 
 import android.content.Context;
 import android.net.Uri;
-import androidx.annotation.NonNull;
-import androidx.viewpager.widget.PagerAdapter;
-import androidx.swiperefreshlayout.widget.CircularProgressDrawable;
-import androidx.appcompat.widget.AppCompatImageView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,10 +9,14 @@ import android.view.ViewGroup;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.dal.storage.StorageWrapper;
 import com.myapps.ron.family_recipes.model.RecipeEntity;
-import com.myapps.ron.family_recipes.utils.MyCallback;
 import com.myapps.ron.family_recipes.utils.GlideApp;
 
 import java.io.File;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.widget.AppCompatImageView;
+import androidx.swiperefreshlayout.widget.CircularProgressDrawable;
+import androidx.viewpager.widget.PagerAdapter;
 
 /**
  * Created by ronginat on 24/10/2018.
@@ -63,29 +63,26 @@ public class MyPagerAdapter extends PagerAdapter {
     private void loadImage(final AppCompatImageView view, final int position) {
         if (recipe != null && recipe.getFoodFiles() != null && recipe.getFoodFiles().size() > position) {
 
-            StorageWrapper.getFoodFile(context, recipe.getFoodFiles().get(position), new MyCallback<String>() {
-                @Override
-                public void onFinished(String path) {
-                    if(path != null) {
-                        CircularProgressDrawable circularProgressDrawable = new CircularProgressDrawable(context);
-                        circularProgressDrawable.setStrokeWidth(5f);
-                        circularProgressDrawable.setCenterRadius(35f);
-                        circularProgressDrawable.start();
+            //.apply(RequestOptions.circleCropTransform())
+            StorageWrapper.getFoodFile(context, recipe.getFoodFiles().get(position), path -> {
+                if(path != null) {
+                    CircularProgressDrawable circularProgressDrawable = new CircularProgressDrawable(context);
+                    circularProgressDrawable.setStrokeWidth(5f);
+                    circularProgressDrawable.setCenterRadius(35f);
+                    circularProgressDrawable.start();
 
-                        File file = new File(path);
-                        if (position > 0)
-                            file.deleteOnExit();
+                    File file = new File(path.getPath());
+                    if (position > 0)
+                        file.deleteOnExit();
 
-                        GlideApp.with(context)
-                                .load(Uri.fromFile(file))
-                                .placeholder(circularProgressDrawable)
-                                //.apply(requestOptions)
-                                .into(view);
-                    }
-                    else
-                        loadDefaultImage(view);
+                    GlideApp.with(context)
+                            .load(Uri.fromFile(file))
+                            .placeholder(circularProgressDrawable)
+                            //.apply(requestOptions)
+                            .into(view);
                 }
-                //.apply(RequestOptions.circleCropTransform())
+                else
+                    loadDefaultImage(view);
             });
         }
         else {

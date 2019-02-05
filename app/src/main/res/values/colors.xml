@@ -71,6 +71,11 @@
         <item name="customer1" type="color">#fc6177</item>
         <item name="other1" type="color">#bcbcbc</item>
     </array>
+
+    <!-- pick image dialog -->
+    <color name="option_pressed">#e9e4e4</color>
+    <color name="option_text_pressed">#000000</color>
+    <color name="option_text">#080808</color>
 </resources>
 
 

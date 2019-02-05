@@ -1,6 +1,7 @@
 package com.myapps.ron.family_recipes.network.S3;
 
 import android.content.Context;
+import android.net.Uri;
 import android.os.StrictMode;
 import androidx.annotation.NonNull;
 import android.util.Log;
@@ -9,6 +10,7 @@ import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferState;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
+import com.myapps.ron.family_recipes.dal.storage.ExternalStorageHelper;
 import com.myapps.ron.family_recipes.utils.MyCallback;
 
 import java.io.File;
@@ -123,21 +125,25 @@ class S3Helper {
     /**
      * the file is located in bucket/{@param key}
      * @param key - file path in bucket and dir/fileName in local storage
-     * @param rootPath - root path of current application
+     * rootPath - root path of current application
      * @param dir - directory in bucket and in local storage
      * @param callback - passed callback
      */
-    void downloadFile(String key, final String rootPath, String dir, final MyCallback<String> callback) {
+    void downloadFile(Context context, String key, String dir, final MyCallback<Uri> callback) {
         //Log.e(TAG, "downloadFile, " + key);
         /*TransferObserver downloadObserver =
                 transferUtility.download(
                         "public/s3Key.txt",
                         new File("/path/to/file/localFile.txt"));*/
 
-        key = dir + "/" + key;
-        Log.e(TAG, "downloadFile, " + key);
-        final String path = rootPath + "/" + key;
-        Log.e(TAG, "downloadFile, " + path);
+        String s3Key = dir + "/" + key;
+        Log.e(TAG, "downloadFile, " + s3Key);
+        final String path = ExternalStorageHelper.getFileForOnlineDownload(context, dir, key);
+        if (path == null) {
+            callback.onFinished(null);
+            return;
+        }
+        Log.e(TAG, "local download file, " + path);
         //final String path = rootPath + "/" + dir + "/" + key;
         final File file = new File(path);
         if(!file.exists()) {
@@ -150,7 +156,7 @@ class S3Helper {
             }
         }
         //Log.e(TAG, "before downloading, key = " + key + " local path = " + path);
-        TransferObserver downloadObserver = transferUtility.download(key, file);
+        TransferObserver downloadObserver = transferUtility.download(s3Key, file);
 
         // Attach a listener to the observer to get state update and progress notifications
         downloadObserver.setTransferListener(new TransferListener() {
@@ -160,7 +166,7 @@ class S3Helper {
                 Log.e(TAG, "state changed, " + state.name());
                 if (TransferState.COMPLETED == state) {
                     // Handle a completed upload.
-                    callback.onFinished(path);
+                    callback.onFinished(ExternalStorageHelper.getFileUri(context, dir, key));
                 }
                 if (TransferState.FAILED == state)
                     callback.onFinished(null);
@@ -177,7 +183,8 @@ class S3Helper {
             @Override
             public void onError(int id, Exception ex) {
                 // Handle errors
-                Log.d(TAG, "error downloading file " + id + "\n" + ex.getMessage());
+                Log.e(TAG, "error downloading file " + id + "\n" + ex.getMessage());
+                ex.printStackTrace();
                 callback.onFinished(null);
             }
 

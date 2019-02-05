@@ -7,6 +7,7 @@
     <string name="action_filter">סינון</string>
     <string name="action_sort_toggle">מיון לפי</string>
     <string name="action_share">שיתוף</string>
+    <string name="action_add_photo">הוספת תמונה</string>
     <string name="action_refresh">רענן</string>
     <string name="search_hint">הקלד/י לחיפוש…</string>
 
@@ -71,6 +72,10 @@
     <string name="no_comments">תגובות (0)</string>
     <string name="post_comment_hint">תגובה חדשה</string>
     <string name="post_comment_succeeded">ההודעה נשלחה בהצלחה</string>
+    <string name="alert_dialog_upload_photos_confirmation">אישור</string>
+    <string name="alert_dialog_upload_photos_cancel">ביטול</string>
+    <string name="alert_dialog_upload_photos_finish">העלה %1$d תמונות</string>
+    <string name="alert_dialog_upload_photos_take_more">עוד</string>
 
     <!-- CreateRecipe Activity -->
     <string name="post_recipe_name">שם המתכון</string>
@@ -115,6 +120,13 @@
         <item>עברית</item>
         <!--<item>תימנית</item>-->
     </string-array>
+
+
+    <!-- pick image dialog -->
+    <string name="pick_image_dialog_camera">מצלמה</string>
+    <string name="pick_image_dialog_gallery">גלריה</string>
+    <string name="pick_image_dialog_choose">בחירה</string>
+    <string name="pick_image_dialog_cancel">ביטול</string>
 
 
     <string name="large_text">

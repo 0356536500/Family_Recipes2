@@ -1,10 +1,18 @@
 package com.myapps.ron.family_recipes.ui.activities;
 
+import android.Manifest;
+import android.content.BroadcastReceiver;
+import android.content.ClipData;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Menu;
@@ -25,8 +33,11 @@ import com.myapps.ron.family_recipes.MyDividerItemDecoration;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.adapters.CommentsAdapter;
 import com.myapps.ron.family_recipes.dal.Injection;
+import com.myapps.ron.family_recipes.dal.storage.StorageWrapper;
 import com.myapps.ron.family_recipes.model.RecipeEntity;
+import com.myapps.ron.family_recipes.services.PostRecipeToServerService;
 import com.myapps.ron.family_recipes.ui.fragments.PagerDialogFragment;
+import com.myapps.ron.family_recipes.ui.fragments.PickImagesMethodDialog;
 import com.myapps.ron.family_recipes.utils.Constants;
 import com.myapps.ron.family_recipes.utils.GlideApp;
 import com.myapps.ron.family_recipes.utils.MyBaseActivity;
@@ -34,10 +45,19 @@ import com.myapps.ron.family_recipes.viewmodels.RecipeViewModel;
 import com.myapps.ron.searchfilter.animator.FiltersListItemAnimator;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.AppCompatEditText;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import androidx.core.widget.ContentLoadingProgressBar;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
@@ -48,12 +68,19 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.schedulers.Schedulers;
 
 public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOffsetChangedListener {
 
+    private static final int MY_PERMISSIONS_REQUEST_STORAGE = 11;
+    private static final int CAMERA_REQUEST = 2;
+    private static final int GALLERY_REQUEST = 1;
+
     private final String TAG = RecipeActivity.class.getSimpleName();
     private AppBarLayout appBarLayout;
-    private MenuItem menuItemShare;
+    //private MenuItem menuItemShare;
     private Toolbar toolbar;
     private CollapsingToolbarLayout collapsingToolbarLayout;
     private ImageView imageViewCollapsingImage;
@@ -77,6 +104,10 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
 
     private int textColorPrimary, textColorSecondary,
             navigationCollapsedColor, navigationExpandedColor;
+    private ProgressBar uploadImagesProgressBar;
+    private Uri imageUri;
+    private List<String> imagesPathsToUpload = new ArrayList<>();
+    private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     @Override
     protected void onMyCreate(Bundle savedInstanceState) {
@@ -129,6 +160,7 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
         postCommentButton = findViewById(R.id.recipe_content_post_button);
         postCommentEditText = findViewById(R.id.recipe_content_post_editText);
         postCommentProgressBar = findViewById(R.id.recipe_content_post_progressBar);
+        uploadImagesProgressBar = findViewById(R.id.recipe_upload_images_progressBar);
     }
 
     private void initUI() {
@@ -233,7 +265,7 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
 
                 GlideApp.with(getApplicationContext())
                         .asDrawable()
-                        .load(Uri.fromFile(new File(path)))
+                        .load(path)
                         //.placeholder(circularProgressDrawable)
                         .error(android.R.drawable.stat_notify_error)
                         .into(imageViewCollapsingImage);
@@ -255,7 +287,7 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_recipe, menu);
-        menuItemShare = menu.findItem(R.id.action_share);
+        //menuItemShare = menu.findItem(R.id.action_share);
 
         return true;
     }
@@ -268,10 +300,116 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
         int itemId = item.getItemId();
 
         switch (itemId) {
+            case R.id.action_add_photo:
+                if (hasStoragePermission())
+                    showChooseDialog();
+                return true;
             case R.id.action_share:
+                //TODO: https://developer.android.com/training/sharing/send
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void showChooseDialog() {
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        Fragment prev = getSupportFragmentManager().findFragmentByTag("dialog");
+        if (prev != null) {
+            ft.remove(prev);
+        }
+        ft.addToBackStack(null);
+
+        // Create and show the dialog.
+        PickImagesMethodDialog pickImageDialog = new PickImagesMethodDialog();
+        pickImageDialog.show(ft, "dialog");
+
+        compositeDisposable.add(pickImageDialog.dispatchInfo
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(next -> {
+                    switch (next) {
+                        case CAMERA:
+                            dispatchCameraIntent();
+                            break;
+                        case GALLERY:
+                            dispatchGalleryIntent();
+                            break;
+                        case CANCEL:
+                            break;
+                    }
+                    pickImageDialog.dismiss();
+                }, Throwable::printStackTrace, compositeDisposable::clear)
+        );
+    }
+
+    private void dispatchCameraIntent() {
+        /*StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+        StrictMode.setVmPolicy(builder.build());*/
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        // Ensure that there's a camera activity to handle the intent
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            try {
+                // Create the File where the photo should go
+                File photoFile = StorageWrapper.createImageFile(this);
+                if (photoFile != null) {
+                    //imageUri = Uri.fromFile(photoFile);
+                    imageUri = FileProvider.getUriForFile(this,
+                            getString(R.string.appPackage),
+                            photoFile);
+                    //Log.e(TAG, "before shooting, file: " + imageUri.getPath());
+                    intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+                    startActivityForResult(intent, CAMERA_REQUEST);
+                }
+            } catch (IOException ex) {
+                Log.e(TAG, ex.getMessage());
+            }
+        }
+    }
+
+    private void dispatchGalleryIntent() {
+        Intent intent = new Intent(Intent.ACTION_PICK);
+        intent.setDataAndType(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
+        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+        startActivityForResult(intent, GALLERY_REQUEST);
+
+        /*Intent intent = new Intent(Intent.ACTION_PICK);
+        intent.setType("image/*");
+        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+        startActivityForResult(intent, GALLERY_REQUEST);*/
+    }
+
+    private boolean hasStoragePermission() {
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            // Permission is not granted; Request the permission
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,
+                            Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    MY_PERMISSIONS_REQUEST_STORAGE);
+            return false;
+
+        } else {
+            // Permission has already been granted
+            return true;
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_STORAGE: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED
+                        && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+
+                    showChooseDialog();
+
+                }
+                break;
+            }
+        }
     }
 
     private void loadLikeDrawable(boolean isUserLiked) {
@@ -318,8 +456,9 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
     }
 
     private void loadRecipeHtml(String path) {
-        if(path != null)
-            myWebView.loadUrl(path);
+        /*File file = new File(path);
+        Log.e(TAG, file.getAbsolutePath());*/
+        myWebView.loadUrl(path);
     }
 
     /*private void loadImage() {
@@ -405,17 +544,23 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
     @Override
     public void onOffsetChanged(final AppBarLayout appBarLayout, final int verticalOffset) {
         appBarLayout.post(() -> {
-            if(menuItemShare == null)
-                return;
+            /*if(menuItemShare == null)
+                return;*/
             if (Math.abs(verticalOffset) == appBarLayout.getTotalScrollRange()) {
                 // Collapsed
-                menuItemShare.setIcon(R.drawable.ic_share_collapsed_24dp);
+                //menuItemShare.setIcon(R.drawable.ic_share_collapsed_24dp);
+                if (toolbar.getOverflowIcon() != null) {
+                    toolbar.getOverflowIcon().setColorFilter(navigationCollapsedColor, PorterDuff.Mode.SRC_ATOP);
+                }
                 if (toolbar.getNavigationIcon() != null) {
                     toolbar.getNavigationIcon().setColorFilter(navigationCollapsedColor, PorterDuff.Mode.SRC_ATOP);
                 }
             } else if (verticalOffset == 0) {
                 // Expanded
-                menuItemShare.setIcon(R.drawable.ic_share_expanded_24dp);
+                //menuItemShare.setIcon(R.drawable.ic_share_expanded_24dp);
+                if (toolbar.getOverflowIcon() != null) {
+                    toolbar.getOverflowIcon().setColorFilter(navigationExpandedColor, PorterDuff.Mode.SRC_ATOP);
+                }
                 if (toolbar.getNavigationIcon() != null) {
                     toolbar.getNavigationIcon().setColorFilter(navigationExpandedColor, PorterDuff.Mode.SRC_ATOP);
                 }
@@ -424,4 +569,124 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
             }*/
         });
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.e(TAG, "onActivityResult");
+        try {
+            switch (requestCode) {
+                case CAMERA_REQUEST:
+                    Log.e(TAG, "camera result, " + imageUri.getPath());
+                    if (resultCode == RESULT_OK) {
+                        File file = new File(imageUri.getPath());
+                        Log.e(TAG, "file bytes = " + file.length());
+
+                        imagesPathsToUpload.add(file.getAbsolutePath());
+                        pickImagesConfirmationDialog();
+
+                    } else {
+                        File file = new File(imageUri.getPath());
+                        if(file.delete())
+                            Toast.makeText(this, R.string.post_recipe_pick_photos_camera_empty_message, Toast.LENGTH_SHORT).show();
+                    }
+                    break;
+                case GALLERY_REQUEST:
+                    if (resultCode == RESULT_OK && null != data && data.getData() != null) {
+                        //single image
+                        Log.e(TAG, data.getData().getPath());
+                        Log.e(TAG, StorageWrapper.getRealPathFromURI(this, data.getData()));
+                        imagesPathsToUpload.add(StorageWrapper.getRealPathFromURI(this, data.getData()));
+
+                        pickImagesConfirmationDialog();
+
+                    } else if(data != null && null != data.getClipData()) {
+                        //multiple images
+                        Log.e(TAG, String.valueOf(data.getClipData().getItemCount()));
+
+                        ClipData mClipData = data.getClipData();
+
+                        int pickedImageCounter;
+
+                        for (pickedImageCounter = 0; pickedImageCounter < mClipData.getItemCount(); pickedImageCounter++) {
+                            Log.e(TAG, mClipData.getItemAt(pickedImageCounter).getUri().getPath());
+
+                            imagesPathsToUpload.add(StorageWrapper.getRealPathFromURI(this, mClipData.getItemAt(pickedImageCounter).getUri()));
+                        }
+                        pickImagesConfirmationDialog();
+                    } else {
+                        Toast.makeText(this, R.string.post_recipe_pick_photos_browse_empty_message,
+                                Toast.LENGTH_SHORT).show();
+                    }
+            }
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage());
+        }
+    }
+
+    private void pickImagesConfirmationDialog() {
+        DialogInterface.OnClickListener dialogClickListener = (dialog, button) -> {
+            switch (button){
+                case DialogInterface.BUTTON_POSITIVE:
+                    //Yes button clicked
+                    IntentFilter intentFilter = new IntentFilter();
+                    intentFilter.addAction(Constants.ACTION_UPLOAD_IMAGES_SERVICE);
+                    registerReceiver(mReceiver, intentFilter);
+                    PostRecipeToServerService.startActionPostImages(this, viewModel.getRecipe().getId(), imagesPathsToUpload);
+                    uploadImagesProgressBar.setVisibility(View.VISIBLE);
+                    break;
+
+                case DialogInterface.BUTTON_NEGATIVE:
+                    //No button clicked
+                    imagesPathsToUpload.clear();
+                    imageUri = null;
+                    break;
+
+                case DialogInterface.BUTTON_NEUTRAL:
+                    showChooseDialog();
+                    break;
+            }
+            dialog.dismiss();
+        };
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder/*.setTitle(R.string.action_add_photo)*/.setMessage(R.string.alert_dialog_upload_photos_confirmation)
+                .setPositiveButton(getString(R.string.alert_dialog_upload_photos_finish, imagesPathsToUpload.size()), dialogClickListener)
+                .setNegativeButton(R.string.alert_dialog_upload_photos_cancel, dialogClickListener)
+                .setNeutralButton(R.string.alert_dialog_upload_photos_take_more, dialogClickListener)
+                .show();
+    }
+
+    /**
+     * The BroadcastReceiver that listens for discovered devices and changes the title when
+     * uploading is finished
+     */
+    private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (action == null)
+                return;
+            switch(action) {
+                // When network state changes
+                case Constants.ACTION_UPLOAD_IMAGES_SERVICE:
+                    Log.d(TAG, "Got an update from service");
+                    //unregisterReceiver(mReceiver);
+                    //registerReceiver(mReceiver, regularFilter);
+                    if (intent.getExtras() != null) {
+                        boolean finishUpload = intent.getBooleanExtra("flag", false);
+                        if (finishUpload) {
+                            Toast.makeText(RecipeActivity.this, "photos uploaded successfully!", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(RecipeActivity.this, "failed to upload the photos", Toast.LENGTH_SHORT).show();
+                        }
+                        uploadImagesProgressBar.setVisibility(View.INVISIBLE);
+                        imagesPathsToUpload.clear();
+                        imageUri = null;
+                    }
+                    unregisterReceiver(mReceiver);
+                    break;
+            }
+        }
+    };
 }
