@@ -31,7 +31,7 @@ public interface RecipeInterface {
     String recipeWithID = Constants.URL_RECIPES + "/{" + Constants.ID_QUERY + "}";
     String recipes = Constants.URL_RECIPES;
     String categories = Constants.URL_CATEGORIES;// + "/{" + Constants.DATE_QUERY + "}";
-    String food = Constants.URL_FOOD;
+    String food = Constants.URL_FOOD + "/{" + Constants.ID_QUERY + "}";
 
 
     @GET(recipeWithID)
@@ -112,7 +112,8 @@ public interface RecipeInterface {
     @PUT(food)
     Call<List<String>> requestFoodUrls(
             @Header(Constants.AUTHORIZATION) String auth,
-            @Query(Constants.ID_QUERY) String id,
+            @Path(Constants.ID_QUERY) String id,
+            @Query(Constants.LAST_MODIFIED_QUERY) String lastModifiedDate,
             @Body Map<String, String> body
     );
 

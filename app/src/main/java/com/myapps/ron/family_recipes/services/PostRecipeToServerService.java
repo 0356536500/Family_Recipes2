@@ -37,6 +37,7 @@ public class PostRecipeToServerService extends IntentService {
     // TODO: Rename parameters
     private static final String EXTRA_PARAM1 = "com.myapps.ron.family_recipes.services.extra.PARAM1";
     private static final String EXTRA_PARAM2 = "com.myapps.ron.family_recipes.services.extra.PARAM2";
+    private static final String EXTRA_PARAM3 = "com.myapps.ron.family_recipes.services.extra.PARAM3";
 
 
     public PostRecipeToServerService() {
@@ -86,7 +87,8 @@ public class PostRecipeToServerService extends IntentService {
             } else if (ACTION_POST_IMAGES.equals(action)) {
                 final List<String> files = intent.getStringArrayListExtra(EXTRA_PARAM1);
                 String id = intent.getStringExtra(EXTRA_PARAM2);
-                handleActionPostImagesSync(id, compressFiles(files));
+                String lastModifiedDate = intent.getStringExtra(EXTRA_PARAM3);
+                handleActionPostImagesSync(id, lastModifiedDate, compressFiles(files));
                 deleteLocalFiles(files);
             }
         }
@@ -112,7 +114,7 @@ public class PostRecipeToServerService extends IntentService {
                     if (fileUploaded) {
                         //sendIntentToUser(false, "recipe uploaded");
                         if (recipe.getFoodFiles() != null) {
-                            uploadFoodFilesSync(recipe.getId(), recipe.getFoodFiles());
+                            uploadFoodFilesSync(recipe.getId(), recipe.getLastModifiedDate(), recipe.getFoodFiles());
                         } else {
                             //no images to upload
                             new Handler().postDelayed(() -> sendIntentToUser(false, "recipe uploaded"), 2500);
@@ -133,11 +135,11 @@ public class PostRecipeToServerService extends IntentService {
     }
 
 
-    private void uploadFoodFilesSync(String id, List<String> foodFiles) {
+    private void uploadFoodFilesSync(String id, String lastModifiedDate, List<String> foodFiles) {
         Log.e(TAG, "uploading images");
         Log.e(TAG, "id = " + id + "\n files: " + foodFiles);
         //Synchronous request with retrofit 2.0
-        List<String> urlsForFood = APICallsHandler.requestUrlsForFoodPicturesSync(id, foodFiles, AppHelper.getAccessToken());
+        List<String> urlsForFood = APICallsHandler.requestUrlsForFoodPicturesSync(id, lastModifiedDate, foodFiles.size(), AppHelper.getAccessToken());
         if (urlsForFood != null) {
             //upload the images to s3
             Log.e(TAG, "urls: " + urlsForFood);
@@ -195,12 +197,12 @@ public class PostRecipeToServerService extends IntentService {
      * Handle action Baz in the provided background thread with the provided
      * parameters.
      */
-    private void handleActionPostImagesSync(String id, List<String> foodFiles) {
+    private void handleActionPostImagesSync(String id, String lastModifiedDate, List<String> foodFiles) {
         //uploadFoodFilesSync(id, localPaths);
         Log.e(TAG, "handle post images");
         Log.e(TAG, "id = " + id + "\n files: " + foodFiles);
         //Synchronous request with retrofit 2.0
-        List<String> urlsForFood = APICallsHandler.requestUrlsForFoodPicturesSync(id, foodFiles, AppHelper.getAccessToken());
+        List<String> urlsForFood = APICallsHandler.requestUrlsForFoodPicturesSync(id, lastModifiedDate, foodFiles.size(), AppHelper.getAccessToken());
         if (urlsForFood != null) {
             //upload the images to s3
             Log.e(TAG, "urls: " + urlsForFood);

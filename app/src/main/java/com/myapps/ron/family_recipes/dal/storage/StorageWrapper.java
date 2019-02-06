@@ -92,14 +92,15 @@ public class StorageWrapper {
         String path = context.getFilesDir().getPath();
         //Log.e("StorageWrapper", "path is " + path);
         File file = new File(path, fileName);
-        if(file.exists()) {
-            try {
+        try {
+            if(file.exists())
                 file.delete();
-                file.createNewFile();
-            } catch (IOException e) {
-                Log.e(TAG, e.getMessage());
-            }
+            if(!file.createNewFile())
+                return null;
+        } catch (IOException e) {
+            Log.e(TAG, e.getMessage());
         }
+
         //String html = "<html><head><title>Title</title></head><body>This is random text.</body></html>";
 
         try {

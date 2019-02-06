@@ -283,7 +283,7 @@ public class APICallsHandler {
         requestBody.put(Constants.PUT_FOOD_EXTENSION, "jpg");
 
         RecipeInterface service = getRetrofitInstance().create(RecipeInterface.class);
-        Call<List<String>> call = service.requestFoodUrls(token, id, requestBody);
+        Call<List<String>> call = service.requestFoodUrls(token, id, null, requestBody);
 
         call.enqueue(new Callback<List<String>>() {
             @Override
@@ -308,17 +308,17 @@ public class APICallsHandler {
 
     }
 
-    public static List<String> requestUrlsForFoodPicturesSync(String id, List<String> files, String token) {
+    public static List<String> requestUrlsForFoodPicturesSync(String id, String lastModifiedDate, int numOfFiles, String token) {
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
                 .permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
         Map<String, String> requestBody = new HashMap<>();
-        requestBody.put(Constants.NUM_FILES_TO_UPLOAD, String.valueOf(files.size()));
+        requestBody.put(Constants.NUM_FILES_TO_UPLOAD, String.valueOf(numOfFiles));
         requestBody.put(Constants.PUT_FOOD_EXTENSION, "jpg");
 
         RecipeInterface service = getRetrofitInstance().create(RecipeInterface.class);
-        Call<List<String>> call = service.requestFoodUrls(token, id, requestBody);
+        Call<List<String>> call = service.requestFoodUrls(token, id, lastModifiedDate, requestBody);
         try {
             Response<List<String>> response = call.execute();
             Log.e(TAG, "response code for requesting urls, " + response.code());
