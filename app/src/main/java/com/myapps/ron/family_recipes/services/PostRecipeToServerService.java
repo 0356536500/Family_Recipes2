@@ -67,11 +67,12 @@ public class PostRecipeToServerService extends IntentService {
      * @see IntentService
      */
     // TODO: Customize helper method
-    public static void startActionPostImages(Context context, String id, List<String> files) {
+    public static void startActionPostImages(Context context, String id, String lastModifiedDate, List<String> files) {
         Intent intent = new Intent(context, PostRecipeToServerService.class);
         intent.setAction(ACTION_POST_IMAGES);
         intent.putStringArrayListExtra(EXTRA_PARAM1, new ArrayList<>(files));
         intent.putExtra(EXTRA_PARAM2, id);
+        intent.putExtra(EXTRA_PARAM3, lastModifiedDate);
         context.startService(intent);
     }
 
@@ -89,7 +90,7 @@ public class PostRecipeToServerService extends IntentService {
                 String id = intent.getStringExtra(EXTRA_PARAM2);
                 String lastModifiedDate = intent.getStringExtra(EXTRA_PARAM3);
                 handleActionPostImagesSync(id, lastModifiedDate, compressFiles(files));
-                deleteLocalFiles(files);
+                //deleteLocalFiles(files);
             }
         }
     }
@@ -167,6 +168,7 @@ public class PostRecipeToServerService extends IntentService {
         sendBroadcast(intent);
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     private void deleteLocalFiles(List<String> files) {
         if (files != null && !files.isEmpty()) {
             for (int i = 0; i < files.size(); i++) {

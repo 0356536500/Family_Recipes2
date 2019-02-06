@@ -125,7 +125,7 @@ public interface RecipeDao {
     Flowable<RecipeEntity> getObservableRecipe(String id);
 
     @Query("SELECT * FROM " + AppDatabases.TABLE_RECIPES + " where " + RecipeEntity.KEY_ID + " = :id")
-    Maybe<RecipeEntity> isRecipeExists(String id);
+    Maybe<RecipeEntity> getMaybeRecipe(String id);
 
 
     // Emits the number of users added to the database.

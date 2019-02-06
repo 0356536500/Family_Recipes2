@@ -21,9 +21,11 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import androidx.annotation.NonNull;
 import androidx.loader.content.CursorLoader;
 
 public class StorageWrapper {
@@ -155,6 +157,17 @@ public class StorageWrapper {
         );
     }
 
+    private static File createCompressedFile(Context context, String fileName) throws IOException {
+        // Create an image file name
+        String imageFileName = fileName + "_" + "compressed";
+        File storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        return File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+    }
+
     public static String compressFile(Context context, String path) {
         if (path == null)
             return null;
@@ -163,7 +176,7 @@ public class StorageWrapper {
         FileOutputStream out;
         String filename = null;
         try {
-            File compressedFile = StorageWrapper.createImageFile(context);
+            File compressedFile = StorageWrapper.createCompressedFile(context, new File(path).getName());
             filename = compressedFile.getAbsolutePath();
 
             out = new FileOutputStream(filename);
@@ -185,10 +198,20 @@ public class StorageWrapper {
             cursor.moveToFirst();
             String result = cursor.getString(column_index);
             cursor.close();
-            Log.e(TAG, result);
+            Log.e(TAG, "getRealPathFromURI, " + result);
             return result;
         }
         return contentUri.getPath();
+    }
+
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    public static void deleteFilesFromCamera(Context context, @NonNull List<String> filesNames) {
+        for (String name: filesNames) {
+            Uri uri = ExternalStorageHelper.getFileAbsolutePath(context, Environment.DIRECTORY_PICTURES, name);
+            if (uri != null) {
+                Log.e(TAG, "deleting " + name + ", " + new File(uri.getPath()).delete());
+            }
+        }
     }
 
 /*    private void showChoosingFile() {

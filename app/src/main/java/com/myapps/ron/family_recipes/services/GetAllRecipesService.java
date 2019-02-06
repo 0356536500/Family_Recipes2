@@ -122,7 +122,7 @@ public class GetAllRecipesService extends IntentService {
                 Log.e(TAG, "response data length: " + response.getData().size());
                 lastKey = response.getLastKey();
 
-                repository.updateFromServer(response.getData(), null);
+                repository.updateFromServer(getApplicationContext(), response.getData(), null);
                 /*MyAsyncRecipeUpdate asyncRecipeUpdate = new MyAsyncRecipeUpdate(getApplicationContext(), response.getPagedRecipes());
                 asyncRecipeUpdate.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                 asyncRecipeUpdateList.add(asyncRecipeUpdate);*/

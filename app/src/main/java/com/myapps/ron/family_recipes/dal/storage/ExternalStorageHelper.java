@@ -7,6 +7,7 @@ import android.util.Log;
 import com.myapps.ron.family_recipes.R;
 
 import java.io.File;
+import java.io.IOException;
 
 import androidx.core.content.FileProvider;
 
@@ -18,7 +19,7 @@ public class ExternalStorageHelper {
      * @param dir - dir of file to check
      * @return path of requested file from cache if available or from app root storage. null if file not exists
      */
-    static Uri getFileAbsolutePath(Context context, String dir, String fileName){
+    public static Uri getFileAbsolutePath(Context context, String dir, String fileName){
         File filesDir = context.getExternalFilesDir(dir);
         File file = new File(filesDir, fileName);
         Uri uri = Uri.fromFile(file);
@@ -91,18 +92,27 @@ public class ExternalStorageHelper {
         return null;
     }
 
-    public static String getFileForOnlineDownload(Context context, String dir, String fileName) {
+    public static File getFileForOnlineDownload(Context context, String dir, String fileName) {
         try {
             File filesDir = context.getExternalFilesDir(dir);
             File file = new File(filesDir, fileName);
-            return file.getAbsolutePath();
+            if(!file.exists()) {
+                if(!file.createNewFile()) {
+                    Log.e("ExternalStorageHelper", "couldn't create the file in " + file.getAbsolutePath());
+                    return null;
+                }
+            }
+            return file;
             /*Uri uri = FileProvider.getUriForFile(context, context.getString(R.string.appPackage), file);
             if (file.exists())
                 Log.e("ExternalStorageHelper", file.getPath() + " exists");
             return uri;*/
 
-        } catch (IllegalArgumentException e) {
+        } /*catch (IllegalArgumentException e) {
             Log.e(ExternalStorageHelper.class.getSimpleName(), e.getMessage());
+        }*/ catch (IOException e) {
+            Log.e("ExternalStorageHelper", e.getMessage());
+            e.printStackTrace();
         }
         return null;
     }

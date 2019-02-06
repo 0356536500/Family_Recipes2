@@ -23,6 +23,9 @@ public class Constants {
     public static final int FALSE = 0;
     public static final int TRUE = 1;
 
+    //RecipeActivity
+    public static final int MAX_FILES_TO_UPLOAD = com.myapps.ron.family_recipes.network.Constants.MAX_FILES_TO_UPLOAD;
+
     //PostRecipeActivity
     public static final int MIN_NUMBER_OF_HTML_ELEMENTS = 2;
 

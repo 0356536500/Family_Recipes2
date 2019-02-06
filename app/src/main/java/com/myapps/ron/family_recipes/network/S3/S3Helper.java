@@ -70,7 +70,7 @@ class S3Helper {
 
         S3Interface s3Interface = retrofit.create(S3Interface.class);
         // imageUrl is the String as received from AWS S3
-        Call<Void> call = s3Interface.uploadImage(url, requestBody);
+        Call<Void> call = s3Interface.uploadFile(url, requestBody);
 
         call.enqueue(new Callback<Void>() {
             @Override
@@ -108,7 +108,7 @@ class S3Helper {
 
         S3Interface s3Interface = retrofit.create(S3Interface.class);
         // imageUrl is the String as received from AWS S3
-        Call<Void> call = s3Interface.uploadImage(url, requestBody);
+        Call<Void> call = s3Interface.uploadFile(url, requestBody);
         Response<Void> response;
         try {
             response = call.execute();
@@ -138,23 +138,12 @@ class S3Helper {
 
         String s3Key = dir + "/" + key;
         Log.e(TAG, "downloadFile, " + s3Key);
-        final String path = ExternalStorageHelper.getFileForOnlineDownload(context, dir, key);
-        if (path == null) {
+        final File file = ExternalStorageHelper.getFileForOnlineDownload(context, dir, key);
+        if (file == null) {
             callback.onFinished(null);
             return;
         }
-        Log.e(TAG, "local download file, " + path);
-        //final String path = rootPath + "/" + dir + "/" + key;
-        final File file = new File(path);
-        if(!file.exists()) {
-            try {
-                if(!file.createNewFile())
-                    Log.e(TAG, "couldn't create the file in " + path);
-            } catch (IOException e) {
-                Log.e(TAG, e.getMessage());
-                //e.printStackTrace();
-            }
-        }
+
         //Log.e(TAG, "before downloading, key = " + key + " local path = " + path);
         TransferObserver downloadObserver = transferUtility.download(s3Key, file);
 
@@ -166,7 +155,7 @@ class S3Helper {
                 Log.e(TAG, "state changed, " + state.name());
                 if (TransferState.COMPLETED == state) {
                     // Handle a completed upload.
-                    callback.onFinished(ExternalStorageHelper.getFileUri(context, dir, key));
+                    callback.onFinished(ExternalStorageHelper.getFileAbsolutePath(context, dir, key));
                 }
                 if (TransferState.FAILED == state)
                     callback.onFinished(null);

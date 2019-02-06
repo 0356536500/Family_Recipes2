@@ -76,6 +76,7 @@
     <string name="alert_dialog_upload_photos_cancel">ביטול</string>
     <string name="alert_dialog_upload_photos_finish">העלה %1$d תמונות</string>
     <string name="alert_dialog_upload_photos_take_more">עוד</string>
+    <string name="alert_dialog_upload_photos_max_limit">מותר להעלות עד %1$d תמונות</string>
 
     <!-- CreateRecipe Activity -->
     <string name="post_recipe_name">שם המתכון</string>

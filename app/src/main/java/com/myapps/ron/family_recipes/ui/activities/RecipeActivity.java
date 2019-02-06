@@ -106,7 +106,7 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
             navigationCollapsedColor, navigationExpandedColor;
     private ProgressBar uploadImagesProgressBar;
     private Uri imageUri;
-    private List<String> imagesPathsToUpload = new ArrayList<>();
+    private List<String> imagesPathsToUpload = new ArrayList<>(), cameraImagesToDeleteAfterUpload = new ArrayList<>();
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     @Override
@@ -285,10 +285,15 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
     }
 
     @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        if (viewModel.getRecipe().getFoodFiles().size() > Constants.MAX_FILES_TO_UPLOAD * 2)
+            menu.findItem(R.id.action_add_photo).setVisible(false);
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_recipe, menu);
-        //menuItemShare = menu.findItem(R.id.action_share);
-
         return true;
     }
 
@@ -335,6 +340,7 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
                             dispatchGalleryIntent();
                             break;
                         case CANCEL:
+                            resetUploadDetails();
                             break;
                     }
                     pickImageDialog.dismiss();
@@ -580,9 +586,11 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
                     Log.e(TAG, "camera result, " + imageUri.getPath());
                     if (resultCode == RESULT_OK) {
                         File file = new File(imageUri.getPath());
-                        Log.e(TAG, "file bytes = " + file.length());
+                        Log.e(TAG, "camera absolute path, " + file.getAbsolutePath());
+                        //Log.e(TAG, "file bytes = " + file.length());
 
                         imagesPathsToUpload.add(file.getAbsolutePath());
+                        cameraImagesToDeleteAfterUpload.add(file.getName());
                         pickImagesConfirmationDialog();
 
                     } else {
@@ -595,7 +603,7 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
                     if (resultCode == RESULT_OK && null != data && data.getData() != null) {
                         //single image
                         Log.e(TAG, data.getData().getPath());
-                        Log.e(TAG, StorageWrapper.getRealPathFromURI(this, data.getData()));
+                        //Log.e(TAG, StorageWrapper.getRealPathFromURI(this, data.getData()));
                         imagesPathsToUpload.add(StorageWrapper.getRealPathFromURI(this, data.getData()));
 
                         pickImagesConfirmationDialog();
@@ -632,14 +640,14 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
                     IntentFilter intentFilter = new IntentFilter();
                     intentFilter.addAction(Constants.ACTION_UPLOAD_IMAGES_SERVICE);
                     registerReceiver(mReceiver, intentFilter);
-                    PostRecipeToServerService.startActionPostImages(this, viewModel.getRecipe().getId(), imagesPathsToUpload);
+                    PostRecipeToServerService.startActionPostImages(this,
+                            viewModel.getRecipe().getId(), viewModel.getRecipe().getLastModifiedDate(), imagesPathsToUpload);
                     uploadImagesProgressBar.setVisibility(View.VISIBLE);
                     break;
 
                 case DialogInterface.BUTTON_NEGATIVE:
                     //No button clicked
-                    imagesPathsToUpload.clear();
-                    imageUri = null;
+                    resetUploadDetails();
                     break;
 
                 case DialogInterface.BUTTON_NEUTRAL:
@@ -650,7 +658,13 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
         };
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder/*.setTitle(R.string.action_add_photo)*/.setMessage(R.string.alert_dialog_upload_photos_confirmation)
+        if (imagesPathsToUpload.size() > Constants.MAX_FILES_TO_UPLOAD) {
+            builder = builder.setMessage(getString(R.string.alert_dialog_upload_photos_max_limit, Constants.MAX_FILES_TO_UPLOAD));
+            imagesPathsToUpload = imagesPathsToUpload.subList(0, Constants.MAX_FILES_TO_UPLOAD);
+        }
+        //builder/*.setTitle(R.string.action_add_photo)*/
+        builder.setTitle(R.string.alert_dialog_upload_photos_confirmation)
+                //.setMessage(R.string.alert_dialog_upload_photos_confirmation)
                 .setPositiveButton(getString(R.string.alert_dialog_upload_photos_finish, imagesPathsToUpload.size()), dialogClickListener)
                 .setNegativeButton(R.string.alert_dialog_upload_photos_cancel, dialogClickListener)
                 .setNeutralButton(R.string.alert_dialog_upload_photos_take_more, dialogClickListener)
@@ -681,12 +695,27 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
                             Toast.makeText(RecipeActivity.this, "failed to upload the photos", Toast.LENGTH_SHORT).show();
                         }
                         uploadImagesProgressBar.setVisibility(View.INVISIBLE);
-                        imagesPathsToUpload.clear();
-                        imageUri = null;
+                        resetUploadDetails();
                     }
                     unregisterReceiver(mReceiver);
                     break;
             }
         }
     };
+
+    private void resetUploadDetails() {
+        StorageWrapper.deleteFilesFromCamera(this, cameraImagesToDeleteAfterUpload);
+        cameraImagesToDeleteAfterUpload.clear();
+        imagesPathsToUpload.clear();
+        imageUri = null;
+    }
+
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    private void deleteFiles(List<String> filesToDelete) {
+        if (filesToDelete != null) {
+            for (int i = 0; i < filesToDelete.size(); i++) {
+                new File(filesToDelete.get(i)).delete();
+            }
+        }
+    }
 }

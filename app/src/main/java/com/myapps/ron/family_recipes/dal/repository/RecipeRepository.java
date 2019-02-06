@@ -1,14 +1,14 @@
 package com.myapps.ron.family_recipes.dal.repository;
 
 import android.content.Context;
-import android.os.Handler;
-import android.os.Looper;
+import android.net.Uri;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.dal.persistence.AppDatabases;
 import com.myapps.ron.family_recipes.dal.persistence.RecipeDao;
+import com.myapps.ron.family_recipes.dal.storage.ExternalStorageHelper;
 import com.myapps.ron.family_recipes.model.QueryModel;
 import com.myapps.ron.family_recipes.model.RecipeEntity;
 import com.myapps.ron.family_recipes.model.RecipeMinimal;
@@ -19,6 +19,7 @@ import com.myapps.ron.family_recipes.network.cognito.AppHelper;
 import com.myapps.ron.family_recipes.network.modelTO.RecipeTO;
 import com.myapps.ron.family_recipes.utils.DateUtil;
 
+import java.io.File;
 import java.util.List;
 import java.util.concurrent.Executor;
 
@@ -30,7 +31,6 @@ import androidx.paging.PagedList;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableMaybeObserver;
@@ -171,7 +171,7 @@ public class RecipeRepository {
         executor.execute(() -> recipeDao.insertAll(AppDatabases.generateData(name, size)));
     }
 
-    public void updateFromServer(List<RecipeTO> list, AddedModifiedSize addedModifiedSize) {
+    public void updateFromServer(Context context, List<RecipeTO> list, AddedModifiedSize addedModifiedSize) {
         if (list != null) {
             if (list.isEmpty()) {
                 return;
@@ -184,8 +184,8 @@ public class RecipeRepository {
         executor.execute(() -> {
             // first cell is for added and second cell is for modified recipes
             for (RecipeTO fromServer: list) {
-                Log.e(TAG, "updateFromServer, id = " + fromServer.getId());
-                recipeDao.isRecipeExists(fromServer.getId()).subscribe(new DisposableMaybeObserver<RecipeEntity>() {
+                //Log.e(TAG, "updateFromServer, id = " + fromServer.getId());
+                recipeDao.getMaybeRecipe(fromServer.getId()).subscribe(new DisposableMaybeObserver<RecipeEntity>() {
                     RecipeEntity update = fromServer.toEntity();
                     @Override
                     public void onSuccess(RecipeEntity recipeEntity) {
@@ -194,6 +194,14 @@ public class RecipeRepository {
                         Log.e(TAG, "updateFromServer, found, id " + fromServer.getId());
                         if (!update.identical(recipeEntity)) {
                             update.setMeLike(recipeEntity.getMeLike());
+                            // compare existing and new recipe html files
+                            if (recipeEntity.getRecipeFile() != null &&
+                                    !recipeEntity.getRecipeFile().equals(update.getRecipeFile())) {
+                                // delete old recipe html file
+                                Log.e(TAG, "different html");
+                                deleteOldRecipeContent(context, recipeEntity.getRecipeFile());
+
+                            }
                             recipeDao.updateRecipe(update);
                             addedModifiedSize.incrementModified();
                             dispose();
@@ -227,6 +235,16 @@ public class RecipeRepository {
         });
     }
 
+    //@SuppressWarnings("ResultOfMethodCallIgnored")
+    private void deleteOldRecipeContent(Context context, String path) {
+        Uri uri = ExternalStorageHelper.getFileAbsolutePath(context,
+                Constants.RECIPES_DIR, path);
+        if (uri != null) {
+            // local file exists
+            Log.e(TAG, "deleting " + path + ", " + new File(uri.getPath()).delete());
+        }
+    }
+
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     public void fetchRecipesReactive(final Context context) {
@@ -245,7 +263,7 @@ public class RecipeRepository {
                         if (next.code() == 200) {
                             Log.e(TAG, "fetch recipes, " + next.body());
                             final AddedModifiedSize addedModifiedSize = new AddedModifiedSize();
-                            updateFromServer(next.body(), addedModifiedSize);
+                            updateFromServer(context, next.body(), addedModifiedSize);
                             String lastKey = next.headers().get(Constants.HEADER_LAST_EVAL_KEY);
                             if (lastKey != null && !lastKey.isEmpty())
                                 // there are more updated recipes
@@ -285,7 +303,7 @@ public class RecipeRepository {
                     .subscribe(next -> {
                         if (next.code() == 200) {
                             Log.e(TAG, "more recipes, status 200");
-                            updateFromServer(next.body(), addedModifiedSize);
+                            updateFromServer(context, next.body(), addedModifiedSize);
                             String lastEvalKey = next.headers().get(Constants.HEADER_LAST_EVAL_KEY);
                             if (lastEvalKey != null && !lastEvalKey.isEmpty())
                                 // there are more updated recipes

@@ -80,6 +80,7 @@
     <string name="alert_dialog_upload_photos_cancel">Cancel</string>
     <string name="alert_dialog_upload_photos_finish">Upload %1$d images</string>
     <string name="alert_dialog_upload_photos_take_more">More</string>
+    <string name="alert_dialog_upload_photos_max_limit">Can upload up to %1$d files</string>
 
     <!-- CreateRecipe Activity -->
     <string name="post_recipe_name">Recipe name</string>
