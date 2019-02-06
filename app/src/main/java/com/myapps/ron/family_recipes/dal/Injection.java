@@ -15,11 +15,6 @@ import java.util.concurrent.Executors;
  */
 public class Injection {
 
-    /*public static RecipeDataSource provideRecipeDataSource(Context context) {
-        AppDatabases database = AppDatabases.getInstance(context);
-        return new LocalRecipeDataSource(database.recipeDao());
-    }*/
-
     public static RecipeRepository provideRecipeRepository(Context context) {
         AppDatabases database = AppDatabases.getInstance(context);
         return RecipeRepository.getInstance(database.recipeDao(), getExecutor(4));

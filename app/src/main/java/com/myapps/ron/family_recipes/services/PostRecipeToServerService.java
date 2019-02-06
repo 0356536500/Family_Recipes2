@@ -1,8 +1,8 @@
 package com.myapps.ron.family_recipes.services;
 
 import android.app.IntentService;
-import android.content.Intent;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Handler;
 import android.os.StrictMode;
 import android.util.Log;
@@ -10,10 +10,9 @@ import android.util.Log;
 import com.myapps.ron.family_recipes.dal.storage.StorageWrapper;
 import com.myapps.ron.family_recipes.model.RecipeEntity;
 import com.myapps.ron.family_recipes.network.APICallsHandler;
-import com.myapps.ron.family_recipes.utils.MyCallback;
-import com.myapps.ron.family_recipes.network.modelTO.RecipeTO;
 import com.myapps.ron.family_recipes.network.S3.OnlineStorageWrapper;
 import com.myapps.ron.family_recipes.network.cognito.AppHelper;
+import com.myapps.ron.family_recipes.network.modelTO.RecipeTO;
 import com.myapps.ron.family_recipes.utils.Constants;
 
 import java.io.File;
@@ -106,27 +105,24 @@ public class PostRecipeToServerService extends IntentService {
 
         Log.e(TAG, "handle action post recipe");
         //maybe open a new thread
-        APICallsHandler.postRecipe(new RecipeTO(recipe), AppHelper.getAccessToken(), new MyCallback<String>() {
-            @Override
-            public void onFinished(String urlForContent) {
-                Log.e(TAG, "finished post pend, got a url, " + urlForContent);
-                if (!"null".equals(urlForContent)) {
-                    boolean fileUploaded = OnlineStorageWrapper.uploadRecipeFileSync(urlForContent, recipe.getRecipeFile());
-                    if (fileUploaded) {
-                        //sendIntentToUser(false, "recipe uploaded");
-                        if (recipe.getFoodFiles() != null) {
-                            uploadFoodFilesSync(recipe.getId(), recipe.getLastModifiedDate(), recipe.getFoodFiles());
-                        } else {
-                            //no images to upload
-                            new Handler().postDelayed(() -> sendIntentToUser(false, "recipe uploaded"), 2500);
-                        }
+        APICallsHandler.postRecipe(new RecipeTO(recipe), AppHelper.getAccessToken(), urlForContent -> {
+            Log.e(TAG, "finished post pend, got a url, " + urlForContent);
+            if (!"null".equals(urlForContent)) {
+                boolean fileUploaded = OnlineStorageWrapper.uploadRecipeFileSync(urlForContent, recipe.getRecipeFile());
+                if (fileUploaded) {
+                    //sendIntentToUser(false, "recipe uploaded");
+                    if (recipe.getFoodFiles() != null) {
+                        uploadFoodFilesSync(recipe.getId(), recipe.getLastModifiedDate(), recipe.getFoodFiles());
+                    } else {
+                        //no images to upload
+                        new Handler().postDelayed(() -> sendIntentToUser(false, "recipe uploaded"), 2500);
                     }
-                    else
-                        sendIntentToUser(false, "recipe wasn't uploaded");
                 }
                 else
                     sendIntentToUser(false, "recipe wasn't uploaded");
             }
+            else
+                sendIntentToUser(false, "recipe wasn't uploaded");
         });
 
         deleteLocalFiles(recipe.getFoodFiles());

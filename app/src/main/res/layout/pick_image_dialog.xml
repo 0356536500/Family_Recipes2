@@ -47,8 +47,12 @@
 
                 <TextView
                     android:id="@+id/pick_image_dialog_camera"
-                    style="@style/option"
                     android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="15dp"
+                    android:paddingEnd="15dp"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
                     android:layout_weight="0.5"
                     android:drawableStart="@drawable/ic_camera"
                     android:drawablePadding="10dp"
@@ -58,8 +62,12 @@
 
                 <TextView
                     android:id="@+id/pick_image_dialog_gallery"
-                    style="@style/option"
                     android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="15dp"
+                    android:paddingEnd="15dp"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
                     android:layout_weight="0.5"
                     android:drawableStart="@drawable/ic_gallery"
                     android:drawablePadding="10dp"

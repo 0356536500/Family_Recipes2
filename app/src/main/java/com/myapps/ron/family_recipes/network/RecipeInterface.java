@@ -46,11 +46,11 @@ public interface RecipeInterface {
             @Path(Constants.ID_QUERY) String id
     );
     //region recipes
-    @GET(recipes)
+    /*@GET(recipes)
     Call<List<RecipeTO>> getAllRecipes(
             @Header(Constants.AUTHORIZATION) String auth,
             @Query(Constants.DATE_QUERY) String date
-    );
+    );*/
 
     @GET(recipes)
     Observable<Response<List<RecipeTO>>> getAllRecipesObservable(

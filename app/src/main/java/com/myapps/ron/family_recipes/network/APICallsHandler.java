@@ -79,44 +79,6 @@ public class APICallsHandler {
         });
     }
 
-    public static void getAllRecipes(String date, String token, final MyCallback<List<RecipeTO>> callback) {
-        /*Map<String, String> headers = new HashMap<>();
-        headers.put(Constants.CONTENT_TYPE, "application/json");
-        headers.put(Constants.AUTHORIZATION, token);*/
-
-        RecipeInterface service = getRetrofitInstance().create(RecipeInterface.class);
-        Call<List<RecipeTO>> call = service.getAllRecipes(token, date);
-
-        call.enqueue(new Callback<List<RecipeTO>>() {
-            @Override
-            public void onResponse(@NotNull Call<List<RecipeTO>> call, @NotNull Response<List<RecipeTO>> response) {
-                String body = response.body() != null ? response.body().toString() : "null";
-
-                if (response.code() == STATUS_OK) {
-                    Log.i(TAG, body);
-                    List<RecipeTO> list = response.body();
-                    callback.onFinished(list);
-                }
-                /*else if (response.code() == STATUS_NOT_MODIFIED) {
-                    Log.i(TAG, "not modified");
-                    callback.onFinished(null);
-                }*/
-                else {
-                    Log.e(TAG, "error getAllRecipes, code = " + response.code() + "\n body: " + body);
-                    callback.onFinished(null);
-                }
-
-                //generateDataList(response.body());
-            }
-
-            @Override
-            public void onFailure(@NotNull Call<List<RecipeTO>> call, @NotNull Throwable t) {
-                Log.e(TAG, "error getting all recipes. message: " + t.getMessage());
-                //Toast.makeText(MainActivity.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
     public static void postRecipe(final RecipeTO recipe, final String token, final MyCallback<String> callback) {
         Log.e(TAG, "start post recipe");
 
@@ -277,7 +239,7 @@ public class APICallsHandler {
         });
     }
 
-    public static void requestUrlsForFoodPictures(String id, List<String> files, String token, final MyCallback<List<String>> callback) {
+    /*public static void requestUrlsForFoodPictures(String id, List<String> files, String token, final MyCallback<List<String>> callback) {
         Map<String, String> requestBody = new HashMap<>();
         requestBody.put(Constants.NUM_FILES_TO_UPLOAD, String.valueOf(files.size()));
         requestBody.put(Constants.PUT_FOOD_EXTENSION, "jpg");
@@ -306,7 +268,7 @@ public class APICallsHandler {
             }
         });
 
-    }
+    }*/
 
     public static List<String> requestUrlsForFoodPicturesSync(String id, String lastModifiedDate, int numOfFiles, String token) {
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()

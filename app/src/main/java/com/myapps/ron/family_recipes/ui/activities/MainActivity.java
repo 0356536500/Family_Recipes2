@@ -1,11 +1,9 @@
 package com.myapps.ron.family_recipes.ui.activities;
 
-import androidx.lifecycle.ViewModelProviders;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.ActivityInfo;
 import android.graphics.Canvas;
 import android.graphics.ColorFilter;
 import android.graphics.Paint;
@@ -17,13 +15,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import com.google.android.material.navigation.NavigationView;
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.widget.Toolbar;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Menu;
@@ -33,6 +24,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUser;
+import com.google.android.material.navigation.NavigationView;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.dal.Injection;
 import com.myapps.ron.family_recipes.network.MiddleWareForNetwork;
@@ -44,6 +36,14 @@ import com.myapps.ron.family_recipes.utils.MyBaseActivity;
 import com.myapps.ron.family_recipes.utils.MyFragment;
 import com.myapps.ron.family_recipes.utils.SharedPreferencesHandler;
 import com.myapps.ron.family_recipes.viewmodels.DataViewModel;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.lifecycle.ViewModelProviders;
 
 public class MainActivity extends MyBaseActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -514,6 +514,8 @@ public class MainActivity extends MyBaseActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
+            if (action == null)
+                return;
             switch(action) {
                 // When network state changes
                 case ConnectivityManager.CONNECTIVITY_ACTION:

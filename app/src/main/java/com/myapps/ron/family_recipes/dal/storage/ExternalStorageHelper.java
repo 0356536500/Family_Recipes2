@@ -47,13 +47,13 @@ public class ExternalStorageHelper {
         return null;
     }
 
-    /**
+    /*
      * @param context - context of application
      * @param filePath - path of file to check
      * @param dir - dir of file to check
      * @return path of requested file from cache if available or from app root storage. null if file not exists
      */
-    static String getFileAbsolutePath1(Context context, String filePath, String dir){
+    /*static String getFileAbsolutePath1(Context context, String filePath, String dir){
         String path = dir + "/" + filePath;
         //check whether file is in cache directory
 
@@ -78,19 +78,19 @@ public class ExternalStorageHelper {
             return pathStr;
         else
             return null;
-    }
+    }*/
 
-    /**
+    /*
      * @param context - context of application
      * @return path for app storage root
      */
-    public static Uri getFilesRootPath(Context context, String dir) {
+    /*public static Uri getFilesRootPath(Context context, String dir) {
         File root = context.getExternalFilesDir(dir);
         if (root != null) {
             return FileProvider.getUriForFile(context, context.getString(R.string.appPackage), root);
         }
         return null;
-    }
+    }*/
 
     public static File getFileForOnlineDownload(Context context, String dir, String fileName) {
         try {

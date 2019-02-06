@@ -80,13 +80,13 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
 
     private final String TAG = RecipeActivity.class.getSimpleName();
     private AppBarLayout appBarLayout;
-    //private MenuItem menuItemShare;
+
     private Toolbar toolbar;
     private CollapsingToolbarLayout collapsingToolbarLayout;
     private ImageView imageViewCollapsingImage;
     private FloatingActionButton like;
-    //private TextView textView;
-    ContentLoadingProgressBar progressBar;
+
+    private ContentLoadingProgressBar progressBar;
     private WebView myWebView;
     private RecipeEntity recipe;
     private TextView textViewCommentTitle;
@@ -708,14 +708,5 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
         cameraImagesToDeleteAfterUpload.clear();
         imagesPathsToUpload.clear();
         imageUri = null;
-    }
-
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-    private void deleteFiles(List<String> filesToDelete) {
-        if (filesToDelete != null) {
-            for (int i = 0; i < filesToDelete.size(); i++) {
-                new File(filesToDelete.get(i)).delete();
-            }
-        }
     }
 }
