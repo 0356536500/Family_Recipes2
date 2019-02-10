@@ -89,14 +89,9 @@ public class MainActivity extends MyBaseActivity {
         viewModel =  ViewModelProviders.of(this, Injection.provideViewModelFactory(this)).get(DataViewModel.class);
         //viewModel = ViewModelProviders.of(this).get(DataViewModel.class);
 
-        /*viewModel.setRecipesReady(false);
-        viewModel.setCategoriesReady(false);*/
-
         new Handler().postDelayed(this::startWithDefaultFragment, 100);
         // white background notification bar
         //whiteNotificationBar(recyclerView);
-
-        //initViewModel();
     }
 
     private void loadColorsFromTheme() {
@@ -265,30 +260,7 @@ public class MainActivity extends MyBaseActivity {
         navDrawer = findViewById(R.id.nav_view);
     }
 
-    /*private void initViewModel() {
-        viewModel =  ViewModelProviders.of(this).get(DataViewModel.class);
-        viewModel.getRecipes().observe(this, new Observer<List<Recipe>>() {
-            @Override
-            public void onChanged(@Nullable List<Recipe> recipes) {
-                mAdapter.updateRecipes(recipes);
-            }
-        });
-    }*/
-
     //endregion
-
-    /*public void fetchRecipes(String orderBy) {
-        lastOrderBy = orderBy;
-        viewModel.loadRecipes(this, orderBy);
-    }*/
-
-    /*public void fetchRecipes() {
-        viewModel.loadRecipes(this, lastOrderBy);
-    }*/
-
-    /*public void fetchCategories() {
-        viewModel.loadCategories(this);
-    }*/
 
     public Menu getMenu() {
         return menu;
@@ -329,8 +301,8 @@ public class MainActivity extends MyBaseActivity {
             case R.id.action_search:
                 return true;
             case R.id.action_sort:
-                currentFragment.onOptionsItemSelected(item);
-                return true;
+                /*currentFragment.onOptionsItemSelected(item);
+                return true;*/
             case R.id.action_refresh:
                 currentFragment.onOptionsItemSelected(item);
                 return true;

@@ -54,10 +54,12 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.AppCompatEditText;
+import androidx.appcompat.widget.ShareActionProvider;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
+import androidx.core.view.MenuItemCompat;
 import androidx.core.widget.ContentLoadingProgressBar;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
@@ -88,7 +90,7 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
 
     private ContentLoadingProgressBar progressBar;
     private WebView myWebView;
-    private RecipeEntity recipe;
+    private String recipeId;
     private TextView textViewCommentTitle;
     private RecipeViewModel viewModel;
 
@@ -109,22 +111,24 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
     private List<String> imagesPathsToUpload = new ArrayList<>(), cameraImagesToDeleteAfterUpload = new ArrayList<>();
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
+    private ShareActionProvider mShareActionProvider;
+
     @Override
     protected void onMyCreate(Bundle savedInstanceState) {
         //super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipe);
 
-        initViewModel();
         loadColorsFromTheme();
 
         Bundle extras = getIntent().getExtras();
         if(extras != null) {
-            recipe = extras.getParcelable(Constants.RECIPE);
+            recipeId = extras.getString(Constants.RECIPE_ID);
             //String path = extras.getString(Constants.RECIPE_PATH, Constants.DEFAULT_RECIPE_PATH);
-            if (recipe != null) {
+            if (recipeId != null) {
                 bindUI();
                 initUI();
-                loadRecipe();
+                initViewModel();
+                //loadRecipe();
             }
         }
     }
@@ -193,7 +197,7 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
         collapsingToolbarLayout.setCollapsedTitleTextColor(textColorPrimary);
         collapsingToolbarLayout.setExpandedTitleColor(textColorSecondary);
         //collapsingToolbarLayout.setContentScrimColor(toolbarCollapsedColor);
-        setTitle(recipe.getName());
+        //setTitle(recipe.getName());
 
         collapsingToolbarLayout.setOnClickListener(view -> {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
@@ -206,7 +210,8 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
             // Create and show the dialog.
             DialogFragment newFragment = new PagerDialogFragment();
             Bundle bundle = new Bundle();
-            bundle.putParcelable(Constants.RECIPE, recipe);
+            //TODO: fix this
+            //bundle.putParcelable(Constants.RECIPE, recipe);
             newFragment.setArguments(bundle);
             newFragment.show(ft, "dialog");
         });
@@ -233,6 +238,14 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
     private void initViewModel() {
         viewModel = ViewModelProviders.of(this, Injection.provideViewModelFactory(this)).get(RecipeViewModel.class);
         //viewModel = ViewModelProviders.of(this).get(RecipeViewModel.class);
+        viewModel.setInitialRecipe(recipeId);
+
+        viewModel.getRecipe().observe(this, recipe -> {
+            if (recipe != null) {
+                setTitle(recipe.getName());
+                loadRecipe();
+            }
+        });
 
         viewModel.getComments().observe(this, comments -> {
             postCommentEditText.setText("");
@@ -284,9 +297,167 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
         });
     }
 
+    private void loadLikeDrawable(boolean isUserLiked) {
+        //Log.e(TAG, recipe.toString());
+        String message;
+        if(isUserLiked) {
+            //Log.e(TAG, "showing full heart");
+            like.setImageResource(R.drawable.ic_favorite_red_36dp);
+            //like.setImageDrawable(getResources().getDrawable(R.drawable.ic_favorite_red_36dp));
+            message = "like";
+        }
+        else {
+            //Log.e(this.getClass().getSimpleName(), "showing empty heart");
+            like.setImageResource(R.drawable.ic_favorite_border_red_36dp);
+            //like.setImageDrawable(getResources().getDrawable(R.drawable.ic_favorite_border_red_36dp));
+            message = "unlike";
+        }
+        if(showLikeMessage)
+            Snackbar.make(like, message, Snackbar.LENGTH_SHORT)
+                    .setAction("Action", null).show();
+        showLikeMessage = true;
+        like.setEnabled(true);
+    }
+
+    private void loadRecipe() {
+        viewModel.loadRecipeContent(this);
+        viewModel.loadRecipeFoodImage(this);
+        viewModel.loadComments(this);
+        //loadImage();
+        initCommentsRecycler();
+        //loadRecipeHtml();
+    }
+
+    private void initCommentsRecycler() {
+        commentsAdapter = new CommentsAdapter();
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
+        commentsRecyclerView.setLayoutManager(mLayoutManager);
+        //recyclerView.setItemAnimator(new DefaultItemAnimator());
+        commentsRecyclerView.addItemDecoration(new MyDividerItemDecoration(this, DividerItemDecoration.VERTICAL, 36));
+        commentsRecyclerView.setItemAnimator(new FiltersListItemAnimator());
+        commentsRecyclerView.setAdapter(commentsAdapter);
+    }
+
+    private void loadRecipeHtml(String path) {
+        /*File file = new File(path);
+        Log.e(TAG, file.getAbsolutePath());*/
+        myWebView.loadUrl(path);
+    }
+
+    /*private void loadImage() {
+        if(recipe.getFoodFiles() != null && recipe.getFoodFiles().size() > 0) {
+            StorageWrapper.getFoodFile(this, recipe.getFoodFiles().get(0), new MyCallback<String>() {
+                @Override
+                public void onFinished(String path) {
+                    if(path != null) {
+                        CircularProgressDrawable circularProgressDrawable = new CircularProgressDrawable(getBaseContext());
+                        circularProgressDrawable.setStrokeWidth(5f);
+                        circularProgressDrawable.setCenterRadius(35f);
+                        circularProgressDrawable.start();
+
+                        GlideApp.with(getApplicationContext())
+                                .asDrawable()
+                                .load(Uri.fromFile(new File(path)))
+                                .placeholder(circularProgressDrawable)
+                                .error(android.R.drawable.stat_notify_error)
+                                .into(imageViewCollapsingImage);
+                    }
+                                .into(new CustomViewTarget<CollapsingToolbarLayout, Drawable>(collapsingToolbarLayout) {
+                                    @Override
+                                    public void onLoadFailed(@Nullable Drawable errorDrawable) {
+                                        collapsingToolbarLayout.setBackground(errorDrawable);
+                                    }
+
+                                    @Override
+                                    public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
+                                        collapsingToolbarLayout.setBackground(resource);
+                                    }
+
+                                    @Override
+                                    protected void onResourceCleared(@Nullable Drawable placeholder) {
+
+                                    }
+                                });
+                    }
+                    else
+                        collapsingToolbarLayout.setBackground(getDrawable(android.R.drawable.stat_notify_error));
+                }
+            });
+        }
+    }*/
+
+    private View.OnClickListener postCommentListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            //Toast.makeText(getApplicationContext(), postCommentEditText.getMessage(), Toast.LENGTH_SHORT).show();
+            if (postCommentEditText.getText() != null && commentValidationCheck(postCommentEditText.getText().toString())) {
+                viewModel.postComment(getApplicationContext(), postCommentEditText.getText().toString());
+
+                postCommentButton.setEnabled(false);
+                postCommentProgressBar.setVisibility(View.VISIBLE);
+                postCommentButton.animate().alpha(0f).setDuration(animationDuration).start();
+                postCommentProgressBar.animate().alpha(1f).setDuration(animationDuration).start();
+
+            } else
+                Toast.makeText(getApplicationContext(), R.string.post_comment_error, Toast.LENGTH_SHORT).show();
+        }
+    };
+
+    private boolean commentValidationCheck(String text) {
+        return text.length() > 0 && !text.startsWith(" ");
+    }
+
+    public void doLike(View view) {
+        like.setEnabled(false);
+        viewModel.changeLike(this);
+    }
+
+    private void exit() {
+        Intent intent = new Intent();
+        intent.putExtra(Constants.RECIPE_ID, recipeId);
+        setResult(RESULT_OK, intent);
+        finish();
+    }
+
+    @Override
+    public void onBackPressed() {
+        exit();
+    }
+
+    @Override
+    public void onOffsetChanged(final AppBarLayout appBarLayout, final int verticalOffset) {
+        appBarLayout.post(() -> {
+            /*if(menuItemShare == null)
+                return;*/
+            if (Math.abs(verticalOffset) == appBarLayout.getTotalScrollRange()) {
+                // Collapsed
+                //menuItemShare.setIcon(R.drawable.ic_share_collapsed_24dp);
+                if (toolbar.getOverflowIcon() != null) {
+                    toolbar.getOverflowIcon().setColorFilter(navigationCollapsedColor, PorterDuff.Mode.SRC_ATOP);
+                }
+                if (toolbar.getNavigationIcon() != null) {
+                    toolbar.getNavigationIcon().setColorFilter(navigationCollapsedColor, PorterDuff.Mode.SRC_ATOP);
+                }
+            } else if (verticalOffset == 0) {
+                // Expanded
+                //menuItemShare.setIcon(R.drawable.ic_share_expanded_24dp);
+                if (toolbar.getOverflowIcon() != null) {
+                    toolbar.getOverflowIcon().setColorFilter(navigationExpandedColor, PorterDuff.Mode.SRC_ATOP);
+                }
+                if (toolbar.getNavigationIcon() != null) {
+                    toolbar.getNavigationIcon().setColorFilter(navigationExpandedColor, PorterDuff.Mode.SRC_ATOP);
+                }
+            } /*else {
+                        // Somewhere in between
+            }*/
+        });
+    }
+
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        if (viewModel.getRecipe().getFoodFiles().size() > Constants.MAX_FILES_TO_UPLOAD * 2)
+        if (viewModel.getRecipe().getValue() != null &&
+                viewModel.getRecipe().getValue().getFoodFiles() != null &&
+                viewModel.getRecipe().getValue().getFoodFiles().size() > Constants.MAX_FILES_TO_UPLOAD * 2)
             menu.findItem(R.id.action_add_photo).setVisible(false);
         return super.onPrepareOptionsMenu(menu);
     }
@@ -294,6 +465,8 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_recipe, menu);
+        mShareActionProvider = (ShareActionProvider) MenuItemCompat
+                .getActionProvider(menu.findItem(R.id.action_share));
         return true;
     }
 
@@ -310,12 +483,14 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
                     showChooseDialog();
                 return true;
             case R.id.action_share:
+                handleShareRecipe();
                 //TODO: https://developer.android.com/training/sharing/send
                 return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
+    // region Add Photos
     private void showChooseDialog() {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         Fragment prev = getSupportFragmentManager().findFragmentByTag("dialog");
@@ -418,164 +593,6 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
         }
     }
 
-    private void loadLikeDrawable(boolean isUserLiked) {
-        //Log.e(TAG, recipe.toString());
-        String message;
-        if(isUserLiked) {
-            //Log.e(TAG, "showing full heart");
-            like.setImageResource(R.drawable.ic_favorite_red_36dp);
-            //like.setImageDrawable(getResources().getDrawable(R.drawable.ic_favorite_red_36dp));
-            message = "like";
-        }
-        else {
-            //Log.e(this.getClass().getSimpleName(), "showing empty heart");
-            like.setImageResource(R.drawable.ic_favorite_border_red_36dp);
-            //like.setImageDrawable(getResources().getDrawable(R.drawable.ic_favorite_border_red_36dp));
-            message = "unlike";
-        }
-        if(showLikeMessage)
-            Snackbar.make(like, message, Snackbar.LENGTH_SHORT)
-                    .setAction("Action", null).show();
-        showLikeMessage = true;
-        like.setEnabled(true);
-    }
-
-    private void loadRecipe() {
-        viewModel.setInitialRecipe(recipe);
-
-        viewModel.loadRecipeContent(this);
-        viewModel.loadRecipeFoodImage(this);
-        viewModel.loadComments(this);
-        //loadImage();
-        initCommentsRecycler();
-        //loadRecipeHtml();
-    }
-
-    private void initCommentsRecycler() {
-        commentsAdapter = new CommentsAdapter();
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
-        commentsRecyclerView.setLayoutManager(mLayoutManager);
-        //recyclerView.setItemAnimator(new DefaultItemAnimator());
-        commentsRecyclerView.addItemDecoration(new MyDividerItemDecoration(this, DividerItemDecoration.VERTICAL, 36));
-        commentsRecyclerView.setItemAnimator(new FiltersListItemAnimator());
-        commentsRecyclerView.setAdapter(commentsAdapter);
-    }
-
-    private void loadRecipeHtml(String path) {
-        /*File file = new File(path);
-        Log.e(TAG, file.getAbsolutePath());*/
-        myWebView.loadUrl(path);
-    }
-
-    /*private void loadImage() {
-        if(recipe.getFoodFiles() != null && recipe.getFoodFiles().size() > 0) {
-            StorageWrapper.getFoodFile(this, recipe.getFoodFiles().get(0), new MyCallback<String>() {
-                @Override
-                public void onFinished(String path) {
-                    if(path != null) {
-                        CircularProgressDrawable circularProgressDrawable = new CircularProgressDrawable(getBaseContext());
-                        circularProgressDrawable.setStrokeWidth(5f);
-                        circularProgressDrawable.setCenterRadius(35f);
-                        circularProgressDrawable.start();
-
-                        GlideApp.with(getApplicationContext())
-                                .asDrawable()
-                                .load(Uri.fromFile(new File(path)))
-                                .placeholder(circularProgressDrawable)
-                                .error(android.R.drawable.stat_notify_error)
-                                .into(imageViewCollapsingImage);
-                    }
-                                .into(new CustomViewTarget<CollapsingToolbarLayout, Drawable>(collapsingToolbarLayout) {
-                                    @Override
-                                    public void onLoadFailed(@Nullable Drawable errorDrawable) {
-                                        collapsingToolbarLayout.setBackground(errorDrawable);
-                                    }
-
-                                    @Override
-                                    public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
-                                        collapsingToolbarLayout.setBackground(resource);
-                                    }
-
-                                    @Override
-                                    protected void onResourceCleared(@Nullable Drawable placeholder) {
-
-                                    }
-                                });
-                    }
-                    else
-                        collapsingToolbarLayout.setBackground(getDrawable(android.R.drawable.stat_notify_error));
-                }
-            });
-        }
-    }*/
-
-    private View.OnClickListener postCommentListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-            //Toast.makeText(getApplicationContext(), postCommentEditText.getMessage(), Toast.LENGTH_SHORT).show();
-            if (postCommentEditText.getText() != null && commentValidationCheck(postCommentEditText.getText().toString())) {
-                viewModel.postComment(getApplicationContext(), postCommentEditText.getText().toString());
-
-                postCommentButton.setEnabled(false);
-                postCommentProgressBar.setVisibility(View.VISIBLE);
-                postCommentButton.animate().alpha(0f).setDuration(animationDuration).start();
-                postCommentProgressBar.animate().alpha(1f).setDuration(animationDuration).start();
-
-            } else
-                Toast.makeText(getApplicationContext(), R.string.post_comment_error, Toast.LENGTH_SHORT).show();
-        }
-    };
-
-    private boolean commentValidationCheck(String text) {
-        return text.length() > 0 && !text.startsWith(" ");
-    }
-
-    public void doLike(View view) {
-        like.setEnabled(false);
-        viewModel.changeLike(this);
-    }
-
-    private void exit() {
-        Intent intent = new Intent();
-        intent.putExtra(Constants.RECIPE, viewModel.getRecipe());
-        setResult(RESULT_OK, intent);
-        finish();
-    }
-
-    @Override
-    public void onBackPressed() {
-        exit();
-    }
-
-    @Override
-    public void onOffsetChanged(final AppBarLayout appBarLayout, final int verticalOffset) {
-        appBarLayout.post(() -> {
-            /*if(menuItemShare == null)
-                return;*/
-            if (Math.abs(verticalOffset) == appBarLayout.getTotalScrollRange()) {
-                // Collapsed
-                //menuItemShare.setIcon(R.drawable.ic_share_collapsed_24dp);
-                if (toolbar.getOverflowIcon() != null) {
-                    toolbar.getOverflowIcon().setColorFilter(navigationCollapsedColor, PorterDuff.Mode.SRC_ATOP);
-                }
-                if (toolbar.getNavigationIcon() != null) {
-                    toolbar.getNavigationIcon().setColorFilter(navigationCollapsedColor, PorterDuff.Mode.SRC_ATOP);
-                }
-            } else if (verticalOffset == 0) {
-                // Expanded
-                //menuItemShare.setIcon(R.drawable.ic_share_expanded_24dp);
-                if (toolbar.getOverflowIcon() != null) {
-                    toolbar.getOverflowIcon().setColorFilter(navigationExpandedColor, PorterDuff.Mode.SRC_ATOP);
-                }
-                if (toolbar.getNavigationIcon() != null) {
-                    toolbar.getNavigationIcon().setColorFilter(navigationExpandedColor, PorterDuff.Mode.SRC_ATOP);
-                }
-            } /*else {
-                        // Somewhere in between
-            }*/
-        });
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -634,6 +651,10 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
 
     private void pickImagesConfirmationDialog() {
         DialogInterface.OnClickListener dialogClickListener = (dialog, button) -> {
+            if (viewModel.getRecipe().getValue() == null) {
+                dialog.dismiss();
+                return;
+            }
             switch (button){
                 case DialogInterface.BUTTON_POSITIVE:
                     //Yes button clicked
@@ -641,7 +662,7 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
                     intentFilter.addAction(Constants.ACTION_UPLOAD_IMAGES_SERVICE);
                     registerReceiver(mReceiver, intentFilter);
                     PostRecipeToServerService.startActionPostImages(this,
-                            viewModel.getRecipe().getId(), viewModel.getRecipe().getLastModifiedDate(), imagesPathsToUpload);
+                            viewModel.getRecipe().getValue().getId(), viewModel.getRecipe().getValue().getLastModifiedDate(), imagesPathsToUpload);
                     uploadImagesProgressBar.setVisibility(View.VISIBLE);
                     break;
 
@@ -709,4 +730,35 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
         imagesPathsToUpload.clear();
         imageUri = null;
     }
+
+    // endregion
+
+    // region Share
+
+    private void handleShareRecipe() {
+        /*StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+        StrictMode.setVmPolicy(builder.build());*/
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.app_name));
+        sendIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.recipe_share_pre_url) + "\n\n"
+                + getString(R.string.share_url, recipeId));
+        /*sendIntent.putExtra(Intent.EXTRA_STREAM, ExternalStorageHelper.getFileUri(this,
+                com.myapps.ron.family_recipes.network.Constants.RECIPES_DIR, viewModel.getRecipe().getRecipeFile()));*/
+        sendIntent.setType(getString(R.string.share_mime_type));
+        /*sendIntent.addFlags(
+                Intent.FLAG_GRANT_READ_URI_PERMISSION);*/
+        setShareIntent(sendIntent);
+        //startActivity(Intent.createChooser(sendIntent, "Share"));
+    }
+
+    private void setShareIntent(Intent shareIntent) {
+        if (mShareActionProvider != null) {
+            mShareActionProvider.setShareIntent(shareIntent);
+        } else
+            startActivity(Intent.createChooser(shareIntent, "Share"));
+    }
+
+
+    // endregion
 }

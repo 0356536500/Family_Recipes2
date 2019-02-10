@@ -28,7 +28,7 @@ public class PagerDialogFragment extends DialogFragment {
         super.onCreate(savedInstanceState);
 
         if (getArguments() != null) {
-            recipe = getArguments().getParcelable(Constants.RECIPE);
+            recipe = getArguments().getParcelable(Constants.RECIPE_ID);
         }
     }
 

@@ -2,6 +2,7 @@ package com.myapps.ron.family_recipes.model;
 
 import android.content.Context;
 import android.text.Editable;
+import android.text.Html;
 
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.utils.HtmlHelper;
@@ -36,8 +37,8 @@ public class HtmlModel {
         this.spinnerPos = spinnerPos;
     }
 
-    public Editable getText() {
-        return text;
+    public String getText() {
+        return Html.escapeHtml(text);
     }
 
     public void setText(Editable text) {
@@ -75,7 +76,7 @@ public class HtmlModel {
     public HtmlHelper buildHtmlFromElement(HtmlHelper helper) {
         if (text == null || text.toString().isEmpty())
             return helper;
-        String fromEditText = text.toString();
+        String fromEditText = getText();
 
         if (spinnerPos >= 0) {
             String htmlElement = context.getResources().getStringArray(R.array.html_elements_types)[spinnerPos];

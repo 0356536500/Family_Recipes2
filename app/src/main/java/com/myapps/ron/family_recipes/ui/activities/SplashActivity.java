@@ -16,7 +16,6 @@ import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.Chal
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.MultiFactorAuthenticationContinuation;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.AuthenticationHandler;
 import com.myapps.ron.family_recipes.R;
-import com.myapps.ron.family_recipes.TestActivity;
 import com.myapps.ron.family_recipes.network.Constants;
 import com.myapps.ron.family_recipes.network.MiddleWareForNetwork;
 import com.myapps.ron.family_recipes.network.cognito.AppHelper;
@@ -76,8 +75,8 @@ public class SplashActivity extends AppCompatActivity {
             Log.d(TAG, " -- Auth Success");
             AppHelper.setCurrSession(cognitoUserSession);
             AppHelper.newDevice(device);
-            Log.e(TAG, "IDToken: " + cognitoUserSession.getIdToken().getJWTToken());
-            Log.e(TAG, "AccessToken: " + cognitoUserSession.getAccessToken().getJWTToken());
+            //Log.e(TAG, "IDToken: " + cognitoUserSession.getIdToken().getJWTToken());
+            //Log.e(TAG, "AccessToken: " + cognitoUserSession.getAccessToken().getJWTToken());
 
             AppHelper.setIdentityProvider(getApplicationContext(), cognitoUserSession);
 
@@ -133,9 +132,25 @@ public class SplashActivity extends AppCompatActivity {
     };
 
     private void launchMain() {
-        Intent intent = new Intent(SplashActivity.this, MainActivity.class);
-        startActivity(intent);
-        finish();
+        if (getIntent() != null) {
+            Intent receivedIntent = getIntent();
+            String recipeId = receivedIntent.getStringExtra(com.myapps.ron.family_recipes.utils.Constants.RECIPE_ID);
+            if (recipeId != null && !"".equals(recipeId)) {
+                Intent recipeIntent = new Intent(SplashActivity.this, RecipeActivity.class);
+                recipeIntent.putExtra(com.myapps.ron.family_recipes.utils.Constants.RECIPE_ID, recipeId);
+                recipeIntent.addFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
+                startActivity(recipeIntent);
+                finish();
+            } else {
+                Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        } else {
+            Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+            startActivity(intent);
+            finish();
+        }
     }
 
     private void launchLogin() {

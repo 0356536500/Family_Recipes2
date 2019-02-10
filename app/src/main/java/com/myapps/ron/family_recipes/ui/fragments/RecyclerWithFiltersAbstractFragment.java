@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.util.TypedValue;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -51,12 +50,10 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
@@ -78,7 +75,7 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
 
     private int filterBackgroundColor, filterTextColor;
 
-    Filter<CategoryEntity> mFilter;
+    private Filter<CategoryEntity> mFilter;
     List<CategoryEntity> tags;
     protected List<RecipeEntity> recipes;
 
@@ -130,6 +127,7 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
         Log.e(TAG, "on attach");
         super.onAttach(context);
         /*if (parent != null) {
+            //parent.removeAllViews();
             parent.addView(swipeRefreshLayout);
             parent.addView(mFilter);
         }*/
@@ -139,13 +137,13 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
     public void onDetach() {
         Log.e(TAG, "on detach");
         super.onDetach();
-        parent.removeAllViews();
+        //parent.removeAllViews();
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        setRetainInstance(true);
+        //setRetainInstance(true);
     }
 
     @Nullable
@@ -157,7 +155,8 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
             Log.e(TAG, "on createView parent was null");
             view = inflater.inflate(R.layout.content_main_recipes, container, false);
             parent = (FrameLayout) view;
-        }
+        } else
+            view = parent;
         return view;
     }
 
@@ -205,53 +204,6 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
         mFilter.build();
     }
 
-    // region initViewModel
-
-    /*private void initViewModel() {
-        viewModel =  ViewModelProviders.of(activity).get(DataViewModel.class);
-        viewModel.getRecipes().observe(this, new Observer<List<Recipe>>() {
-            @Override
-            public void onChanged(@Nullable List<Recipe> recipes) {
-                //Toast.makeText(activity, "get recipes from DAL", Toast.LENGTH_SHORT).show();
-                String log = "null";
-                if(recipes != null)
-                    log = recipes.toString();
-                Log.e(TAG, "getAllRecipes from db.\n" + log);
-                if (mFilter != null && recipes != null)
-                    mFilter.setCustomTextView(getString(R.string.number_of_recipes_indicator, recipes.size()));
-                firstLoadingProgressBar.setVisibility(View.GONE);
-                swipeRefreshLayout.setRefreshing(false);
-                //Log.e(TAG, "update from fragment");
-                if (mAdapter == null) {
-                    mAdapter = new RecipesAdapter(activity, recipes, RecyclerWithFiltersAbstractFragment.this);
-                    recyclerView.setAdapter(mAdapter);
-                } else
-                    mAdapter.updateRecipes(recipes, recipes != null && !recipes.isEmpty());
-            }
-        });
-        viewModel.getFilters().observe(this, new Observer<List<Category>>() {
-            @Override
-            public void onChanged(@Nullable List<Category> categories) {
-                if(categories != null) {
-                    tags = new ArrayList<>(categories);
-                    tags.add(0, new Category(getString(R.string.str_all_selected), mColors[0]));
-                    loadFiltersColor();
-                    setCategories();
-                    initCategories();
-                }
-            }
-        });
-        viewModel.getInfoFromLastFetch().observe(this, new Observer<String>() {
-            @Override
-            public void onChanged(@Nullable String s) {
-                if (s != null)
-                    Toast.makeText(activity, s, Toast.LENGTH_SHORT).show();
-            }
-        });
-    }*/
-
-    // endregion
-
     // region init Views
     private void initRecycler() {
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(activity.getApplicationContext());
@@ -289,6 +241,7 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
         progressBar.setVisibility(View.VISIBLE);*/
         onRefreshListener = () -> {
             if(mayRefresh) {
+                Log.e(TAG, "in refresh listener, mayRefresh = true");
                 viewModel.fetchFromServer(getContext());
                 //activity.fetchRecipes(orderBy);
                 mayRefresh = false;
@@ -357,7 +310,7 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
     // region Option Menu
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
@@ -430,11 +383,14 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
     // endregion
 
     // region Recycler Listener
-    private Disposable onItemSelectedDisposable;
+    //private Disposable onItemSelectedDisposable;
     @Override
     public void onItemSelected(RecipeMinimal recipeMinimal) {
         Log.e(TAG, "onItemSelected, " + recipeMinimal);
-        onItemSelectedDisposable = viewModel.getRecipe(recipeMinimal.getId())
+        Intent intent = new Intent(activity, RecipeActivity.class);
+        intent.putExtra(Constants.RECIPE_ID, recipeMinimal.getId());
+        startActivityForResult(intent, Constants.RECIPE_ACTIVITY_CODE);
+        /*onItemSelectedDisposable = viewModel.getRecipe(recipeMinimal.getId())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(recipeEntity -> {
@@ -444,7 +400,7 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
                     startActivityForResult(intent, Constants.RECIPE_ACTIVITY_CODE);
                     if (onItemSelectedDisposable != null)
                         onItemSelectedDisposable.dispose();
-                }, error -> Log.e(TAG, error.getMessage()));
+                }, error -> Log.e(TAG, error.getMessage()));*/
         //compositeDisposable.add(disposable);
     }
 
@@ -464,7 +420,7 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
                 .subscribe(recipeEntity -> {
                     DialogFragment newFragment = new PagerDialogFragment();
                     Bundle bundle = new Bundle();
-                    bundle.putParcelable(Constants.RECIPE, recipeEntity);
+                    bundle.putParcelable(Constants.RECIPE_ID, recipeEntity);
                     newFragment.setArguments(bundle);
                     newFragment.show(ft, "dialog");
                 }, error -> Log.e(TAG, error.getMessage()));
@@ -485,7 +441,7 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
         if(requestCode == Constants.RECIPE_ACTIVITY_CODE) {
             if(resultCode == RESULT_OK) {
                 //mAdapter.updateRecipes(new RecipesDBHelper(this).getAllRecipes());
-                RecipeEntity updatedRecipe = data.getParcelableExtra(Constants.RECIPE);
+                //RecipeEntity updatedRecipe = data.getParcelableExtra(Constants.RECIPE_ID);
                 //mAdapter.updateOneRecipe(updatedRecipe);
             }
         }
@@ -524,7 +480,7 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
     }
 
     @Override
-    public void onFiltersSelected(@NotNull ArrayList<CategoryEntity> arrayList) {
+    public void onFiltersSelected(ArrayList<CategoryEntity> arrayList) {
         //List<Recipe> oldList = new ArrayList<>(mAdapter.getCurrentList());
         final List<String> newTags = convertCategoriesToString(arrayList);
         new Handler().postDelayed(() -> {

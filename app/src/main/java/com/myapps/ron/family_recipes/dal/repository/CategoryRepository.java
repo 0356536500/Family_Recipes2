@@ -105,7 +105,8 @@ public class CategoryRepository {
                     .getAllCategoriesObservable(DateUtil.getLastCategoriesUpdateTime(context), AppHelper.getAccessToken());
             Disposable disposable = categoryObservable
                     .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
+                    .observeOn(Schedulers.from(executor))
+                    //.observeOn(AndroidSchedulers.mainThread())
                     .subscribe(next -> {
                         if (next.code() == 200)
                             updateFromServer(next.body());

@@ -2,7 +2,7 @@ package com.myapps.ron.family_recipes.utils;
 
 public class Constants {
 
-    public static final String RECIPE = "recipe";
+    public static final String RECIPE_ID = "recipe";
     public static final String RECIPE_PATH = "recipe_file";
     public static final String DEFAULT_RECIPE_PATH = "/recipe/default.html";
 

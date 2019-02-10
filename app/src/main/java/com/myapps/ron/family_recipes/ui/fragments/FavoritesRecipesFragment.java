@@ -7,7 +7,6 @@ import android.widget.Toast;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.adapters.RecipesAdapter;
 import com.myapps.ron.family_recipes.model.CategoryEntity;
-import com.myapps.ron.family_recipes.model.RecipeEntity;
 import com.myapps.ron.family_recipes.viewmodels.DataViewModel;
 import com.myapps.ron.searchfilter.listener.FilterListener;
 
@@ -24,7 +23,7 @@ public class FavoritesRecipesFragment extends RecyclerWithFiltersAbstractFragmen
     @Override
     protected void initAfterViewCreated() {
         swipeRefreshLayout.setEnabled(false);
-        queryModel.setOrderBy(RecipeEntity.KEY_CREATED);
+        //queryModel.setOrderBy(RecipeEntity.KEY_CREATED);
         queryModel.setFavorites(true);
         new Handler().postDelayed(() ->
                 viewModel.applyQuery(queryModel), 500);
@@ -39,21 +38,16 @@ public class FavoritesRecipesFragment extends RecyclerWithFiltersAbstractFragmen
     protected void initViewModel() {
         viewModel =  ViewModelProviders.of(activity).get(DataViewModel.class);
         viewModel.getPagedRecipes().observe(this, recipes -> {
-            //Toast.makeText(activity, "get recipes from DAL", Toast.LENGTH_SHORT).show();
             Log.e(TAG, "in favorite recipes observer");
             if(recipes != null) {
-                Log.e(TAG, recipes.toString());
-                /*if (mFilter != null)
-                    mFilter.setCustomTextView(getString(R.string.number_of_recipes_indicator, recipes.size()));*/
-                //Log.e(TAG, "update from fragment");
+                //Log.e(TAG, recipes.toString());
                 mAdapter.submitList(recipes);
             }
         });
         // already have values from AllRecipesFragment
         viewModel.getCategories().observe(this, categories -> {
-            Log.e(TAG, "in categories observer");
-            if(categories != null) {
-                Log.e(TAG, categories.toString());
+            Log.e(TAG, "in favorite categories observer");
+            if (categories != null) {
                 tags = new ArrayList<>(categories);
                 tags.add(0, new CategoryEntity.CategoryBuilder()
                         .name(getString(R.string.str_all_selected))
@@ -61,11 +55,12 @@ public class FavoritesRecipesFragment extends RecyclerWithFiltersAbstractFragmen
                         .build());
                 loadFiltersColor();
                 initCategories();
+                mAdapter.setCategoryList(categories);
             }
         });
-        viewModel.getInfoFromLastFetch().observe(this, s -> {
+        /*viewModel.getInfoFromLastFetch().observe(this, s -> {
             if (s != null)
                 Toast.makeText(activity, s, Toast.LENGTH_LONG).show();
-        });
+        });*/
     }
 }

@@ -2,6 +2,7 @@ package com.myapps.ron.family_recipes.dal.repository;
 
 import android.content.Context;
 import android.net.Uri;
+import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -22,6 +23,7 @@ import com.myapps.ron.family_recipes.utils.DateUtil;
 import java.io.File;
 import java.util.List;
 import java.util.concurrent.Executor;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
@@ -51,6 +53,7 @@ public class RecipeRepository {
     @SuppressWarnings("FieldCanBeLocal")
     private final long DELAYED_DISPATCH = 2000;
     private final int LIMIT = 100;
+    private AtomicBoolean mayRefresh;
 
     private final RecipeDao recipeDao;
     private final Executor executor;
@@ -77,6 +80,7 @@ public class RecipeRepository {
                 .setEnablePlaceholders(true)
                 .build();
         this.dispatchInfo = PublishSubject.create();
+        this.mayRefresh = new AtomicBoolean(true);
     }
 
     public Single<RecipeEntity> getRecipe(String id) {
@@ -248,6 +252,10 @@ public class RecipeRepository {
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     public void fetchRecipesReactive(final Context context) {
+        if (!mayRefresh.get())
+            return;
+        mayRefresh.getAndSet(false);
+        new Handler().postDelayed(() -> mayRefresh.getAndSet(true), com.myapps.ron.family_recipes.utils.Constants.REFRESH_DELAY);
         if(MiddleWareForNetwork.checkInternetConnection(context)) {
             final String time = DateUtil.getUTCTime();
 
