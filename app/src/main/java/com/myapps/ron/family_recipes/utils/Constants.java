@@ -1,6 +1,14 @@
 package com.myapps.ron.family_recipes.utils;
 
 public class Constants {
+    // region Notifications
+    public static final String BODY = "message";
+    public static final String TITLE = "title";
+    public static final String CHANNEL = "channel";
+    public static final String ID = "id";
+    public static final String NOTIFICATION = "notification";
+
+    // endregion
 
     public static final String RECIPE_ID = "recipe";
     public static final String RECIPE_PATH = "recipe_file";

@@ -24,7 +24,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUser;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.dal.Injection;
 import com.myapps.ron.family_recipes.network.MiddleWareForNetwork;
@@ -92,6 +96,28 @@ public class MainActivity extends MyBaseActivity {
         new Handler().postDelayed(this::startWithDefaultFragment, 100);
         // white background notification bar
         //whiteNotificationBar(recyclerView);
+        getFirebaseToken();
+    }
+
+    private void getFirebaseToken() {
+        FirebaseInstanceId.getInstance().getInstanceId()
+                .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                        if (!task.isSuccessful()) {
+                            Log.w(TAG, "getInstanceId failed", task.getException());
+                            return;
+                        }
+
+                        // Get new Instance ID token
+                        String token = task.getResult().getToken();
+
+                        // Log and toast
+                        //String msg = getString(R.string.msg_token_fmt, token);
+                        Log.e(TAG, "firebase token: " + token);
+                        //Toast.makeText(MainActivity.this, "firebase token: " + token, Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     private void loadColorsFromTheme() {
