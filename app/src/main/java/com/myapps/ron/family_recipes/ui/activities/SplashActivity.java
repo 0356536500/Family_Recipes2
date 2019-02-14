@@ -76,7 +76,7 @@ public class SplashActivity extends AppCompatActivity {
             AppHelper.setCurrSession(cognitoUserSession);
             AppHelper.newDevice(device);
             //Log.e(TAG, "IDToken: " + cognitoUserSession.getIdToken().getJWTToken());
-            //Log.e(TAG, "AccessToken: " + cognitoUserSession.getAccessToken().getJWTToken());
+            Log.e(TAG, "AccessToken: " + cognitoUserSession.getAccessToken().getJWTToken());
 
             AppHelper.setIdentityProvider(getApplicationContext(), cognitoUserSession);
 

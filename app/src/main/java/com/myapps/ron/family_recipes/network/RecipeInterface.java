@@ -13,7 +13,6 @@ import retrofit2.Call;
 import retrofit2.Response;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
-
 import retrofit2.http.Header;
 import retrofit2.http.HeaderMap;
 import retrofit2.http.PATCH;
@@ -32,6 +31,8 @@ public interface RecipeInterface {
     String recipes = Constants.URL_RECIPES;
     String categories = Constants.URL_CATEGORIES;// + "/{" + Constants.DATE_QUERY + "}";
     String food = Constants.URL_FOOD + "/{" + Constants.ID_QUERY + "}";
+    String subscriptions = Constants.URL_SUBSCRIPTIONS + "/{" + Constants.PATH_DEVICE_ID + "}";
+    String token = Constants.URL_TOKENS + "/{" + Constants.PATH_DEVICE_ID + "}" + "/{" + Constants.PATH_TOKEN + "}";
 
 
     @GET(recipeWithID)
@@ -116,6 +117,28 @@ public interface RecipeInterface {
             @Query(Constants.LAST_MODIFIED_QUERY) String lastModifiedDate,
             @Body Map<String, String> body
     );
+
+    //endregion
+
+    //region users
+    @PUT(token)
+    Call<Void> registerNewToken(
+            @Header(Constants.AUTHORIZATION) String auth,
+            @Path(Constants.PATH_DEVICE_ID) String deviceId,
+            @Path(Constants.PATH_TOKEN) String token,
+            @Query(Constants.QUERY_PLATFORM) String platform
+    );
+
+    @PUT(subscriptions)
+    Observable<Response<Void>> manageSubscriptions(
+            @Header(Constants.AUTHORIZATION) String auth,
+            @Path(Constants.PATH_DEVICE_ID) String deviceId,
+            @Query(Constants.QUERY_NEW_RECIPE_SUBSCRIPTION) String newRecipeSubscription,
+            @Query(Constants.QUERY_COMMENTS_SUBSCRIPTION) String commentsSubscription,
+            //@QueryMap Map<String, String> queries,
+            @Body Map<String, String> body
+    );
+
 
     //endregion
 

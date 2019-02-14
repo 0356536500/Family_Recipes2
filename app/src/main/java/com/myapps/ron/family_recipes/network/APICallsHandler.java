@@ -340,4 +340,49 @@ public class APICallsHandler {
     }
 
     // endregion
+
+    // region USERS
+
+    public static void registerNewToken(String authToken, String deviceId, String firebaseToken, final MyCallback<String> callback) {
+        RecipeInterface service = getRetrofitInstance().create(RecipeInterface.class);
+        Call<Void> call = service.registerNewToken(authToken, deviceId, firebaseToken, "android");
+
+        call.enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(@NotNull Call<Void> call, @NotNull Response<Void> response) {
+                //String body = response.body() != null ? response.body().toString() : "null";
+                Log.i(TAG, "postComment code, " + response.code());
+
+                if (response.code() == STATUS_OK) {
+                    callback.onFinished(null);
+                }
+                else {
+                    try {
+                        if (response.errorBody() != null) {
+                            Log.e(TAG, "error postComment, code = " + response.code() + "\n errorBody: " + response.errorBody().string());
+                            callback.onFinished(response.errorBody().string());
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            }
+
+            @Override
+            public void onFailure(@NotNull Call<Void> call, @NotNull Throwable t) {
+                Log.e(TAG, "error patching recipe. message: " + t.getMessage());
+                callback.onFinished(t.getMessage());
+                //Toast.makeText(MainActivity.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    public static Observable<Response<Void>> manageSubscriptionsObservable(
+            String token, String deviceId, String newRecipeSubscription, String commentSubscription, Map<String, String> attributes) {
+        RecipeInterface service = getReactiveRetrofitInstance().create(RecipeInterface.class);
+        return service.manageSubscriptions(token, deviceId, newRecipeSubscription, commentSubscription, attributes);
+    }
+
+    // endregion
 }

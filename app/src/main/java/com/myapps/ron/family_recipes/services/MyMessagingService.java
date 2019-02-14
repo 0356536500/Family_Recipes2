@@ -3,7 +3,6 @@ package com.myapps.ron.family_recipes.services;
 import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.NotificationChannel;
-import android.app.NotificationChannelGroup;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -25,6 +24,7 @@ import com.myapps.ron.family_recipes.utils.Constants;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
@@ -96,9 +96,10 @@ public class MyMessagingService extends FirebaseMessagingService {
         if (channelId == null)
             channelId = getString(R.string.notification_new_recipe_channel_name);
 
+        int notificationID = new Random(System.currentTimeMillis()).nextInt();
         // create notification click intent
         PendingIntent pendingIntent = getIntentToStartActivity(data, channelId);
-        PendingIntent deletionIntent = getDeletionIntent(channelId);
+        PendingIntent deletionIntent = getDeletionIntent(notificationID);
 
         // set the notification UI
         NotificationCompat.Builder notificationBuilder = getNotificationBuilderUI(data, channelId, pendingIntent, deletionIntent);
@@ -112,7 +113,7 @@ public class MyMessagingService extends FirebaseMessagingService {
         }
 
         // send notification to the user
-        notificationManager.notify(Integer.parseInt(channelId) /* ID of notification */, notificationBuilder.build());
+        notificationManager.notify(notificationID /* ID of notification */, notificationBuilder.build());
     }
 
     private PendingIntent getIntentToStartActivity(Map<String, String> data, String channelId) {
@@ -136,7 +137,7 @@ public class MyMessagingService extends FirebaseMessagingService {
                 PendingIntent.FLAG_ONE_SHOT);
     }
 
-    private PendingIntent getDeletionIntent(String notificationID) {
+    private PendingIntent getDeletionIntent(int notificationID) {
         Intent intent = new Intent(NOTIFICATION_DELETION_ACTION);
         intent.putExtra(Constants.ID, notificationID);
         return PendingIntent.getBroadcast(this, NOTIFICATION_DELETION_REQUEST, intent, PendingIntent.FLAG_ONE_SHOT);
@@ -144,7 +145,6 @@ public class MyMessagingService extends FirebaseMessagingService {
 
     private NotificationCompat.Builder getNotificationBuilderUI(Map<String, String> data, String channelId, PendingIntent pendingIntent, PendingIntent deletionIntent) {
         // set the notification UI
-        NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder =
                 new NotificationCompat.Builder(this, channelId)
@@ -155,13 +155,10 @@ public class MyMessagingService extends FirebaseMessagingService {
                         .setSound(defaultSoundUri)
                         .setColorized(true)
                         .setColor(ContextCompat.getColor(this, R.color.logo_foreground1))
-                        .setGroupSummary(true)
                         .setGroup(DEFAULT_GROUP)
                         .setContentIntent(pendingIntent)
                         .setDeleteIntent(deletionIntent);
-        inboxStyle.setBigContentTitle("New events from recipes");
-        inboxStyle.addLine(data.get(Constants.TITLE));
-        notificationBuilder.setStyle(inboxStyle);
+
         if (channelId.equals(getString(R.string.notification_new_recipe_channel_id))) {
             notificationBuilder.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_action_post_black));
         }
@@ -175,14 +172,19 @@ public class MyMessagingService extends FirebaseMessagingService {
         NotificationChannel channel1 = new NotificationChannel(getString(R.string.notification_new_recipe_channel_id),
                 getString(R.string.notification_new_recipe_channel_name),
                 NotificationManager.IMPORTANCE_LOW);
-        //channel1.setGroup(DEFAULT_GROUP);
-        channel1.setVibrationPattern(new long[]{150, 150, 100});
+        //channel1.setVibrationPattern(new long[]{150, 20, 150});
+        //channel1.enableVibration(true);
         channels.add(channel1);
+
         NotificationChannel channel2 = new NotificationChannel(getString(R.string.notification_comment_channel_id),
                 getString(R.string.notification_comment_channel_name),
                 NotificationManager.IMPORTANCE_DEFAULT);
-        //channel2.setGroup(DEFAULT_GROUP);
         channels.add(channel2);
+
+        NotificationChannel channel3 = new NotificationChannel(getString(R.string.notification_system_update_channel_id),
+                getString(R.string.notification_system_update_channel_name),
+                NotificationManager.IMPORTANCE_DEFAULT);
+        channels.add(channel3);
 
         notificationManager.createNotificationChannels(channels);
     }
@@ -209,7 +211,7 @@ public class MyMessagingService extends FirebaseMessagingService {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             if (NOTIFICATION_DELETION_ACTION.equals(action)) {
-                String id = intent.getStringExtra(Constants.ID);
+                int id = intent.getIntExtra(Constants.ID, 0);
                 Log.e(TAG, "Notification deleted, " + id);
             }
         }
