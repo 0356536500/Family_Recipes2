@@ -38,4 +38,12 @@ public class Constants {
     public static final int MIN_NUMBER_OF_HTML_ELEMENTS = 2;
 
     public static final String DEFAULT_COLOR = "#827f93";
+
+    //Dark Theme Preferences
+    //public static final String[] DARK_THEME = {"always", "auto", "battery", "never"};
+    public static final String DARK_THEME_ALWAYS = "always";
+    public static final String DARK_THEME_NIGHT_BATTERY_SAVER = "auto";
+    public static final String DARK_THEME_BATTERY_SAVER = "battery";
+    public static final String DARK_THEME_NEVER = "never";
+
 }

@@ -125,10 +125,39 @@
     <string name="settings_category_notifications">Notifications</string>
     <string name="settings_category_general">General</string>
 
-    <string name="pref_title_dark_theme">Enable Dark Theme</string>
+    <!-- Keys to Settings -->
+    <string name="preference_key_dark_theme" translatable="false">dark_theme</string>
+    <string name="preference_key_language" translatable="false">system_language</string>
+    <string name="preference_key_notification_new_recipe" translatable="false">@string/notification_new_recipe_channel_id</string>
+    <string name="preference_key_notification_comment" translatable="false">@string/notification_comment_channel_id</string>
+    <string name="preference_key_notification_likes" translatable="false">@string/notification_like_channel_id</string>
+
+    <string name="pref_summary_notification_new_recipe">Get updates on new recipes</string>
+    <string name="pref_summary_notification_comment">Get notified when someone comments on your recipes</string>
+    <string name="pref_summary_notification_like">Get notified when someone likes your recipes</string>
+
+    <!-- Values to Settings -->
+    <string name="pref_title_notification_new_recipe">@string/notification_new_recipe_channel_name</string>
+    <string name="pref_title_notification_comment">@string/notification_comment_channel_name</string>
+    <string name="pref_title_notification_like">@string/notification_like_channel_name</string>
+
+    <string name="pref_title_dark_theme">Dark Theme</string>
     <string name="pref_description_dark_theme">Switching to dark theme is recommended by google
         for saving battery life
     </string>
+
+    <string-array name="pref_dark_theme_list_titles">
+        <item>Always</item>
+        <item>Automatically (at night &amp; battery saver)</item>
+        <item>Battery saver only</item>
+        <item>Never</item>
+    </string-array>
+    <string-array name="pref_dark_theme_list_values">
+        <item>always</item>
+        <item>auto</item>
+        <item>battery</item>
+        <item>never</item>
+    </string-array>
 
     <string name="pref_title_choose_language">Language</string>
     <string-array name="pref_languages_list_titles">
@@ -143,9 +172,7 @@
     </string-array>
 
     <!-- SharedPreferences -->
-    <string name="sharedPreferences" translatable="false">com.myapps.ron.family_recipes</string>
-    <string name="preference_key_dark_mode" translatable="false">dark_mode</string>
-    <string name="preference_key_language" translatable="false">system_language</string>
+    <string name="sharedPreferences" translatable="false">com.myapps.ron.family_recipes_preferences</string>
 
 
     <!--
@@ -162,9 +189,11 @@
     <string name="notification_system_update_channel_id" translatable="false">system_update</string>
     <string name="notification_system_update_channel_name" translatable="false">System updates</string>
     <string name="notification_new_recipe_channel_id" translatable="false">new_recipe</string>
-    <string name="notification_new_recipe_channel_name" translatable="false">New recipe</string>
+    <string name="notification_new_recipe_channel_name" translatable="false">New recipes</string>
     <string name="notification_comment_channel_id" translatable="false">comment</string>
-    <string name="notification_comment_channel_name" translatable="false">Comment</string>
+    <string name="notification_comment_channel_name" translatable="false">Comments</string>
+    <string name="notification_like_channel_id" translatable="false">like</string>
+    <string name="notification_like_channel_name" translatable="false">Likes</string>
 
     <string name="notification_default_channel_group_name" translatable="false">recipes</string>
 

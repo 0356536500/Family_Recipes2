@@ -1,0 +1,69 @@
+<androidx.preference.PreferenceScreen
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    app:title="@string/title_activity_settings">
+
+    <PreferenceCategory
+        app:title="@string/settings_category_display"
+        app:iconSpaceReserved="false">
+
+        <!--<SwitchPreferenceCompat
+            app:defaultValue="false"
+            app:key="@string/preference_key_dark_mode"
+            app:summary="@string/pref_description_dark_theme"
+            app:title="@string/pref_title_dark_theme"
+            app:iconSpaceReserved="false" />-->
+
+        <ListPreference
+            app:defaultValue="never"
+            app:entries="@array/pref_dark_theme_list_titles"
+            app:entryValues="@array/pref_dark_theme_list_values"
+            app:key="@string/preference_key_dark_theme"
+            app:negativeButtonText="@null"
+            app:positiveButtonText="@null"
+            app:title="@string/pref_title_dark_theme"
+            app:summary="%s"
+            app:iconSpaceReserved="false" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:title="@string/settings_category_general"
+        app:iconSpaceReserved="false">
+
+        <!-- NOTE: Hide buttons to simplify the UI. Users can touch outside the dialog to
+            dismiss it. -->
+        <!-- NOTE: ListPreference's summary should be set to its value by the activity code. -->
+        <ListPreference
+            android:defaultValue="en"
+            android:entries="@array/pref_languages_list_titles"
+            android:entryValues="@array/pref_languages_list_values"
+            android:key="@string/preference_key_language"
+            android:summary="%s"
+            app:negativeButtonText="@null"
+            app:positiveButtonText="@null"
+            app:title="@string/pref_title_choose_language"
+            app:iconSpaceReserved="false" />
+    </PreferenceCategory>
+
+    <!-- NOTE: EditTextPreference accepts EditText attributes. -->
+    <!-- NOTE: EditTextPreference's summary should be set to its value by the activity code. -->
+    <EditTextPreference
+        android:capitalize="words"
+        app:enabled="false"
+        app:defaultValue="@string/pref_default_display_name"
+        android:inputType="textCapWords"
+        app:key="example_text"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        app:title="@string/pref_title_display_name"
+        app:iconSpaceReserved="false" />
+
+    <Preference
+        app:fragment=
+            "com.myapps.ron.family_recipes.ui.activities.SettingsActivity$NotificationPreferenceFragment"
+        app:title="@string/settings_category_notifications"
+        app:iconSpaceReserved="false" />
+
+</androidx.preference.PreferenceScreen>

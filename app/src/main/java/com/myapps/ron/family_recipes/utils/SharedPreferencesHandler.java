@@ -2,10 +2,17 @@ package com.myapps.ron.family_recipes.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import com.myapps.ron.family_recipes.R;
 
+import androidx.core.content.SharedPreferencesCompat;
+
 public class SharedPreferencesHandler {
+    public static SharedPreferences getSharedPreferences(Context context) {
+        return context.getSharedPreferences(context.getString(R.string.sharedPreferences), Context.MODE_PRIVATE);
+    }
+
     public static void wipeSharedPreferences(Context ctx) {
         SharedPreferences sharedPref = ctx.getSharedPreferences(ctx.getString(R.string.sharedPreferences), Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();

@@ -38,14 +38,15 @@ public abstract class MyBaseActivity extends AppCompatActivity implements Shared
     @Override
     protected void onPostCreate(@Nullable Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
-        getSharedPreferences(getString(R.string.sharedPreferences), MODE_PRIVATE).registerOnSharedPreferenceChangeListener(this);
+        SharedPreferencesHandler.getSharedPreferences(this).registerOnSharedPreferenceChangeListener(this);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         Log.e(getClass().getSimpleName(), "on destroy");
-        getSharedPreferences(getString(R.string.sharedPreferences), MODE_PRIVATE).unregisterOnSharedPreferenceChangeListener(this);
+        SharedPreferencesHandler.getSharedPreferences(this).unregisterOnSharedPreferenceChangeListener(this);
+        //getSharedPreferences(getString(R.string.sharedPreferences), MODE_PRIVATE).unregisterOnSharedPreferenceChangeListener(this);
     }
 
     /**
@@ -58,7 +59,29 @@ public abstract class MyBaseActivity extends AppCompatActivity implements Shared
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (key == null)
             return;
-        if (key.equals(getString(R.string.preference_key_dark_mode))) {
+        Log.e(getClass().getSimpleName(), "value, " + sharedPreferences.getString(key, "default"));
+        if (key.equals(getString(R.string.preference_key_dark_theme))) {
+            recreate();
+        }
+        /*if (key.equals(getString(R.string.preference_key_dark_theme))) {
+            Log.e(getClass().getSimpleName(), "value, " + sharedPreferences.getString(key, "never"));
+            String themePreference = sharedPreferences.getString(key, Constants.DARK_THEME_NEVER);
+            if (themePreference != null) {
+                switch (themePreference) {
+                    case Constants.DARK_THEME_ALWAYS: // always dark theme
+                        setTheme(R.style.AppTheme_Dark);
+                        recreate();
+                        break;
+                    case Constants.DARK_THEME_NEVER:
+                        setTheme(R.style.AppTheme_Light);
+                        recreate();
+                        break;
+                }
+            }
+            //setTheme(sharedPreferences.getString(key, "never") ? R.style.AppTheme_Dark : R.style.AppTheme_Dark);
+
+        }*/
+        if (key.equals(getString(R.string.preference_key_dark_theme))) {
             Log.e(getClass().getSimpleName(), "value, " + sharedPreferences.getBoolean(key, false));
             setTheme(sharedPreferences.getBoolean(key, false) ? R.style.AppTheme_Dark : R.style.AppTheme_Light);
             //toolbar.setPopupTheme(sharedPreferences.getBoolean(key, false) ? R.style.AppTheme_PopupOverlay_Dark : R.style.AppTheme_PopupOverlay_Light);
