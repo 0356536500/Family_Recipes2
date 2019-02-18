@@ -59,33 +59,16 @@ public abstract class MyBaseActivity extends AppCompatActivity implements Shared
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (key == null)
             return;
-        Log.e(getClass().getSimpleName(), "value, " + sharedPreferences.getString(key, "default"));
+        //Log.e(getClass().getSimpleName(), "value, " + sharedPreferences.getString(key, "default"));
         if (key.equals(getString(R.string.preference_key_dark_theme))) {
             recreate();
         }
-        /*if (key.equals(getString(R.string.preference_key_dark_theme))) {
-            Log.e(getClass().getSimpleName(), "value, " + sharedPreferences.getString(key, "never"));
-            String themePreference = sharedPreferences.getString(key, Constants.DARK_THEME_NEVER);
-            if (themePreference != null) {
-                switch (themePreference) {
-                    case Constants.DARK_THEME_ALWAYS: // always dark theme
-                        setTheme(R.style.AppTheme_Dark);
-                        recreate();
-                        break;
-                    case Constants.DARK_THEME_NEVER:
-                        setTheme(R.style.AppTheme_Light);
-                        recreate();
-                        break;
-                }
-            }
-            //setTheme(sharedPreferences.getString(key, "never") ? R.style.AppTheme_Dark : R.style.AppTheme_Dark);
 
-        }*/
-        if (key.equals(getString(R.string.preference_key_dark_theme))) {
+        /*if (key.equals(getString(R.string.preference_key_dark_theme))) {
             Log.e(getClass().getSimpleName(), "value, " + sharedPreferences.getBoolean(key, false));
             setTheme(sharedPreferences.getBoolean(key, false) ? R.style.AppTheme_Dark : R.style.AppTheme_Light);
             //toolbar.setPopupTheme(sharedPreferences.getBoolean(key, false) ? R.style.AppTheme_PopupOverlay_Dark : R.style.AppTheme_PopupOverlay_Light);
             recreate();
-        }
+        }*/
     }
 }

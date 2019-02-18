@@ -32,7 +32,7 @@ public interface RecipeInterface {
     String categories = Constants.URL_CATEGORIES;// + "/{" + Constants.DATE_QUERY + "}";
     String food = Constants.URL_FOOD + "/{" + Constants.ID_QUERY + "}";
     String subscriptions = Constants.URL_SUBSCRIPTIONS + "/{" + Constants.PATH_DEVICE_ID + "}";
-    String token = Constants.URL_TOKENS + "/{" + Constants.PATH_DEVICE_ID + "}" + "/{" + Constants.PATH_TOKEN + "}";
+    String register_token = Constants.URL_TOKENS + "/{" + Constants.PATH_DEVICE_ID + "}" + "/{" + Constants.PATH_TOKEN + "}";
 
 
     @GET(recipeWithID)
@@ -121,14 +121,6 @@ public interface RecipeInterface {
     //endregion
 
     //region users
-    @PUT(token)
-    Call<Void> registerNewToken(
-            @Header(Constants.AUTHORIZATION) String auth,
-            @Path(Constants.PATH_DEVICE_ID) String deviceId,
-            @Path(Constants.PATH_TOKEN) String token,
-            @Query(Constants.QUERY_PLATFORM) String platform
-    );
-
     @PUT(subscriptions)
     Observable<Response<Void>> manageSubscriptions(
             @Header(Constants.AUTHORIZATION) String auth,
@@ -139,6 +131,13 @@ public interface RecipeInterface {
             @Body Map<String, String> body
     );
 
+    @PUT(register_token)
+    Call<Void> registerNewToken(
+            @Header(Constants.AUTHORIZATION) String auth,
+            @Path(Constants.PATH_DEVICE_ID) String deviceId,
+            @Path(Constants.PATH_TOKEN) String notificationsToken,
+            @Query(Constants.QUERY_PLATFORM) String platform
+    );
 
     //endregion
 

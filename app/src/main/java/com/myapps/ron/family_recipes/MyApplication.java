@@ -7,7 +7,9 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.PowerManager;
+import android.provider.Settings;
 
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.myapps.ron.family_recipes.utils.Constants;
 import com.myapps.ron.family_recipes.utils.LocaleHelper;
 import com.myapps.ron.family_recipes.utils.SharedPreferencesHandler;
@@ -89,5 +91,10 @@ public class MyApplication extends Application {
         Calendar cal = Calendar.getInstance();
         int hour = cal.get(Calendar.HOUR_OF_DAY);
         return hour < 6 || hour > 18;
+    }
+
+    public String getDeviceId() {
+        //return FirebaseInstanceId.getInstance().getId();
+        return Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
     }
 }

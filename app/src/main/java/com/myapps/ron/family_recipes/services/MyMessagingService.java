@@ -14,10 +14,14 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
+import com.myapps.ron.family_recipes.MyApplication;
 import com.myapps.ron.family_recipes.R;
+import com.myapps.ron.family_recipes.network.APICallsHandler;
+import com.myapps.ron.family_recipes.network.cognito.AppHelper;
 import com.myapps.ron.family_recipes.ui.activities.SplashActivity;
 import com.myapps.ron.family_recipes.utils.Constants;
 
@@ -29,6 +33,9 @@ import java.util.Random;
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created by ronginat on 10/02/2019.
@@ -40,12 +47,14 @@ public class MyMessagingService extends FirebaseMessagingService {
     private final String DEFAULT_GROUP = "com.myapps.ron.family_recipes.DEFAULT";
 
     private List<Notification> notifications;
+    private CompositeDisposable compositeDisposable;
 
     @Override
     public void onCreate() {
         super.onCreate();
         notifications = new ArrayList<>();
         registerReceiver(mReceiver, intentFilter);
+        compositeDisposable = new CompositeDisposable();
     }
 
     @Override
@@ -54,6 +63,7 @@ public class MyMessagingService extends FirebaseMessagingService {
         notifications.clear();
         notifications = null;
         unregisterReceiver(mReceiver);
+        compositeDisposable.clear();
     }
 
     @Override
@@ -83,6 +93,20 @@ public class MyMessagingService extends FirebaseMessagingService {
     public void onNewToken(String token) {
         super.onNewToken(token);
         Log.e(TAG, "Refreshed token: " + token);
+        compositeDisposable.add(AppHelper.currSessionObservable
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .subscribe(currSession -> {
+                    if (currSession != null) {
+                        APICallsHandler.registerNewToken(currSession.getAccessToken().getJWTToken(), ((MyApplication)getApplication()).getDeviceId(), token, message -> {
+                            if (message != null)
+                                Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+                            else
+                                compositeDisposable.clear();
+                        });
+                    }
+                }, error -> Log.e(TAG, error.getMessage()))
+                );
     }
 
     /**

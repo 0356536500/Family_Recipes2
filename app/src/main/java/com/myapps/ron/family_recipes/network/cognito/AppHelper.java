@@ -30,6 +30,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import io.reactivex.subjects.PublishSubject;
+
 public class AppHelper {
     private static final String TAG = "AppHelper";
     // App settings
@@ -92,6 +94,7 @@ public class AppHelper {
     private static final Regions cognitoRegion = Constants.COGNITO_REGION;
 
     // User details from the service
+    public static PublishSubject<CognitoUserSession> currSessionObservable = PublishSubject.create();
     private static CognitoUserSession currSession;
     private static CognitoUserDetails userDetails;
 
@@ -167,6 +170,7 @@ public class AppHelper {
 
     public static void setCurrSession(CognitoUserSession session) {
         currSession = session;
+        currSessionObservable.onNext(session);
     }
 
     public static CognitoUserSession getCurrSession() {
@@ -174,6 +178,8 @@ public class AppHelper {
     }
 
     public static String getAccessToken() {
+        if (getCurrSession() == null)
+            return null;
         Date date = new Date();
         //date.setTime(date.getTime() + TimeUnit.MINUTES.toMillis(5));
         if (getCurrSession().getAccessToken().getExpiration().before(date)) {

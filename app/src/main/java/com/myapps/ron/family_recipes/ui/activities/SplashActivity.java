@@ -132,7 +132,9 @@ public class SplashActivity extends AppCompatActivity {
     };
 
     private void launchMain() {
-        if (getIntent() != null) {
+        startActivity(new Intent(this, SettingsActivity.class));
+        finish();
+        if (false && getIntent() != null) {
             Intent receivedIntent = getIntent();
             String recipeId = receivedIntent.getStringExtra(com.myapps.ron.family_recipes.utils.Constants.RECIPE_ID);
             if (recipeId != null && !"".equals(recipeId)) {
@@ -146,7 +148,7 @@ public class SplashActivity extends AppCompatActivity {
                 startActivity(intent);
                 finish();
             }
-        } else {
+        } else if(false){
             Intent intent = new Intent(SplashActivity.this, MainActivity.class);
             startActivity(intent);
             finish();
