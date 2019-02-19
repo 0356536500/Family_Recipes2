@@ -69,7 +69,7 @@
     <!-- Recipe Activity -->
     <string name="recipe_content_not_found">recipe content not found</string>
     <string name="recipe_not_in_server">recipe has no content in server</string>
-    <string name="no_internet_message">Not connected to internet</string>
+    <string name="no_internet_message">Not connected to the internet</string>
     <string name="post_comment_error">Can\'t send empty message</string>
     <string name="comments">Comments (%1$d)</string>
     <string name="no_comments">Comments (0)</string>
@@ -188,11 +188,11 @@
     <!-- Notification Channels -->
     <string name="notification_system_update_channel_id" translatable="false">system_update</string>
     <string name="notification_system_update_channel_name" translatable="false">System updates</string>
-    <string name="notification_new_recipe_channel_id" translatable="false">new_recipe</string>
+    <string name="notification_new_recipe_channel_id" translatable="false">newRecipes</string>
     <string name="notification_new_recipe_channel_name" translatable="false">New recipes</string>
-    <string name="notification_comment_channel_id" translatable="false">comment</string>
+    <string name="notification_comment_channel_id" translatable="false">comments</string>
     <string name="notification_comment_channel_name" translatable="false">Comments</string>
-    <string name="notification_like_channel_id" translatable="false">like</string>
+    <string name="notification_like_channel_id" translatable="false">likes</string>
     <string name="notification_like_channel_name" translatable="false">Likes</string>
 
     <string name="notification_default_channel_group_name" translatable="false">recipes</string>

@@ -102,7 +102,7 @@ public class SettingsActivity extends MyBaseActivity
             recreate();
         }
         if (key.equals(getString(R.string.preference_key_language))) {
-            Log.e(getClass().getSimpleName(), "new lang, " + sharedPreferences.getString(key, "en"));
+            Log.e(getClass().getSimpleName(), "new lang, " + sharedPreferences.getString(key, "he"));
             LocaleHelper.setLocale(SettingsActivity.this, sharedPreferences.getString(key, "he"));
             SettingsActivity.this.recreate();
         }

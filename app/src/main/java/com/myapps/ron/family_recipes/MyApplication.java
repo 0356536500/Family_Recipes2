@@ -93,8 +93,8 @@ public class MyApplication extends Application {
         return hour < 6 || hour > 18;
     }
 
-    public String getDeviceId() {
+    public static String getDeviceId() {
         //return FirebaseInstanceId.getInstance().getId();
-        return Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+        return Settings.Secure.getString(mContext.getContentResolver(), Settings.Secure.ANDROID_ID);
     }
 }

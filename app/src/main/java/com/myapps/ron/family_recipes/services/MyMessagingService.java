@@ -33,7 +33,6 @@ import java.util.Random;
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 
@@ -193,22 +192,23 @@ public class MyMessagingService extends FirebaseMessagingService {
     private void createNotificationChannels(NotificationManager notificationManager) {
         List<NotificationChannel> channels = new ArrayList<>();
         //createNotificationChannelGroup(notificationManager);
-        NotificationChannel channel1 = new NotificationChannel(getString(R.string.notification_new_recipe_channel_id),
+        channels.add(new NotificationChannel(getString(R.string.notification_new_recipe_channel_id),
                 getString(R.string.notification_new_recipe_channel_name),
-                NotificationManager.IMPORTANCE_LOW);
+                NotificationManager.IMPORTANCE_LOW));
         //channel1.setVibrationPattern(new long[]{150, 20, 150});
         //channel1.enableVibration(true);
-        channels.add(channel1);
 
-        NotificationChannel channel2 = new NotificationChannel(getString(R.string.notification_comment_channel_id),
+        channels.add(new NotificationChannel(getString(R.string.notification_comment_channel_id),
                 getString(R.string.notification_comment_channel_name),
-                NotificationManager.IMPORTANCE_DEFAULT);
-        channels.add(channel2);
+                NotificationManager.IMPORTANCE_DEFAULT));
 
-        NotificationChannel channel3 = new NotificationChannel(getString(R.string.notification_system_update_channel_id),
+        channels.add(new NotificationChannel(getString(R.string.notification_like_channel_id),
+                getString(R.string.notification_like_channel_name),
+                NotificationManager.IMPORTANCE_DEFAULT));
+
+        channels.add(new NotificationChannel(getString(R.string.notification_system_update_channel_id),
                 getString(R.string.notification_system_update_channel_name),
-                NotificationManager.IMPORTANCE_DEFAULT);
-        channels.add(channel3);
+                NotificationManager.IMPORTANCE_DEFAULT));
 
         notificationManager.createNotificationChannels(channels);
     }

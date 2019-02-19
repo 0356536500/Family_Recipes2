@@ -20,6 +20,7 @@ import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
+import retrofit2.http.QueryMap;
 
 
 public interface RecipeInterface {
@@ -33,6 +34,7 @@ public interface RecipeInterface {
     String food = Constants.URL_FOOD + "/{" + Constants.ID_QUERY + "}";
     String subscriptions = Constants.URL_SUBSCRIPTIONS + "/{" + Constants.PATH_DEVICE_ID + "}";
     String register_token = Constants.URL_TOKENS + "/{" + Constants.PATH_DEVICE_ID + "}" + "/{" + Constants.PATH_TOKEN + "}";
+    String userWithID = Constants.URL_USERS + "/{" + Constants.PATH_DEVICE_ID + "}";
 
 
     @GET(recipeWithID)
@@ -122,11 +124,13 @@ public interface RecipeInterface {
 
     //region users
     @PUT(subscriptions)
-    Observable<Response<Void>> manageSubscriptions(
+    Call<Void> manageSubscriptions(
             @Header(Constants.AUTHORIZATION) String auth,
             @Path(Constants.PATH_DEVICE_ID) String deviceId,
-            @Query(Constants.QUERY_NEW_RECIPE_SUBSCRIPTION) String newRecipeSubscription,
+            @QueryMap Map<String, String> queries,
+            /*@Query(Constants.QUERY_NEW_RECIPE_SUBSCRIPTION) String newRecipesSubscription,
             @Query(Constants.QUERY_COMMENTS_SUBSCRIPTION) String commentsSubscription,
+            @Query(Constants.QUERY_LIKES_SUBSCRIPTION) String likesSubscription,*/
             //@QueryMap Map<String, String> queries,
             @Body Map<String, String> body
     );
@@ -137,6 +141,12 @@ public interface RecipeInterface {
             @Path(Constants.PATH_DEVICE_ID) String deviceId,
             @Path(Constants.PATH_TOKEN) String notificationsToken,
             @Query(Constants.QUERY_PLATFORM) String platform
+    );
+
+    @GET(userWithID)
+    Observable<Response<Map<String, Object>>> getUserDataObservable(
+            @Header(Constants.AUTHORIZATION) String auth,
+            @Path(Constants.PATH_DEVICE_ID) String deviceId
     );
 
     //endregion
