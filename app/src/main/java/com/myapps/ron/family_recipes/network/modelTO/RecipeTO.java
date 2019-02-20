@@ -2,6 +2,7 @@ package com.myapps.ron.family_recipes.network.modelTO;
 
 import com.google.gson.annotations.SerializedName;
 import com.myapps.ron.family_recipes.model.RecipeEntity;
+import com.myapps.ron.family_recipes.network.PostRecipe;
 import com.myapps.ron.family_recipes.utils.Constants;
 
 import java.util.List;
@@ -13,7 +14,7 @@ import androidx.annotation.NonNull;
 /**
  * Created by ronginat on 31/12/2018.
  */
-public class RecipeTO {
+public class RecipeTO implements PostRecipe {
 
     //public static String image = "https://api.androidhive.info/json/images/keanu.jpg";
 

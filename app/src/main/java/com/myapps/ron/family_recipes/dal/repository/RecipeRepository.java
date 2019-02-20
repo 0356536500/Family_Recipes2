@@ -22,6 +22,7 @@ import com.myapps.ron.family_recipes.utils.DateUtil;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -378,6 +379,8 @@ public class RecipeRepository {
         }
     }*/
 
+    //for case of server not sending the updated recipe in the response,
+    //need to fetch it to update lastModifiedDate attribute
     public void changeLike(String id, boolean like) {
         executor.execute(() -> {
             recipeDao.updateLikeRecipe(id, like ? TRUE : FALSE);
@@ -423,6 +426,16 @@ public class RecipeRepository {
                             }
                         })
         );
+    }
+
+    public void updateFavoritesFromUserRecord(List<String> favorites) {
+        if (favorites != null) {
+            executor.execute(() -> {
+                for (String id : favorites)
+                    recipeDao.updateLikeRecipe(id, TRUE);
+                //recipeDao.updateLikesFromUserRecord(favorites, TRUE);
+            });
+        }
     }
 
     public void deleteAllRecipes() {

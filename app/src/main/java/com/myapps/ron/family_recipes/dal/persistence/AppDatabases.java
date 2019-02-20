@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.model.CategoryEntity;
+import com.myapps.ron.family_recipes.model.PendingRecipe;
 import com.myapps.ron.family_recipes.model.RecipeEntity;
 import com.myapps.ron.family_recipes.utils.DateUtil;
 
@@ -24,7 +25,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
 /**
  * Created by ronginat on 31/12/2018.
  */
-@Database(entities = {RecipeEntity.class, CategoryEntity.class}, version = 1, exportSchema = false)
+@Database(entities = {RecipeEntity.class, CategoryEntity.class, PendingRecipe.class}, version = 1, exportSchema = false)
 @TypeConverters({Converters.class})
 public abstract class AppDatabases extends RoomDatabase {
 
@@ -32,11 +33,13 @@ public abstract class AppDatabases extends RoomDatabase {
 
     private static final String DATABASE_NAME = "family_recipes.db";
 
-    public static final String TABLE_RECIPES = "recipes";
+    static final String TABLE_RECIPES = "recipes";
     public static final String TABLE_CATEGORIES = "categories";
+    static final String TABLE_PENDING_RECIPES = "pendingRecipes";
 
     public abstract RecipeDao recipeDao();
     public abstract CategoryDao categoriesDao();
+    public abstract PendingRecipeDao pendingRecipeDao();
 
     public static AppDatabases getInstance(Context context)  {
         if (INSTANCE == null) {
@@ -62,22 +65,15 @@ public abstract class AppDatabases extends RoomDatabase {
                                 }
                             })*/
                             /*.addCallback(new Callback() {
-                                *//*@Override
-                                public void onCreate(@NonNull SupportSQLiteDatabase db) {
-                                    super.onCreate(db);
-                                    Executors.newSingleThreadScheduledExecutor().execute(() -> {
-                                        getInstance(context).recipeDao().insertAll(generateData("recipe", 150));
-                                    });
-                                }*//*
-
                                 @Override
                                 public void onOpen(@NonNull SupportSQLiteDatabase db) {
                                     super.onOpen(db);
                                     Executors.newSingleThreadScheduledExecutor().execute(() -> {
                                         RecipeDao recipeDao = getInstance(context).recipeDao();
                                         recipeDao.deleteAllRecipes();
-                                        recipeDao.insertAll(generateData("recipe", 15));
-                                        recipeDao.insertAll(generateData("tirass", 15));
+                                        recipeDao.insertAll(generate3Recipe());
+                                        //recipeDao.insertAll(generateData("recipe", 15));
+                                        //recipeDao.insertAll(generateData("tirass", 15));
                                     });
                                 }
                             })*/
@@ -86,6 +82,27 @@ public abstract class AppDatabases extends RoomDatabase {
             }
         }
         return INSTANCE;
+    }
+
+    private static List<RecipeEntity> generate3Recipe() {
+        List<RecipeEntity> recipeEntities = new ArrayList<>();
+        recipeEntities.add(new RecipeEntity.RecipeBuilder()
+                .id("1")
+                .name("מרק עוף")
+                .meLike(false)
+                .build());
+        recipeEntities.add(new RecipeEntity.RecipeBuilder()
+                .id("2")
+                .name("alef")
+                .meLike(false)
+                .build());
+        recipeEntities.add(new RecipeEntity.RecipeBuilder()
+                .id("3")
+                .name("bet")
+                .meLike(false)
+                .build());
+
+        return recipeEntities;
     }
 
     public static List<RecipeEntity> generateData(String name, int size) {

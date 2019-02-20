@@ -5,6 +5,7 @@ import com.myapps.ron.family_recipes.model.RecipeMinimal;
 import com.myapps.ron.family_recipes.utils.Constants;
 
 import java.util.List;
+import java.util.Set;
 
 import androidx.paging.DataSource;
 import androidx.room.Dao;
@@ -114,6 +115,12 @@ public interface RecipeDao {
     DataSource.Factory<Integer, RecipeMinimal> findAllFavoritesByNameLikeOrDescriptionLikeAndCategoriesLikeOrderByPopularity(
             String search, String filters);
 
+    @Query("SELECT " + recipeMinimalFields + " FROM " + AppDatabases.TABLE_RECIPES)
+    List<RecipeMinimal> findAllSync(); //testing only
+
+    @Query("SELECT " + recipeMinimalFields + " FROM " + AppDatabases.TABLE_RECIPES + " WHERE "
+            + RecipeEntity.KEY_FAVORITE + " = " + Constants.TRUE)
+    List<RecipeMinimal> findAllFavoritesSync(); //testing only
 
     // endregion
 
@@ -150,6 +157,9 @@ public interface RecipeDao {
 
     @Query("UPDATE " + AppDatabases.TABLE_RECIPES + " SET meLike = :meLike where " + RecipeEntity.KEY_ID + " = :id")
     void updateLikeRecipe(String id, int meLike);
+
+    /*@Query("UPDATE " + AppDatabases.TABLE_RECIPES + " SET meLike = :meLike where " + RecipeEntity.KEY_ID + " IN (:ids)")
+    void updateLikesFromUserRecord(List<String> ids, int meLike); // not working */
 
     @Delete
     void deleteRecipe(RecipeEntity recipeEntity);

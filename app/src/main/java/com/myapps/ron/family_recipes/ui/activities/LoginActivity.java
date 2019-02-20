@@ -356,7 +356,7 @@ public class LoginActivity extends AppCompatActivity {
     private void launchUser() {
         Intent mainIntent = new Intent(this, SettingsActivity.class);
         mainIntent.putExtra("name", username);
-        mainIntent.putExtra("load_likes", true);
+        mainIntent.putExtra("from_login", true);
         startActivity(mainIntent);
         finish();
     }

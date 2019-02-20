@@ -6,17 +6,28 @@ import android.content.Intent;
 import android.os.StrictMode;
 import android.util.Log;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.myapps.ron.family_recipes.MyApplication;
 import com.myapps.ron.family_recipes.dal.Injection;
+import com.myapps.ron.family_recipes.dal.persistence.AppDatabases;
 import com.myapps.ron.family_recipes.dal.repository.RecipeRepository;
 import com.myapps.ron.family_recipes.network.APICallsHandler;
 import com.myapps.ron.family_recipes.network.APIResponse;
+import com.myapps.ron.family_recipes.network.Constants;
 import com.myapps.ron.family_recipes.network.MiddleWareForNetwork;
 import com.myapps.ron.family_recipes.network.cognito.AppHelper;
 import com.myapps.ron.family_recipes.network.modelTO.RecipeTO;
 import com.myapps.ron.family_recipes.utils.DateUtil;
+import com.myapps.ron.family_recipes.utils.SharedPreferencesHandler;
 
+import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.Map;
+
+import io.reactivex.observers.DisposableObserver;
+import retrofit2.Response;
 
 /**
  * An {@link IntentService} subclass for handling asynchronous task requests in
@@ -30,7 +41,7 @@ public class GetAllRecipesService extends IntentService {
 
     // IntentService can perform, e.g. ACTION_FETCH_NEW_ITEMS
     private static final String ACTION_GET_ALL = "com.myapps.ron.family_recipes.services.action.GET_ALL";
-    private static final String ACTION_GET_PAGINATION = "com.myapps.ron.family_recipes.services.action.GET_PAGINATION";
+    private static final String ACTION_FETCH_USER_DETAILS = "com.myapps.ron.family_recipes.services.action.GET_USER_DETAILS";
 
     // TODO: Rename parameters
     private static final String EXTRA_PARAM1 = "com.myapps.ron.family_recipes.services.extra.PARAM1";
@@ -67,13 +78,11 @@ public class GetAllRecipesService extends IntentService {
      *
      * @see IntentService
      */
-    /*public static void startActionBaz(Context context, String param1, String param2) {
+    public static void startActionFetchUserDetails(Context context) {
         Intent intent = new Intent(context, GetAllRecipesService.class);
-        intent.setAction(ACTION_BAZ);
-        intent.putExtra(EXTRA_PARAM1, param1);
-        intent.putExtra(EXTRA_PARAM2, param2);
+        intent.setAction(ACTION_FETCH_USER_DETAILS);
         context.startService(intent);
-    }*/
+    }
 
     @Override
     protected void onHandleIntent(Intent intent) {
@@ -83,11 +92,9 @@ public class GetAllRecipesService extends IntentService {
                 Log.e(TAG, "onHandleIntent");
                 setThreadPolicy();
                 handleActionGetAllRecipes();
-            } /*else if (ACTION_BAZ.equals(action)) {
-                final String param1 = intent.getStringExtra(EXTRA_PARAM1);
-                final String param2 = intent.getStringExtra(EXTRA_PARAM2);
-                handleActionBaz(param1, param2);
-            }*/
+            } else if (ACTION_FETCH_USER_DETAILS.equals(action)) {
+                handleActionFetchUserDetails();
+            }
         }
     }
 
@@ -97,9 +104,6 @@ public class GetAllRecipesService extends IntentService {
         StrictMode.setThreadPolicy(policy);
     }
 
-    //private List<MyAsyncRecipeUpdate> asyncRecipeUpdateList = null;
-    private AtomicInteger newTotalRecipes = new AtomicInteger(0);
-    private AtomicInteger modifiedTotalRecipes =  new AtomicInteger(0);
 
     /**
      * Handle action GetAllRecipes in the provided background thread with the provided
@@ -123,10 +127,6 @@ public class GetAllRecipesService extends IntentService {
                 lastKey = response.getLastKey();
 
                 repository.updateFromServer(getApplicationContext(), response.getData(), null);
-                /*MyAsyncRecipeUpdate asyncRecipeUpdate = new MyAsyncRecipeUpdate(getApplicationContext(), response.getPagedRecipes());
-                asyncRecipeUpdate.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                asyncRecipeUpdateList.add(asyncRecipeUpdate);*/
-
             }
         }
         while (lastKey != null && !lastKey.isEmpty() && MiddleWareForNetwork.checkInternetConnection(getApplicationContext()));
@@ -134,56 +134,82 @@ public class GetAllRecipesService extends IntentService {
         DateUtil.updateServerTime(getApplicationContext(), time);
     }
 
+
     /**
-     * Handle action Baz in the provided background thread with the provided
-     * parameters.
+     * Handle action FetchUserDetails in the provided background thread
      */
-    /*private void handleActionBaz(String param1, String param2) {
-        throw new UnsupportedOperationException("Not yet implemented");
-    }*/
+    private void handleActionFetchUserDetails() {
+        if (MiddleWareForNetwork.checkInternetConnection(getApplicationContext())) {
+            if (AppHelper.getAccessToken() == null)
+                return;
+            APICallsHandler
+                    .getUserDetailsObservable(AppHelper.getAccessToken(), MyApplication.getDeviceId())
+                    .subscribe(new DisposableObserver<Response<Map<String, Object>>>() {
+                        @Override
+                        public void onNext(Response<Map<String, Object>> response) {
+                            Log.e(TAG, "getUserDetails code = " + response.code());
+                            if (response.code() == APICallsHandler.STATUS_OK) {
+                                Map<String, Object> body = response.body();
+                                if (body != null) {
+                                    Log.e(TAG, body.toString());
+                                    Gson gson = new Gson();
+                                    if (body.get(Constants.RESPONSE_KEY_SUBSCRIPTIONS) != null) {
+                                        Type mapType = new TypeToken<Map<String,Boolean>>() {}.getType();
 
-    /*@SuppressLint("StaticFieldLeak")
-    class MyAsyncRecipeUpdate extends AsyncTask<Void, Void, Boolean> {
-        private int newRecipes, modifiedRecipes;
-        private List<RecipeTO> recipes;
-        private RecipesDBHelper dbHelper;
+                                        Map<String, Boolean> subscriptionsMap = gson.fromJson(gson.toJson(body.get(Constants.RESPONSE_KEY_SUBSCRIPTIONS)), mapType);
+                                        if (subscriptionsMap != null)
+                                            Log.e(TAG, "subscriptions: " + subscriptionsMap.toString());
+                                        updateSubscriptions(subscriptionsMap);
+                                    }
 
-        MyAsyncRecipeUpdate(Context context, List<RecipeTO> recipes) {
-            this.dbHelper = new RecipesDBHelper(context);
-            this.recipes = recipes;
-            this.newRecipes = 0;
-            this.modifiedRecipes = 0;
+                                    if (body.get(Constants.RESPONSE_KEY_FAVORITES) != null) {
+                                        Type mapType = new TypeToken<List<String>>() {}.getType();
+
+                                        List<String> favoritesMap = gson.fromJson(gson.toJson(body.get(Constants.RESPONSE_KEY_FAVORITES)), mapType);
+                                        if (favoritesMap != null)
+
+                                        Injection.provideRecipeRepository(getApplicationContext())
+                                                .updateFavoritesFromUserRecord(favoritesMap);
+
+                                    }
+                                }
+                            }
+                            else {
+                                try {
+                                    if (response.errorBody() != null) {
+                                        Log.e(TAG, "error getUserDetails, errorBody: " + response.errorBody().string()
+                                                + "\n message: " + response.message());
+                                    }
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                            dispose();
+                        }
+
+                        @Override
+                        public void onError(Throwable t) {
+                            Log.e(TAG, "onError, " + t.getMessage());
+                            dispose();
+                        }
+
+                        @Override
+                        public void onComplete() {
+                            Log.e(TAG, "onComplete");
+                            dispose();
+                        }
+                    });
         }
+    }
 
-        @Override
-        protected Boolean doInBackground(Void... voids) {
-            for (RecipeTO item : recipes) {
-                if (isCancelled())
-                    return false;
-                //Log.e(getClass().getSimpleName(), "item: " + item.getId());
-                if(dbHelper.recipeExists(item.getId())) {
-                    //Log.e(getClass().getSimpleName(), "\t exists");
-                    dbHelper.updateRecipeServerChanges(item.toEntity());
-                    modifiedRecipes++;
-                } else {
-                    //Log.e(getClass().getSimpleName(), "\t not exists");
-                    dbHelper.insertRecipe(item.toEntity());
-                    newRecipes++;
-                }
+    private void updateSubscriptions(Map<String, Boolean> subscriptionsMap) {
+        if (subscriptionsMap != null) {
+            for (Map.Entry<String, Boolean> entry: subscriptionsMap.entrySet()) {
+                SharedPreferencesHandler.writeBoolean(getApplicationContext(), entry.getKey(), entry.getValue());
             }
-            return true;
+            //Log.e(TAG, SharedPreferencesHandler.getSharedPreferences(getApplicationContext()).getAll().toString());
         }
-
-        @Override
-        protected void onPostExecute(Boolean aBoolean) {
-            super.onPostExecute(aBoolean);
-            if (aBoolean){
-                newTotalRecipes.addAndGet(newRecipes);
-                modifiedTotalRecipes.addAndGet(modifiedRecipes);
-            }
-
-        }
-    }*/
+    }
 
 
 }

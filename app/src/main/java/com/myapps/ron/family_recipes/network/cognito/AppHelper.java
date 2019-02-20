@@ -6,6 +6,7 @@ import android.util.Log;
 
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoDevice;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUser;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserAttributes;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserDetails;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserPool;
@@ -26,9 +27,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 import io.reactivex.subjects.PublishSubject;
 
@@ -183,44 +184,103 @@ public class AppHelper {
         Date date = new Date();
         //date.setTime(date.getTime() + TimeUnit.MINUTES.toMillis(5));
         if (getCurrSession().getAccessToken().getExpiration().before(date)) {
-            /*getPool().getCurrentUser().getSession(new AuthenticationHandler() {
-                @Override
-                public void onSuccess(CognitoUserSession cognitoUserSession, CognitoDevice device) {
-                    Log.d(TAG, " -- Auth Success");
-                    setCurrSession(cognitoUserSession);
-                    newDevice(device);
-                    Log.e(TAG, "IDToken: " + cognitoUserSession.getIdToken().getJWTToken());
-                    Log.e(TAG, "AccessToken: " + cognitoUserSession.getAccessToken().getJWTToken());
-
-                    setIdentityProvider(MyApplication.getContext(), cognitoUserSession);
-                }
-
-                @Override
-                public void getAuthenticationDetails(AuthenticationContinuation continuation, String userId) {
-                    String password = SharedPreferencesHandler.getString(MyApplication.getContext(), Constants.PASSWORD);
-                    AuthenticationDetails authenticationDetails = new AuthenticationDetails(user, password, null);
-                    continuation.setAuthenticationDetails(authenticationDetails);
-                    continuation.continueTask();
-                }
-
-                @Override
-                public void getMFACode(MultiFactorAuthenticationContinuation continuation) {
-
-                }
-
-                @Override
-                public void authenticationChallenge(ChallengeContinuation continuation) {
-
-                }
-
-                @Override
-                public void onFailure(Exception exception) {
-
-                }
-            });*/
-            //getCredentialsProvider().refresh();
+            setUserSessionBackground(MyApplication.getContext());
+            return null;
         }
         return getCurrSession().getAccessToken().getJWTToken();
+    }
+
+    /**
+     * initiating user session for valid access token
+     * subscribe to {@link AppHelper#currSessionObservable} for updates on {@link AppHelper#currSession}
+     * @param context application context
+     */
+    public static void setUserSessionBackground(Context context) {
+        CognitoUser user = getPool().getCurrentUser();
+        String username = user.getUserId();
+        //user saved in cache
+        if(username != null) {
+            AppHelper.setUser(username);
+            user.getSessionInBackground(getAuthenticationHandler(context));
+        }
+        //re-signing
+        else {
+            signInUser(context);
+        }
+    }
+
+    private static void signInUser(Context context) {
+        String username = SharedPreferencesHandler.getString(context, Constants.USERNAME);
+        String password = SharedPreferencesHandler.getString(context, Constants.PASSWORD);
+        if(username != null && password != null) {
+            AppHelper.setUser(username);
+
+            AppHelper.getPool().getUser(username).getSessionInBackground(getAuthenticationHandler(context));
+        }
+        /*else
+            launchLogin();*/
+    }
+
+    private static AuthenticationHandler getAuthenticationHandler(Context context) {
+        return new AuthenticationHandler() {
+            @Override
+            public void onSuccess(CognitoUserSession cognitoUserSession, CognitoDevice device) {
+                Log.d(TAG, " -- Auth Success");
+                AppHelper.setCurrSession(cognitoUserSession);
+                AppHelper.newDevice(device);
+                //Log.e(TAG, "IDToken: " + cognitoUserSession.getIdToken().getJWTToken());
+                Log.e(TAG, "AccessToken: " + cognitoUserSession.getAccessToken().getJWTToken());
+
+                AppHelper.setIdentityProvider(context, cognitoUserSession);
+
+            }
+
+            @Override
+            public void getAuthenticationDetails(AuthenticationContinuation authenticationContinuation, String username) {
+                Locale.setDefault(Locale.US);
+                getUserAuthentication(context, authenticationContinuation, username);
+            }
+
+            @Override
+            public void getMFACode(MultiFactorAuthenticationContinuation multiFactorAuthenticationContinuation) {
+                //mfaAuth(multiFactorAuthenticationContinuation);
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                //launchLogin();
+                signInUser(context);
+                Log.e(TAG, "Sign-in failed, " + AppHelper.formatException(e));
+            }
+
+            /**
+             * For Custom authentication challenge, implement your logic to present challenge to the
+             * user and pass the user's responses to the continuation.
+             */
+            @Override
+            public void authenticationChallenge(ChallengeContinuation continuation) {
+                if ("NEW_PASSWORD_REQUIRED".equals(continuation.getChallengeName())) {
+                    Log.i(TAG, "NEW PASSWORD REQUIRED");
+                } else if ("SELECT_MFA_TYPE".equals(continuation.getChallengeName())) {
+                    Log.i(TAG, "SELECT MFA TYPE");
+                }
+            }
+        };
+    }
+
+    private static void getUserAuthentication(Context context, AuthenticationContinuation continuation, String username) {
+        if(username != null) {
+            AppHelper.setUser(username);
+        }
+        String password = SharedPreferencesHandler.getString(context, Constants.PASSWORD);
+        if(password == null) {
+            Log.e(TAG, "enter password1");
+            return;
+        }
+
+        AuthenticationDetails authenticationDetails = new AuthenticationDetails(username, password, null);
+        continuation.setAuthenticationDetails(authenticationDetails);
+        continuation.continueTask();
     }
 
     public static void setUserDetails(CognitoUserDetails details) {

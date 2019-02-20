@@ -23,6 +23,7 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.SwitchPreferenceCompat;
+import androidx.preference.TwoStatePreference;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -39,6 +40,9 @@ public class SettingsActivity extends MyBaseActivity
         setContentView(R.layout.activity_settings);
 
         setupActionBar();
+        ViewModelProviders.of(this).get(SettingsViewModel.class)
+                .getInfo().observe(this, info ->
+                Toast.makeText(this, info, Toast.LENGTH_SHORT).show());
 
         getSupportFragmentManager()
                 .beginTransaction()
@@ -47,11 +51,6 @@ public class SettingsActivity extends MyBaseActivity
                 .commit();
 
         fragmentCounter++;
-
-        //SettingsViewModel viewModel =
-        ViewModelProviders.of(this).get(SettingsViewModel.class)
-                .getInfo().observe(this, info ->
-                Toast.makeText(this, info, Toast.LENGTH_SHORT).show());
     }
 
     /**
@@ -213,6 +212,14 @@ public class SettingsActivity extends MyBaseActivity
                 new Handler().postDelayed(() -> Log.e(getClass().getSimpleName(), "delayed operation, value = " + newValue), 1500);
                 return true;
             });
+
+            if (getActivity() != null) {
+                SettingsViewModel viewModel = ViewModelProviders.of(getActivity()).get(SettingsViewModel.class);
+                viewModel.changeKeyToValue.observe(this, entry -> {
+                    TwoStatePreference statePreference = findPreference(entry.getKey());
+                    statePreference.setChecked(entry.getValue());
+                });
+            }
             //addPreferencesFromResource(R.xml.pref_notification);
         }
 

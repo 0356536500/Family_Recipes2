@@ -97,7 +97,7 @@ public class MyMessagingService extends FirebaseMessagingService {
                 .observeOn(Schedulers.io())
                 .subscribe(currSession -> {
                     if (currSession != null) {
-                        APICallsHandler.registerNewToken(currSession.getAccessToken().getJWTToken(), ((MyApplication)getApplication()).getDeviceId(), token, message -> {
+                        APICallsHandler.registerNewToken(currSession.getAccessToken().getJWTToken(), MyApplication.getDeviceId(), token, message -> {
                             if (message != null)
                                 Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
                             else
@@ -105,7 +105,7 @@ public class MyMessagingService extends FirebaseMessagingService {
                         });
                     }
                 }, error -> Log.e(TAG, error.getMessage()))
-                );
+        );
     }
 
     /**

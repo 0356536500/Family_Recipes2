@@ -3,7 +3,8 @@ package com.myapps.ron.family_recipes.network;
 import android.os.StrictMode;
 import android.util.Log;
 
-import com.google.gson.JsonObject;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.myapps.ron.family_recipes.network.modelTO.CategoryTO;
 import com.myapps.ron.family_recipes.network.modelTO.CommentTO;
 import com.myapps.ron.family_recipes.network.modelTO.RecipeTO;
@@ -12,6 +13,7 @@ import com.myapps.ron.family_recipes.utils.MyCallback;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -79,7 +81,7 @@ public class APICallsHandler {
         });
     }
 
-    public static void postRecipe(final RecipeTO recipe, final String token, final MyCallback<String> callback) {
+    public static void postRecipe(final PostRecipe recipe, final String token, final MyCallback<Map<String, String>> callback) {
         Log.e(TAG, "start post recipe");
 
         Map<String, String> headers = new HashMap<>();
@@ -93,32 +95,36 @@ public class APICallsHandler {
 
         Log.e(TAG, "post body: \n" + body.toString());
         RecipeInterface service = getRetrofitInstance().create(RecipeInterface.class);
-        Call<JsonObject> call = service.postPendRecipe(headers, body);
+        Call<Map<String, String>> call = service.postPendRecipe(headers, body);
 
-        call.enqueue(new Callback<JsonObject>() {
+        call.enqueue(new Callback<Map<String, String>>() {
             @Override
-            public void onResponse(@NotNull Call<JsonObject> call, @NotNull Response<JsonObject> response) {
+            public void onResponse(@NotNull Call<Map<String, String>> call, @NotNull Response<Map<String, String>> response) {
                 String url = "null";
-                if (response.body() != null && response.body().get("url") != null)
-                    url = response.body().get("url").getAsString();
+                /*if (response.body() != null && response.body().get("url") != null)
+                    url = response.body().get("url").getAsString();*/
 
                 Log.i(TAG, "response code = " + response.code() + ",\t" + url);
 
                 if (response.code() == STATUS_OK) {
-                    //Log.i(TAG, url);
-                    callback.onFinished(url);
-                }
+                    Map<String, String> body = response.body();
+                    if (body != null && body.get("url") != null && body.get("id") != null) {
+                        callback.onFinished(response.body());
+                    } else
+                        callback.onFinished(null);
+                } else
+                    callback.onFinished(null);
             }
 
             @Override
-            public void onFailure(@NotNull Call<JsonObject> call, @NotNull Throwable t) {
+            public void onFailure(@NotNull Call<Map<String, String>> call, @NotNull Throwable t) {
                 Log.e(TAG, "error posting recipe. message: " + t.getMessage());
                 //Toast.makeText(MainActivity.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    private static Map<String,Object> generatePostRecipeFields(RecipeTO recipe) {
+    private static Map<String,Object> generatePostRecipeFields(PostRecipe recipe) {
         Map<String, Object> fields = new HashMap<>();
         fields.put(Constants.POSTED_NAME, recipe.getName());
         fields.put(Constants.POSTED_DESCRIPTION, recipe.getDescription());
@@ -399,15 +405,20 @@ public class APICallsHandler {
                 else {
                     try {
                         if (response.errorBody() != null) {
-                            Log.e(TAG, "error manageSubscriptions, code = " + response.code() + "\n errorBody: " + response.errorBody().string()
-                                    + "\n message: " + response.message());
-                            callback.onFinished(response.errorBody().string());
+                            Gson gson = new Gson();
+                            Type type = new TypeToken<Map<String, Object>>() {}.getType();
+                            Map<String, Object> errorBody = gson.fromJson(response.errorBody().string(), type);
+                            if (errorBody != null && errorBody.get("message") != null) {
+                                Log.e(TAG, "error errorBody: " + errorBody.get("message"));
+                                callback.onFinished((String) errorBody.get("message"));
+                            }
+                            else
+                                callback.onFinished("error");
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
                         callback.onFinished("error");
                     }
-
                 }
             }
 
@@ -418,6 +429,11 @@ public class APICallsHandler {
                 //Toast.makeText(MainActivity.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    public static Observable<Response<Map<String, Object>>> getUserDetailsObservable(String token, String deviceId) {
+        RecipeInterface service = getReactiveRetrofitInstance().create(RecipeInterface.class);
+        return service.getUserDetailsObservable(token, deviceId);
     }
 
     // endregion

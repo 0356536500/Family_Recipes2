@@ -72,7 +72,7 @@ public interface RecipeInterface {
     );
 
     @POST(recipes)
-    Call<JsonObject> postPendRecipe(
+    Call<Map<String, String>> postPendRecipe(
             @HeaderMap Map<String, String> headers,
             @Body Map<String, Object> body
     );
@@ -144,7 +144,7 @@ public interface RecipeInterface {
     );
 
     @GET(userWithID)
-    Observable<Response<Map<String, Object>>> getUserDataObservable(
+    Observable<Response<Map<String, Object>>> getUserDetailsObservable(
             @Header(Constants.AUTHORIZATION) String auth,
             @Path(Constants.PATH_DEVICE_ID) String deviceId
     );
