@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.myapps.ron.family_recipes.R;
+import com.myapps.ron.family_recipes.services.PostRecipeScheduledWorker;
 import com.myapps.ron.family_recipes.utils.LocaleHelper;
 import com.myapps.ron.family_recipes.utils.MyBaseActivity;
 import com.myapps.ron.family_recipes.viewmodels.SettingsViewModel;
@@ -26,6 +27,8 @@ import androidx.preference.SwitchPreferenceCompat;
 import androidx.preference.TwoStatePreference;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.work.WorkManager;
+import io.reactivex.subjects.PublishSubject;
 
 /**
  * Created by ronginat on 12/12/2018.
@@ -34,10 +37,13 @@ public class SettingsActivity extends MyBaseActivity
         implements PreferenceFragmentCompat.OnPreferenceStartFragmentCallback{
 
     private int fragmentCounter = 0;
+    public static PublishSubject<Integer> publishSubject = PublishSubject.create();
 
     @Override
     protected void onMyCreate(@Nullable Bundle savedInstanceState) {
         setContentView(R.layout.activity_settings);
+
+        //new Handler().postDelayed(this::startPublish, 1000);
 
         setupActionBar();
         ViewModelProviders.of(this).get(SettingsViewModel.class)
@@ -51,6 +57,21 @@ public class SettingsActivity extends MyBaseActivity
                 .commit();
 
         fragmentCounter++;
+
+        //Log.e(getClass().getSimpleName(), "call worker");
+        //WorkManager.getInstance().enqueue(PostRecipeScheduledWorker.createPostRecipesWorker());
+    }
+
+    private void startPublish() {
+        try {
+            for (int i = 0; i < 4; i++) {
+                Thread.sleep(1000);
+                publishSubject.onNext(i);
+            }
+            publishSubject.onComplete();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -93,7 +114,7 @@ public class SettingsActivity extends MyBaseActivity
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        Log.e(getClass().getSimpleName(), "change event, " + key + ", value = " + sharedPreferences.getBoolean(key, false));
+        //Log.e(getClass().getSimpleName(), "change event, " + key + ", value = " + sharedPreferences.getBoolean(key, false));
         if (key == null)
             return;
 
@@ -103,7 +124,7 @@ public class SettingsActivity extends MyBaseActivity
         if (key.equals(getString(R.string.preference_key_language))) {
             Log.e(getClass().getSimpleName(), "new lang, " + sharedPreferences.getString(key, "he"));
             LocaleHelper.setLocale(SettingsActivity.this, sharedPreferences.getString(key, "he"));
-            SettingsActivity.this.recreate();
+            recreate();
         }
     }
 

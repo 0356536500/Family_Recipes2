@@ -186,7 +186,7 @@
     <string name="pick_image_dialog_cancel">Cancel</string>
 
     <!-- Notification Channels -->
-    <string name="notification_system_update_channel_id" translatable="false">system_update</string>
+    <string name="notification_system_update_channel_id" translatable="false">systemUpdates</string>
     <string name="notification_system_update_channel_name" translatable="false">System updates</string>
     <string name="notification_new_recipe_channel_id" translatable="false">newRecipes</string>
     <string name="notification_new_recipe_channel_name" translatable="false">New recipes</string>

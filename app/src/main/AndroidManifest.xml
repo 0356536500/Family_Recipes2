@@ -8,7 +8,6 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
-
     <application
         android:name=".MyApplication"
         android:allowBackup="true"
@@ -41,10 +40,6 @@
                 android:resource="@xml/searchable" />
         </activity>
 
-        <service
-            android:name=".services.PostRecipeToServerService"
-            android:exported="false" />
-
         <activity
             android:name=".ui.activities.RecipeActivity"
             android:label="@string/title_activity_recipe"
@@ -76,7 +71,6 @@
             android:name=".ui.activities.ForgotPasswordActivity"
             android:label="@string/title_activity_forgot_password" />
         <activity android:name=".ui.activities.SharedActivity">
-
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -84,16 +78,9 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:scheme="@string/scheme"
-                    android:host="@string/host" />
+                    android:host="@string/host"
+                    android:scheme="@string/scheme" />
             </intent-filter>
-
-            <!--<intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>-->
-
         </activity>
 
         <meta-data
@@ -104,21 +91,22 @@
             android:name=".ui.activities.SettingsActivity"
             android:label="@string/title_activity_settings"
             android:parentActivityName=".ui.activities.MainActivity">
-            <!--<intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>-->
-
         </activity>
+
+        <service
+            android:name=".services.PostRecipeToServerService"
+            android:exported="false" />
+
+        <service
+            android:name=".services.PostEnqueuedRecipesService"
+            android:exported="false"/>
 
         <service
             android:name=".services.GetAllRecipesService"
             android:exported="false" />
-
         <service
             android:name=".services.MyMessagingService"
-            android:exported="false" >
+            android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
@@ -133,18 +121,20 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
-
-        <!-- Set custom default icon. This is used when no icon is set for incoming notification messages.
-     See README(https://goo.gl/l4GJaQ) for more. -->
+        <!--
+ Set custom default icon. This is used when no icon is set for incoming notification messages.
+     See README(https://goo.gl/l4GJaQ) for more.
+        -->
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@drawable/ic_status_logo" />
-        <!-- Set color used with incoming notification messages. This is used when no color is set for the incoming
-             notification message. See README(https://goo.gl/6BKBk7) for more. -->
+        <!--
+ Set color used with incoming notification messages. This is used when no color is set for the incoming
+             notification message. See README(https://goo.gl/6BKBk7) for more.
+        -->
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@color/logo_foreground1" />
-
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
             android:value="@string/notification_new_recipe_channel_id" />

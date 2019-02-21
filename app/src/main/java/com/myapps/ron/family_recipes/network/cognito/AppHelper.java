@@ -201,7 +201,7 @@ public class AppHelper {
         //user saved in cache
         if(username != null) {
             AppHelper.setUser(username);
-            user.getSessionInBackground(getAuthenticationHandler(context));
+            user.getSessionInBackground(getAuthenticationHandler(context, true));
         }
         //re-signing
         else {
@@ -215,13 +215,13 @@ public class AppHelper {
         if(username != null && password != null) {
             AppHelper.setUser(username);
 
-            AppHelper.getPool().getUser(username).getSessionInBackground(getAuthenticationHandler(context));
+            AppHelper.getPool().getUser(username).getSessionInBackground(getAuthenticationHandler(context, false));
         }
         /*else
             launchLogin();*/
     }
 
-    private static AuthenticationHandler getAuthenticationHandler(Context context) {
+    private static AuthenticationHandler getAuthenticationHandler(Context context, boolean retryOnError) {
         return new AuthenticationHandler() {
             @Override
             public void onSuccess(CognitoUserSession cognitoUserSession, CognitoDevice device) {
@@ -249,7 +249,10 @@ public class AppHelper {
             @Override
             public void onFailure(Exception e) {
                 //launchLogin();
-                signInUser(context);
+                if (retryOnError)
+                    signInUser(context);
+                else
+                    currSessionObservable.onError(e);
                 Log.e(TAG, "Sign-in failed, " + AppHelper.formatException(e));
             }
 

@@ -1,14 +1,11 @@
 package com.myapps.ron.family_recipes.services;
 
 import android.annotation.TargetApi;
-import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.graphics.BitmapFactory;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -45,23 +42,21 @@ public class MyMessagingService extends FirebaseMessagingService {
     @SuppressWarnings("FieldCanBeLocal")
     private final String DEFAULT_GROUP = "com.myapps.ron.family_recipes.DEFAULT";
 
-    private List<Notification> notifications;
     private CompositeDisposable compositeDisposable;
+    @SuppressWarnings("FieldCanBeLocal")
+    private final int SUMMARY_ID = 0;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        notifications = new ArrayList<>();
-        registerReceiver(mReceiver, intentFilter);
+        //registerReceiver(mReceiver, intentFilter);
         compositeDisposable = new CompositeDisposable();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        notifications.clear();
-        notifications = null;
-        unregisterReceiver(mReceiver);
+        //unregisterReceiver(mReceiver);
         compositeDisposable.clear();
     }
 
@@ -104,7 +99,10 @@ public class MyMessagingService extends FirebaseMessagingService {
                                 compositeDisposable.clear();
                         });
                     }
-                }, error -> Log.e(TAG, error.getMessage()))
+                }, error -> {
+                    Log.e(TAG, error.getMessage());
+                    compositeDisposable.clear();
+                })
         );
     }
 
@@ -122,10 +120,10 @@ public class MyMessagingService extends FirebaseMessagingService {
         int notificationID = new Random(System.currentTimeMillis()).nextInt();
         // create notification click intent
         PendingIntent pendingIntent = getIntentToStartActivity(data, channelId);
-        PendingIntent deletionIntent = getDeletionIntent(notificationID);
+        //PendingIntent deletionIntent = getDeletionIntent(notificationID);
 
         // set the notification UI
-        NotificationCompat.Builder notificationBuilder = getNotificationBuilderUI(data, channelId, pendingIntent, deletionIntent);
+        NotificationCompat.Builder notificationBuilder = getNotificationBuilderUI(data, channelId, pendingIntent/*, deletionIntent*/);
 
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -137,6 +135,7 @@ public class MyMessagingService extends FirebaseMessagingService {
 
         // send notification to the user
         notificationManager.notify(notificationID /* ID of notification */, notificationBuilder.build());
+        notificationManager.notify(SUMMARY_ID, getSummaryBuilderUI().build());
     }
 
     private PendingIntent getIntentToStartActivity(Map<String, String> data, String channelId) {
@@ -160,18 +159,19 @@ public class MyMessagingService extends FirebaseMessagingService {
                 PendingIntent.FLAG_ONE_SHOT);
     }
 
-    private PendingIntent getDeletionIntent(int notificationID) {
+    /*private PendingIntent getDeletionIntent(int notificationID) {
         Intent intent = new Intent(NOTIFICATION_DELETION_ACTION);
         intent.putExtra(Constants.ID, notificationID);
         return PendingIntent.getBroadcast(this, NOTIFICATION_DELETION_REQUEST, intent, PendingIntent.FLAG_ONE_SHOT);
-    }
+    }*/
 
-    private NotificationCompat.Builder getNotificationBuilderUI(Map<String, String> data, String channelId, PendingIntent pendingIntent, PendingIntent deletionIntent) {
+    private NotificationCompat.Builder getNotificationBuilderUI(Map<String, String> data, String channelId, PendingIntent pendingIntent/*, PendingIntent deletionIntent*/) {
         // set the notification UI
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder =
                 new NotificationCompat.Builder(this, channelId)
                         .setSmallIcon(R.drawable.ic_status_logo)
+                        .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_logo_foreground))
                         .setContentTitle(data.get(Constants.TITLE))
                         .setContentText(data.get(Constants.BODY))
                         .setAutoCancel(true)
@@ -179,13 +179,23 @@ public class MyMessagingService extends FirebaseMessagingService {
                         .setColorized(true)
                         .setColor(ContextCompat.getColor(this, R.color.logo_foreground1))
                         .setGroup(DEFAULT_GROUP)
-                        .setContentIntent(pendingIntent)
-                        .setDeleteIntent(deletionIntent);
+                        .setContentIntent(pendingIntent);
+                        //.setDeleteIntent(deletionIntent);
 
         if (channelId.equals(getString(R.string.notification_new_recipe_channel_id))) {
             notificationBuilder.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_action_post_black));
         }
         return notificationBuilder;
+    }
+
+    private NotificationCompat.Builder getSummaryBuilderUI() {
+        return new NotificationCompat.Builder(this, "newRecipes")
+                .setSmallIcon(R.drawable.ic_status_logo)
+                .setColorized(true)
+                .setColor(ContextCompat.getColor(this, R.color.logo_foreground1))
+                //.setNumber(messageCount)
+                .setGroup(DEFAULT_GROUP)
+                .setGroupSummary(true);
     }
 
     @TargetApi(Build.VERSION_CODES.O)
@@ -227,7 +237,7 @@ public class MyMessagingService extends FirebaseMessagingService {
         Log.e(TAG, "onDeletedMessages");
     }
 
-    private static final int NOTIFICATION_DELETION_REQUEST = 2;
+    /*private static final int NOTIFICATION_DELETION_REQUEST = 2;
     private final String NOTIFICATION_DELETION_ACTION = "com.myapps.ron.family_recipes.services.MyMessagingService.DELETE";
     private final IntentFilter intentFilter = new IntentFilter(NOTIFICATION_DELETION_ACTION);
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
@@ -239,7 +249,7 @@ public class MyMessagingService extends FirebaseMessagingService {
                 Log.e(TAG, "Notification deleted, " + id);
             }
         }
-    };
+    };*/
 
     /*
     Open the notification channel settings

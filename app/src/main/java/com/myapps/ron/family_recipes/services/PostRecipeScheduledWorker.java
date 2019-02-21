@@ -1,9 +1,8 @@
 package com.myapps.ron.family_recipes.services;
 
 import android.content.Context;
-
-import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserSession;
-import com.myapps.ron.family_recipes.network.cognito.AppHelper;
+import android.content.Intent;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.work.Constraints;
@@ -11,12 +10,13 @@ import androidx.work.NetworkType;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
-import io.reactivex.observers.DisposableObserver;
 
 /**
  * Created by ronginat on 20/02/2019.
  */
 public class PostRecipeScheduledWorker extends Worker {
+
+    private final String TAG = getClass().getSimpleName();
 
     public PostRecipeScheduledWorker(
             @NonNull Context context,
@@ -24,10 +24,21 @@ public class PostRecipeScheduledWorker extends Worker {
         super(context, params);
     }
 
+    @Override
+    public void onStopped() {
+        super.onStopped();
+        Log.e(TAG, "onStopped");
+    }
+
     @NonNull
     @Override
     public Result doWork() {
-        PostRecipeToServerService.startActionPostRecipeFromQueue(getApplicationContext());
+        Log.e(TAG, "doWork");
+        //PostRecipeToServerService.startActionPostRecipeFromQueue(getApplicationContext());
+        Intent intent = new Intent(getApplicationContext(), PostEnqueuedRecipesService.class);
+        intent.setAction(PostEnqueuedRecipesService.ACTION_POST_ENQUEUED_RECIPES);
+        getApplicationContext().startService(intent);
+        Log.e(TAG, "finish work");
         // Indicate success or failure with your return value:
         return Result.success();
 
