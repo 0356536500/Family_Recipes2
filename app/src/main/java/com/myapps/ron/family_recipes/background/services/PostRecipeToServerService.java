@@ -1,4 +1,4 @@
-package com.myapps.ron.family_recipes.services;
+package com.myapps.ron.family_recipes.background.services;
 
 import android.app.IntentService;
 import android.content.Context;
@@ -10,12 +10,14 @@ import android.util.Log;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserSession;
 import com.myapps.ron.family_recipes.dal.Injection;
 import com.myapps.ron.family_recipes.dal.persistence.PendingRecipeDao;
+import com.myapps.ron.family_recipes.dal.repository.PendingRecipeRepository;
 import com.myapps.ron.family_recipes.dal.storage.StorageWrapper;
-import com.myapps.ron.family_recipes.model.PendingRecipe;
+import com.myapps.ron.family_recipes.model.PendingRecipeEntity;
 import com.myapps.ron.family_recipes.model.RecipeEntity;
 import com.myapps.ron.family_recipes.network.APICallsHandler;
 import com.myapps.ron.family_recipes.network.S3.OnlineStorageWrapper;
 import com.myapps.ron.family_recipes.network.cognito.AppHelper;
+import com.myapps.ron.family_recipes.network.modelTO.PendingRecipeTO;
 import com.myapps.ron.family_recipes.network.modelTO.RecipeTO;
 import com.myapps.ron.family_recipes.utils.Constants;
 
@@ -39,13 +41,13 @@ import static com.myapps.ron.family_recipes.network.Constants.RESPONSE_KEY_URL;
 public class PostRecipeToServerService extends IntentService {
     private static final String TAG = PostRecipeToServerService.class.getSimpleName();
     // IntentService can perform, e.g. ACTION_FETCH_NEW_ITEMS
-    private static final String ACTION_POST_RECIPE = "com.myapps.ron.family_recipes.services.action.POST_RECIPE";
-    private static final String ACTION_POST_IMAGES = "com.myapps.ron.family_recipes.services.action.POST_IMAGES";
-    private static final String ACTION_POST_RECIPE_FROM_QUEUE = "com.myapps.ron.family_recipes.services.action.POST_RECIPE_FROM_QUEUE";
+    private static final String ACTION_POST_RECIPE = "com.myapps.ron.family_recipes.background.services.action.POST_RECIPE";
+    private static final String ACTION_POST_IMAGES = "com.myapps.ron.family_recipes.background.services.action.POST_IMAGES";
+    private static final String ACTION_POST_RECIPE_FROM_QUEUE = "com.myapps.ron.family_recipes.background.services.action.POST_RECIPE_FROM_QUEUE";
 
-    private static final String EXTRA_PARAM1 = "com.myapps.ron.family_recipes.services.extra.PARAM1";
-    private static final String EXTRA_PARAM2 = "com.myapps.ron.family_recipes.services.extra.PARAM2";
-    private static final String EXTRA_PARAM3 = "com.myapps.ron.family_recipes.services.extra.PARAM3";
+    private static final String EXTRA_PARAM1 = "com.myapps.ron.family_recipes.background.services.extra.PARAM1";
+    private static final String EXTRA_PARAM2 = "com.myapps.ron.family_recipes.background.services.extra.PARAM2";
+    private static final String EXTRA_PARAM3 = "com.myapps.ron.family_recipes.background.services.extra.PARAM3";
 
 
     public PostRecipeToServerService() {
@@ -271,14 +273,14 @@ public class PostRecipeToServerService extends IntentService {
 
     private void startPostPendingRecipesProcess() {
         // get records from db
-        PendingRecipeDao pendingRecipeDao = Injection.providePendingRecipeDao(getApplicationContext());
-        List<PendingRecipe> pendingRecipes = pendingRecipeDao.getAll();
+        PendingRecipeRepository pendingRecipeRepository = Injection.providePendingRecipeRopsitory(getApplicationContext());
+        List<PendingRecipeEntity> pendingRecipes = pendingRecipeRepository.getAll();
 
-        for (PendingRecipe recipe: pendingRecipes) {
+        for (PendingRecipeEntity recipe: pendingRecipes) {
             uploadRecipeSync(recipe);
 
             // delete from db when finish upload
-            pendingRecipeDao.delete(recipe);
+            pendingRecipeRepository.delete(recipe);
         }
     }
 
@@ -286,14 +288,14 @@ public class PostRecipeToServerService extends IntentService {
      * Handle action Foo in the provided background thread with the provided
      * parameters.
      */
-    private void uploadRecipeSync(final PendingRecipe recipe) {
+    private void uploadRecipeSync(final PendingRecipeEntity recipe) {
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
                 .permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
         Log.e(TAG, "handle action post recipe");
         //maybe open a new thread
-        APICallsHandler.postRecipe(recipe, AppHelper.getAccessToken(), results -> {
+        APICallsHandler.postRecipe(new PendingRecipeTO(recipe), AppHelper.getAccessToken(), results -> {
             if (results != null) {
                 Log.e(TAG, "finished post pend, " + results.toString());
                 boolean fileUploaded = OnlineStorageWrapper.uploadRecipeFileSync(results.get(RESPONSE_KEY_URL), recipe.getRecipeFile());

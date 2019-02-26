@@ -1,8 +1,9 @@
-package com.myapps.ron.family_recipes.services;
+package com.myapps.ron.family_recipes.background.workers;
 
 import android.content.Context;
-import android.content.Intent;
 import android.util.Log;
+
+import com.myapps.ron.family_recipes.background.services.PostEnqueuedRecipesService;
 
 import androidx.annotation.NonNull;
 import androidx.work.Constraints;
@@ -35,9 +36,7 @@ public class PostRecipeScheduledWorker extends Worker {
     public Result doWork() {
         Log.e(TAG, "doWork");
         //PostRecipeToServerService.startActionPostRecipeFromQueue(getApplicationContext());
-        Intent intent = new Intent(getApplicationContext(), PostEnqueuedRecipesService.class);
-        intent.setAction(PostEnqueuedRecipesService.ACTION_POST_ENQUEUED_RECIPES);
-        getApplicationContext().startService(intent);
+        PostEnqueuedRecipesService.startActionPostRecipeFromQueue(getApplicationContext());
         Log.e(TAG, "finish work");
         // Indicate success or failure with your return value:
         return Result.success();

@@ -1,6 +1,7 @@
-package com.myapps.ron.family_recipes.services;
+package com.myapps.ron.family_recipes.background.services;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -12,11 +13,12 @@ import android.os.StrictMode;
 import android.util.Log;
 
 import com.myapps.ron.family_recipes.dal.Injection;
-import com.myapps.ron.family_recipes.dal.persistence.PendingRecipeDao;
-import com.myapps.ron.family_recipes.model.PendingRecipe;
+import com.myapps.ron.family_recipes.dal.repository.PendingRecipeRepository;
+import com.myapps.ron.family_recipes.model.PendingRecipeEntity;
 import com.myapps.ron.family_recipes.network.APICallsHandler;
 import com.myapps.ron.family_recipes.network.S3.OnlineStorageWrapper;
 import com.myapps.ron.family_recipes.network.cognito.AppHelper;
+import com.myapps.ron.family_recipes.network.modelTO.PendingRecipeTO;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -30,14 +32,21 @@ import static com.myapps.ron.family_recipes.network.Constants.RESPONSE_KEY_RECIP
 import static com.myapps.ron.family_recipes.network.Constants.RESPONSE_KEY_URL;
 
 public class PostEnqueuedRecipesService extends Service {
-    private final String TAG = getClass().getSimpleName();
+    private static final String TAG = PostEnqueuedRecipesService.class.getSimpleName();
 
-    static final String ACTION_POST_ENQUEUED_RECIPES = "com.myapps.ron.family_recipes.services.action.POST_ENQUEUED_RECIPES";
+    static final String ACTION_POST_RECIPE_FROM_QUEUE = "com.myapps.ron.family_recipes.background.services.action.POST_ENQUEUED_RECIPES";
 
     private Looper serviceLooper;
     private ServiceHandler serviceHandler;
     private int startId;
     private CompositeDisposable compositeDisposable;
+
+    public static void startActionPostRecipeFromQueue(Context context) {
+        Log.e(TAG, "handle action post recipe from queue");
+        Intent intent = new Intent(context, PostRecipeToServerService.class);
+        intent.setAction(ACTION_POST_RECIPE_FROM_QUEUE);
+        context.startService(intent);
+    }
 
     // Handler that receives messages from the thread
     private final class ServiceHandler extends Handler {
@@ -66,7 +75,7 @@ public class PostEnqueuedRecipesService extends Service {
             final String action = intent.getAction();
             if (action != null) {
                 switch (action) {
-                    case ACTION_POST_ENQUEUED_RECIPES:
+                    case ACTION_POST_RECIPE_FROM_QUEUE:
                         handleActionPostRecipeFromQueue();
                         break;
                 }
@@ -96,18 +105,14 @@ public class PostEnqueuedRecipesService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.e(TAG, "service starting");
 
+        // For each start request, send a message to start a job and deliver the
+        // start ID so we know which request we're stopping when we finish the job
         Message msg = serviceHandler.obtainMessage();
         msg.arg1 = startId;
         msg.obj = intent;
         serviceHandler.sendMessage(msg);
 
-        // For each start request, send a message to start a job and deliver the
-        // start ID so we know which request we're stopping when we finish the job
-        /*Message msg = serviceHandler.obtainMessage();
-        msg.arg1 = startId;
-        serviceHandler.sendMessage(msg);
-
-        // If we get killed, after returning from here, restart*/
+        // If we get killed, after returning from here, restart
         return START_NOT_STICKY;
     }
 
@@ -147,14 +152,14 @@ public class PostEnqueuedRecipesService extends Service {
 
     private void startPostPendingRecipesProcess() {
         // get records from db
-        PendingRecipeDao pendingRecipeDao = Injection.providePendingRecipeDao(getApplicationContext());
-        List<PendingRecipe> pendingRecipes = pendingRecipeDao.getAll();
+        PendingRecipeRepository pendingRepository = Injection.providePendingRecipeRopsitory(getApplicationContext());
+        List<PendingRecipeEntity> pendingRecipes = pendingRepository.getAll();
 
-        for (PendingRecipe recipe: pendingRecipes) {
+        for (PendingRecipeEntity recipe: pendingRecipes) {
             uploadRecipeSync(recipe);
 
             // delete from db when finish upload
-            pendingRecipeDao.delete(recipe);
+            pendingRepository.delete(recipe);
         }
         stopSelf(startId);
     }
@@ -163,14 +168,14 @@ public class PostEnqueuedRecipesService extends Service {
      * Handle action Foo in the provided background thread with the provided
      * parameters.
      */
-    private void uploadRecipeSync(final PendingRecipe recipe) {
+    private void uploadRecipeSync(final PendingRecipeEntity recipe) {
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
                 .permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
         Log.e(TAG, "handle action post recipe");
         //maybe open a new thread
-        APICallsHandler.postRecipe(recipe, AppHelper.getAccessToken(), results -> {
+        APICallsHandler.postRecipe(new PendingRecipeTO(recipe), AppHelper.getAccessToken(), results -> {
             if (results != null) {
                 Log.e(TAG, "finished post pend, " + results.toString());
                 boolean fileUploaded = OnlineStorageWrapper.uploadRecipeFileSync(results.get(RESPONSE_KEY_URL), recipe.getRecipeFile());

@@ -1,4 +1,4 @@
-package com.myapps.ron.family_recipes.services;
+package com.myapps.ron.family_recipes.background.services;
 
 import android.annotation.TargetApi;
 import android.app.NotificationChannel;
@@ -238,7 +238,7 @@ public class MyMessagingService extends FirebaseMessagingService {
     }
 
     /*private static final int NOTIFICATION_DELETION_REQUEST = 2;
-    private final String NOTIFICATION_DELETION_ACTION = "com.myapps.ron.family_recipes.services.MyMessagingService.DELETE";
+    private final String NOTIFICATION_DELETION_ACTION = "com.myapps.ron.family_recipes.background.services.MyMessagingService.DELETE";
     private final IntentFilter intentFilter = new IntentFilter(NOTIFICATION_DELETION_ACTION);
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override

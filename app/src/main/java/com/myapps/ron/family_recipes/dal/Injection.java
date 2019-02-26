@@ -5,6 +5,7 @@ import android.content.Context;
 import com.myapps.ron.family_recipes.dal.persistence.AppDatabases;
 import com.myapps.ron.family_recipes.dal.persistence.PendingRecipeDao;
 import com.myapps.ron.family_recipes.dal.repository.CategoryRepository;
+import com.myapps.ron.family_recipes.dal.repository.PendingRecipeRepository;
 import com.myapps.ron.family_recipes.dal.repository.RecipeRepository;
 import com.myapps.ron.family_recipes.viewmodels.ViewModelFactory;
 
@@ -16,9 +17,9 @@ import java.util.concurrent.Executors;
  */
 public class Injection {
 
-    public static PendingRecipeDao providePendingRecipeDao(Context context) {
+    public static PendingRecipeRepository providePendingRecipeRopsitory(Context context) {
         AppDatabases database = AppDatabases.getInstance(context);
-        return database.pendingRecipeDao();
+        return PendingRecipeRepository.getInstance(database.pendingRecipeDao(), getExecutor(1));
     }
 
     public static RecipeRepository provideRecipeRepository(Context context) {

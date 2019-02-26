@@ -1,7 +1,5 @@
 package com.myapps.ron.family_recipes.model;
 
-import com.myapps.ron.family_recipes.network.PostRecipe;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -15,7 +13,7 @@ import androidx.room.PrimaryKey;
  * Created by ronginat on 20/02/2019.
  */
 @Entity(tableName = "pendingRecipes")
-public class PendingRecipe implements PostRecipe {
+public class PendingRecipeEntity {
 
     public static final String KEY_NAME = "name";
     public static final String KEY_DESCRIPTION = "description";
@@ -38,7 +36,7 @@ public class PendingRecipe implements PostRecipe {
     @ColumnInfo(name = KEY_FOOD_FILES)
     private List<String> foodFiles;
 
-    public PendingRecipe() {
+    public PendingRecipeEntity() {
         this.creationDate = new Date();
         categories = new ArrayList<>();
         foodFiles = new ArrayList<>();
@@ -63,11 +61,6 @@ public class PendingRecipe implements PostRecipe {
 
     public String getDescription() {
         return description;
-    }
-
-    @Override
-    public String getLastModifiedDate() {
-        return null;
     }
 
     public void setDescription(String description) {

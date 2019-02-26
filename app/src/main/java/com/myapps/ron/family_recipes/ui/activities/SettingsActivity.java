@@ -10,7 +10,6 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.myapps.ron.family_recipes.R;
-import com.myapps.ron.family_recipes.services.PostRecipeScheduledWorker;
 import com.myapps.ron.family_recipes.utils.LocaleHelper;
 import com.myapps.ron.family_recipes.utils.MyBaseActivity;
 import com.myapps.ron.family_recipes.viewmodels.SettingsViewModel;
@@ -27,7 +26,6 @@ import androidx.preference.SwitchPreferenceCompat;
 import androidx.preference.TwoStatePreference;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.work.WorkManager;
 import io.reactivex.subjects.PublishSubject;
 
 /**

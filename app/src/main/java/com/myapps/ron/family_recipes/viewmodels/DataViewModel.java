@@ -9,7 +9,7 @@ import com.myapps.ron.family_recipes.model.CategoryEntity;
 import com.myapps.ron.family_recipes.model.QueryModel;
 import com.myapps.ron.family_recipes.model.RecipeEntity;
 import com.myapps.ron.family_recipes.model.RecipeMinimal;
-import com.myapps.ron.family_recipes.services.GetAllRecipesService;
+import com.myapps.ron.family_recipes.background.services.GetAllRecipesService;
 
 import java.util.List;
 

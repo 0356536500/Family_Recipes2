@@ -35,7 +35,7 @@ import com.myapps.ron.family_recipes.adapters.CommentsAdapter;
 import com.myapps.ron.family_recipes.dal.Injection;
 import com.myapps.ron.family_recipes.dal.storage.StorageWrapper;
 import com.myapps.ron.family_recipes.model.RecipeEntity;
-import com.myapps.ron.family_recipes.services.PostRecipeToServerService;
+import com.myapps.ron.family_recipes.background.services.PostRecipeToServerService;
 import com.myapps.ron.family_recipes.ui.fragments.PagerDialogFragment;
 import com.myapps.ron.family_recipes.ui.fragments.PickImagesMethodDialog;
 import com.myapps.ron.family_recipes.utils.Constants;

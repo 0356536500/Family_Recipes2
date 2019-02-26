@@ -140,7 +140,7 @@ public class RecipeViewModel extends ViewModel {
     }
 
     public void changeLike(final Context context) {
-        if(MiddleWareForNetwork.checkInternetConnection(context)) {
+        if(MiddleWareForNetwork.checkInternetConnection(context) && recipe.getValue() != null) {
             Map<String, Object> attrs = new HashMap<>();
             String likeStr = recipe.getValue().isUserLiked() ? "unlike" : "like";
             attrs.put(Constants.LIKES, likeStr);
@@ -160,7 +160,7 @@ public class RecipeViewModel extends ViewModel {
     }
 
     public void postComment(final Context context, String text) {
-        if(MiddleWareForNetwork.checkInternetConnection(context)) {
+        if(MiddleWareForNetwork.checkInternetConnection(context) && recipe.getValue() != null) {
             Map<String, Object> attrs = new HashMap<>();
             attrs.put(Constants.COMMENT, text);
             //Log.e("viewModel", "before posting comment:\n" + attrs);

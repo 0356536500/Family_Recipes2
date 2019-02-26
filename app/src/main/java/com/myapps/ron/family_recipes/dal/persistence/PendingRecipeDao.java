@@ -1,6 +1,6 @@
 package com.myapps.ron.family_recipes.dal.persistence;
 
-import com.myapps.ron.family_recipes.model.PendingRecipe;
+import com.myapps.ron.family_recipes.model.PendingRecipeEntity;
 
 import java.util.List;
 
@@ -14,15 +14,18 @@ import androidx.room.Query;
  */
 @Dao
 public interface PendingRecipeDao {
-    @Query("SELECT * FROM " + AppDatabases.TABLE_PENDING_RECIPES)// + " ORDER BY " + PendingRecipe.KEY_CREATED + " ASC")
-    List<PendingRecipe> getAll();
+    @Query("SELECT * FROM " + AppDatabases.TABLE_PENDING_RECIPES)// + " ORDER BY " + PendingRecipeEntity.KEY_CREATED + " ASC")
+    List<PendingRecipeEntity> getAll();
 
     @Insert
-    void insert(PendingRecipe recipe);
+    void insert(PendingRecipeEntity recipe);
 
     @Insert
-    void insertAll(PendingRecipe... recipes);
+    void insertAll(PendingRecipeEntity... recipes);
 
     @Delete
-    void delete(PendingRecipe recipe);
+    void delete(PendingRecipeEntity recipe);
+
+    @Query("DELETE FROM " + AppDatabases.TABLE_PENDING_RECIPES)
+    void deleteAll();
 }

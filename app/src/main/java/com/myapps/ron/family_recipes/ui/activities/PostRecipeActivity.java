@@ -14,7 +14,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.myapps.ron.family_recipes.R;
-import com.myapps.ron.family_recipes.services.PostRecipeToServerService;
+import com.myapps.ron.family_recipes.background.services.PostRecipeToServerService;
 import com.myapps.ron.family_recipes.ui.fragments.AdvancedStepFragment;
 import com.myapps.ron.family_recipes.ui.fragments.FirstStepFragment;
 import com.myapps.ron.family_recipes.ui.fragments.PickPhotosFragment;

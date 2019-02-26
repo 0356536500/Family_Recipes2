@@ -9,7 +9,7 @@ import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.adapters.RecipesAdapter;
 import com.myapps.ron.family_recipes.dal.Injection;
 import com.myapps.ron.family_recipes.model.CategoryEntity;
-import com.myapps.ron.family_recipes.services.GetAllRecipesService;
+import com.myapps.ron.family_recipes.background.services.GetAllRecipesService;
 import com.myapps.ron.family_recipes.viewmodels.DataViewModel;
 import com.myapps.ron.searchfilter.listener.FilterListener;
 

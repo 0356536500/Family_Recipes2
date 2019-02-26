@@ -1,4 +1,4 @@
-package com.myapps.ron.family_recipes.services;
+package com.myapps.ron.family_recipes.background.services;
 
 import android.app.IntentService;
 import android.content.Context;
@@ -10,7 +10,6 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.myapps.ron.family_recipes.MyApplication;
 import com.myapps.ron.family_recipes.dal.Injection;
-import com.myapps.ron.family_recipes.dal.persistence.AppDatabases;
 import com.myapps.ron.family_recipes.dal.repository.RecipeRepository;
 import com.myapps.ron.family_recipes.network.APICallsHandler;
 import com.myapps.ron.family_recipes.network.APIResponse;
@@ -40,12 +39,12 @@ public class GetAllRecipesService extends IntentService {
     private static final String TAG = GetAllRecipesService.class.getSimpleName();
 
     // IntentService can perform, e.g. ACTION_FETCH_NEW_ITEMS
-    private static final String ACTION_GET_ALL = "com.myapps.ron.family_recipes.services.action.GET_ALL";
-    private static final String ACTION_FETCH_USER_DETAILS = "com.myapps.ron.family_recipes.services.action.GET_USER_DETAILS";
+    private static final String ACTION_GET_ALL = "com.myapps.ron.family_recipes.background.services.action.GET_ALL";
+    private static final String ACTION_FETCH_USER_DETAILS = "com.myapps.ron.family_recipes.background.services.action.GET_USER_DETAILS";
 
     // TODO: Rename parameters
-    private static final String EXTRA_PARAM1 = "com.myapps.ron.family_recipes.services.extra.PARAM1";
-    private static final String EXTRA_PARAM2 = "com.myapps.ron.family_recipes.services.extra.PARAM2";
+    private static final String EXTRA_PARAM1 = "com.myapps.ron.family_recipes.background.services.extra.PARAM1";
+    private static final String EXTRA_PARAM2 = "com.myapps.ron.family_recipes.background.services.extra.PARAM2";
 
     public GetAllRecipesService() {
         super("GetAllRecipesService");
