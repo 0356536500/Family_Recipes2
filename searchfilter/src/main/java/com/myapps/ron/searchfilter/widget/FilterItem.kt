@@ -40,6 +40,7 @@ class FilterItem : FrameLayout, Serializable {
     var typeface: Typeface? = null
         set(value) {
             textView.typeface = value
+            field = value
         }
     var text: String
         get() = textView.text.toString()

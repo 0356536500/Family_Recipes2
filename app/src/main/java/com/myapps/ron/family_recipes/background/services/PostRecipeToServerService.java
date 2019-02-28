@@ -9,7 +9,6 @@ import android.util.Log;
 
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserSession;
 import com.myapps.ron.family_recipes.dal.Injection;
-import com.myapps.ron.family_recipes.dal.persistence.PendingRecipeDao;
 import com.myapps.ron.family_recipes.dal.repository.PendingRecipeRepository;
 import com.myapps.ron.family_recipes.dal.storage.StorageWrapper;
 import com.myapps.ron.family_recipes.model.PendingRecipeEntity;
@@ -273,7 +272,7 @@ public class PostRecipeToServerService extends IntentService {
 
     private void startPostPendingRecipesProcess() {
         // get records from db
-        PendingRecipeRepository pendingRecipeRepository = Injection.providePendingRecipeRopsitory(getApplicationContext());
+        PendingRecipeRepository pendingRecipeRepository = Injection.providePendingRecipeRepository(getApplicationContext());
         List<PendingRecipeEntity> pendingRecipes = pendingRecipeRepository.getAll();
 
         for (PendingRecipeEntity recipe: pendingRecipes) {

@@ -152,7 +152,7 @@ public class PostEnqueuedRecipesService extends Service {
 
     private void startPostPendingRecipesProcess() {
         // get records from db
-        PendingRecipeRepository pendingRepository = Injection.providePendingRecipeRopsitory(getApplicationContext());
+        PendingRecipeRepository pendingRepository = Injection.providePendingRecipeRepository(getApplicationContext());
         List<PendingRecipeEntity> pendingRecipes = pendingRepository.getAll();
 
         for (PendingRecipeEntity recipe: pendingRecipes) {

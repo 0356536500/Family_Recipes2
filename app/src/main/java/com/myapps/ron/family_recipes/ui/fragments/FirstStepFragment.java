@@ -27,13 +27,13 @@ import com.myapps.ron.searchfilter.widget.FilterItem;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatEditText;
 import androidx.core.content.ContextCompat;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
 /**
@@ -47,7 +47,7 @@ public class FirstStepFragment extends MyFragment implements FilterListener<Cate
     private AppCompatEditText editTextName, editTextDesc;
     private Filter<CategoryEntity> mFilter;
     private List<CategoryEntity> allTags;
-    private List<String> tags;
+    private List<String> chosenTags;
 
     private String name, desc;
 
@@ -79,7 +79,7 @@ public class FirstStepFragment extends MyFragment implements FilterListener<Cate
     }
 
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         Log.e(getClass().getSimpleName(), "on attach");
         /*if (parent != null){
@@ -105,7 +105,6 @@ public class FirstStepFragment extends MyFragment implements FilterListener<Cate
             parent = (FrameLayout) view;
 
             initViewModel();
-            viewModel.loadCategories(activity);
         }
         return view;
     }
@@ -116,14 +115,14 @@ public class FirstStepFragment extends MyFragment implements FilterListener<Cate
         Log.e(getClass().getSimpleName(), "on view created");
         activity.setTitle(getString(R.string.nav_main_post_recipe) + " 1/3");
 
-        if (mFilter == null) {
+        //if (mFilter == null) {
             mFilter = view.findViewById(R.id.first_step_filter);
 
             editTextName = view.findViewById(R.id.recipe_name_editText);
             editTextDesc = view.findViewById(R.id.recipe_desc_editText);
 
             setListeners();
-        }
+        //}
 
         /*editTextDesc = view.findViewById(R.id.recipe_desc_editText);
         editTextName = view.findViewById(R.id.recipe_name_editText);
@@ -143,14 +142,11 @@ public class FirstStepFragment extends MyFragment implements FilterListener<Cate
 
     private void initViewModel() {
         viewModel =  ViewModelProviders.of(activity).get(PostRecipeViewModel.class);
-        viewModel.getCategories().observe(this, new Observer<List<CategoryEntity>>() {
-            @Override
-            public void onChanged(@Nullable List<CategoryEntity> categories) {
-                if(categories != null) {
-                    allTags = new ArrayList<>(categories);
-                    loadFiltersColor();
-                    initCategories();
-                }
+        viewModel.getCategories().observe(this, categories -> {
+            if(categories != null) {
+                allTags = new ArrayList<>(categories);
+                loadFiltersColor();
+                initCategories();
             }
         });
         /*viewModel.getInfoFromLastFetch().observe(this, new Observer<String>() {
@@ -164,9 +160,13 @@ public class FirstStepFragment extends MyFragment implements FilterListener<Cate
 
     private void initCategories() {
         Log.e(getClass().getSimpleName(), "init categories");
-        mFilter.setAdapter(new Adapter(allTags));
+        mFilter.setAdapter(new FirstStepFragment.Adapter(allTags));
         mFilter.setListener(this);
 
+        //set the collapsed text color according to current theme
+        TypedValue value = new TypedValue();
+        activity.getTheme().resolveAttribute(R.attr.searchFilterCustomTextColor, value, true);
+        mFilter.setCustomTextViewColor(value.data);
         //the text to show when there's no selected items
         mFilter.setCustomTextView(getString(R.string.str_all_selected));
         mFilter.build();
@@ -182,15 +182,14 @@ public class FirstStepFragment extends MyFragment implements FilterListener<Cate
     }
 
     private void setListeners() {
-        activity.nextButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (checkValidation()) {
-                    viewModel.recipe.setName(name);
-                    viewModel.recipe.setDescription(desc);
-                    viewModel.recipe.setCategories(tags);
-                    activity.nextFragment();
-                }
+        activity.nextButton.setOnClickListener(view -> {
+            Log.e(getClass().getSimpleName(), "next listener");
+            if (checkValidation()) {
+                Log.e(getClass().getSimpleName(), "data validated");
+                viewModel.recipe.setName(name);
+                viewModel.recipe.setDescription(desc);
+                viewModel.recipe.setCategories(chosenTags);
+                activity.nextFragment();
             }
         });
 
@@ -247,7 +246,7 @@ public class FirstStepFragment extends MyFragment implements FilterListener<Cate
             editTextDesc.setError(getString(R.string.post_recipe_field_required));
             editTextDesc.getBackground().setTint(Color.RED);
         }
-        if (tags == null || tags.size() < Constants.MIN_TAGS) {
+        if (chosenTags == null || chosenTags.size() < Constants.MIN_TAGS) {
             if (valid)
                 Toast.makeText(activity, getString(R.string.post_recipe_tags_required, Constants.MIN_TAGS), Toast.LENGTH_SHORT).show();
             valid = false;
@@ -255,32 +254,35 @@ public class FirstStepFragment extends MyFragment implements FilterListener<Cate
         return valid;
     }
 
-    private List<String> convertCategoriesToString(@Nullable ArrayList<CategoryEntity> arrayList) {
-        if (arrayList == null)
-            return  null;
-        List<String> results = new ArrayList<>();
-        for (CategoryEntity cat: arrayList) {
-            results.add(cat.getText());
+    private List<String> convertCategoriesToString(ArrayList<CategoryEntity> arrayList) {
+        List<String> results = null;
+        if (arrayList != null) {
+            results = new ArrayList<>();
+            for (CategoryEntity cat : arrayList) {
+                results.add(cat.getText());
+            }
         }
         return results;
     }
 
     @Override
-    public void onFiltersSelected(@NotNull ArrayList<CategoryEntity> filters) {
-        tags = convertCategoriesToString(filters);
+    public void onFiltersSelected(@NonNull ArrayList<CategoryEntity> filters) {
+        chosenTags = convertCategoriesToString(filters);
+        if (chosenTags != null)
+            Collections.sort(chosenTags);
     }
 
     @Override
     public void onNothingSelected() {
-
+        chosenTags = null;
     }
 
     @Override
     public void onFilterSelected(CategoryEntity item) {
-        if (item.getText().equals(allTags.get(0).getText())) {
+        /*if (item.getText().equals(allTags.get(0).getText())) {
             mFilter.deselectAll();
             mFilter.collapse();
-        }
+        }*/
     }
 
     @Override
@@ -324,7 +326,10 @@ public class FirstStepFragment extends MyFragment implements FilterListener<Cate
                 filterItem.setStrokeWidth(5);
             }
 
+            filterItem.deselect();
+
             return filterItem;
         }
+
     }
 }

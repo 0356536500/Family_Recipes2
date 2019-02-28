@@ -70,7 +70,7 @@ dependencies {
     // endregion
 
     // region WorkManager
-    def work_version = "1.0.0-rc01"
+    def work_version = "1.0.0-rc02"
 
     implementation "android.arch.work:work-runtime:$work_version" // For Kotlin+Coroutines use work-runtime-ktx
 
@@ -152,7 +152,7 @@ dependencies {
 
     // region Firebase
     implementation 'com.google.firebase:firebase-core:16.0.7'
-    implementation 'com.google.firebase:firebase-messaging:17.3.4'
+    implementation 'com.google.firebase:firebase-messaging:17.4.0'
 
     // endregion
 

@@ -132,7 +132,7 @@ public class SplashActivity extends AppCompatActivity {
     };
 
     private void launchMain() {
-        startActivity(new Intent(this, SettingsActivity.class));
+        startActivity(new Intent(this, PostRecipeActivity.class));
         finish();
         if (false && getIntent() != null) {
             Intent receivedIntent = getIntent();

@@ -41,13 +41,12 @@ public class DataViewModel extends ViewModel {
             RepoSearchResults::getData
     );
 
-    private MutableLiveData<List<CategoryEntity>> categoryList = new MutableLiveData<>(); // list of newCategories from api
+    private LiveData<List<CategoryEntity>> categoryList;// = new MutableLiveData<>(); // list of newCategories from api
 
     private MutableLiveData<String> infoFromLastFetch = new MutableLiveData<>(); // info about new or modified pagedRecipes from last fetch from api
     private CompositeDisposable compositeDisposable;
 
-    private Observer<List<CategoryEntity>> categoryObserver =
-            listLiveData -> categoryList.setValue(listLiveData);
+    //private Observer<List<CategoryEntity>> categoryObserver = categoryList::setValue;
 
     public DataViewModel(RecipeRepository recipeRepository, CategoryRepository categoryRepository) {
         this.recipeRepository = recipeRepository;
@@ -57,7 +56,7 @@ public class DataViewModel extends ViewModel {
         compositeDisposable.add(this.recipeRepository.dispatchInfo.subscribe(infoFromLastFetch::postValue));
         compositeDisposable.add(this.categoryRepository.dispatchInfo.subscribe(infoFromLastFetch::postValue));
 
-        categoryRepository.getAllCategoriesLiveData().observeForever(categoryObserver);
+        categoryList = categoryRepository.getAllCategoriesLiveData();//.observeForever(categoryObserver);
     }
 
 
@@ -98,7 +97,7 @@ public class DataViewModel extends ViewModel {
     protected void onCleared() {
         super.onCleared();
         compositeDisposable.clear();
-        categoryRepository.getAllCategoriesLiveData().removeObserver(categoryObserver);
+        //categoryRepository.getAllCategoriesLiveData().removeObserver(categoryObserver);
     }
 
 

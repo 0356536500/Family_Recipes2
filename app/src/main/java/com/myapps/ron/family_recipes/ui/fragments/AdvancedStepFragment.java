@@ -1,13 +1,8 @@
 package com.myapps.ron.family_recipes.ui.fragments;
 
-import androidx.lifecycle.ViewModelProviders;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,7 +17,14 @@ import com.myapps.ron.family_recipes.ui.activities.PostRecipeActivity;
 import com.myapps.ron.family_recipes.utils.Constants;
 import com.myapps.ron.family_recipes.utils.MyFragment;
 import com.myapps.ron.family_recipes.viewmodels.PostRecipeViewModel;
-import com.myapps.ron.searchfilter.animator.FiltersListItemAnimator;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 /**
  * Created by ronginat on 29/10/2018.
@@ -35,7 +37,7 @@ public class AdvancedStepFragment extends MyFragment {
 
     private HtmlElementsAdapter mAdapter;
     private RecyclerView recyclerView;
-    private Button preview;
+    private Button preview, sample, reset;
 
     private PostRecipeActivity activity;
     private PostRecipeViewModel viewModel;
@@ -51,28 +53,24 @@ public class AdvancedStepFragment extends MyFragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        //setRetainInstance(true);
+        setRetainInstance(true);
     }
 
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         Log.e(TAG, "on attach");
-        if (parent != null){
+        /*if (parent != null){
             parent.addView(recyclerView);
             parent.addView(preview);
-        }
+        }*/
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
         Log.e(TAG, "on detach");
-        /*recyclerView = view.findViewById(R.id.advanced_step_recycler);
-        preview = view.findViewById(R.id.advanced_step_preview_button);
-        parent.removeView(preview);
-        parent.removeView(recyclerView);*/
-        parent.removeAllViews();
+        //parent.removeAllViews();
     }
 
     @Override
@@ -84,7 +82,7 @@ public class AdvancedStepFragment extends MyFragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        if (recyclerView == null) {
+        if (parent == null) {
             //Log.e(TAG, "on create view");
             view = inflater.inflate(R.layout.content_post_advanced_step, container, false);
             parent = (LinearLayout) view;
@@ -107,6 +105,8 @@ public class AdvancedStepFragment extends MyFragment {
 
         //viewModel =  ViewModelProviders.of(activity).get(PostRecipeViewModel.class);
         preview = view.findViewById(R.id.advanced_step_preview_button);
+        sample = view.findViewById(R.id.advanced_step_load_sample_button);
+        reset = view.findViewById(R.id.advanced_step_reset_button);
 
         activity.setTitle(getString(R.string.nav_main_post_recipe) + " 2/3");
         setListeners();
@@ -119,28 +119,53 @@ public class AdvancedStepFragment extends MyFragment {
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(mAdapter);
-        recyclerView.setItemAnimator(new FiltersListItemAnimator());
     }
 
     private void setListeners() {
-        preview.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                activity.showMyDialog(mAdapter.generateHtml());
-            }
-        });
+        preview.setOnClickListener(view ->
+                activity.showMyDialog(mAdapter.generateHtml("some name" , "long description")));
 
-        activity.nextButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(mAdapter.checkValidInput()) {
-                    String html = mAdapter.generateHtml();
-                    Log.e(TAG, html);
-                    viewModel.setRecipeFile(activity, html);
-                    activity.nextFragment();
-                } else {
-                    Toast.makeText(activity, getString(R.string.post_recipe_advanced_step_validation_message, Constants.MIN_NUMBER_OF_HTML_ELEMENTS), Toast.LENGTH_SHORT).show();
-                }
+        View.OnClickListener clickListener = view -> {
+            if (mAdapter.getItemCount() > 1) {
+                DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
+                    switch (which){
+                        case DialogInterface.BUTTON_POSITIVE:
+                            //Yes button clicked
+                            if (view.getId() == R.id.advanced_step_reset_button)
+                                mAdapter.reset();
+                            else if (view.getId() == R.id.advanced_step_load_sample_button) {
+                                mAdapter.loadSample();
+                            }
+                            break;
+
+                        case DialogInterface.BUTTON_NEGATIVE:
+                            //No button clicked
+                            break;
+                    }
+                    dialog.dismiss();
+                };
+
+                new AlertDialog.Builder(activity)
+                        .setMessage(R.string.post_recipe_advanced_step_reset_message)
+                        .setPositiveButton(R.string.yes, dialogClickListener)
+                        .setNegativeButton(R.string.no, dialogClickListener)
+                        .show();
+            } else if (view.getId() == R.id.advanced_step_load_sample_button){
+                mAdapter.loadSample();
+            }
+        };
+
+        sample.setOnClickListener(clickListener);
+        reset.setOnClickListener(clickListener);
+
+        activity.nextButton.setOnClickListener(view -> {
+            if(mAdapter.checkValidInput()) {
+                String html = mAdapter.generateHtml(viewModel.recipe.getName(), viewModel.recipe.getDescription());
+                Log.e(TAG, html);
+                viewModel.setRecipeFile(activity, html);
+                activity.nextFragment();
+            } else {
+                Toast.makeText(activity, getString(R.string.post_recipe_advanced_step_validation_message, Constants.MIN_NUMBER_OF_HTML_ELEMENTS), Toast.LENGTH_SHORT).show();
             }
         });
     }

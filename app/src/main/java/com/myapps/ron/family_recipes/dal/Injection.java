@@ -3,7 +3,6 @@ package com.myapps.ron.family_recipes.dal;
 import android.content.Context;
 
 import com.myapps.ron.family_recipes.dal.persistence.AppDatabases;
-import com.myapps.ron.family_recipes.dal.persistence.PendingRecipeDao;
 import com.myapps.ron.family_recipes.dal.repository.CategoryRepository;
 import com.myapps.ron.family_recipes.dal.repository.PendingRecipeRepository;
 import com.myapps.ron.family_recipes.dal.repository.RecipeRepository;
@@ -17,7 +16,7 @@ import java.util.concurrent.Executors;
  */
 public class Injection {
 
-    public static PendingRecipeRepository providePendingRecipeRopsitory(Context context) {
+    public static PendingRecipeRepository providePendingRecipeRepository(Context context) {
         AppDatabases database = AppDatabases.getInstance(context);
         return PendingRecipeRepository.getInstance(database.pendingRecipeDao(), getExecutor(1));
     }
@@ -27,7 +26,7 @@ public class Injection {
         return RecipeRepository.getInstance(database.recipeDao(), getExecutor(4));
     }
 
-    public static CategoryRepository provideCategoryRepository(Context context) {
+    private static CategoryRepository provideCategoryRepository(Context context) {
         AppDatabases database = AppDatabases.getInstance(context);
         return CategoryRepository.getInstance(database.categoriesDao(), getExecutor(2));
     }

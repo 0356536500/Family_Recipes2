@@ -82,6 +82,8 @@
     <string name="recipe_share_pre_url">תראו את המתכון הזה!</string>
 
     <!-- CreateRecipe Activity -->
+    <string name="yes">כן</string>
+    <string name="no">לא</string>
     <string name="post_recipe_name">שם המתכון</string>
     <string name="post_recipe_description">תיאור המתכון</string>
     <string name="post_recipe_next">הבא</string>
@@ -93,6 +95,9 @@
     <string name="post_recipe_advanced_step_bold">טקסט מודגש</string>
     <string name="post_recipe_advanced_step_under_score">קו תחתון</string>
     <string name="post_recipe_advanced_step_preview">תצוגה מקדימה</string>
+    <string name="post_recipe_advanced_step_sample">דוגמא</string>
+    <string name="post_recipe_advanced_step_reset">איפוס</string>
+    <string name="post_recipe_advanced_step_reset_message">מה שכתבת יימחק. להמשיך?</string>
     <string name="post_recipe_advanced_step_list_message">לחיצה על אנטר מפרידה בין פריטים ברשימה</string>
     <string name="post_recipe_advanced_step_validation_message">צריך לפחות %1$d שדות מלאים</string>
     <string name="post_recipe_pick_photos_button">גלריה</string>

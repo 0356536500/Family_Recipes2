@@ -25,6 +25,7 @@ public class PreviewDialogFragment extends Fragment {
 
         if (getArguments() != null) {
             html = getArguments().getString("html");
+            Log.e(getClass().getSimpleName(), "html");
         }
     }
 

@@ -35,7 +35,7 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
             } catch (ClassCastException | IllegalAccessException | NoSuchMethodException | InstantiationException | InvocationTargetException e) {
                 throw new RuntimeException("Cannot create an instance of " + modelClass, e);
             }
-        } else if (modelClass.isAssignableFrom(CategoriesViewModel.class)) {
+        } else if (modelClass.isAssignableFrom(PostRecipeViewModel.class)) {
             try {
                 return modelClass.getConstructor(CategoryRepository.class).newInstance(mDataSource2);
             } catch (ClassCastException | IllegalAccessException | NoSuchMethodException | InstantiationException | InvocationTargetException e) {

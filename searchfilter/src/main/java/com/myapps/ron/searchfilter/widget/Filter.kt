@@ -34,6 +34,7 @@ class Filter<T : FilterModel> : FrameLayout, FilterItemListener, CollapseListene
     var customTextView: String = ""
         set(value) {
             collapsedText.text = value
+            field = value
         }
     /*var textToReplaceArrow: String = ""
         set(value) {

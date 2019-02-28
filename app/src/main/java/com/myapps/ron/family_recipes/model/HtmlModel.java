@@ -37,8 +37,11 @@ public class HtmlModel {
         this.spinnerPos = spinnerPos;
     }
 
-    public String getText() {
-        return Html.escapeHtml(text);
+    public Editable getText() {
+        return text;
+        /*if (text != null)
+            return Html.escapeHtml(text);
+        return null;*/
     }
 
     public void setText(Editable text) {
@@ -76,7 +79,7 @@ public class HtmlModel {
     public HtmlHelper buildHtmlFromElement(HtmlHelper helper) {
         if (text == null || text.toString().isEmpty())
             return helper;
-        String fromEditText = getText();
+        String fromEditText = getText().toString();
 
         if (spinnerPos >= 0) {
             String htmlElement = context.getResources().getStringArray(R.array.html_elements_types)[spinnerPos];
@@ -120,5 +123,13 @@ public class HtmlModel {
             helper.addTagToBuilder(HtmlHelper.HORIZONTAL_RULE);
 
         return helper;
+    }
+
+    @Override
+    public String toString() {
+        return "HtmlModel{" +
+                "spinnerPos=" + spinnerPos +
+                ", text=" + text +
+                '}';
     }
 }

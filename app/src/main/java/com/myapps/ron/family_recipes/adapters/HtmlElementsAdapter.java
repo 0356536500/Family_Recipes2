@@ -1,9 +1,7 @@
 package com.myapps.ron.family_recipes.adapters;
 
 import android.content.Context;
-import androidx.annotation.NonNull;
-import androidx.appcompat.widget.AppCompatEditText;
-import androidx.recyclerview.widget.RecyclerView;
+import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -14,7 +12,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -25,6 +22,10 @@ import com.myapps.ron.family_recipes.utils.HtmlHelper;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.widget.AppCompatEditText;
+import androidx.recyclerview.widget.RecyclerView;
 
 /**
  * Created by ronginat on 01/11/2018.
@@ -81,32 +82,25 @@ public class HtmlElementsAdapter extends RecyclerView.Adapter<HtmlElementsAdapte
                 model.setText(editable);
                 if (!hasUserTypedInEditText && !editable.toString().isEmpty()) {
                     hasUserTypedInEditText = true;
-                    addElementToScreen();
+                    Log.e("afterTextChanged", "addElementToScreen");
+                    addElementToScreen(getAdapterPosition());
                 }
             }
         };
 
-        private CheckBox.OnCheckedChangeListener boldListener = new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                if (model != null)
-                    model.setBold(b);
-            }
-        };
-
-        private CompoundButton.OnCheckedChangeListener underscoreListener = new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                if (model != null)
-                    model.setUnderscore(b);
-            }
-        };
-
-        private CompoundButton.OnCheckedChangeListener dividerListener = new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                if (model != null)
-                    model.setDivider(b);
+        private CheckBox.OnCheckedChangeListener checkboxListener = (compoundButton, b) -> {
+            if (model != null) {
+                switch (compoundButton.getId()) {
+                    case R.id.advanced_step_bold_checkBox:
+                        model.setBold(b);
+                        break;
+                    case R.id.advanced_step_under_score_checkBox:
+                        model.setUnderscore(b);
+                        break;
+                    case R.id.advanced_step_horizontal_divider:
+                        model.setDivider(b);
+                        break;
+                }
             }
         };
 
@@ -123,6 +117,7 @@ public class HtmlElementsAdapter extends RecyclerView.Adapter<HtmlElementsAdapte
 
         private void setModel(HtmlModel model) {
             this.model = model;
+            Log.e("setModel", model.toString());
 
             if (model.getText() != null)
                 editText.setText(model.getText());
@@ -144,21 +139,22 @@ public class HtmlElementsAdapter extends RecyclerView.Adapter<HtmlElementsAdapte
 
             spinner.setOnItemSelectedListener(spinnerListener);
             editText.addTextChangedListener(textWatcher);
-            checkBoxBold.setOnCheckedChangeListener(boldListener);
-            checkBoxUnderScore.setOnCheckedChangeListener(underscoreListener);
-            checkBoxDivider.setOnCheckedChangeListener(dividerListener);
+            checkBoxBold.setOnCheckedChangeListener(checkboxListener);
+            checkBoxUnderScore.setOnCheckedChangeListener(checkboxListener);
+            checkBoxDivider.setOnCheckedChangeListener(checkboxListener);
         }
     }
 
     public HtmlElementsAdapter(Context context) {
         this.context = context;
         this.elements = new ArrayList<>();
-        addElementToScreen();
+        addElementToScreen(0);
     }
 
     @NonNull
     @Override
     public FlexibleHtmlStructureHolder onCreateViewHolder(@NonNull ViewGroup parent, int position) {
+        //Log.e(TAG, "onCreateViewHolder , pos " + position);
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.row_item_flexible_html_structure, parent, false);
 
@@ -167,8 +163,11 @@ public class HtmlElementsAdapter extends RecyclerView.Adapter<HtmlElementsAdapte
 
     @Override
     public void onBindViewHolder(@NonNull FlexibleHtmlStructureHolder holder, int position) {
-        Log.e(getClass().getSimpleName(), "bind view position = " + position);
+        //Log.e(TAG, "bind view position = " + position);
         holder.setModel(elements.get(position));
+        /*holder.fromSample = true;
+        if (position == elements.size() - 1)
+            holder.fromSample = false;*/
     }
 
     @Override
@@ -176,9 +175,12 @@ public class HtmlElementsAdapter extends RecyclerView.Adapter<HtmlElementsAdapte
         return elements.size();
     }
 
-    private void addElementToScreen() {
-        elements.add(new HtmlModel(context));
-        notifyItemInserted(elements.size());
+    private void addElementToScreen(int position) {
+        Log.e("addElementToScreen", "addElementToScreen");
+        if (position == elements.size()) {
+            elements.add(new HtmlModel(context));
+            notifyItemInserted(elements.size());
+        }
     }
 
     public boolean checkValidInput() {
@@ -194,9 +196,9 @@ public class HtmlElementsAdapter extends RecyclerView.Adapter<HtmlElementsAdapte
         return numberOfValidElements > Constants.MIN_NUMBER_OF_HTML_ELEMENTS;
     }
 
-    public String generateHtml() {
+    public String generateHtml(String...headers) {
         HtmlHelper helper = new HtmlHelper();
-        helper.openStaticElements();
+        helper.openStaticElements(headers);
 
         for (HtmlModel element : elements) {
             if (element.isElementHasContent())
@@ -206,5 +208,66 @@ public class HtmlElementsAdapter extends RecyclerView.Adapter<HtmlElementsAdapte
         helper.closeStaticElements();
 
         return helper.toString();
+    }
+
+    public void reset() {
+        int size = elements.size();
+        elements.clear();
+        notifyItemRangeRemoved(0, size);
+        Log.e("reset", "addElementToScreen");
+        addElementToScreen(0);
+    }
+
+    public void loadSample() {
+        /*for (Constants.HTML_SAMPLE_SPINNER val: Constants.HTML_SAMPLE_SPINNER.values()) {
+            Log.e(getClass().getSimpleName(), val.ordinal() + ", " + val.name());
+        }*/
+        int size = elements.size();
+        elements.clear();
+        notifyItemRangeRemoved(0, size);
+        Editable.Factory factory = Editable.Factory.getInstance();
+        //int[] spinnerPostArr = this.context.getResources().getIntArray(R.array.html_elements_types);
+
+        HtmlModel model = new HtmlModel(this.context);
+        model.setSpinnerPos(Constants.HTML_SAMPLE_SPINNER.SUB_HEADER.ordinal());
+        model.setText(factory.newEditable(Constants.HTML_SAMPLE_TEXT_INFO));
+        elements.add(model);
+        //notifyItemInserted(elements.size());
+
+        model = new HtmlModel(this.context);
+        model.setSpinnerPos(Constants.HTML_SAMPLE_SPINNER.HEADER.ordinal());
+        model.setText(factory.newEditable(Constants.HTML_SAMPLE_TEXT_INGREDIENTS));
+        elements.add(model);
+        //notifyItemInserted(elements.size());
+
+        model = new HtmlModel(this.context);
+        model.setSpinnerPos(Constants.HTML_SAMPLE_SPINNER.UNORDERED_LIST.ordinal());
+        model.setText(factory.newEditable(Constants.HTML_SAMPLE_INGREDIENT_LIST));
+        model.setDivider(true);
+        elements.add(model);
+        //notifyItemInserted(elements.size());
+
+        model = new HtmlModel(this.context);
+        model.setSpinnerPos(Constants.HTML_SAMPLE_SPINNER.HEADER.ordinal());
+        model.setText(factory.newEditable(Constants.HTML_SAMPLE_TEXT_HOW_TO_MAKE));
+        elements.add(model);
+        //notifyItemInserted(elements.size());
+
+        model = new HtmlModel(this.context);
+        model.setSpinnerPos(Constants.HTML_SAMPLE_SPINNER.ORDERED_LIST.ordinal());
+        model.setText(factory.newEditable(Constants.HTML_SAMPLE_HOW_TO_MAKE_STEPS_LIST));
+        model.setDivider(true);
+        elements.add(model);
+        //notifyItemInserted(elements.size());
+
+        model = new HtmlModel(this.context);
+        model.setSpinnerPos(Constants.HTML_SAMPLE_SPINNER.PARAGRAPH.ordinal());
+        model.setText(factory.newEditable(Constants.HTML_SAMPLE_TEXT_CHECK_THE_PREVIEW));
+        model.setBold(true);
+        model.setUnderscore(true);
+        elements.add(model);
+        //notifyItemInserted(elements.size());
+
+        notifyItemRangeInserted(0, elements.size());
     }
 }

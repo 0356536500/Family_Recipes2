@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.background.services.PostRecipeToServerService;
+import com.myapps.ron.family_recipes.dal.Injection;
 import com.myapps.ron.family_recipes.ui.fragments.AdvancedStepFragment;
 import com.myapps.ron.family_recipes.ui.fragments.FirstStepFragment;
 import com.myapps.ron.family_recipes.ui.fragments.PickPhotosFragment;
@@ -44,7 +45,8 @@ public class PostRecipeActivity extends MyBaseActivity {
         setContentView(R.layout.activity_post_recipe);
 
         nextButton = findViewById(R.id.create_recipe_next_button);
-        viewModel =  ViewModelProviders.of(this).get(PostRecipeViewModel.class);
+        viewModel = ViewModelProviders.of(this, Injection.provideViewModelFactory(this)).get(PostRecipeViewModel.class);
+
         setFragments();
 
         Toolbar toolbar = findViewById(R.id.main_toolbar);
@@ -71,8 +73,9 @@ public class PostRecipeActivity extends MyBaseActivity {
     private void setFragments() {
         fragments = new ArrayList<>();
 
-        fragments.add(new FirstStepFragment());
         fragments.add(new AdvancedStepFragment());
+        fragments.add(new FirstStepFragment());
+
         fragments.add(new PickPhotosFragment());
 
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();

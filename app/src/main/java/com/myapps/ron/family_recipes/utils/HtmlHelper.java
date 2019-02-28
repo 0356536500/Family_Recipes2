@@ -2,6 +2,8 @@ package com.myapps.ron.family_recipes.utils;
 
 import java.util.Stack;
 
+import androidx.annotation.NonNull;
+
 /**
  * Created by ronginat on 30/10/2018.
  *
@@ -38,6 +40,11 @@ public class HtmlHelper {
         return "</" + tag + ">";
     }
 
+    @SuppressWarnings("SameParameterValue")
+    private String autoCloseTagWithAttributes(String tag, String attributes) {
+        return "<" + tag + " " + attributes + " />";
+    }
+
     private String closeContainer() {
         if (!containers.empty()) {
             return closeTag(containers.pop());
@@ -57,10 +64,17 @@ public class HtmlHelper {
         builder.append(closeTag(tag));
     }
 
-    public void openStaticElements() {
+    public void openStaticElements(String...metaHeaders) {
+        builder.append(addTag("!DOCTYPE html"));
         builder.append(addTag("html dir=rtl lang=he"));
         addTagToBuilder("head");
         addTagWithAttributeToBuilder("meta", "charset", "utf-8");
+        if (metaHeaders != null && metaHeaders.length >= 2) {
+            openElement("title", metaHeaders[0]);
+            builder.append(addTag("meta name=" + "\"description\"" +  " content=" + "\"" + metaHeaders[1] + "\""));
+            builder.append(autoCloseTagWithAttributes("meta", "property=og:title content=" + "\"" + metaHeaders[0] + "\""));
+            builder.append(autoCloseTagWithAttributes("meta", "property=og:description content=" + "\"" + metaHeaders[1] + "\""));
+        }
         closeTagInBuilder("head");
         builder.append(addTag("body " + BODY_TEXT_STYLE));
     }
@@ -111,6 +125,7 @@ public class HtmlHelper {
         }
     }
 
+    @NonNull
     @Override
     public String toString() {
         return builder.toString();

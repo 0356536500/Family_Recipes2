@@ -19,12 +19,13 @@ import java.util.List;
  */
 public class PostRecipeViewModel extends ViewModel {
     private MutableLiveData<String> recipePath = new MutableLiveData<>();
-    private MutableLiveData<List<CategoryEntity>> categoryList = new MutableLiveData<>(); // list of categories from local db
+    private LiveData<List<CategoryEntity>> categoryList;// = new MutableLiveData<>(); // list of categories from local db
 
-    private CategoryRepository categoryRepository;
+    //private CategoryRepository categoryRepository;
 
     public PostRecipeViewModel(CategoryRepository categoryRepository) {
-        this.categoryRepository = categoryRepository;
+        //this.categoryRepository = categoryRepository;
+        this.categoryList = categoryRepository.getAllCategoriesLiveData();
     }
 
     private File recipeFile;
@@ -43,16 +44,14 @@ public class PostRecipeViewModel extends ViewModel {
         return categoryList;
     }
 
-    private void setCategories(List<CategoryEntity> items) {
+    /*private void setCategories(List<CategoryEntity> items) {
         categoryList.setValue(items);
-    }
+    }*/
 
 
-    public void loadCategories(final Context context) {
+    /*public void loadCategories(final Context context) {
         setCategories(categoryRepository.getAllCategories());
-        /*CategoriesDBHelper dbHelper = new CategoriesDBHelper(context);
-        setCategories(dbHelper.getAllCategoriesLiveData());*/
-    }
+    }*/
 
     public File getRecipeFile() {
         return recipeFile;

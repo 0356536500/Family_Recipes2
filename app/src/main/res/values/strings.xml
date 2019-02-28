@@ -85,6 +85,8 @@
     <string name="recipe_share_pre_url">Hey check out this recipe!</string>
 
     <!-- CreateRecipe Activity -->
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
     <string name="post_recipe_name">Recipe name</string>
     <string name="post_recipe_description">Recipe description</string>
     <string name="post_recipe_next">next</string>
@@ -96,6 +98,9 @@
     <string name="post_recipe_advanced_step_bold">Bold</string>
     <string name="post_recipe_advanced_step_under_score">Underscore</string>
     <string name="post_recipe_advanced_step_preview">preview</string>
+    <string name="post_recipe_advanced_step_sample">sample</string>
+    <string name="post_recipe_advanced_step_reset">reset</string>
+    <string name="post_recipe_advanced_step_reset_message">What you wrote will be deleted. Continue?</string>
     <string name="post_recipe_advanced_step_list_message">Press ENTER to separate between items</string>
     <string name="post_recipe_advanced_step_validation_message">Need at least %1$d non empty elements</string>
     <string name="post_recipe_pick_photos_button">browse</string>
