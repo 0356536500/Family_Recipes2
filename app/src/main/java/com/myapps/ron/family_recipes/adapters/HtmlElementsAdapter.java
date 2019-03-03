@@ -1,7 +1,6 @@
 package com.myapps.ron.family_recipes.adapters;
 
 import android.content.Context;
-import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -31,7 +30,7 @@ import androidx.recyclerview.widget.RecyclerView;
  * Created by ronginat on 01/11/2018.
  */
 public class HtmlElementsAdapter extends RecyclerView.Adapter<HtmlElementsAdapter.FlexibleHtmlStructureHolder>{
-    //private final String TAG = getClass().getSimpleName();
+    private final String TAG = getClass().getSimpleName();
     public static final int UNORDERED_LIST_POS = 3;
     public static final int ORDERED_LIST_POS = 4;
 
@@ -43,15 +42,12 @@ public class HtmlElementsAdapter extends RecyclerView.Adapter<HtmlElementsAdapte
         private CheckBox checkBoxDivider, checkBoxBold, checkBoxUnderScore ;
         private AppCompatEditText editText;
 
-        private HtmlModel model;
-
-        private boolean hasUserTypedInEditText;
-
         private AdapterView.OnItemSelectedListener spinnerListener =
                 new AdapterView.OnItemSelectedListener() {
                     @Override
                     public void onItemSelected(AdapterView<?> adapterView, View view, int pos, long l) {
-                        model.setSpinnerPos(pos);
+                        Log.e(TAG, "onItemSelected, before " + elements.get(getAdapterPosition()).getSpinnerPos() + ", after " + pos);
+                        elements.get(getAdapterPosition()).setSpinnerPos(pos);
 
                         if (pos >= UNORDERED_LIST_POS && pos <= ORDERED_LIST_POS) {
                             Toast toast = Toast.makeText(context, R.string.post_recipe_advanced_step_list_message, Toast.LENGTH_LONG);
@@ -62,7 +58,8 @@ public class HtmlElementsAdapter extends RecyclerView.Adapter<HtmlElementsAdapte
 
                     @Override
                     public void onNothingSelected(AdapterView<?> adapterView) {
-                        model.setSpinnerPos(-1);
+                        Log.e(TAG, "onNothingSelected");
+                        elements.get(getAdapterPosition()).setSpinnerPos(-1);
                     }
                 };
 
@@ -79,26 +76,21 @@ public class HtmlElementsAdapter extends RecyclerView.Adapter<HtmlElementsAdapte
 
             @Override
             public void afterTextChanged(Editable editable) {
-                model.setText(editable);
-                if (!hasUserTypedInEditText && !editable.toString().isEmpty()) {
-                    hasUserTypedInEditText = true;
-                    Log.e("afterTextChanged", "addElementToScreen");
-                    addElementToScreen(getAdapterPosition());
-                }
+                elements.get(getAdapterPosition()).setText(editable);
             }
         };
 
         private CheckBox.OnCheckedChangeListener checkboxListener = (compoundButton, b) -> {
-            if (model != null) {
+            if (elements.get(getAdapterPosition()) != null) {
                 switch (compoundButton.getId()) {
                     case R.id.advanced_step_bold_checkBox:
-                        model.setBold(b);
+                        elements.get(getAdapterPosition()).setBold(b);
                         break;
                     case R.id.advanced_step_under_score_checkBox:
-                        model.setUnderscore(b);
+                        elements.get(getAdapterPosition()).setUnderscore(b);
                         break;
                     case R.id.advanced_step_horizontal_divider:
-                        model.setDivider(b);
+                        elements.get(getAdapterPosition()).setDivider(b);
                         break;
                 }
             }
@@ -111,26 +103,23 @@ public class HtmlElementsAdapter extends RecyclerView.Adapter<HtmlElementsAdapte
             checkBoxBold = view.findViewById(R.id.advanced_step_bold_checkBox);
             checkBoxUnderScore = view.findViewById(R.id.advanced_step_under_score_checkBox);
             editText = view.findViewById(R.id.advanced_step_details_editText);
-
-            hasUserTypedInEditText = false;
         }
 
-        private void setModel(HtmlModel model) {
-            this.model = model;
-            Log.e("setModel", model.toString());
+        private void bindTo(HtmlModel model) {
+            if (model != null) {
+                if (model.getText() != null)
+                    editText.setText(model.getText());
+                if (model.getSpinnerPos() >= 0)
+                    spinner.setSelection(model.getSpinnerPos());
+                checkBoxBold.setChecked(model.isBold());
+                checkBoxUnderScore.setChecked(model.isUnderscore());
+                checkBoxDivider.setChecked(model.isDivider());
 
-            if (model.getText() != null)
-                editText.setText(model.getText());
-            if (model.getSpinnerPos() > -1)
-                spinner.setSelection(model.getSpinnerPos());
-            checkBoxBold.setChecked(model.isBold());
-            checkBoxUnderScore.setChecked(model.isUnderscore());
-            checkBoxDivider.setChecked(model.isDivider());
-
-            initUI();
+                setListeners();
+            }
         }
 
-        private void initUI() {
+        private void setListeners() {
             //init the spinner
             ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(context,
                     R.array.html_elements, android.R.layout.simple_spinner_item);
@@ -148,7 +137,7 @@ public class HtmlElementsAdapter extends RecyclerView.Adapter<HtmlElementsAdapte
     public HtmlElementsAdapter(Context context) {
         this.context = context;
         this.elements = new ArrayList<>();
-        addElementToScreen(0);
+        addElementToScreen();
     }
 
     @NonNull
@@ -163,11 +152,14 @@ public class HtmlElementsAdapter extends RecyclerView.Adapter<HtmlElementsAdapte
 
     @Override
     public void onBindViewHolder(@NonNull FlexibleHtmlStructureHolder holder, int position) {
-        //Log.e(TAG, "bind view position = " + position);
-        holder.setModel(elements.get(position));
-        /*holder.fromSample = true;
-        if (position == elements.size() - 1)
-            holder.fromSample = false;*/
+        Log.e(TAG, "bind view position = " + position);
+        holder.bindTo(elements.get(position));
+    }
+
+    @Override
+    public void onViewRecycled(@NonNull FlexibleHtmlStructureHolder holder) {
+        Log.e(TAG, "onViewRecycled, " + elements.get(holder.getOldPosition()).getText());
+        super.onViewRecycled(holder);
     }
 
     @Override
@@ -175,12 +167,9 @@ public class HtmlElementsAdapter extends RecyclerView.Adapter<HtmlElementsAdapte
         return elements.size();
     }
 
-    private void addElementToScreen(int position) {
-        Log.e("addElementToScreen", "addElementToScreen");
-        if (position == elements.size()) {
-            elements.add(new HtmlModel(context));
-            notifyItemInserted(elements.size());
-        }
+    public void addElementToScreen() {
+        elements.add(new HtmlModel(context));
+        notifyItemInserted(elements.size() - 1);
     }
 
     public boolean checkValidInput() {
@@ -213,15 +202,13 @@ public class HtmlElementsAdapter extends RecyclerView.Adapter<HtmlElementsAdapte
     public void reset() {
         int size = elements.size();
         elements.clear();
+        //elements = new ArrayList<>();
         notifyItemRangeRemoved(0, size);
         Log.e("reset", "addElementToScreen");
-        addElementToScreen(0);
+        addElementToScreen();
     }
 
     public void loadSample() {
-        /*for (Constants.HTML_SAMPLE_SPINNER val: Constants.HTML_SAMPLE_SPINNER.values()) {
-            Log.e(getClass().getSimpleName(), val.ordinal() + ", " + val.name());
-        }*/
         int size = elements.size();
         elements.clear();
         notifyItemRangeRemoved(0, size);

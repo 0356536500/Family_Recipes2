@@ -13,13 +13,12 @@
     <FrameLayout
         android:id="@+id/create_fragment_container"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.9"
-        app:layout_constraintTop_toTopOf="parent">
+        android:layout_height="match_parent"
+        android:layout_gravity="center">
 
     </FrameLayout>
 
-    <androidx.appcompat.widget.AppCompatButton
+    <!--<androidx.appcompat.widget.AppCompatButton
         android:id="@+id/create_recipe_next_button"
         android:layout_width="150dp"
         android:layout_height="0dp"
@@ -33,6 +32,6 @@
         android:text="@string/post_recipe_next"
         android:textColor="@color/white"
         android:textSize="22sp"
-        android:layout_gravity="bottom|center_horizontal"/>
+        android:layout_gravity="bottom|center_horizontal"/>-->
 
 </LinearLayout>

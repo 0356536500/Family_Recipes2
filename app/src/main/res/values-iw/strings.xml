@@ -94,9 +94,14 @@
     <string name="post_recipe_advanced_step_hr">קו הפרדה</string>
     <string name="post_recipe_advanced_step_bold">טקסט מודגש</string>
     <string name="post_recipe_advanced_step_under_score">קו תחתון</string>
-    <string name="post_recipe_advanced_step_preview">תצוגה מקדימה</string>
-    <string name="post_recipe_advanced_step_sample">דוגמא</string>
-    <string name="post_recipe_advanced_step_reset">איפוס</string>
+
+    <!--#region Fab Menu -->
+    <string name="post_recipe_advanced_step_fab_add">בלוק חדש</string>
+    <string name="post_recipe_advanced_step_fab_preview">תצוגה מקדימה</string>
+    <string name="post_recipe_advanced_step_fab_template">דוגמא</string>
+    <string name="post_recipe_advanced_step_fab_reset">איפוס</string>
+    <!--#endregion Fab Menu -->
+
     <string name="post_recipe_advanced_step_reset_message">מה שכתבת יימחק. להמשיך?</string>
     <string name="post_recipe_advanced_step_list_message">לחיצה על אנטר מפרידה בין פריטים ברשימה</string>
     <string name="post_recipe_advanced_step_validation_message">צריך לפחות %1$d שדות מלאים</string>

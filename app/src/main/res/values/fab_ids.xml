@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="fab_preview_action" type="id" />
+    <item name="fab_add_action" type="id" />
+    <item name="fab_reset_action" type="id" />
+    <item name="fab_template_action" type="id" />
+</resources>
