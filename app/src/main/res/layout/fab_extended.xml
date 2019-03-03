@@ -6,6 +6,8 @@
     android:layout_height="wrap_content"
     android:background="@drawable/fab_background"
     android:elevation="8dp"
+    android:layout_margin="18dp"
+    android:layout_gravity="bottom|start"
     android:id="@+id/extend_fab_container">
 
     <android.support.design.button.MaterialButton

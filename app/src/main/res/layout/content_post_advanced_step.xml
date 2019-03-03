@@ -35,7 +35,7 @@
         app:sdMainFabOpenedBackgroundColor="@color/md_red_900"
         app:sdOverlayLayout="@id/overlay" />
 
-    <include layout="@layout/fab_collapsed" />
+    <include layout="@layout/fab_extended" />
     <!--<com.google.android.material.floatingactionbutton.FloatingActionButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

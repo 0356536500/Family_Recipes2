@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -254,6 +255,23 @@ public class AdvancedStepFragment extends MyFragment {
         mSnackbar = Snackbar.make(view, text, Snackbar.LENGTH_SHORT);
         mSnackbar.setAction("Close", view -> mSnackbar.dismiss());
         mSnackbar.show();
+    }
+
+    private void initNextButton() {
+        Button nextButton = view.findViewById(R.id.fab);
+        nextButton.setOnTouchListener((view, motionEvent) -> {
+            switch (motionEvent.getAction()) {
+                case MotionEvent.ACTION_BUTTON_PRESS:
+                    nextButton.setText("Next");
+                    break;
+                case MotionEvent.ACTION_BUTTON_RELEASE:
+                    nextButton.setText("");
+                    break;
+            }
+            view.performClick();
+            return true;
+        });
+        nextButton.setOnClickListener(View::performClick);
     }
 
     /*private void setExtended(boolean extended, boolean force) {
