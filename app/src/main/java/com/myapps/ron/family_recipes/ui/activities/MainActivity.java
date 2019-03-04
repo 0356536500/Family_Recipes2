@@ -36,8 +36,8 @@ import com.myapps.ron.family_recipes.network.cognito.AppHelper;
 import com.myapps.ron.family_recipes.ui.fragments.AllRecipesFragment;
 import com.myapps.ron.family_recipes.ui.fragments.FavoritesRecipesFragment;
 import com.myapps.ron.family_recipes.utils.Constants;
-import com.myapps.ron.family_recipes.utils.MyBaseActivity;
-import com.myapps.ron.family_recipes.utils.MyFragment;
+import com.myapps.ron.family_recipes.ui.baseclasses.MyBaseActivity;
+import com.myapps.ron.family_recipes.ui.baseclasses.MyFragment;
 import com.myapps.ron.family_recipes.utils.SharedPreferencesHandler;
 import com.myapps.ron.family_recipes.viewmodels.DataViewModel;
 

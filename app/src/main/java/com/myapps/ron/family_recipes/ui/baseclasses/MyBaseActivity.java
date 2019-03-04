@@ -1,4 +1,4 @@
-package com.myapps.ron.family_recipes.utils;
+package com.myapps.ron.family_recipes.ui.baseclasses;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -9,6 +9,8 @@ import android.util.Log;
 
 import com.myapps.ron.family_recipes.MyApplication;
 import com.myapps.ron.family_recipes.R;
+import com.myapps.ron.family_recipes.utils.LocaleHelper;
+import com.myapps.ron.family_recipes.utils.SharedPreferencesHandler;
 
 /**
  * Created by ronginat on 13/12/2018.

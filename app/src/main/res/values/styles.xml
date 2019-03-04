@@ -3,6 +3,7 @@
     <!-- Base application theme - Default - Light -->
     <style name="AppTheme.Light" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- toolbar colors and themes -->
+        <item name="material_theme">@style/Theme.MaterialComponents.Light.NoActionBar</item>
         <item name="toolbar_theme">@style/ActionBarTheme.Light</item>
         <item name="toolbarBackgroundPrimary">@color/white</item>
         <item name="toolbarBackgroundSecondary">@color/logo_background_darker</item>
@@ -47,6 +48,7 @@
     <!-- Base application theme - Dark -->
     <style name="AppTheme.Dark" parent="Theme.AppCompat.NoActionBar">
         <!-- toolbar colors and themes -->
+        <item name="material_theme">@style/Theme.MaterialComponents.Light.DarkActionBar</item>
         <item name="toolbar_theme">@style/ActionBarTheme.Dark</item>
         <item name="toolbarBackgroundPrimary">@color/grey_500</item>
         <item name="toolbarBackgroundSecondary">@color/logo_foreground</item>

@@ -6,7 +6,6 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -17,27 +16,28 @@ import com.leinardi.android.speeddial.SpeedDialActionItem;
 import com.leinardi.android.speeddial.SpeedDialView;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.adapters.HtmlElementsAdapter;
+import com.myapps.ron.family_recipes.recycler.MyRecyclerScroll;
 import com.myapps.ron.family_recipes.ui.activities.PostRecipeActivity;
+import com.myapps.ron.family_recipes.ui.baseclasses.PostRecipeBaseFragment;
 import com.myapps.ron.family_recipes.utils.Constants;
-import com.myapps.ron.family_recipes.utils.MyFragment;
 import com.myapps.ron.family_recipes.viewmodels.PostRecipeViewModel;
+import com.tunjid.androidbootstrap.material.animator.FabExtensionAnimator;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.transition.AutoTransition;
-import androidx.transition.TransitionManager;
+
+import static androidx.core.content.ContextCompat.getDrawable;
 
 /**
  * Created by ronginat on 29/10/2018.
  */
-public class AdvancedStepFragment extends MyFragment {
+public class AdvancedStepFragment extends PostRecipeBaseFragment {
     private final String TAG = getClass().getSimpleName();
 
     private View view;
@@ -47,18 +47,11 @@ public class AdvancedStepFragment extends MyFragment {
     private RecyclerView recyclerView;
     private Button preview, sample, reset;
 
-    private PostRecipeActivity activity;
+    //private PostRecipeActivity activity;
     private PostRecipeViewModel viewModel;
 
     private SpeedDialView mSpeedDialView;
 
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        activity = (PostRecipeActivity)getActivity();
-    }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -110,20 +103,30 @@ public class AdvancedStepFragment extends MyFragment {
             mSpeedDialView = view.findViewById(R.id.advanced_step_speedDial);
             viewModel =  ViewModelProviders.of(activity).get(PostRecipeViewModel.class);
 
-            initSpeedDial(savedInstanceState == null);
+            initFloatingMenu(savedInstanceState == null);
             initRecycler();
         }
+        togglePersistentUi();
 
         //viewModel =  ViewModelProviders.of(activity).get(PostRecipeViewModel.class);
         /*preview = view.findViewById(R.id.advanced_step_preview_button);
         sample = view.findViewById(R.id.advanced_step_load_sample_button);
         reset = view.findViewById(R.id.advanced_step_reset_button);*/
 
-        activity.setTitle(getString(R.string.nav_main_post_recipe) + " 2/3");
+        //activity.setTitle(getString(R.string.nav_main_post_recipe) + " 2/3");
         //setListeners();
     }
 
-    private void initSpeedDial(boolean addActionItems) {
+    // region PostRecipeBaseFragment Overrides
+
+    @Override
+    protected String getTitle() {
+        return getString(R.string.nav_main_post_recipe) + " 2/3";
+    }
+
+    // endregion
+
+    private void initFloatingMenu(boolean addActionItems) {
         if (addActionItems) {
             /*Drawable drawable = AppCompatResources.getDrawable(activity, R.drawable.ic_custom_color);
             FabWithLabelView fabWithLabelView = mSpeedDialView.addActionItem(new SpeedDialActionItem.Builder(R.id
@@ -257,38 +260,6 @@ public class AdvancedStepFragment extends MyFragment {
         mSnackbar.show();
     }
 
-    private void initNextButton() {
-        Button nextButton = view.findViewById(R.id.fab);
-        nextButton.setOnTouchListener((view, motionEvent) -> {
-            switch (motionEvent.getAction()) {
-                case MotionEvent.ACTION_BUTTON_PRESS:
-                    nextButton.setText("Next");
-                    break;
-                case MotionEvent.ACTION_BUTTON_RELEASE:
-                    nextButton.setText("");
-                    break;
-            }
-            view.performClick();
-            return true;
-        });
-        nextButton.setOnClickListener(View::performClick);
-    }
-
-    /*private void setExtended(boolean extended, boolean force) {
-        if (isAnimating || (extended && isExtended() && !force)) return;
-
-        ConstraintSet set = new ConstraintSet();
-        set.clone(container.getContext(), extended ? R.layout.fab_extended : R.layout.fab_collapsed);
-
-        TransitionManager.beginDelayedTransition(container, new AutoTransition()
-                .addListener(listener).setDuration(150));
-
-        if (extended) button.setText("qwerty");
-        else button.setText("");
-
-        set.applyTo(container);
-    }*/
-
     private void initRecycler() {
         mAdapter = new HtmlElementsAdapter(activity);
 
@@ -296,6 +267,17 @@ public class AdvancedStepFragment extends MyFragment {
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(mAdapter);
+        recyclerView.addOnScrollListener(new MyRecyclerScroll() {
+            @Override
+            public void show() {
+                toggleFab(true);
+            }
+
+            @Override
+            public void hide() {
+                toggleFab(false);
+            }
+        });
     }
 
     private void setListeners() {
@@ -335,7 +317,7 @@ public class AdvancedStepFragment extends MyFragment {
         sample.setOnClickListener(clickListener);
         reset.setOnClickListener(clickListener);
 
-        activity.nextButton.setOnClickListener(view -> {
+        activity.expandedButton.setOnClickListener(view -> {
             if(mAdapter.checkValidInput()) {
                 String html = mAdapter.generateHtml(viewModel.recipe.getName(), viewModel.recipe.getDescription());
                 Log.e(TAG, html);

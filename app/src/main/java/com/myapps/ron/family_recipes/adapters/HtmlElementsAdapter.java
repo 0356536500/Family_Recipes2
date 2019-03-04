@@ -46,7 +46,7 @@ public class HtmlElementsAdapter extends RecyclerView.Adapter<HtmlElementsAdapte
                 new AdapterView.OnItemSelectedListener() {
                     @Override
                     public void onItemSelected(AdapterView<?> adapterView, View view, int pos, long l) {
-                        Log.e(TAG, "onItemSelected, before " + elements.get(getAdapterPosition()).getSpinnerPos() + ", after " + pos);
+                        //Log.e(TAG, "onItemSelected, before " + elements.get(getAdapterPosition()).getSpinnerPos() + ", after " + pos);
                         elements.get(getAdapterPosition()).setSpinnerPos(pos);
 
                         if (pos >= UNORDERED_LIST_POS && pos <= ORDERED_LIST_POS) {
@@ -58,7 +58,7 @@ public class HtmlElementsAdapter extends RecyclerView.Adapter<HtmlElementsAdapte
 
                     @Override
                     public void onNothingSelected(AdapterView<?> adapterView) {
-                        Log.e(TAG, "onNothingSelected");
+                        //Log.e(TAG, "onNothingSelected");
                         elements.get(getAdapterPosition()).setSpinnerPos(-1);
                     }
                 };
@@ -152,13 +152,13 @@ public class HtmlElementsAdapter extends RecyclerView.Adapter<HtmlElementsAdapte
 
     @Override
     public void onBindViewHolder(@NonNull FlexibleHtmlStructureHolder holder, int position) {
-        Log.e(TAG, "bind view position = " + position);
+        //Log.e(TAG, "bind view position = " + position);
         holder.bindTo(elements.get(position));
     }
 
     @Override
     public void onViewRecycled(@NonNull FlexibleHtmlStructureHolder holder) {
-        Log.e(TAG, "onViewRecycled, " + elements.get(holder.getOldPosition()).getText());
+        //Log.e(TAG, "onViewRecycled, " + elements.get(holder.getOldPosition()).getText());
         super.onViewRecycled(holder);
     }
 

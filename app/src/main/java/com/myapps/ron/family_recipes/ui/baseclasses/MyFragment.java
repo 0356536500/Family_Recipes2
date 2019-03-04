@@ -1,4 +1,4 @@
-package com.myapps.ron.family_recipes.utils;
+package com.myapps.ron.family_recipes.ui.baseclasses;
 
 import androidx.fragment.app.Fragment;
 

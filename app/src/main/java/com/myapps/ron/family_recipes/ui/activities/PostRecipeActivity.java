@@ -1,31 +1,37 @@
 package com.myapps.ron.family_recipes.ui.activities;
 
-import androidx.lifecycle.ViewModelProviders;
+import android.annotation.SuppressLint;
 import android.os.Bundle;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.core.app.NavUtils;
-import androidx.appcompat.widget.AppCompatButton;
-import androidx.appcompat.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
 import android.widget.Toast;
 
+import com.google.android.material.button.MaterialButton;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.background.services.PostRecipeToServerService;
 import com.myapps.ron.family_recipes.dal.Injection;
+import com.myapps.ron.family_recipes.ui.baseclasses.MyBaseActivity;
+import com.myapps.ron.family_recipes.ui.baseclasses.MyFragment;
 import com.myapps.ron.family_recipes.ui.fragments.AdvancedStepFragment;
 import com.myapps.ron.family_recipes.ui.fragments.FirstStepFragment;
 import com.myapps.ron.family_recipes.ui.fragments.PickPhotosFragment;
 import com.myapps.ron.family_recipes.ui.fragments.PreviewDialogFragment;
-import com.myapps.ron.family_recipes.utils.MyBaseActivity;
-import com.myapps.ron.family_recipes.utils.MyFragment;
 import com.myapps.ron.family_recipes.viewmodels.PostRecipeViewModel;
+import com.tunjid.androidbootstrap.material.animator.FabExtensionAnimator;
+import com.tunjid.androidbootstrap.view.animator.ViewHider;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.NavUtils;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.ViewModelProviders;
 
 /**
  * Created by ronginat on 29/10/2018.
@@ -35,17 +41,57 @@ public class PostRecipeActivity extends MyBaseActivity {
     private PostRecipeViewModel viewModel;
     private List<MyFragment> fragments;
 
-    public AppCompatButton nextButton;
+    public MaterialButton expandedButton;
+    private FabExtensionAnimator fabExtensionAnimator;
+    private ViewHider fabHider;
     private int currentIndex = 0;
     private boolean inPreview = false;
 
+    /*final FragmentManager.FragmentLifecycleCallbacks fragmentLifecycleCallback = new FragmentManager.FragmentLifecycleCallbacks() {
+
+        @Override
+        public void onFragmentPreAttached(@NonNull FragmentManager fm, @NonNull Fragment f, @NonNull Context context) {
+            super.onFragmentPreAttached(fm, f, context);
+            Log.e(getClass().getSimpleName(), "onFragmentPreAttached, " + f.getClass().getSimpleName());
+        }
+
+        @Override
+        public void onFragmentViewCreated(@NonNull FragmentManager fm, @NonNull Fragment f, @NonNull View v, @Nullable Bundle savedInstanceState) {
+            Log.e(getClass().getSimpleName(), "onFragmentViewCreated, " + f.getClass().getSimpleName());
+            super.onFragmentViewCreated(fm, f, v, savedInstanceState);
+            PostRecipeBaseFragment fragment = (PostRecipeBaseFragment) f;
+
+            fragment.togglePersistentUi();
+        }
+    };*/
+
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onMyCreate(@Nullable Bundle savedInstanceState) {
         //super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post_recipe);
 
-        nextButton = findViewById(R.id.create_recipe_next_button);
+        //getSupportFragmentManager().registerFragmentLifecycleCallbacks(fragmentLifecycleCallback, true);
+
+        expandedButton = findViewById(R.id.create_recipe_expanded_button);
         viewModel = ViewModelProviders.of(this, Injection.provideViewModelFactory(this)).get(PostRecipeViewModel.class);
+
+        fabHider = ViewHider.of(expandedButton).setDirection(ViewHider.BOTTOM).build();
+        fabExtensionAnimator = new FabExtensionAnimator(expandedButton);
+        //fabExtensionAnimator.setExtended(false);
+        expandedButton.setOnTouchListener((view, motionEvent) -> {
+            Log.e(getClass().getSimpleName(), "Touch detected");
+            switch (motionEvent.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    if (!isFabExtended())
+                        fabExtensionAnimator.setExtended(true);
+                    break;
+                case MotionEvent.ACTION_UP:
+                    if (isFabExtended())
+                        fabExtensionAnimator.setExtended(false);
+            }
+            return false;
+        });
 
         setFragments();
 
@@ -54,13 +100,38 @@ public class PostRecipeActivity extends MyBaseActivity {
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
-        /*nextButton.setOnClickListener(new View.OnClickListener() {
+        /*expandedButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 postRecipe();
             }
         });*/
     }
+
+    // region FAB methods
+
+    public void toggleFab(boolean show) {
+        if (show) this.fabHider.show();
+        else this.fabHider.hide();
+    }
+
+    public void setFabExtended(boolean extended) {
+        fabExtensionAnimator.setExtended(extended);
+    }
+
+    public void updateFab(FabExtensionAnimator.GlyphState glyphState) {
+        if (this.fabExtensionAnimator != null) this.fabExtensionAnimator.updateGlyphs(glyphState);
+    }
+
+    public void setFabClickListener(View.OnClickListener onClickListener) {
+        expandedButton.setOnClickListener(onClickListener);
+    }
+
+    public boolean isFabExtended() {
+        return fabExtensionAnimator.isExtended();
+    }
+
+    // endregion
 
     @Override
     public void setTitle(CharSequence title) {

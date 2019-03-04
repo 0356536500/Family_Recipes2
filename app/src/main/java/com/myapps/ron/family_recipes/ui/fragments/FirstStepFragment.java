@@ -16,13 +16,13 @@ import android.widget.Toast;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.model.CategoryEntity;
 import com.myapps.ron.family_recipes.network.Constants;
-import com.myapps.ron.family_recipes.ui.activities.PostRecipeActivity;
-import com.myapps.ron.family_recipes.utils.MyFragment;
+import com.myapps.ron.family_recipes.ui.baseclasses.PostRecipeBaseFragment;
 import com.myapps.ron.family_recipes.viewmodels.PostRecipeViewModel;
 import com.myapps.ron.searchfilter.adapter.FilterAdapter;
 import com.myapps.ron.searchfilter.listener.FilterListener;
 import com.myapps.ron.searchfilter.widget.Filter;
 import com.myapps.ron.searchfilter.widget.FilterItem;
+import com.tunjid.androidbootstrap.material.animator.FabExtensionAnimator;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -36,10 +36,12 @@ import androidx.appcompat.widget.AppCompatEditText;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProviders;
 
+import static androidx.core.content.ContextCompat.getDrawable;
+
 /**
  * Created by ronginat on 29/10/2018.
  */
-public class FirstStepFragment extends MyFragment implements FilterListener<CategoryEntity> {
+public class FirstStepFragment extends PostRecipeBaseFragment implements FilterListener<CategoryEntity> {
 
     private View view;
     private FrameLayout parent;
@@ -52,16 +54,16 @@ public class FirstStepFragment extends MyFragment implements FilterListener<Cate
     private String name, desc;
 
     private PostRecipeViewModel viewModel;
-    private PostRecipeActivity activity;
+    //private PostRecipeActivity activity;
 
     private int filterBackgroundColor, filterTextColor;
 
-    @Override
+    /*@Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         activity = (PostRecipeActivity)getActivity();
-    }
+    }*/
 
     @Override
     public boolean onBackPressed() {
@@ -113,7 +115,7 @@ public class FirstStepFragment extends MyFragment implements FilterListener<Cate
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         Log.e(getClass().getSimpleName(), "on view created");
-        activity.setTitle(getString(R.string.nav_main_post_recipe) + " 1/3");
+        //activity.setTitle(getString(R.string.nav_main_post_recipe) + " 1/3");
 
         //if (mFilter == null) {
             mFilter = view.findViewById(R.id.first_step_filter);
@@ -123,6 +125,8 @@ public class FirstStepFragment extends MyFragment implements FilterListener<Cate
 
             setListeners();
         //}
+
+        togglePersistentUi();
 
         /*editTextDesc = view.findViewById(R.id.recipe_desc_editText);
         editTextName = view.findViewById(R.id.recipe_name_editText);
@@ -139,6 +143,15 @@ public class FirstStepFragment extends MyFragment implements FilterListener<Cate
             viewModel.loadCategories(activity);
         }*/
     }
+
+    // region PostRecipeBaseFragment Overrides
+
+    @Override
+    protected String getTitle() {
+        return getString(R.string.nav_main_post_recipe) + " 1/3";
+    }
+
+    // endregion
 
     private void initViewModel() {
         viewModel =  ViewModelProviders.of(activity).get(PostRecipeViewModel.class);
@@ -182,7 +195,7 @@ public class FirstStepFragment extends MyFragment implements FilterListener<Cate
     }
 
     private void setListeners() {
-        activity.nextButton.setOnClickListener(view -> {
+        activity.expandedButton.setOnClickListener(view -> {
             Log.e(getClass().getSimpleName(), "next listener");
             if (checkValidation()) {
                 Log.e(getClass().getSimpleName(), "data validated");

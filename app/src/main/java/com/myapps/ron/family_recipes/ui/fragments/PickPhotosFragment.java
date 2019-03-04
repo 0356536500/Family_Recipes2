@@ -27,9 +27,11 @@ import android.widget.Toast;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.dal.storage.StorageWrapper;
 import com.myapps.ron.family_recipes.ui.activities.PostRecipeActivity;
+import com.myapps.ron.family_recipes.ui.baseclasses.PostRecipeBaseFragment;
 import com.myapps.ron.family_recipes.utils.GlideApp;
-import com.myapps.ron.family_recipes.utils.MyFragment;
+import com.myapps.ron.family_recipes.ui.baseclasses.MyFragment;
 import com.myapps.ron.family_recipes.viewmodels.PostRecipeViewModel;
+import com.tunjid.androidbootstrap.material.animator.FabExtensionAnimator;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -38,11 +40,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static android.app.Activity.RESULT_OK;
+import static androidx.core.content.ContextCompat.getDrawable;
 
 /**
  * Created by ronginat on 30/10/2018.
  */
-public class PickPhotosFragment extends MyFragment {
+public class PickPhotosFragment extends PostRecipeBaseFragment {
     private static final int MY_PERMISSIONS_REQUEST_STORAGE = 11;
     private final String TAG = getClass().getSimpleName();
 
@@ -52,7 +55,7 @@ public class PickPhotosFragment extends MyFragment {
     private LinearLayout imagesContainer;
     private AppCompatButton browseButton, takeButton, resetButton;
     private PostRecipeViewModel viewModel;
-    private PostRecipeActivity activity;
+    //private PostRecipeActivity activity;
 
     private LinearLayout.LayoutParams layoutParams;
     private List<String> imagesUris = new ArrayList<>();
@@ -63,17 +66,11 @@ public class PickPhotosFragment extends MyFragment {
 
     private int storageRelatedButtonClicked = 0;
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        activity = (PostRecipeActivity)getActivity();
-    }
 
     @Override
     public boolean onBackPressed() {
         activity.previousFragment();
-        activity.nextButton.setText(R.string.post_recipe_next);
+        activity.expandedButton.setText(R.string.post_recipe_next);
         return true;
     }
 
@@ -90,12 +87,34 @@ public class PickPhotosFragment extends MyFragment {
         takeButton = view.findViewById(R.id.pick_photos_take_photo_button);
         resetButton = view.findViewById(R.id.pick_photos_reset_button);
 
-        activity.setTitle(getString(R.string.nav_main_post_recipe) + " 3/3");
+        //activity.setTitle(getString(R.string.nav_main_post_recipe) + " 3/3");
         layoutParams = new LinearLayout.LayoutParams(750, 750);
         layoutParams.setMargins(10, 10, 10, 10);
         initViewModel();
         setListeners();
     }
+
+    // region PostRecipeBaseFragment Overrides
+
+    @Override
+    protected String getTitle() {
+        return getString(R.string.nav_main_post_recipe) + " 3/3";
+    }
+
+    @Override
+    protected FabExtensionAnimator.GlyphState getFabState() {
+        return FabExtensionAnimator.newState(getText(R.string.post_recipe_finish), getDrawable(requireContext(), R.drawable.ic_arrow));
+    }
+
+    @Override
+    protected View.OnClickListener getFabClickListener() {
+        return view -> {
+            viewModel.setImagesUris(imagesUris);
+            activity.postRecipe();
+        };
+    }
+
+    // endregion
 
     private void initViewModel() {
         viewModel =  ViewModelProviders.of(activity).get(PostRecipeViewModel.class);
@@ -103,43 +122,34 @@ public class PickPhotosFragment extends MyFragment {
 
     private void setListeners() {
         storageRelatedButtonClicked = 0;
-        browseButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                storageRelatedButtonClicked = BROWSE_CODE;
-                checkStoragePermission();
-                //openGallery();
-            }
+        browseButton.setOnClickListener(view -> {
+            storageRelatedButtonClicked = BROWSE_CODE;
+            checkStoragePermission();
+            //openGallery();
         });
 
-        takeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                storageRelatedButtonClicked = CAMERA_CODE;
-                checkStoragePermission();
-                //openCamera();
-            }
+        takeButton.setOnClickListener(view -> {
+            storageRelatedButtonClicked = CAMERA_CODE;
+            checkStoragePermission();
+            //openCamera();
         });
 
-        resetButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                /*if(viewModel.getImagesUris() != null) {
-                    viewModel.setImagesUris(new ArrayList<Uri>());
-                }*/
-                imagesUris.clear();
-                imagesContainer.removeAllViews();
-            }
+        resetButton.setOnClickListener(view -> {
+            /*if(viewModel.getImagesUris() != null) {
+                viewModel.setImagesUris(new ArrayList<Uri>());
+            }*/
+            imagesUris.clear();
+            imagesContainer.removeAllViews();
         });
 
-        activity.nextButton.setText(R.string.post_recipe_finish);
-        activity.nextButton.setOnClickListener(new View.OnClickListener() {
+        /*activity.expandedButton.setText(R.string.post_recipe_finish);
+        activity.expandedButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 viewModel.setImagesUris(imagesUris);
                 activity.postRecipe();
             }
-        });
+        });*/
     }
 
     private void checkStoragePermission() {

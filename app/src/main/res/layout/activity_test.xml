@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:id="@+id/post_recipe_container"
-    tools:context=".ui.activities.PostRecipeActivity">
+    tools:context=".TestActivity">
 
     <include layout="@layout/toolbar"
         android:id="@+id/create_recipe_toolbar"
@@ -21,15 +21,36 @@
         android:layout_marginTop="?attr/actionBarSize">
     </FrameLayout>
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/create_recipe_expanded_button"
-        android:theme="?attr/material_theme"
+    <com.leinardi.android.speeddial.SpeedDialView
+        android:id="@+id/test_speedDial"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|start"
-        android:layout_margin="@dimen/single_margin"
-        app:layout_behavior="@string/bottom_transient_bar_behavior" />
-    <!--style="@style/Widget.MaterialComponents.Button.UnelevatedButton"-->
+        android:layout_gravity="bottom|end"
+        android:layout_margin="2dp"
+        app:layout_behavior="@string/speeddial_scrolling_view_snackbar_behavior"
+        app:sdExpansionMode="top"
+        app:sdMainFabAnimationRotateAngle="90"
+        app:sdMainFabClosedSrc="@drawable/ic_more_fab"
+        app:sdMainFabOpenedSrc="@drawable/ic_close_white"
+        app:sdMainFabClosedBackgroundColor="@color/black"
+        app:sdMainFabOpenedBackgroundColor="@color/md_red_900"
+        app:sdOverlayLayout="@id/overlay" />
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/coordinator_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|start">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/test_expanded_button"
+            android:theme="?attr/material_theme"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/single_margin"
+            app:layout_behavior="@string/bottom_transient_bar_behavior" />
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     <!--<androidx.appcompat.widget.AppCompatButton
         android:id="@+id/create_recipe_next_button"

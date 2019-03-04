@@ -48,9 +48,11 @@ dependencies {
     def lifecycle_version = "2.0.0"
     // ViewModel and LiveData
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
-    annotationProcessor "androidx.lifecycle:lifecycle-compiler:$lifecycle_version" // use kapt for Kotlin
+    annotationProcessor "androidx.lifecycle:lifecycle-compiler:$lifecycle_version"
+    // use kapt for Kotlin
     // optional - ReactiveStreams support for LiveData
-    implementation "androidx.lifecycle:lifecycle-reactivestreams:$lifecycle_version" // use -ktx for Kotlin
+    implementation "androidx.lifecycle:lifecycle-reactivestreams:$lifecycle_version"
+    // use -ktx for Kotlin
 
     // optional - Test helpers for LiveData
     testImplementation "androidx.arch.core:core-testing:$lifecycle_version"
@@ -72,7 +74,8 @@ dependencies {
     // region WorkManager
     def work_version = "1.0.0-rc02"
 
-    implementation "android.arch.work:work-runtime:$work_version" // For Kotlin+Coroutines use work-runtime-ktx
+    implementation "android.arch.work:work-runtime:$work_version"
+    // For Kotlin+Coroutines use work-runtime-ktx
 
     // optional - RxJava2 support
     implementation "android.arch.work:work-rxjava2:$work_version"
@@ -150,11 +153,18 @@ dependencies {
 
     implementation 'org.jetbrains:annotations:16.0.3'
 
-    implementation 'com.leinardi.android:speed-dial:2.0.1'
-
     // region Firebase
     implementation 'com.google.firebase:firebase-core:16.0.7'
     implementation 'com.google.firebase:firebase-messaging:17.4.0'
+
+    // endregion
+
+    // region FloatingActionButton Helpers
+    def bootstrap_version = "5.0.0-beta1"
+    implementation "com.tunjid.android-bootstrap:material:$bootstrap_version"
+    implementation "com.tunjid.android-bootstrap:view:$bootstrap_version"
+
+    implementation 'com.leinardi.android:speed-dial:2.0.1'
 
     // endregion
 
