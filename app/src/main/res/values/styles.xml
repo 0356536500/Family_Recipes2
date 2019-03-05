@@ -3,7 +3,7 @@
     <!-- Base application theme - Default - Light -->
     <style name="AppTheme.Light" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- toolbar colors and themes -->
-        <item name="material_theme">@style/Theme.MaterialComponents.Light.NoActionBar</item>
+        <item name="material_theme">@style/Material.Light</item>
         <item name="toolbar_theme">@style/ActionBarTheme.Light</item>
         <item name="toolbarBackgroundPrimary">@color/white</item>
         <item name="toolbarBackgroundSecondary">@color/logo_background_darker</item>
@@ -48,7 +48,7 @@
     <!-- Base application theme - Dark -->
     <style name="AppTheme.Dark" parent="Theme.AppCompat.NoActionBar">
         <!-- toolbar colors and themes -->
-        <item name="material_theme">@style/Theme.MaterialComponents.Light.DarkActionBar</item>
+        <item name="material_theme">@style/Material.Dark</item>
         <item name="toolbar_theme">@style/ActionBarTheme.Dark</item>
         <item name="toolbarBackgroundPrimary">@color/grey_500</item>
         <item name="toolbarBackgroundSecondary">@color/logo_foreground</item>
@@ -198,6 +198,30 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light">
         <item name="colorPrimary">@color/toolbar_background</item>
+    </style>
+
+    <style name="Material.Light" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <!-- Material Button background -->
+        <item name="colorPrimary">@color/md_light_green_800</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <!-- Edit text line color -->
+        <item name="colorAccent">@color/black</item>
+
+        <item name="android:editTextColor">@color/grey_700</item>
+        <item name="android:textColorPrimary">@color/grey_700</item>
+        <item name="android:textColorSecondary">@color/grey_500</item>
+    </style>
+
+    <style name="Material.Dark" parent="Theme.MaterialComponents.Light.DarkActionBar">
+        <!-- Material Button background -->
+        <item name="colorPrimary">@color/grey_400</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <!-- Edit text line color -->
+        <item name="colorAccent">@color/white</item>
+
+        <item name="android:editTextColor">@color/grey_100</item>
+        <item name="android:textColorPrimary">@color/grey_100</item>
+        <item name="android:textColorSecondary">@color/grey_300</item>
     </style>
 
     <!--<style name="CustomDialogAnimation">

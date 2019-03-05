@@ -1,4 +1,3 @@
-/*
 package com.myapps.ron.family_recipes;
 
 import android.animation.AnimatorSet;
@@ -28,7 +27,7 @@ public class FabExtensionAnimator {
     private static final float TWITCH_END = 20.0f;
     private static final float TWITCH_START = 0.0f;
     private static final int TWITCH_DURATION = 200;
-    private static final int EXTENSION_DURATION = 150;
+    public static final int EXTENSION_DURATION = 150;
     private static final String ROTATION_Y_PROPERTY = "rotationY";
 
     private final int collapsedFabSize;
@@ -71,6 +70,10 @@ public class FabExtensionAnimator {
     public boolean isExtended() {
         ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) button.getLayoutParams();//ViewUtil.getLayoutParams(button);
         return !(params.height == params.width && params.width == getCollapsedFabSize());
+    }
+
+    public boolean isAnimating() {
+        return isAnimating;
     }
 
     private void animateChange(GlyphState glyphState, boolean isSame) {
@@ -185,4 +188,4 @@ public class FabExtensionAnimator {
             return Objects.hash(icon, text);
         }
     }
-}*/
+}

@@ -22,9 +22,6 @@ import com.myapps.ron.searchfilter.adapter.FilterAdapter;
 import com.myapps.ron.searchfilter.listener.FilterListener;
 import com.myapps.ron.searchfilter.widget.Filter;
 import com.myapps.ron.searchfilter.widget.FilterItem;
-import com.tunjid.androidbootstrap.material.animator.FabExtensionAnimator;
-
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -36,12 +33,11 @@ import androidx.appcompat.widget.AppCompatEditText;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProviders;
 
-import static androidx.core.content.ContextCompat.getDrawable;
-
 /**
  * Created by ronginat on 29/10/2018.
  */
-public class FirstStepFragment extends PostRecipeBaseFragment implements FilterListener<CategoryEntity> {
+public class PostRecipeFirstFragment extends PostRecipeBaseFragment implements FilterListener<CategoryEntity> {
+    private final String TAG = getClass().getSimpleName();
 
     private View view;
     private FrameLayout parent;
@@ -84,54 +80,41 @@ public class FirstStepFragment extends PostRecipeBaseFragment implements FilterL
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         Log.e(getClass().getSimpleName(), "on attach");
-        /*if (parent != null){
-            parent.addView(mFilter);
-            parent.addView(floater);
-        }*/
     }
 
     @Override
     public void onDetach(){
         super.onDetach();
         Log.e(getClass().getSimpleName(), "on detach");
-        /*mFilter = view.findViewById(R.id.first_step_filter);
-        floater = parent.findViewById(R.id.create_recipe_first_step_layout);*/
-        parent.removeAllViews();
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        if (parent == null) {
+        if (savedInstanceState == null) {
             view = inflater.inflate(R.layout.content_post_first_step, container,false);
             parent = (FrameLayout) view;
-
-            initViewModel();
         }
         return view;
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+        //super.onViewCreated(view, savedInstanceState);
         Log.e(getClass().getSimpleName(), "on view created");
         //activity.setTitle(getString(R.string.nav_main_post_recipe) + " 1/3");
 
-        //if (mFilter == null) {
-            mFilter = view.findViewById(R.id.first_step_filter);
+        mFilter = view.findViewById(R.id.first_step_filter);
 
-            editTextName = view.findViewById(R.id.recipe_name_editText);
-            editTextDesc = view.findViewById(R.id.recipe_desc_editText);
+        editTextName = view.findViewById(R.id.recipe_name_editText);
+        editTextDesc = view.findViewById(R.id.recipe_desc_editText);
 
-            setListeners();
-        //}
+        initViewModel();
+        setListeners();
 
         togglePersistentUi();
 
-        /*editTextDesc = view.findViewById(R.id.recipe_desc_editText);
-        editTextName = view.findViewById(R.id.recipe_name_editText);
-
-        mColors = getResources().getIntArray(R.array.colors);
+        /*mColors = getResources().getIntArray(R.array.colors);
 
         initViewModel();
         setListeners();
@@ -151,11 +134,26 @@ public class FirstStepFragment extends PostRecipeBaseFragment implements FilterL
         return getString(R.string.nav_main_post_recipe) + " 1/3";
     }
 
+    @Override
+    protected View.OnClickListener getFabClickListener() {
+        return (view -> {
+            Log.e(getClass().getSimpleName(), "next listener");
+            if (checkValidation()) {
+                Log.e(getClass().getSimpleName(), "data validated");
+                viewModel.recipe.setName(name);
+                viewModel.recipe.setDescription(desc);
+                viewModel.recipe.setCategories(chosenTags);
+                activity.nextFragment();
+            }
+        });
+    }
+
     // endregion
 
     private void initViewModel() {
         viewModel =  ViewModelProviders.of(activity).get(PostRecipeViewModel.class);
         viewModel.getCategories().observe(this, categories -> {
+            Log.e(TAG, "categories observer, " + Boolean.toString(categories != null));
             if(categories != null) {
                 allTags = new ArrayList<>(categories);
                 loadFiltersColor();
@@ -173,7 +171,7 @@ public class FirstStepFragment extends PostRecipeBaseFragment implements FilterL
 
     private void initCategories() {
         Log.e(getClass().getSimpleName(), "init categories");
-        mFilter.setAdapter(new FirstStepFragment.Adapter(allTags));
+        mFilter.setAdapter(new PostRecipeFirstFragment.Adapter(allTags));
         mFilter.setListener(this);
 
         //set the collapsed text color according to current theme
@@ -195,7 +193,7 @@ public class FirstStepFragment extends PostRecipeBaseFragment implements FilterL
     }
 
     private void setListeners() {
-        activity.expandedButton.setOnClickListener(view -> {
+        /*activity.expandedButton.setOnClickListener(view -> {
             Log.e(getClass().getSimpleName(), "next listener");
             if (checkValidation()) {
                 Log.e(getClass().getSimpleName(), "data validated");
@@ -204,7 +202,7 @@ public class FirstStepFragment extends PostRecipeBaseFragment implements FilterL
                 viewModel.recipe.setCategories(chosenTags);
                 activity.nextFragment();
             }
-        });
+        });*/
 
         editTextName.addTextChangedListener(new TextWatcher() {
             @Override
@@ -267,22 +265,21 @@ public class FirstStepFragment extends PostRecipeBaseFragment implements FilterL
         return valid;
     }
 
-    private List<String> convertCategoriesToString(ArrayList<CategoryEntity> arrayList) {
+    private List<String> convertCategoriesToSortedStringList(@NonNull ArrayList<CategoryEntity> arrayList) {
         List<String> results = null;
-        if (arrayList != null) {
+        if (!arrayList.isEmpty()) {
             results = new ArrayList<>();
             for (CategoryEntity cat : arrayList) {
                 results.add(cat.getText());
             }
+            Collections.sort(results);
         }
         return results;
     }
 
     @Override
     public void onFiltersSelected(@NonNull ArrayList<CategoryEntity> filters) {
-        chosenTags = convertCategoriesToString(filters);
-        if (chosenTags != null)
-            Collections.sort(chosenTags);
+        chosenTags = convertCategoriesToSortedStringList(filters);
     }
 
     @Override
@@ -310,7 +307,7 @@ public class FirstStepFragment extends PostRecipeBaseFragment implements FilterL
             super(items);
         }
 
-        @NotNull
+        @NonNull
         @Override
         public FilterItem createView(CategoryEntity item, CategoryEntity parent) {
             FilterItem filterItem = new FilterItem(activity);

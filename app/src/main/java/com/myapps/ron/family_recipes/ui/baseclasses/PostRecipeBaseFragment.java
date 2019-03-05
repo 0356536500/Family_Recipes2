@@ -5,9 +5,9 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 
+import com.myapps.ron.family_recipes.FabExtensionAnimator;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.ui.activities.PostRecipeActivity;
-import com.tunjid.androidbootstrap.material.animator.FabExtensionAnimator;
 
 import androidx.annotation.Nullable;
 
@@ -54,7 +54,7 @@ public abstract class PostRecipeBaseFragment extends MyFragment {
     }
 
     protected FabExtensionAnimator.GlyphState getFabState() {
-        return FabExtensionAnimator.newState(getText(R.string.post_recipe_next), getDrawable(requireContext(), R.drawable.ic_done_fab));
+        return FabExtensionAnimator.newState(R.string.post_recipe_next, R.drawable.ic_done_fab);
     }
 
     protected View.OnClickListener getFabClickListener() { return view -> {

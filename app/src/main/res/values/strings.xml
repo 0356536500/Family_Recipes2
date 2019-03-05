@@ -103,6 +103,8 @@
     <string name="post_recipe_advanced_step_fab_preview">Preview</string>
     <string name="post_recipe_advanced_step_fab_template">Basic Template</string>
     <string name="post_recipe_advanced_step_fab_reset">Reset</string>
+
+    <string name="bottom_transient_bar_behavior" translatable="false">com.myapps.ron.family_recipes.BottomTransientBarBehavior</string>
     <!--#endregion Fab Menu -->
 
     <string name="post_recipe_advanced_step_reset_message">What you wrote will be deleted. Continue?</string>

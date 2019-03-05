@@ -1,4 +1,4 @@
-/*
+
 package com.myapps.ron.family_recipes;
 
 import android.content.Context;
@@ -15,14 +15,14 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.view.ViewCompat;
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
 
-*/
+
 /**
  * Animates a {@link View} when a {@link Snackbar} appears.
  * <p>
  * Mostly identical to {@link com.google.android.material.floatingactionbutton.FloatingActionButton.Behavior}
  * <p>
 
- *//*
+ */
 
 @SuppressWarnings("unused") // Constructed via xml
 public class TransientBarBehavior extends CoordinatorLayout.Behavior<View> {
@@ -70,4 +70,3 @@ public class TransientBarBehavior extends CoordinatorLayout.Behavior<View> {
         return minOffset;
     }
 }
-*/

@@ -17,11 +17,9 @@ import com.myapps.ron.searchfilter.adapter.FilterAdapter
 import com.myapps.ron.searchfilter.listener.CollapseListener
 import com.myapps.ron.searchfilter.listener.FilterItemListener
 import com.myapps.ron.searchfilter.listener.FilterListener
-import com.myapps.ron.searchfilter.model.Coord
 import com.myapps.ron.searchfilter.model.FilterModel
 import kotlinx.android.synthetic.main.collapsed_container.view.*
 import kotlinx.android.synthetic.main.filter.view.*
-import java.io.Serializable
 import java.util.*
 
 
@@ -74,15 +72,14 @@ class Filter<T : FilterModel> : FrameLayout, FilterItemListener, CollapseListene
     private var isCollapsed: Boolean? = null
 
     private val STATE_SUPER = "state_super"
-    private val STATE_SELECTED = "state_selected"
-    private val STATE_REMOVED = "state_removed"
+    private val STATE_SELECTED_ITEMS = "state_selected_items"
     private val STATE_COLLAPSED = "state_collapsed"
 
     private var mNothingSelectedItem: FilterItem? = null
     //private val mSelectedFilters: LinkedHashMap<FilterItem, Coord> = LinkedHashMap()
-    private val mRemovedFilters: LinkedHashMap<FilterItem, Coord> = LinkedHashMap()
-    private val mItems: LinkedHashMap<FilterItem, T> = LinkedHashMap()
-    private val mainFilters: ArrayList<FilterItem> = ArrayList()
+    //private val mRemovedFilters: LinkedHashMap<FilterItem, Coord> = LinkedHashMap()
+    private var mItems: LinkedHashMap<FilterItem, T> = LinkedHashMap()
+    private var mainFilters: ArrayList<FilterItem> = ArrayList()
     private var mSelectedFilters: ArrayList<FilterItem> = ArrayList()
     private var mSelectedItems: ArrayList<T> = ArrayList()
     //private var mRemovedItems: ArrayList<T> = ArrayList()
@@ -190,7 +187,7 @@ class Filter<T : FilterModel> : FrameLayout, FilterItemListener, CollapseListene
     private fun collapse(duration: Long) {
         if (mIsBusy) return
         mIsBusy = true
-        mRemovedFilters.clear()
+        //mRemovedFilters.clear()
 
         isCollapsed = true
 
@@ -376,14 +373,8 @@ class Filter<T : FilterModel> : FrameLayout, FilterItemListener, CollapseListene
                 collapsed = false
             putBoolean(STATE_COLLAPSED, collapsed)
             //putBoolean(STATE_COLLAPSED, isCollapsed!!)
-            val selected = mSelectedItems
-            //val removed = mRemovedItems
-            if (selected is Serializable) {
-                putSerializable(STATE_SELECTED, selected)
-            }
-            /*if (removed is Serializable) {
-                putSerializable(STATE_REMOVED, removed)
-            }*/
+            val selectedItems = mSelectedItems
+            putSerializable(STATE_SELECTED_ITEMS, selectedItems)
         }
     }
 
@@ -400,36 +391,34 @@ class Filter<T : FilterModel> : FrameLayout, FilterItemListener, CollapseListene
      * @see #dispatchRestoreInstanceState(android.util.SparseArray)
      */
     override fun onRestoreInstanceState(state: Parcelable?) {
-        if (state is Bundle) {
-            super.onRestoreInstanceState(state.getParcelable(STATE_SUPER))
-            val selected = state.getSerializable(STATE_SELECTED) as? List<T>
-            val removed = state.getSerializable(STATE_REMOVED) as? List<T>
-            isCollapsed = state.getBoolean(STATE_COLLAPSED)
-            if (selected is ArrayList<T> && removed is ArrayList<T>) {
-                mSelectedItems = selected
-                //mRemovedItems = removed
-                expandedFilter.post {
-                    restore(expandedFilter.filters)
+        if (state != null) {
+            if (state is Bundle) {
+                super.onRestoreInstanceState(state.getParcelable(STATE_SUPER))
+                val selectedItems = state.getSerializable(STATE_SELECTED_ITEMS) as? ArrayList<T>
+                isCollapsed = state.getBoolean(STATE_COLLAPSED)
+                if (selectedItems is ArrayList<T>) {
+                    mSelectedItems = selectedItems
+                    //mSelectedFilters = selectedFilters
+                    expandedFilter.post {
+                        visibility = View.VISIBLE
+                        restore(mItems)
+                    }
                 }
             }
         }
     }
 
-    private fun restore(filters: LinkedHashMap<FilterItem, Coord>) {
-        //mSelectedFilters.clear()
+    private fun restore(filters: LinkedHashMap<FilterItem, T>) {
+        mSelectedFilters.clear()
         expandedFilter.post {
             filters.keys.forEach { filterItem ->
-                filters[filterItem]?.let { coord ->
+                filters[filterItem]?.let {
                     val item = { item: T -> filterItem.text == item.getText() }
 
                     if (mSelectedItems.any(item)) {
                         mSelectedFilters.add(filterItem)
-                        //mSelectedFilters.put(filterItem, coord)
                         filterItem.select(false)
-                    } /*else if (mRemovedItems.any(item)) {
-                        mRemovedFilters.put(filterItem, coord)
-                        filterItem.deselect(false)
-                    }*/
+                    }
                 }
             }
 

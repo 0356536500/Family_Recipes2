@@ -1,7 +1,9 @@
 package com.myapps.ron.family_recipes.ui.activities;
 
 import android.annotation.SuppressLint;
+import android.graphics.Rect;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -9,18 +11,18 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.google.android.material.button.MaterialButton;
+import com.myapps.ron.family_recipes.FabExtensionAnimator;
 import com.myapps.ron.family_recipes.R;
+import com.myapps.ron.family_recipes.ViewHider;
 import com.myapps.ron.family_recipes.background.services.PostRecipeToServerService;
 import com.myapps.ron.family_recipes.dal.Injection;
 import com.myapps.ron.family_recipes.ui.baseclasses.MyBaseActivity;
 import com.myapps.ron.family_recipes.ui.baseclasses.MyFragment;
-import com.myapps.ron.family_recipes.ui.fragments.AdvancedStepFragment;
-import com.myapps.ron.family_recipes.ui.fragments.FirstStepFragment;
-import com.myapps.ron.family_recipes.ui.fragments.PickPhotosFragment;
+import com.myapps.ron.family_recipes.ui.fragments.PostRecipeGenerateContentFragment;
+import com.myapps.ron.family_recipes.ui.fragments.PostRecipeFirstFragment;
+import com.myapps.ron.family_recipes.ui.fragments.PostRecipePickPhotosFragment;
 import com.myapps.ron.family_recipes.ui.fragments.PreviewDialogFragment;
 import com.myapps.ron.family_recipes.viewmodels.PostRecipeViewModel;
-import com.tunjid.androidbootstrap.material.animator.FabExtensionAnimator;
-import com.tunjid.androidbootstrap.view.animator.ViewHider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,35 +45,17 @@ public class PostRecipeActivity extends MyBaseActivity {
 
     public MaterialButton expandedButton;
     private FabExtensionAnimator fabExtensionAnimator;
+    private View.OnClickListener expandedButtonListener;
     private ViewHider fabHider;
     private int currentIndex = 0;
     private boolean inPreview = false;
 
-    /*final FragmentManager.FragmentLifecycleCallbacks fragmentLifecycleCallback = new FragmentManager.FragmentLifecycleCallbacks() {
-
-        @Override
-        public void onFragmentPreAttached(@NonNull FragmentManager fm, @NonNull Fragment f, @NonNull Context context) {
-            super.onFragmentPreAttached(fm, f, context);
-            Log.e(getClass().getSimpleName(), "onFragmentPreAttached, " + f.getClass().getSimpleName());
-        }
-
-        @Override
-        public void onFragmentViewCreated(@NonNull FragmentManager fm, @NonNull Fragment f, @NonNull View v, @Nullable Bundle savedInstanceState) {
-            Log.e(getClass().getSimpleName(), "onFragmentViewCreated, " + f.getClass().getSimpleName());
-            super.onFragmentViewCreated(fm, f, v, savedInstanceState);
-            PostRecipeBaseFragment fragment = (PostRecipeBaseFragment) f;
-
-            fragment.togglePersistentUi();
-        }
-    };*/
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onMyCreate(@Nullable Bundle savedInstanceState) {
         //super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post_recipe);
-
-        //getSupportFragmentManager().registerFragmentLifecycleCallbacks(fragmentLifecycleCallback, true);
 
         expandedButton = findViewById(R.id.create_recipe_expanded_button);
         viewModel = ViewModelProviders.of(this, Injection.provideViewModelFactory(this)).get(PostRecipeViewModel.class);
@@ -80,15 +64,27 @@ public class PostRecipeActivity extends MyBaseActivity {
         fabExtensionAnimator = new FabExtensionAnimator(expandedButton);
         //fabExtensionAnimator.setExtended(false);
         expandedButton.setOnTouchListener((view, motionEvent) -> {
-            Log.e(getClass().getSimpleName(), "Touch detected");
             switch (motionEvent.getAction()) {
                 case MotionEvent.ACTION_DOWN:
-                    if (!isFabExtended())
-                        fabExtensionAnimator.setExtended(true);
+                    fabExtensionAnimator.setExtended(true);
                     break;
                 case MotionEvent.ACTION_UP:
-                    if (isFabExtended())
+                    Rect rect = new Rect(view.getLeft(), view.getTop(), view.getRight(), view.getBottom());
+                    if (rect.contains(view.getLeft() + (int) motionEvent.getX(),view.getTop () + (int) motionEvent.getY())) {
+                        // user lift his fingers inside the button borders
+                        long wait = fabExtensionAnimator.isAnimating() ? 3 * FabExtensionAnimator.EXTENSION_DURATION : 2 * FabExtensionAnimator.EXTENSION_DURATION;
+                        //new Handler().postDelayed(() -> Toast.makeText(getApplicationContext(), "toast", Toast.LENGTH_SHORT).show(), wait);
+                        new Handler().postDelayed(() -> {
+                            if (expandedButtonListener != null)
+                                expandedButtonListener.onClick(view);
+                        }, wait);
+                    }
+                    //
+                    if (fabExtensionAnimator.isAnimating())
+                        new Handler().postDelayed(() -> fabExtensionAnimator.setExtended(false), 2 * FabExtensionAnimator.EXTENSION_DURATION);
+                    else
                         fabExtensionAnimator.setExtended(false);
+                    break;
             }
             return false;
         });
@@ -100,12 +96,6 @@ public class PostRecipeActivity extends MyBaseActivity {
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
-        /*expandedButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                postRecipe();
-            }
-        });*/
     }
 
     // region FAB methods
@@ -124,7 +114,8 @@ public class PostRecipeActivity extends MyBaseActivity {
     }
 
     public void setFabClickListener(View.OnClickListener onClickListener) {
-        expandedButton.setOnClickListener(onClickListener);
+        expandedButtonListener = onClickListener;
+        //expandedButton.setOnClickListener(onClickListener);
     }
 
     public boolean isFabExtended() {
@@ -144,34 +135,31 @@ public class PostRecipeActivity extends MyBaseActivity {
     private void setFragments() {
         fragments = new ArrayList<>();
 
-        fragments.add(new AdvancedStepFragment());
-        fragments.add(new FirstStepFragment());
+        fragments.add(new PostRecipeFirstFragment());
+        fragments.add(new PostRecipeGenerateContentFragment());
+        fragments.add(new PostRecipePickPhotosFragment());
 
-        fragments.add(new PickPhotosFragment());
+        getSupportFragmentManager()
+                .beginTransaction()
+                .add(R.id.create_fragment_container, fragments.get(0))
+                .addToBackStack(null)
+                .commit();
 
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.add(R.id.create_fragment_container, fragments.get(0));
-        transaction.addToBackStack(null);
-        transaction.commit();
+        //new Handler().postDelayed(this::nextFragment, 700);
     }
 
     public void nextFragment() {
         if (currentIndex < fragments.size() - 1) {
             getSupportFragmentManager()
-            .beginTransaction()
-            .setCustomAnimations(
-                    R.anim.fragment_slide_left_enter,
-                    R.anim.fragment_slide_left_exit,
-                    R.anim.fragment_slide_right_enter,
-                    R.anim.fragment_slide_right_exit)
-            .replace(R.id.create_fragment_container, fragments.get(++currentIndex))
-            .addToBackStack(null)
-            .commit();
-            //Log.e(getClass().getSimpleName(), "current index = " + currentIndex);
-            /*FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            transaction.replace(R.id.create_fragment_container, fragments.get(++currentIndex));
-            transaction.addToBackStack(null);
-            transaction.commit();*/
+                .beginTransaction()
+                .setCustomAnimations(
+                        R.anim.fragment_slide_left_enter,
+                        R.anim.fragment_slide_left_exit,
+                        R.anim.fragment_slide_right_enter,
+                        R.anim.fragment_slide_right_exit)
+                .replace(R.id.create_fragment_container, fragments.get(++currentIndex))
+                .addToBackStack(null)
+                .commit();
         }
     }
 

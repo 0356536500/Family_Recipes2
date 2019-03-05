@@ -40,6 +40,7 @@ import com.myapps.ron.searchfilter.widget.FilterItem;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -456,10 +457,14 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
         filterTextColor = textValue.data;
     }
 
-    private List<String> convertCategoriesToString(ArrayList<CategoryEntity> arrayList) {
-        List<String> results = new ArrayList<>();
-        for (CategoryEntity cat: arrayList) {
-            results.add(cat.getText());
+    private List<String> convertCategoriesToSortedStringList(@NonNull ArrayList<CategoryEntity> arrayList) {
+        List<String> results = null;
+        if (!arrayList.isEmpty()) {
+            results = new ArrayList<>();
+            for (CategoryEntity cat : arrayList) {
+                results.add(cat.getText());
+            }
+            Collections.sort(results);
         }
         return results;
     }
@@ -474,15 +479,17 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
     @Override
     public void onFilterSelected(CategoryEntity item) {
         if (item.getText().equals(tags.get(0).getText())) {
-            mFilter.deselectAll();
-            mFilter.collapse();
+            new Handler().postDelayed(() -> {
+                mFilter.deselectAll();
+                mFilter.collapse();
+            }, 200);
         }
     }
 
     @Override
-    public void onFiltersSelected(ArrayList<CategoryEntity> arrayList) {
+    public void onFiltersSelected(@NonNull ArrayList<CategoryEntity> arrayList) {
         //List<Recipe> oldList = new ArrayList<>(mAdapter.getCurrentList());
-        final List<String> newTags = convertCategoriesToString(arrayList);
+        final List<String> newTags = convertCategoriesToSortedStringList(arrayList);
         new Handler().postDelayed(() -> {
             queryModel.setFilters(newTags);
             viewModel.applyQuery(queryModel);

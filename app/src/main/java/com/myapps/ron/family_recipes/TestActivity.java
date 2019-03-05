@@ -7,8 +7,6 @@ import android.os.Handler;
 import com.google.android.material.button.MaterialButton;
 import com.leinardi.android.speeddial.SpeedDialActionItem;
 import com.leinardi.android.speeddial.SpeedDialView;
-import com.tunjid.androidbootstrap.material.animator.FabExtensionAnimator;
-import com.tunjid.androidbootstrap.view.animator.ViewHider;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.res.ResourcesCompat;
@@ -29,7 +27,7 @@ public class TestActivity extends AppCompatActivity {
 
         fabHider = ViewHider.of(expandedButton).setDirection(ViewHider.BOTTOM).build();
         fabExtensionAnimator = new FabExtensionAnimator(expandedButton);
-        fabExtensionAnimator.updateGlyphs(FabExtensionAnimator.newState("test", getDrawable(R.drawable.ic_action_post_black)));
+        fabExtensionAnimator.updateGlyphs(FabExtensionAnimator.newState(R.string.post_recipe_next, R.drawable.ic_action_post_black));
         fabExtensionAnimator.setExtended(false);
 
         new Handler().postDelayed(() -> fabExtensionAnimator.setExtended(true), 1500);

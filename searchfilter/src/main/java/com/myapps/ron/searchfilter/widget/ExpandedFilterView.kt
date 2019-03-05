@@ -1,14 +1,12 @@
 package com.myapps.ron.searchfilter.widget
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
 import android.view.MotionEvent
-import android.view.View
 import com.google.android.flexbox.*
 import com.myapps.ron.searchfilter.R
 import com.myapps.ron.searchfilter.listener.CollapseListener
-import com.myapps.ron.searchfilter.model.Coord
-import java.util.*
 
 
 class ExpandedFilterView : FlexboxLayout {
@@ -21,7 +19,7 @@ class ExpandedFilterView : FlexboxLayout {
 
     internal var listener: CollapseListener? = null
     internal var margin: Int = dpToPx(getDimen(R.dimen.margin))
-    internal val filters: LinkedHashMap<FilterItem, Coord> = LinkedHashMap()
+    //internal val filters: LinkedHashMap<FilterItem, Coord> = LinkedHashMap()
 
     constructor(context: Context) : this(context, null)
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
@@ -40,6 +38,7 @@ class ExpandedFilterView : FlexboxLayout {
         justifyContent = JustifyContent.FLEX_START
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent): Boolean {
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {

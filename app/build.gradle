@@ -160,9 +160,9 @@ dependencies {
     // endregion
 
     // region FloatingActionButton Helpers
-    def bootstrap_version = "5.0.0-beta1"
+    /*def bootstrap_version = "5.0.0-beta1"
     implementation "com.tunjid.android-bootstrap:material:$bootstrap_version"
-    implementation "com.tunjid.android-bootstrap:view:$bootstrap_version"
+    implementation "com.tunjid.android-bootstrap:view:$bootstrap_version"*/
 
     implementation 'com.leinardi.android:speed-dial:2.0.1'
 

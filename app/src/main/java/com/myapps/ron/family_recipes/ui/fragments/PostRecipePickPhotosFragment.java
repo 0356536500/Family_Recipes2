@@ -1,7 +1,6 @@
 package com.myapps.ron.family_recipes.ui.fragments;
 
 import android.Manifest;
-import androidx.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -11,11 +10,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.provider.MediaStore;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
-import androidx.loader.content.CursorLoader;
-import androidx.appcompat.widget.AppCompatButton;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,14 +18,12 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.myapps.ron.family_recipes.FabExtensionAnimator;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.dal.storage.StorageWrapper;
-import com.myapps.ron.family_recipes.ui.activities.PostRecipeActivity;
 import com.myapps.ron.family_recipes.ui.baseclasses.PostRecipeBaseFragment;
 import com.myapps.ron.family_recipes.utils.GlideApp;
-import com.myapps.ron.family_recipes.ui.baseclasses.MyFragment;
 import com.myapps.ron.family_recipes.viewmodels.PostRecipeViewModel;
-import com.tunjid.androidbootstrap.material.animator.FabExtensionAnimator;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -39,13 +31,20 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.AppCompatButton;
+import androidx.core.content.ContextCompat;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.loader.content.CursorLoader;
+
 import static android.app.Activity.RESULT_OK;
 import static androidx.core.content.ContextCompat.getDrawable;
 
 /**
  * Created by ronginat on 30/10/2018.
  */
-public class PickPhotosFragment extends PostRecipeBaseFragment {
+public class PostRecipePickPhotosFragment extends PostRecipeBaseFragment {
     private static final int MY_PERMISSIONS_REQUEST_STORAGE = 11;
     private final String TAG = getClass().getSimpleName();
 
@@ -103,7 +102,7 @@ public class PickPhotosFragment extends PostRecipeBaseFragment {
 
     @Override
     protected FabExtensionAnimator.GlyphState getFabState() {
-        return FabExtensionAnimator.newState(getText(R.string.post_recipe_finish), getDrawable(requireContext(), R.drawable.ic_arrow));
+        return FabExtensionAnimator.newState(R.string.post_recipe_finish, R.drawable.ic_upload_fab);
     }
 
     @Override

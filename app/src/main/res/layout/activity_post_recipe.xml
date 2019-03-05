@@ -8,11 +8,7 @@
     android:id="@+id/post_recipe_container"
     tools:context=".ui.activities.PostRecipeActivity">
 
-    <include layout="@layout/toolbar"
-        android:id="@+id/create_recipe_toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="top"/>
+    <include layout="@layout/toolbar" />
 
     <FrameLayout
         android:id="@+id/create_fragment_container"

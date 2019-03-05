@@ -17,11 +17,9 @@ import com.leinardi.android.speeddial.SpeedDialView;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.adapters.HtmlElementsAdapter;
 import com.myapps.ron.family_recipes.recycler.MyRecyclerScroll;
-import com.myapps.ron.family_recipes.ui.activities.PostRecipeActivity;
 import com.myapps.ron.family_recipes.ui.baseclasses.PostRecipeBaseFragment;
 import com.myapps.ron.family_recipes.utils.Constants;
 import com.myapps.ron.family_recipes.viewmodels.PostRecipeViewModel;
-import com.tunjid.androidbootstrap.material.animator.FabExtensionAnimator;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -32,12 +30,10 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import static androidx.core.content.ContextCompat.getDrawable;
-
 /**
  * Created by ronginat on 29/10/2018.
  */
-public class AdvancedStepFragment extends PostRecipeBaseFragment {
+public class PostRecipeGenerateContentFragment extends PostRecipeBaseFragment {
     private final String TAG = getClass().getSimpleName();
 
     private View view;
@@ -56,24 +52,7 @@ public class AdvancedStepFragment extends PostRecipeBaseFragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        setRetainInstance(true);
-    }
-
-    @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-        Log.e(TAG, "on attach");
-        /*if (parent != null){
-            parent.addView(recyclerView);
-            parent.addView(preview);
-        }*/
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        Log.e(TAG, "on detach");
-        //parent.removeAllViews();
+        //setRetainInstance(true);
     }
 
     @Override
@@ -85,7 +64,7 @@ public class AdvancedStepFragment extends PostRecipeBaseFragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        if (parent == null) {
+        if (savedInstanceState == null) {
             //Log.e(TAG, "on create view");
             view = inflater.inflate(R.layout.content_post_advanced_step, container, false);
             parent = (ViewGroup) view;
