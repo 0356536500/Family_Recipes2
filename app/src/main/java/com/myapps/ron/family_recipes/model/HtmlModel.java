@@ -1,11 +1,12 @@
 package com.myapps.ron.family_recipes.model;
 
-import android.content.Context;
 import android.text.Editable;
-import android.text.Html;
 
+import com.myapps.ron.family_recipes.MyApplication;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.utils.HtmlHelper;
+
+import java.io.Serializable;
 
 import static com.myapps.ron.family_recipes.adapters.HtmlElementsAdapter.ORDERED_LIST_POS;
 import static com.myapps.ron.family_recipes.adapters.HtmlElementsAdapter.UNORDERED_LIST_POS;
@@ -13,15 +14,13 @@ import static com.myapps.ron.family_recipes.adapters.HtmlElementsAdapter.UNORDER
 /**
  * Created by ronginat on 01/11/2018.
  */
-public class HtmlModel {
+public class HtmlModel implements Serializable {
 
-    private Context context;
     private int spinnerPos;
     private Editable text;
     private boolean bold, underscore, divider;
 
-    public HtmlModel(Context context) {
-        this.context = context;
+    public HtmlModel() {
         text = null;
         spinnerPos = -1;
         bold = false;
@@ -82,7 +81,7 @@ public class HtmlModel {
         String fromEditText = getText().toString();
 
         if (spinnerPos >= 0) {
-            String htmlElement = context.getResources().getStringArray(R.array.html_elements_types)[spinnerPos];
+            String htmlElement = MyApplication.getContext().getResources().getStringArray(R.array.html_elements_types)[spinnerPos];
 
             helper.openElement(htmlElement); // can be list/header/paragraph
 

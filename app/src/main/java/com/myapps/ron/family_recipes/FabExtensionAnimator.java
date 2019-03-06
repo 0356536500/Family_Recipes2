@@ -8,6 +8,7 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.RippleDrawable;
+import android.os.Handler;
 import android.view.ViewGroup;
 
 import com.google.android.material.button.MaterialButton;
@@ -66,7 +67,11 @@ public class FabExtensionAnimator {
 
     public void setExtended(boolean extended) { setExtended(extended, false); }
 
-    @SuppressWarnings("WeakerAccess")
+    public void setExtended(boolean extended, long delay) {
+        new Handler().postDelayed(() -> setExtended(extended, false), delay);
+    }
+
+    //@SuppressWarnings("WeakerAccess")
     public boolean isExtended() {
         ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) button.getLayoutParams();//ViewUtil.getLayoutParams(button);
         return !(params.height == params.width && params.width == getCollapsedFabSize());

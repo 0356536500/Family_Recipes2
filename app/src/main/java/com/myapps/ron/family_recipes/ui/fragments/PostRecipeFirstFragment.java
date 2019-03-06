@@ -1,6 +1,5 @@
 package com.myapps.ron.family_recipes.ui.fragments;
 
-import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
@@ -10,7 +9,6 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.myapps.ron.family_recipes.R;
@@ -39,9 +37,6 @@ import androidx.lifecycle.ViewModelProviders;
 public class PostRecipeFirstFragment extends PostRecipeBaseFragment implements FilterListener<CategoryEntity> {
     private final String TAG = getClass().getSimpleName();
 
-    private View view;
-    private FrameLayout parent;
-    //private RelativeLayout floater;
     private AppCompatEditText editTextName, editTextDesc;
     private Filter<CategoryEntity> mFilter;
     private List<CategoryEntity> allTags;
@@ -50,16 +45,8 @@ public class PostRecipeFirstFragment extends PostRecipeBaseFragment implements F
     private String name, desc;
 
     private PostRecipeViewModel viewModel;
-    //private PostRecipeActivity activity;
 
     private int filterBackgroundColor, filterTextColor;
-
-    /*@Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        activity = (PostRecipeActivity)getActivity();
-    }*/
 
     @Override
     public boolean onBackPressed() {
@@ -70,37 +57,14 @@ public class PostRecipeFirstFragment extends PostRecipeBaseFragment implements F
         return false;
     }
 
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        setRetainInstance(true);
-    }
-
-    @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-        Log.e(getClass().getSimpleName(), "on attach");
-    }
-
-    @Override
-    public void onDetach(){
-        super.onDetach();
-        Log.e(getClass().getSimpleName(), "on detach");
-    }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        if (savedInstanceState == null) {
-            view = inflater.inflate(R.layout.content_post_first_step, container,false);
-            parent = (FrameLayout) view;
-        }
-        return view;
+        return inflater.inflate(R.layout.content_post_first_step, container,false);
     }
 
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        //super.onViewCreated(view, savedInstanceState);
+    public void onMyViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         Log.e(getClass().getSimpleName(), "on view created");
         //activity.setTitle(getString(R.string.nav_main_post_recipe) + " 1/3");
 
@@ -111,20 +75,6 @@ public class PostRecipeFirstFragment extends PostRecipeBaseFragment implements F
 
         initViewModel();
         setListeners();
-
-        togglePersistentUi();
-
-        /*mColors = getResources().getIntArray(R.array.colors);
-
-        initViewModel();
-        setListeners();
-
-        activity.setTitle(getString(R.string.nav_main_post_recipe) + " 1/3");
-
-        if (mFilter == null) {
-            mFilter = view.findViewById(R.id.first_step_filter);
-            viewModel.loadCategories(activity);
-        }*/
     }
 
     // region PostRecipeBaseFragment Overrides
@@ -135,16 +85,21 @@ public class PostRecipeFirstFragment extends PostRecipeBaseFragment implements F
     }
 
     @Override
+    protected boolean showsFab() {
+        return true;
+    }
+
+    @Override
     protected View.OnClickListener getFabClickListener() {
         return (view -> {
-            Log.e(getClass().getSimpleName(), "next listener");
             if (checkValidation()) {
-                Log.e(getClass().getSimpleName(), "data validated");
+                //Log.e(getClass().getSimpleName(), "data validated");
                 viewModel.recipe.setName(name);
                 viewModel.recipe.setDescription(desc);
                 viewModel.recipe.setCategories(chosenTags);
-                activity.nextFragment();
-            }
+                activity.nextFragmentDelayed();
+            } else
+                setFabExtended(false, 1000);
         });
     }
 
@@ -153,7 +108,7 @@ public class PostRecipeFirstFragment extends PostRecipeBaseFragment implements F
     private void initViewModel() {
         viewModel =  ViewModelProviders.of(activity).get(PostRecipeViewModel.class);
         viewModel.getCategories().observe(this, categories -> {
-            Log.e(TAG, "categories observer, " + Boolean.toString(categories != null));
+            //Log.e(TAG, "categories observer, " + Boolean.toString(categories != null));
             if(categories != null) {
                 allTags = new ArrayList<>(categories);
                 loadFiltersColor();
@@ -170,7 +125,7 @@ public class PostRecipeFirstFragment extends PostRecipeBaseFragment implements F
     }
 
     private void initCategories() {
-        Log.e(getClass().getSimpleName(), "init categories");
+        //Log.e(getClass().getSimpleName(), "init categories");
         mFilter.setAdapter(new PostRecipeFirstFragment.Adapter(allTags));
         mFilter.setListener(this);
 
@@ -193,17 +148,6 @@ public class PostRecipeFirstFragment extends PostRecipeBaseFragment implements F
     }
 
     private void setListeners() {
-        /*activity.expandedButton.setOnClickListener(view -> {
-            Log.e(getClass().getSimpleName(), "next listener");
-            if (checkValidation()) {
-                Log.e(getClass().getSimpleName(), "data validated");
-                viewModel.recipe.setName(name);
-                viewModel.recipe.setDescription(desc);
-                viewModel.recipe.setCategories(chosenTags);
-                activity.nextFragment();
-            }
-        });*/
-
         editTextName.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {

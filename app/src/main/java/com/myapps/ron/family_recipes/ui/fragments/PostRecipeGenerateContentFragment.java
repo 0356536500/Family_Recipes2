@@ -1,6 +1,5 @@
 package com.myapps.ron.family_recipes.ui.fragments;
 
-import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -11,15 +10,17 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.google.android.material.snackbar.Snackbar;
 import com.leinardi.android.speeddial.SpeedDialActionItem;
 import com.leinardi.android.speeddial.SpeedDialView;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.adapters.HtmlElementsAdapter;
+import com.myapps.ron.family_recipes.model.HtmlModel;
 import com.myapps.ron.family_recipes.recycler.MyRecyclerScroll;
 import com.myapps.ron.family_recipes.ui.baseclasses.PostRecipeBaseFragment;
 import com.myapps.ron.family_recipes.utils.Constants;
 import com.myapps.ron.family_recipes.viewmodels.PostRecipeViewModel;
+
+import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -36,9 +37,7 @@ import androidx.recyclerview.widget.RecyclerView;
 public class PostRecipeGenerateContentFragment extends PostRecipeBaseFragment {
     private final String TAG = getClass().getSimpleName();
 
-    private View view;
-    private ViewGroup parent;
-
+    private List<HtmlModel> elements;
     private HtmlElementsAdapter mAdapter;
     private RecyclerView recyclerView;
     private Button preview, sample, reset;
@@ -48,52 +47,41 @@ public class PostRecipeGenerateContentFragment extends PostRecipeBaseFragment {
 
     private SpeedDialView mSpeedDialView;
 
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        //setRetainInstance(true);
-    }
-
     @Override
     public boolean onBackPressed() {
-        activity.previousFragment();
+        if (mSpeedDialView.isOpen())
+            mSpeedDialView.close();
+        else
+            activity.previousFragmentDelayed();
         return true;
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        if (savedInstanceState == null) {
-            //Log.e(TAG, "on create view");
-            view = inflater.inflate(R.layout.content_post_advanced_step, container, false);
-            parent = (ViewGroup) view;
-
-        }
-        return view;
+        return inflater.inflate(R.layout.content_post_advanced_step, container, false);
     }
 
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        //super.onViewCreated(view, savedInstanceState);
+    public void onMyViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        recyclerView = view.findViewById(R.id.advanced_step_recycler);
+        mSpeedDialView = view.findViewById(R.id.advanced_step_speedDial);
+        viewModel =  ViewModelProviders.of(activity).get(PostRecipeViewModel.class);
 
-        if (recyclerView == null) {
-            recyclerView = view.findViewById(R.id.advanced_step_recycler);
-            mSpeedDialView = view.findViewById(R.id.advanced_step_speedDial);
-            viewModel =  ViewModelProviders.of(activity).get(PostRecipeViewModel.class);
-
-            initFloatingMenu(savedInstanceState == null);
-            initRecycler();
-        }
-        togglePersistentUi();
+        initFloatingMenu(savedInstanceState == null);
+        initRecycler();
 
         //viewModel =  ViewModelProviders.of(activity).get(PostRecipeViewModel.class);
-        /*preview = view.findViewById(R.id.advanced_step_preview_button);
-        sample = view.findViewById(R.id.advanced_step_load_sample_button);
-        reset = view.findViewById(R.id.advanced_step_reset_button);*/
 
         //activity.setTitle(getString(R.string.nav_main_post_recipe) + " 2/3");
         //setListeners();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        isDestroyed = true;
+        elements = mAdapter.getElements();
     }
 
     // region PostRecipeBaseFragment Overrides
@@ -103,9 +91,31 @@ public class PostRecipeGenerateContentFragment extends PostRecipeBaseFragment {
         return getString(R.string.nav_main_post_recipe) + " 2/3";
     }
 
+    @Override
+    protected View.OnClickListener getFabClickListener() {
+        return view -> {
+            if(mAdapter.checkValidInput()) {
+                String html = mAdapter.generateHtml(viewModel.recipe.getName(), viewModel.recipe.getDescription());
+                Log.e(TAG, html);
+                viewModel.setRecipeFile(activity, html);
+                activity.nextFragmentDelayed();
+            } else {
+                Toast.makeText(activity, getString(R.string.post_recipe_advanced_step_validation_message, Constants.MIN_NUMBER_OF_HTML_ELEMENTS), Toast.LENGTH_SHORT).show();
+                activity.setFabExtended(false, 1000);
+            }
+        };
+    }
+
     // endregion
 
+    // region Floating Menu
+
     private void initFloatingMenu(boolean addActionItems) {
+        initFloatingMenuUI(addActionItems);
+        initFloatingMenuListener();
+    }
+
+    private void initFloatingMenuUI(boolean addActionItems) {
         if (addActionItems) {
             /*Drawable drawable = AppCompatResources.getDrawable(activity, R.drawable.ic_custom_color);
             FabWithLabelView fabWithLabelView = mSpeedDialView.addActionItem(new SpeedDialActionItem.Builder(R.id
@@ -163,7 +173,7 @@ public class PostRecipeGenerateContentFragment extends PostRecipeBaseFragment {
 
         }
         //Set main action click listener.
-        mSpeedDialView.setOnChangeListener(new SpeedDialView.OnChangeListener() {
+        /*mSpeedDialView.setOnChangeListener(new SpeedDialView.OnChangeListener() {
             @Override
             public boolean onMainActionSelected() {
                 //Toast.makeText(activity,"Main action clicked!", Toast.LENGTH_SHORT).show();
@@ -175,23 +185,30 @@ public class PostRecipeGenerateContentFragment extends PostRecipeBaseFragment {
             public void onToggleChanged(boolean isOpen) {
                 Log.w(TAG, "Speed dial toggle state changed. Open = " + isOpen);
             }
-        });
+        });*/
+    }
 
-        //Set option fabs clicklisteners.
+    private void initFloatingMenuListener() {
+        //Set option fab click listeners.
         mSpeedDialView.setOnActionSelectedListener(actionItem -> {
             switch (actionItem.getId()) {
                 case R.id.fab_add_action:
-                    showToast("No label action clicked!\nClosing with animation");
-                    mSpeedDialView.close(); // To close the Speed Dial with animation
-                    return true; // false will close it without animation
+                    //showToast("No label action clicked!\nClosing with animation");
+                    //mSpeedDialView.close(); // To close the Speed Dial with animation
+                    mAdapter.addElementToScreen();
+                    break;
+                    //return true; // false will close it without animation
                 case R.id.fab_preview_action:
-                    showSnackbar(actionItem.getLabel(activity) + " clicked!");
+                    //showSnackbar(actionItem.getLabel(activity) + " clicked!");
+                    activity.showMyDialog(mAdapter.generateHtml("some name" , "long description"));
                     break;
                 case R.id.fab_template_action:
-                    showToast(actionItem.getLabel(activity) + " clicked!\nClosing without animation.");
+                    //showToast(actionItem.getLabel(activity) + " clicked!\nClosing without animation.");
+                    mAdapter.loadTemplate();
                     return false; // closes without animation (same as mSpeedDialView.close(false); return false;)
                 case R.id.fab_reset_action:
-                    showToast(actionItem.getLabel(activity) + " clicked!");
+                    //showToast(actionItem.getLabel(activity) + " clicked!");
+                    mAdapter.reset();
                     break;
                 /*case R.id.fab_add_action:
                     mSpeedDialView.addActionItem(new SpeedDialActionItem.Builder(R.id.fab_replace_action,
@@ -217,12 +234,12 @@ public class PostRecipeGenerateContentFragment extends PostRecipeBaseFragment {
                 default:
                     break;
             }
+            mSpeedDialView.close();
             return true; // To keep the Speed Dial open
         });
-
     }
 
-    private Toast mToast;
+    /*private Toast mToast;
     private Snackbar mSnackbar;
 
     private void showToast(String text) {
@@ -234,13 +251,15 @@ public class PostRecipeGenerateContentFragment extends PostRecipeBaseFragment {
     }
 
     private void showSnackbar(String text) {
-        mSnackbar = Snackbar.make(view, text, Snackbar.LENGTH_SHORT);
+        mSnackbar = Snackbar.make(getView(), text, Snackbar.LENGTH_SHORT);
         mSnackbar.setAction("Close", view -> mSnackbar.dismiss());
         mSnackbar.show();
-    }
+    }*/
+
+    // endregion Floating Menu
 
     private void initRecycler() {
-        mAdapter = new HtmlElementsAdapter(activity);
+        mAdapter = new HtmlElementsAdapter(activity, elements);
 
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(activity.getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
@@ -272,7 +291,7 @@ public class PostRecipeGenerateContentFragment extends PostRecipeBaseFragment {
                             /*if (view.getId() == R.id.advanced_step_reset_button)
                                 mAdapter.reset();
                             else if (view.getId() == R.id.advanced_step_load_sample_button) {
-                                mAdapter.loadSample();
+                                mAdapter.loadTemplate();
                             }*/
                             break;
 
@@ -289,22 +308,22 @@ public class PostRecipeGenerateContentFragment extends PostRecipeBaseFragment {
                         .setNegativeButton(R.string.no, dialogClickListener)
                         .show();
             } /*else if (view.getId() == R.id.advanced_step_load_sample_button){
-                mAdapter.loadSample();
+                mAdapter.loadTemplate();
             }*/
         };
 
         sample.setOnClickListener(clickListener);
         reset.setOnClickListener(clickListener);
 
-        activity.expandedButton.setOnClickListener(view -> {
+        /*activity.expandedButton.setOnClickListener(view -> {
             if(mAdapter.checkValidInput()) {
                 String html = mAdapter.generateHtml(viewModel.recipe.getName(), viewModel.recipe.getDescription());
                 Log.e(TAG, html);
                 viewModel.setRecipeFile(activity, html);
-                activity.nextFragment();
+                activity.nextFragmentDelayed();
             } else {
                 Toast.makeText(activity, getString(R.string.post_recipe_advanced_step_validation_message, Constants.MIN_NUMBER_OF_HTML_ELEMENTS), Toast.LENGTH_SHORT).show();
             }
-        });
+        });*/
     }
 }

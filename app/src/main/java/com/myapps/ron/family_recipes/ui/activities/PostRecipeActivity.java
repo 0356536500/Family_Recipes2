@@ -64,26 +64,26 @@ public class PostRecipeActivity extends MyBaseActivity {
         fabExtensionAnimator = new FabExtensionAnimator(expandedButton);
         //fabExtensionAnimator.setExtended(false);
         expandedButton.setOnTouchListener((view, motionEvent) -> {
+            if (fabExtensionAnimator == null)
+                return false;
             switch (motionEvent.getAction()) {
                 case MotionEvent.ACTION_DOWN:
-                    fabExtensionAnimator.setExtended(true);
+                    setFabExtended(true);
                     break;
                 case MotionEvent.ACTION_UP:
                     Rect rect = new Rect(view.getLeft(), view.getTop(), view.getRight(), view.getBottom());
                     if (rect.contains(view.getLeft() + (int) motionEvent.getX(),view.getTop () + (int) motionEvent.getY())) {
                         // user lift his fingers inside the button borders
-                        long wait = fabExtensionAnimator.isAnimating() ? 3 * FabExtensionAnimator.EXTENSION_DURATION : 2 * FabExtensionAnimator.EXTENSION_DURATION;
-                        //new Handler().postDelayed(() -> Toast.makeText(getApplicationContext(), "toast", Toast.LENGTH_SHORT).show(), wait);
-                        new Handler().postDelayed(() -> {
-                            if (expandedButtonListener != null)
+                        if (expandedButtonListener != null) {
+                            if (fabExtensionAnimator.isAnimating())
+                                new Handler().postDelayed(() -> expandedButtonListener.onClick(view), FabExtensionAnimator.EXTENSION_DURATION);
+                            else
                                 expandedButtonListener.onClick(view);
-                        }, wait);
+                        }
+                    } else {
+                        // user lift his finger outside the button borders
+                        setFabExtended(false);
                     }
-                    //
-                    if (fabExtensionAnimator.isAnimating())
-                        new Handler().postDelayed(() -> fabExtensionAnimator.setExtended(false), 2 * FabExtensionAnimator.EXTENSION_DURATION);
-                    else
-                        fabExtensionAnimator.setExtended(false);
                     break;
             }
             return false;
@@ -107,6 +107,10 @@ public class PostRecipeActivity extends MyBaseActivity {
 
     public void setFabExtended(boolean extended) {
         fabExtensionAnimator.setExtended(extended);
+    }
+
+    public void setFabExtended(boolean extended, long delay) {
+        fabExtensionAnimator.setExtended(extended, delay);
     }
 
     public void updateFab(FabExtensionAnimator.GlyphState glyphState) {
@@ -145,25 +149,33 @@ public class PostRecipeActivity extends MyBaseActivity {
                 .addToBackStack(null)
                 .commit();
 
-        //new Handler().postDelayed(this::nextFragment, 700);
+        new Handler().postDelayed(this::nextFragmentDelayed, 700);
     }
 
-    public void nextFragment() {
+    public void nextFragmentDelayed() {
+        new Handler().postDelayed(this::nextFragment, 2 * FabExtensionAnimator.EXTENSION_DURATION);
+    }
+
+    private void nextFragment() {
         if (currentIndex < fragments.size() - 1) {
             getSupportFragmentManager()
-                .beginTransaction()
-                .setCustomAnimations(
-                        R.anim.fragment_slide_left_enter,
-                        R.anim.fragment_slide_left_exit,
-                        R.anim.fragment_slide_right_enter,
-                        R.anim.fragment_slide_right_exit)
-                .replace(R.id.create_fragment_container, fragments.get(++currentIndex))
-                .addToBackStack(null)
-                .commit();
+                    .beginTransaction()
+                    .setCustomAnimations(
+                            R.anim.fragment_slide_left_enter,
+                            R.anim.fragment_slide_left_exit,
+                            R.anim.fragment_slide_right_enter,
+                            R.anim.fragment_slide_right_exit)
+                    .replace(R.id.create_fragment_container, fragments.get(++currentIndex))
+                    .addToBackStack(null)
+                    .commit();
         }
     }
 
-    public void previousFragment() {
+    public void previousFragmentDelayed() {
+        new Handler().postDelayed(this::previousFragment, FabExtensionAnimator.EXTENSION_DURATION);
+    }
+
+    private void previousFragment() {
         if (currentIndex > 0) {
             currentIndex--;
             FragmentManager manager = getSupportFragmentManager();
@@ -199,7 +211,7 @@ public class PostRecipeActivity extends MyBaseActivity {
                 return true;
             }
             if (currentIndex > 0) {
-                previousFragment();
+                previousFragmentDelayed();
                 return true;
             }
             else {

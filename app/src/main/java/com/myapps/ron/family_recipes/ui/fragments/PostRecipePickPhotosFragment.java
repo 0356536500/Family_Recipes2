@@ -39,7 +39,6 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.loader.content.CursorLoader;
 
 import static android.app.Activity.RESULT_OK;
-import static androidx.core.content.ContextCompat.getDrawable;
 
 /**
  * Created by ronginat on 30/10/2018.
@@ -48,8 +47,8 @@ public class PostRecipePickPhotosFragment extends PostRecipeBaseFragment {
     private static final int MY_PERMISSIONS_REQUEST_STORAGE = 11;
     private final String TAG = getClass().getSimpleName();
 
-    protected static final int CAMERA_REQUEST = 0;
-    protected static final int GALLERY_REQUEST = 1;
+    private static final int CAMERA_REQUEST = 0;
+    private static final int GALLERY_REQUEST = 1;
 
     private LinearLayout imagesContainer;
     private AppCompatButton browseButton, takeButton, resetButton;
@@ -68,8 +67,7 @@ public class PostRecipePickPhotosFragment extends PostRecipeBaseFragment {
 
     @Override
     public boolean onBackPressed() {
-        activity.previousFragment();
-        activity.expandedButton.setText(R.string.post_recipe_next);
+        activity.previousFragmentDelayed();
         return true;
     }
 
@@ -80,7 +78,7 @@ public class PostRecipePickPhotosFragment extends PostRecipeBaseFragment {
     }
 
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+    public void onMyViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         imagesContainer = view.findViewById(R.id.pick_photos_images_container);
         browseButton = view.findViewById(R.id.pick_photos_choose_button);
         takeButton = view.findViewById(R.id.pick_photos_take_photo_button);

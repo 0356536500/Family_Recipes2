@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatEditText;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -134,10 +135,16 @@ public class HtmlElementsAdapter extends RecyclerView.Adapter<HtmlElementsAdapte
         }
     }
 
-    public HtmlElementsAdapter(Context context) {
+    public HtmlElementsAdapter(Context context, @Nullable List<HtmlModel> elements) {
         this.context = context;
-        this.elements = new ArrayList<>();
-        addElementToScreen();
+        if (elements != null) {
+            this.elements = elements;
+            notifyItemRangeInserted(0 , getItemCount());
+        }
+        else {
+            this.elements = new ArrayList<>();
+            addElementToScreen();
+        }
     }
 
     @NonNull
@@ -157,18 +164,18 @@ public class HtmlElementsAdapter extends RecyclerView.Adapter<HtmlElementsAdapte
     }
 
     @Override
-    public void onViewRecycled(@NonNull FlexibleHtmlStructureHolder holder) {
-        //Log.e(TAG, "onViewRecycled, " + elements.get(holder.getOldPosition()).getText());
-        super.onViewRecycled(holder);
+    public int getItemCount() {
+        if (elements != null)
+            return elements.size();
+        return 0;
     }
 
-    @Override
-    public int getItemCount() {
-        return elements.size();
+    public List<HtmlModel> getElements() {
+        return elements;
     }
 
     public void addElementToScreen() {
-        elements.add(new HtmlModel(context));
+        elements.add(new HtmlModel());
         notifyItemInserted(elements.size() - 1);
     }
 
@@ -182,7 +189,7 @@ public class HtmlElementsAdapter extends RecyclerView.Adapter<HtmlElementsAdapte
                 return false;
             numberOfValidElements++;
         }
-        return numberOfValidElements > Constants.MIN_NUMBER_OF_HTML_ELEMENTS;
+        return numberOfValidElements >= Constants.MIN_NUMBER_OF_HTML_ELEMENTS;
     }
 
     public String generateHtml(String...headers) {
@@ -202,52 +209,51 @@ public class HtmlElementsAdapter extends RecyclerView.Adapter<HtmlElementsAdapte
     public void reset() {
         int size = elements.size();
         elements.clear();
-        //elements = new ArrayList<>();
         notifyItemRangeRemoved(0, size);
         Log.e("reset", "addElementToScreen");
         addElementToScreen();
     }
 
-    public void loadSample() {
+    public void loadTemplate() {
         int size = elements.size();
         elements.clear();
         notifyItemRangeRemoved(0, size);
         Editable.Factory factory = Editable.Factory.getInstance();
         //int[] spinnerPostArr = this.context.getResources().getIntArray(R.array.html_elements_types);
 
-        HtmlModel model = new HtmlModel(this.context);
+        HtmlModel model = new HtmlModel();
         model.setSpinnerPos(Constants.HTML_SAMPLE_SPINNER.SUB_HEADER.ordinal());
         model.setText(factory.newEditable(Constants.HTML_SAMPLE_TEXT_INFO));
         elements.add(model);
         //notifyItemInserted(elements.size());
 
-        model = new HtmlModel(this.context);
+        model = new HtmlModel();
         model.setSpinnerPos(Constants.HTML_SAMPLE_SPINNER.HEADER.ordinal());
         model.setText(factory.newEditable(Constants.HTML_SAMPLE_TEXT_INGREDIENTS));
         elements.add(model);
         //notifyItemInserted(elements.size());
 
-        model = new HtmlModel(this.context);
+        model = new HtmlModel();
         model.setSpinnerPos(Constants.HTML_SAMPLE_SPINNER.UNORDERED_LIST.ordinal());
         model.setText(factory.newEditable(Constants.HTML_SAMPLE_INGREDIENT_LIST));
         model.setDivider(true);
         elements.add(model);
         //notifyItemInserted(elements.size());
 
-        model = new HtmlModel(this.context);
+        model = new HtmlModel();
         model.setSpinnerPos(Constants.HTML_SAMPLE_SPINNER.HEADER.ordinal());
         model.setText(factory.newEditable(Constants.HTML_SAMPLE_TEXT_HOW_TO_MAKE));
         elements.add(model);
         //notifyItemInserted(elements.size());
 
-        model = new HtmlModel(this.context);
+        model = new HtmlModel();
         model.setSpinnerPos(Constants.HTML_SAMPLE_SPINNER.ORDERED_LIST.ordinal());
         model.setText(factory.newEditable(Constants.HTML_SAMPLE_HOW_TO_MAKE_STEPS_LIST));
         model.setDivider(true);
         elements.add(model);
         //notifyItemInserted(elements.size());
 
-        model = new HtmlModel(this.context);
+        model = new HtmlModel();
         model.setSpinnerPos(Constants.HTML_SAMPLE_SPINNER.PARAGRAPH.ordinal());
         model.setText(factory.newEditable(Constants.HTML_SAMPLE_TEXT_CHECK_THE_PREVIEW));
         model.setBold(true);
