@@ -8,8 +8,8 @@ import com.myapps.ron.family_recipes.utils.HtmlHelper;
 
 import java.io.Serializable;
 
-import static com.myapps.ron.family_recipes.adapters.HtmlElementsAdapter.ORDERED_LIST_POS;
-import static com.myapps.ron.family_recipes.adapters.HtmlElementsAdapter.UNORDERED_LIST_POS;
+import static com.myapps.ron.family_recipes.recycler.adapters.HtmlElementsAdapter.ORDERED_LIST_POS;
+import static com.myapps.ron.family_recipes.recycler.adapters.HtmlElementsAdapter.UNORDERED_LIST_POS;
 
 /**
  * Created by ronginat on 01/11/2018.

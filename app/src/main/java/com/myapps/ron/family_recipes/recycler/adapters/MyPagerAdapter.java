@@ -1,4 +1,4 @@
-package com.myapps.ron.family_recipes.adapters;
+package com.myapps.ron.family_recipes.recycler.adapters;
 
 import android.content.Context;
 import android.net.Uri;

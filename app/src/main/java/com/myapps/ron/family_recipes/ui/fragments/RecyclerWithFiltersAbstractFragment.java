@@ -20,24 +20,22 @@ import android.widget.Toast;
 
 import com.myapps.ron.family_recipes.MyDividerItemDecoration;
 import com.myapps.ron.family_recipes.R;
-import com.myapps.ron.family_recipes.adapters.RecipesAdapter;
 import com.myapps.ron.family_recipes.model.CategoryEntity;
 import com.myapps.ron.family_recipes.model.QueryModel;
 import com.myapps.ron.family_recipes.model.RecipeEntity;
 import com.myapps.ron.family_recipes.model.RecipeMinimal;
-import com.myapps.ron.family_recipes.recycler.MyRecyclerScroll;
+import com.myapps.ron.family_recipes.recycler.adapters.RecipesAdapter;
+import com.myapps.ron.family_recipes.recycler.helpers.MyRecyclerScroll;
 import com.myapps.ron.family_recipes.ui.activities.MainActivity;
 import com.myapps.ron.family_recipes.ui.activities.RecipeActivity;
-import com.myapps.ron.family_recipes.utils.Constants;
 import com.myapps.ron.family_recipes.ui.baseclasses.MyFragment;
+import com.myapps.ron.family_recipes.utils.Constants;
 import com.myapps.ron.family_recipes.viewmodels.DataViewModel;
 import com.myapps.ron.searchfilter.adapter.FilterAdapter;
 import com.myapps.ron.searchfilter.animator.FiltersListItemAnimator;
 import com.myapps.ron.searchfilter.listener.FilterListener;
 import com.myapps.ron.searchfilter.widget.Filter;
 import com.myapps.ron.searchfilter.widget.FilterItem;
-
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -513,7 +511,7 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
             super(items);
         }
 
-        @NotNull
+        @NonNull
         @Override
         public FilterItem createView(CategoryEntity item, CategoryEntity parent) {
             FilterItem filterItem = new FilterItem(activity);

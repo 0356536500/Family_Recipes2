@@ -1,4 +1,4 @@
-package com.myapps.ron.family_recipes.recycler;
+package com.myapps.ron.family_recipes.recycler.helpers;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;

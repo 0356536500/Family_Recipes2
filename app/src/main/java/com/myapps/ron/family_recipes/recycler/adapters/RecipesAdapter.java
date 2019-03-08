@@ -1,4 +1,4 @@
-package com.myapps.ron.family_recipes.adapters;
+package com.myapps.ron.family_recipes.recycler.adapters;
 
 import android.content.Context;
 import android.graphics.PorterDuff;
@@ -15,7 +15,7 @@ import com.myapps.ron.family_recipes.dal.storage.StorageWrapper;
 import com.myapps.ron.family_recipes.model.CategoryEntity;
 import com.myapps.ron.family_recipes.model.RecipeEntity;
 import com.myapps.ron.family_recipes.model.RecipeMinimal;
-import com.myapps.ron.family_recipes.recycler.RecipesAdapterHelper;
+import com.myapps.ron.family_recipes.recycler.helpers.RecipesAdapterHelper;
 import com.myapps.ron.family_recipes.utils.GlideApp;
 
 import java.util.List;

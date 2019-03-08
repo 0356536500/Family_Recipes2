@@ -8,8 +8,6 @@ import com.myapps.ron.family_recipes.dal.persistence.AppDatabases;
 import com.myapps.ron.family_recipes.utils.Constants;
 import com.myapps.ron.searchfilter.model.FilterModel;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +15,6 @@ import java.util.List;
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
-import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 /**
@@ -43,11 +40,12 @@ public class CategoryEntity implements FilterModel {
     public CategoryEntity() {
     }
 
+    @NonNull
     public String getName() {
         return name;
     }
 
-    public void setName(String text) {
+    public void setName(@NonNull String text) {
         this.name = text;
     }
 
@@ -130,13 +128,13 @@ public class CategoryEntity implements FilterModel {
         return result;
     }
 
-    @NotNull
+    @NonNull
     @Override
     public String getText() {
         return getName();
     }
 
-    @NotNull
+    @NonNull
     @Override
     public List<FilterModel> getSubs() {
         if (categories != null)
@@ -144,6 +142,7 @@ public class CategoryEntity implements FilterModel {
         return new ArrayList<>();
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "CategoryEntity{" +

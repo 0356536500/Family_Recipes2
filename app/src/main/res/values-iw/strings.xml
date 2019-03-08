@@ -105,6 +105,8 @@
     <string name="post_recipe_advanced_step_reset_message">מה שכתבת יימחק. להמשיך?</string>
     <string name="post_recipe_advanced_step_list_message">לחיצה על אנטר מפרידה בין פריטים ברשימה</string>
     <string name="post_recipe_advanced_step_validation_message">צריך לפחות %1$d שדות מלאים</string>
+    <string name="post_recipe_advanced_step_item_removed_message">%1$s הוסר</string>
+    <string name="post_recipe_advanced_step_item_undo_message">ביטול</string>
     <string name="post_recipe_pick_photos_button">גלריה</string>
     <string name="post_recipe_shoot_photos_button">מצלמה</string>
     <string name="post_recipe_reset_photos_button">איפוס</string>

@@ -5,13 +5,27 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <androidx.recyclerview.widget.RecyclerView
+    <!--<androidx.recyclerview.widget.RecyclerView
         android:id="@+id/advanced_step_recycler"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
-        <!--android:theme="@style/RecyclerTheme">-->
-    </androidx.recyclerview.widget.RecyclerView>
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:theme="@style/RecyclerTheme">
+    </androidx.recyclerview.widget.RecyclerView>-->
+
+    <com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView
+        android:id="@+id/advanced_step_recycler"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:item_layout="@layout/row_item_flexible_html_structure"
+        app:behind_swiped_item_bg_color="@color/swipeBehindBackground"
+        app:behind_swiped_item_bg_color_secondary="@color/swipeBehindBackground"
+        app:behind_swiped_item_icon="@drawable/ic_reset_fab"
+        app:behind_swiped_item_icon_secondary="@drawable/ic_reset_fab"
+        app:behind_swiped_item_icon_margin="@dimen/single_margin"
+        app:behind_swiped_item_icon_centered="false"/>
+    <!--app:divider="@drawable/list_divider"-->
 
     <com.leinardi.android.speeddial.SpeedDialOverlayLayout
         android:id="@+id/overlay"

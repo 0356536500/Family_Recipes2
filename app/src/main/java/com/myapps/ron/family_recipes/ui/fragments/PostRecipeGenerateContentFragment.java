@@ -10,16 +10,24 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView;
+import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnItemDragListener;
+import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnItemSwipeListener;
+import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnListScrollListener;
+import com.google.android.material.snackbar.Snackbar;
 import com.leinardi.android.speeddial.SpeedDialActionItem;
 import com.leinardi.android.speeddial.SpeedDialView;
 import com.myapps.ron.family_recipes.R;
-import com.myapps.ron.family_recipes.adapters.HtmlElementsAdapter;
+import com.myapps.ron.family_recipes.recycler.adapters.HtmlElementsAdapter;
 import com.myapps.ron.family_recipes.model.HtmlModel;
-import com.myapps.ron.family_recipes.recycler.MyRecyclerScroll;
+import com.myapps.ron.family_recipes.recycler.adapters.MyDragDropSwipeAdapter;
+import com.myapps.ron.family_recipes.recycler.helpers.MyRecyclerScroll;
 import com.myapps.ron.family_recipes.ui.baseclasses.PostRecipeBaseFragment;
 import com.myapps.ron.family_recipes.utils.Constants;
 import com.myapps.ron.family_recipes.viewmodels.PostRecipeViewModel;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -37,7 +45,10 @@ import androidx.recyclerview.widget.RecyclerView;
 public class PostRecipeGenerateContentFragment extends PostRecipeBaseFragment {
     private final String TAG = getClass().getSimpleName();
 
+    private ViewGroup rootView;
     private List<HtmlModel> elements;
+    private MyDragDropSwipeAdapter mDragDropSwipeAdapter;
+    private DragDropSwipeRecyclerView mList;
     private HtmlElementsAdapter mAdapter;
     private RecyclerView recyclerView;
     private Button preview, sample, reset;
@@ -59,17 +70,19 @@ public class PostRecipeGenerateContentFragment extends PostRecipeBaseFragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.content_post_advanced_step, container, false);
+        rootView = (ViewGroup) inflater.inflate(R.layout.content_post_advanced_step, container, false);
+        return rootView;
     }
 
     @Override
     public void onMyViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        recyclerView = view.findViewById(R.id.advanced_step_recycler);
+        mList = view.findViewById(R.id.advanced_step_recycler);
         mSpeedDialView = view.findViewById(R.id.advanced_step_speedDial);
         viewModel =  ViewModelProviders.of(activity).get(PostRecipeViewModel.class);
 
         initFloatingMenu(savedInstanceState == null);
-        initRecycler();
+        initDragDropSwipeRecycler();
+        //initRecycler();
 
         //viewModel =  ViewModelProviders.of(activity).get(PostRecipeViewModel.class);
 
@@ -258,11 +271,52 @@ public class PostRecipeGenerateContentFragment extends PostRecipeBaseFragment {
 
     // endregion Floating Menu
 
+    private void initDragDropSwipeRecycler() {
+        List<String> list = Arrays.asList("1", "2", "3", "4");
+        mDragDropSwipeAdapter = new MyDragDropSwipeAdapter(list);
+        mList.setLayoutManager(new LinearLayoutManager(activity));
+        mList.setOrientation(DragDropSwipeRecyclerView.ListOrientation.VERTICAL_LIST_WITH_VERTICAL_DRAGGING);
+        mList.setAdapter(mDragDropSwipeAdapter);
+
+        setListListeners();
+    }
+
+    private void setListListeners() {
+        mList.setSwipeListener((OnItemSwipeListener<String>) (position, swipeDirection, item) -> {
+            Log.e(TAG, "onSwipe");
+            removeItem(item, position);
+            return false;
+        });
+        mList.setDragListener(new OnItemDragListener<String>() {
+            @Override
+            public void onItemDropped(int i, int i1, String s) {
+                // Handle action of item being dragged from one position to another
+                Log.e(TAG, mDragDropSwipeAdapter.getDataSet().toString());
+            }
+
+            @Override
+            public void onItemDragged(int i, int i1, String s) {
+                // Handle action of item dropped
+            }
+        });
+        mList.setScrollListener((scrollDirection, distance) -> {
+            // Handle scrolling
+        });
+    }
+
+    private void removeItem(String item, int position) {
+        Snackbar
+                .make(rootView, getString(R.string.post_recipe_advanced_step_item_removed_message, item), Snackbar.LENGTH_LONG)
+                .setAction(R.string.post_recipe_advanced_step_item_undo_message, view ->
+                        mDragDropSwipeAdapter.insertItem(position, item, false))
+                .show();
+    }
+
     private void initRecycler() {
         mAdapter = new HtmlElementsAdapter(activity, elements);
 
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(activity.getApplicationContext());
-        recyclerView.setLayoutManager(mLayoutManager);
+        //RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(activity.getApplicationContext());
+        //recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(mAdapter);
         recyclerView.addOnScrollListener(new MyRecyclerScroll() {

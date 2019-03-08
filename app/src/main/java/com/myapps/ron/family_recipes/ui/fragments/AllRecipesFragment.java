@@ -6,7 +6,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.myapps.ron.family_recipes.R;
-import com.myapps.ron.family_recipes.adapters.RecipesAdapter;
+import com.myapps.ron.family_recipes.recycler.adapters.RecipesAdapter;
 import com.myapps.ron.family_recipes.dal.Injection;
 import com.myapps.ron.family_recipes.model.CategoryEntity;
 import com.myapps.ron.family_recipes.background.services.GetAllRecipesService;

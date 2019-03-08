@@ -37,7 +37,7 @@ import android.widget.TextView;
 
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.network.cognito.AppHelper;
-import com.myapps.ron.family_recipes.adapters.FirstTimeLoginAttributesDisplayAdapter;
+import com.myapps.ron.family_recipes.recycler.adapters.FirstTimeLoginAttributesDisplayAdapter;
 
 public class NewPassword extends AppCompatActivity {
     private String TAG = "NewPassword";

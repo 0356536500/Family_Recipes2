@@ -10,8 +10,6 @@ import com.myapps.ron.family_recipes.network.modelTO.CommentTO;
 import com.myapps.ron.family_recipes.network.modelTO.RecipeTO;
 import com.myapps.ron.family_recipes.utils.MyCallback;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -19,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import androidx.annotation.NonNull;
 import io.reactivex.Observable;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -63,7 +62,7 @@ public class APICallsHandler {
 
         call.enqueue(new Callback<List<CommentTO>>() {
             @Override
-            public void onResponse(@NotNull Call<List<CommentTO>> call, @NotNull Response<List<CommentTO>> response) {
+            public void onResponse(@NonNull Call<List<CommentTO>> call, @NonNull Response<List<CommentTO>> response) {
                 String body = response.body() != null ? response.body().toString() : "null";
                 Log.e(TAG, body);
                 if (response.code() == STATUS_OK) {
@@ -75,7 +74,7 @@ public class APICallsHandler {
             }
 
             @Override
-            public void onFailure(@NotNull Call<List<CommentTO>> call, @NotNull Throwable t) {
+            public void onFailure(@NonNull Call<List<CommentTO>> call, @NonNull Throwable t) {
                 Log.e(TAG, "error getting recipe comments", t);
             }
         });
@@ -99,7 +98,7 @@ public class APICallsHandler {
 
         call.enqueue(new Callback<Map<String, String>>() {
             @Override
-            public void onResponse(@NotNull Call<Map<String, String>> call, @NotNull Response<Map<String, String>> response) {
+            public void onResponse(@NonNull Call<Map<String, String>> call, @NonNull Response<Map<String, String>> response) {
                 String url = "null";
                 /*if (response.body() != null && response.body().get("url") != null)
                     url = response.body().get("url").getAsString();*/
@@ -117,7 +116,7 @@ public class APICallsHandler {
             }
 
             @Override
-            public void onFailure(@NotNull Call<Map<String, String>> call, @NotNull Throwable t) {
+            public void onFailure(@NonNull Call<Map<String, String>> call, @NonNull Throwable t) {
                 Log.e(TAG, "error posting recipe. message: " + t.getMessage());
                 //Toast.makeText(MainActivity.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
             }
@@ -148,7 +147,7 @@ public class APICallsHandler {
 
         call.enqueue(new Callback<RecipeTO>() {
             @Override
-            public void onResponse(@NotNull Call<RecipeTO> call, @NotNull Response<RecipeTO> response) {
+            public void onResponse(@NonNull Call<RecipeTO> call, @NonNull Response<RecipeTO> response) {
                 //String body = response.body() != null ? response.body().toString() : "null";
                 Log.i(TAG, "patchRecipe code, " + response.code());
 
@@ -168,7 +167,7 @@ public class APICallsHandler {
             }
 
             @Override
-            public void onFailure(@NotNull Call<RecipeTO> call, @NotNull Throwable t) {
+            public void onFailure(@NonNull Call<RecipeTO> call, @NonNull Throwable t) {
                 Log.e(TAG, "error patching recipe. message: " + t.getMessage());
                 //Toast.makeText(MainActivity.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
             }
@@ -185,7 +184,7 @@ public class APICallsHandler {
 
         call.enqueue(new Callback<Void>() {
             @Override
-            public void onResponse(@NotNull Call<Void> call, @NotNull Response<Void> response) {
+            public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
                 //String body = response.body() != null ? response.body().toString() : "null";
                 Log.i(TAG, "postComment code, " + response.code());
 
@@ -205,7 +204,7 @@ public class APICallsHandler {
             }
 
             @Override
-            public void onFailure(@NotNull Call<Void> call, @NotNull Throwable t) {
+            public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
                 Log.e(TAG, "error patching recipe. message: " + t.getMessage());
                 //Toast.makeText(MainActivity.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
             }
@@ -218,7 +217,7 @@ public class APICallsHandler {
 
         call.enqueue(new Callback<List<CategoryTO>>() {
             @Override
-            public void onResponse(@NotNull Call<List<CategoryTO>> call, @NotNull Response<List<CategoryTO>> response) {
+            public void onResponse(@NonNull Call<List<CategoryTO>> call, @NonNull Response<List<CategoryTO>> response) {
                 String body = response.body() != null ? response.body().toString() : "null";
 
                 if (response.code() == STATUS_OK) {
@@ -237,7 +236,7 @@ public class APICallsHandler {
             }
 
             @Override
-            public void onFailure(@NotNull Call<List<CategoryTO>> call, @NotNull Throwable t) {
+            public void onFailure(@NonNull Call<List<CategoryTO>> call, @NonNull Throwable t) {
                 Log.e(TAG, "error getting all recipes. message: " + t.getMessage());
                 callback.onFinished(null);
                 //Toast.makeText(MainActivity.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
@@ -355,7 +354,7 @@ public class APICallsHandler {
 
         call.enqueue(new Callback<Void>() {
             @Override
-            public void onResponse(@NotNull Call<Void> call, @NotNull Response<Void> response) {
+            public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
                 //String body = response.body() != null ? response.body().toString() : "null";
                 Log.i(TAG, "registerNewToken code, " + response.code());
 
@@ -378,7 +377,7 @@ public class APICallsHandler {
             }
 
             @Override
-            public void onFailure(@NotNull Call<Void> call, @NotNull Throwable t) {
+            public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
                 Log.e(TAG, "error registerNewToken. message: " + t.getMessage());
                 callback.onFinished(t.getMessage());
                 //Toast.makeText(MainActivity.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
@@ -395,7 +394,7 @@ public class APICallsHandler {
 
         call.enqueue(new Callback<Void>() {
             @Override
-            public void onResponse(@NotNull Call<Void> call, @NotNull Response<Void> response) {
+            public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
                 //String body = response.body() != null ? response.body().toString() : "null";
                 Log.i(TAG, "manageSubscriptions code, " + response.code());
 
@@ -423,7 +422,7 @@ public class APICallsHandler {
             }
 
             @Override
-            public void onFailure(@NotNull Call<Void> call, @NotNull Throwable t) {
+            public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
                 Log.e(TAG, "error manageSubscriptions. message: " + t.getMessage());
                 callback.onFinished(t.getMessage());
                 //Toast.makeText(MainActivity.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();

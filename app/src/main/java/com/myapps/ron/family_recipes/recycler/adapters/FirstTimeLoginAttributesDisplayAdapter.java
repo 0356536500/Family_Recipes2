@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.myapps.ron.family_recipes.adapters;
+package com.myapps.ron.family_recipes.recycler.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;

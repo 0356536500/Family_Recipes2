@@ -110,6 +110,8 @@
     <string name="post_recipe_advanced_step_reset_message">What you wrote will be deleted. Continue?</string>
     <string name="post_recipe_advanced_step_list_message">Press ENTER to separate between items</string>
     <string name="post_recipe_advanced_step_validation_message">Need at least %1$d non empty elements</string>
+    <string name="post_recipe_advanced_step_item_removed_message">%1$s was removed</string>
+    <string name="post_recipe_advanced_step_item_undo_message">undo</string>
     <string name="post_recipe_pick_photos_button">browse</string>
     <string name="post_recipe_shoot_photos_button">camera</string>
     <string name="post_recipe_reset_photos_button">reset</string>

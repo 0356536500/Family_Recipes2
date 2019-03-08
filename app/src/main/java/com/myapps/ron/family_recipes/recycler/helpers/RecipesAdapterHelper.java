@@ -1,4 +1,4 @@
-package com.myapps.ron.family_recipes.recycler;
+package com.myapps.ron.family_recipes.recycler.helpers;
 
 import android.graphics.Color;
 

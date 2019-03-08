@@ -1,10 +1,9 @@
-package com.myapps.ron.family_recipes.adapters;
+package com.myapps.ron.family_recipes.recycler.adapters;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,7 +11,7 @@ import android.widget.TextView;
 
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.model.CommentEntity;
-import com.myapps.ron.family_recipes.recycler.CommentsDiffCallback;
+import com.myapps.ron.family_recipes.recycler.helpers.CommentsDiffCallback;
 import com.myapps.ron.family_recipes.utils.DateUtil;
 
 import java.util.ArrayList;

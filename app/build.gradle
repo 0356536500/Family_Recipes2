@@ -72,7 +72,7 @@ dependencies {
     // endregion
 
     // region WorkManager
-    def work_version = "1.0.0-rc02"
+    def work_version = "1.0.0"
 
     implementation "android.arch.work:work-runtime:$work_version"
     // For Kotlin+Coroutines use work-runtime-ktx
@@ -129,9 +129,9 @@ dependencies {
     // endregion
 
     // region AWS
-    implementation 'com.amazonaws:aws-android-sdk-s3:2.7.2'
-    implementation('com.amazonaws:aws-android-sdk-mobile-client:2.7.+@aar') { transitive = true }
-    implementation('com.amazonaws:aws-android-sdk-auth-userpools:2.7.+@aar') { transitive = true }
+    implementation 'com.amazonaws:aws-android-sdk-s3:2.12.2'
+    implementation('com.amazonaws:aws-android-sdk-mobile-client:2.12.+@aar') { transitive = true }
+    implementation('com.amazonaws:aws-android-sdk-auth-userpools:2.12.+@aar') { transitive = true }
     //implementation 'com.amazonaws:aws-android-sdk-sns:2.12.0'
 
     // endregion
@@ -144,14 +144,18 @@ dependencies {
 
     // endregion
 
-    //view pager with dots indicator
-    implementation 'com.tbuonomo.andrui:viewpagerdotsindicator:2.1.2'
-
+    // region Google
     implementation 'com.google.code.gson:gson:2.8.5'
-
     implementation 'com.google.android:flexbox:1.1.0'
+    // endregion
 
-    implementation 'org.jetbrains:annotations:16.0.3'
+    //implementation 'org.jetbrains:annotations:16.0.3'
+
+    //view pager with dots indicator
+    implementation 'com.tbuonomo.andrui:viewpagerdotsindicator:3.0.3'
+
+    // recyclerView with drag, drop and swipe
+    implementation 'com.ernestoyaquello.dragdropswiperecyclerview:drag-drop-swipe-recyclerview:0.1.2'
 
     // region Firebase
     implementation 'com.google.firebase:firebase-core:16.0.7'
