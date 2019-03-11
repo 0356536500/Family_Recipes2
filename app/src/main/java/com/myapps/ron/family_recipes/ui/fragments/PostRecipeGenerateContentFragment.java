@@ -14,7 +14,6 @@ import com.google.android.material.snackbar.Snackbar;
 import com.leinardi.android.speeddial.SpeedDialActionItem;
 import com.leinardi.android.speeddial.SpeedDialView;
 import com.myapps.ron.family_recipes.R;
-import com.myapps.ron.family_recipes.ViewHider;
 import com.myapps.ron.family_recipes.model.HtmlModel;
 import com.myapps.ron.family_recipes.recycler.adapters.HtmlElementsAdapter;
 import com.myapps.ron.family_recipes.recycler.adapters.MyDragDropSwipeAdapter;
@@ -44,7 +43,6 @@ import androidx.recyclerview.widget.SimpleItemAnimator;
 public class PostRecipeGenerateContentFragment extends PostRecipeBaseFragment {
     private final String TAG = getClass().getSimpleName();
 
-    private ViewGroup rootView;
     private List<HtmlModel> elements;
     private MyDragDropSwipeAdapter mDragDropSwipeAdapter;
     private HtmlElementsAdapter mAdapter;
@@ -55,7 +53,6 @@ public class PostRecipeGenerateContentFragment extends PostRecipeBaseFragment {
     private PostRecipeViewModel viewModel;
 
     private SpeedDialView mSpeedDialView;
-    private ViewHider floatingMenuHider;
 
     @Override
     public boolean onBackPressed() {
@@ -69,19 +66,18 @@ public class PostRecipeGenerateContentFragment extends PostRecipeBaseFragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        rootView = (ViewGroup) inflater.inflate(R.layout.content_post_advanced_step, container, false);
-        return rootView;
+        return inflater.inflate(R.layout.content_post_advanced_step, container, false);
     }
 
     @Override
     public void onMyViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         recyclerView = view.findViewById(R.id.advanced_step_recycler);
-        mSpeedDialView = view.findViewById(R.id.advanced_step_speedDial);
+        mSpeedDialView = activity.mSpeedDialView;
+        //mSpeedDialView = view.findViewById(R.id.advanced_step_speedDial);
         viewModel =  ViewModelProviders.of(activity).get(PostRecipeViewModel.class);
 
         initFloatingMenu(savedInstanceState == null);
         initDragDropSwipeRecycler();
-        floatingMenuHider = ViewHider.of(mSpeedDialView).setDirection(ViewHider.BOTTOM).build();
         //initRecycler();
 
         //viewModel =  ViewModelProviders.of(activity).get(PostRecipeViewModel.class);
@@ -94,7 +90,8 @@ public class PostRecipeGenerateContentFragment extends PostRecipeBaseFragment {
     public void onDestroyView() {
         super.onDestroyView();
         isDestroyed = true;
-        elements = mAdapter.getElements();
+        mSpeedDialView.setVisibility(View.GONE);
+        //TODO: this.elements = mAdapter.getElements();
     }
 
     // region PostRecipeBaseFragment Overrides
@@ -119,17 +116,12 @@ public class PostRecipeGenerateContentFragment extends PostRecipeBaseFragment {
         };
     }
 
-    @Override
-    protected void toggleFab(boolean show) {
-        super.toggleFab(show);
-        toggleFloatingMenu(show);
-    }
-
     // endregion
 
     // region Floating Menu
 
     private void initFloatingMenu(boolean addActionItems) {
+        mSpeedDialView.setVisibility(View.VISIBLE);
         initFloatingMenuUI(addActionItems);
         initFloatingMenuListener();
     }
@@ -191,20 +183,6 @@ public class PostRecipeGenerateContentFragment extends PostRecipeBaseFragment {
                     .create());
 
         }
-        //Set main action click listener.
-        /*mSpeedDialView.setOnChangeListener(new SpeedDialView.OnChangeListener() {
-            @Override
-            public boolean onMainActionSelected() {
-                //Toast.makeText(activity,"Main action clicked!", Toast.LENGTH_SHORT).show();
-                Log.w(TAG, "onMainActionSelected");
-                return false; // True to keep the Speed Dial open
-            }
-
-            @Override
-            public void onToggleChanged(boolean isOpen) {
-                Log.w(TAG, "Speed dial toggle state changed. Open = " + isOpen);
-            }
-        });*/
     }
 
     private void initFloatingMenuListener() {
@@ -258,11 +236,6 @@ public class PostRecipeGenerateContentFragment extends PostRecipeBaseFragment {
         });
     }
 
-    private void toggleFloatingMenu(boolean show) {
-        if (show) this.floatingMenuHider.show();
-        else this.floatingMenuHider.hide();
-    }
-
     // endregion Floating Menu
 
     private void initDragDropSwipeRecycler() {
@@ -292,11 +265,11 @@ public class PostRecipeGenerateContentFragment extends PostRecipeBaseFragment {
 
 
     private void removeItem(String item, int position) {
-        Snackbar
-                .make(rootView, getString(R.string.post_recipe_advanced_step_item_removed_message, item), Snackbar.LENGTH_LONG)
+        Snackbar snackbar = Snackbar
+                .make(activity.coordinatorLayout, getString(R.string.post_recipe_advanced_step_item_removed_message, item), Snackbar.LENGTH_LONG)
                 .setAction(R.string.post_recipe_advanced_step_item_undo_message, view ->
-                        mDragDropSwipeAdapter.insertItem(item, position))
-                .show();
+                        mDragDropSwipeAdapter.insertItem(item, position));
+                snackbar.show();
     }
 
     private void initRecycler() {

@@ -155,7 +155,7 @@ dependencies {
     implementation 'com.tbuonomo.andrui:viewpagerdotsindicator:3.0.3'
 
     // recyclerView with drag, drop and swipe
-    implementation 'com.ernestoyaquello.dragdropswiperecyclerview:drag-drop-swipe-recyclerview:0.1.2'
+    //implementation 'com.ernestoyaquello.dragdropswiperecyclerview:drag-drop-swipe-recyclerview:0.1.2'
 
     // region Firebase
     implementation 'com.google.firebase:firebase-core:16.0.7'

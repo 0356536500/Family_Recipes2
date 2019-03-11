@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:id="@+id/post_recipe_container"
+    android:id="@+id/create_recipe_container"
     tools:context=".ui.activities.PostRecipeActivity">
 
     <include layout="@layout/toolbar" />
@@ -23,8 +23,32 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|start"
-        android:layout_margin="@dimen/single_margin"
-        app:layout_behavior="@string/bottom_transient_bar_behavior" />
-    <!--style="@style/Widget.MaterialComponents.Button.UnelevatedButton"-->
+        app:layout_behavior="@string/bottom_transient_bar_behavior"
+        android:layout_margin="@dimen/single_margin" />
+    <!--style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+    app:layout_behavior="@string/bottom_transient_bar_behavior"-->
 
-</FrameLayout>
+    <com.leinardi.android.speeddial.SpeedDialOverlayLayout
+        android:id="@+id/overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:clickable_overlay="true"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+    <com.leinardi.android.speeddial.SpeedDialView
+        android:id="@+id/advanced_step_speedDial"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:visibility="gone"
+        android:layout_margin="2dp"
+        app:layout_behavior="@string/bottom_transient_bar_behavior"
+        app:sdExpansionMode="top"
+        app:sdMainFabAnimationRotateAngle="90"
+        app:sdMainFabClosedSrc="@drawable/ic_more_fab"
+        app:sdMainFabOpenedSrc="@drawable/ic_close_white"
+        app:sdMainFabClosedBackgroundColor="@color/black"
+        app:sdMainFabOpenedBackgroundColor="@color/md_red_900"
+        app:sdOverlayLayout="@id/overlay" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

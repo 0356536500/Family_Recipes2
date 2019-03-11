@@ -23,6 +23,11 @@ import androidx.transition.AutoTransition;
 import androidx.transition.Transition;
 import androidx.transition.TransitionManager;
 
+/**
+ * taken from:
+ * {@link "https://github.com/tunjid/android-bootstrap/blob/master/material/src/main/java/com/tunjid/androidbootstrap/material/animator/FabExtensionAnimator.java"}
+ */
+
 public class FabExtensionAnimator {
 
     private static final float TWITCH_END = 20.0f;

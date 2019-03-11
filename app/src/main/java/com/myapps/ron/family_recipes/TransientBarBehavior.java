@@ -20,7 +20,9 @@ import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
  * Animates a {@link View} when a {@link Snackbar} appears.
  * <p>
  * Mostly identical to {@link com.google.android.material.floatingactionbutton.FloatingActionButton.Behavior}
- * <p>
+ * from
+ * {@link "https://github.com/tunjid/android-bootstrap/tree/master/material/src/main/java/com/tunjid/androidbootstrap/material/behavior"}
+ * </p>
 
  */
 

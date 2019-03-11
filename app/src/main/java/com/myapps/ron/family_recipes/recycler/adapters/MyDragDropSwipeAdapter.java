@@ -1,6 +1,5 @@
 package com.myapps.ron.family_recipes.recycler.adapters;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,7 +8,6 @@ import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeAdapter;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.model.HtmlModel;
 import com.myapps.ron.family_recipes.recycler.helpers.SwipeAndDragHelper;
@@ -30,7 +28,7 @@ public class MyDragDropSwipeAdapter extends RecyclerView.Adapter<MyDragDropSwipe
     private List<String> elements;
     private SwipingRecycler swipingListener;
 
-    class MyViewHolder extends DragDropSwipeAdapter.ViewHolder implements View.OnClickListener{
+    class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         private ViewGroup expandedLayout, collapsedLayout;
         private Spinner spinner;
         private CheckBox checkBoxDivider, checkBoxBold, checkBoxUnderScore ;
@@ -129,7 +127,6 @@ public class MyDragDropSwipeAdapter extends RecyclerView.Adapter<MyDragDropSwipe
 
     @Override
     public void onViewMoved(int oldPosition, int newPosition) {
-        Log.e(TAG, "item moved, " + elements.get(oldPosition));
         String str = elements.get(oldPosition);
         //User user = new User(targetUser);
         elements.remove(oldPosition);
@@ -139,7 +136,6 @@ public class MyDragDropSwipeAdapter extends RecyclerView.Adapter<MyDragDropSwipe
 
     @Override
     public void onViewSwiped(int position) {
-        Log.e(TAG, "item swiped, " + elements.get(position));
         String item = elements.remove(position);
         notifyItemRemoved(position);
         swipingListener.onItemRemoved(item, position);

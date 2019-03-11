@@ -67,7 +67,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/device/ic_access_time_black_24dp.xml" />
+                                      <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/navigation/ic_unfold_more_black_24dp.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -78,11 +78,9 @@
                         <option name="values">
                           <map>
                             <entry key="autoMirrored" value="true" />
-                            <entry key="height" value="12" />
-                            <entry key="outputName" value="ic_access_time_black" />
+                            <entry key="outputName" value="ic_unfold_more" />
                             <entry key="overrideSize" value="true" />
-                            <entry key="sourceFile" value="C:\Users\Guy" />
-                            <entry key="width" value="12" />
+                            <entry key="sourceFile" value="D:\Ron\Recipes\ic_logo_foreground.svg" />
                           </map>
                         </option>
                       </PersistentState>

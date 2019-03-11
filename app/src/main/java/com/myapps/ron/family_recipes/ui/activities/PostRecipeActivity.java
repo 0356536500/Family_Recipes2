@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.google.android.material.button.MaterialButton;
+import com.leinardi.android.speeddial.SpeedDialView;
 import com.myapps.ron.family_recipes.FabExtensionAnimator;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.ViewHider;
@@ -29,6 +30,7 @@ import java.util.List;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.app.NavUtils;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -40,6 +42,9 @@ import androidx.lifecycle.ViewModelProviders;
  */
 public class PostRecipeActivity extends MyBaseActivity {
 
+    public CoordinatorLayout coordinatorLayout;
+    public SpeedDialView mSpeedDialView;
+    public ViewHider floatingMenuHider;
     private PostRecipeViewModel viewModel;
     private List<MyFragment> fragments;
 
@@ -57,9 +62,12 @@ public class PostRecipeActivity extends MyBaseActivity {
         //super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post_recipe);
 
+        coordinatorLayout = findViewById(R.id.create_recipe_container);
+        mSpeedDialView = findViewById(R.id.advanced_step_speedDial);
         expandedButton = findViewById(R.id.create_recipe_expanded_button);
         viewModel = ViewModelProviders.of(this, Injection.provideViewModelFactory(this)).get(PostRecipeViewModel.class);
 
+        floatingMenuHider = ViewHider.of(mSpeedDialView).setDirection(ViewHider.BOTTOM).build();
         fabHider = ViewHider.of(expandedButton).setDirection(ViewHider.BOTTOM).build();
         fabExtensionAnimator = new FabExtensionAnimator(expandedButton);
         //fabExtensionAnimator.setExtended(false);
@@ -101,8 +109,14 @@ public class PostRecipeActivity extends MyBaseActivity {
     // region FAB methods
 
     public void toggleFab(boolean show) {
-        if (show) this.fabHider.show();
-        else this.fabHider.hide();
+        if (show) {
+            this.fabHider.show();
+            this.floatingMenuHider.show();
+        }
+        else {
+            this.fabHider.hide();
+            this.floatingMenuHider.hide();
+        }
     }
 
     public void setFabExtended(boolean extended) {
