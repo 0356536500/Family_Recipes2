@@ -1,5 +1,6 @@
 package com.myapps.ron.family_recipes.model;
 
+import android.content.Context;
 import android.text.Editable;
 
 import com.myapps.ron.family_recipes.MyApplication;
@@ -7,6 +8,8 @@ import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.utils.HtmlHelper;
 
 import java.io.Serializable;
+
+import androidx.annotation.NonNull;
 
 import static com.myapps.ron.family_recipes.recycler.adapters.HtmlElementsAdapter.ORDERED_LIST_POS;
 import static com.myapps.ron.family_recipes.recycler.adapters.HtmlElementsAdapter.UNORDERED_LIST_POS;
@@ -124,6 +127,11 @@ public class HtmlModel implements Serializable {
         return helper;
     }
 
+    public String getSpinnerText(Context context) {
+        return context.getResources().getStringArray(R.array.html_elements)[getSpinnerPos()];
+    }
+
+    @NonNull
     @Override
     public String toString() {
         return "HtmlModel{" +

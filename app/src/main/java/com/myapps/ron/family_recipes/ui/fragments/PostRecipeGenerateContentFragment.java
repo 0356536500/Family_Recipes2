@@ -189,7 +189,8 @@ public class PostRecipeGenerateContentFragment extends PostRecipeBaseFragment {
 
     private void removeItem(HtmlModel item, int position) {
         Snackbar snackbar = Snackbar
-                .make(activity.coordinatorLayout, getString(R.string.post_recipe_advanced_step_item_removed_message, item), Snackbar.LENGTH_LONG)
+                .make(activity.coordinatorLayout, getString(R.string.post_recipe_advanced_step_item_removed_message,
+                        item.getSpinnerText(activity)), Snackbar.LENGTH_LONG)
                 .setAction(R.string.post_recipe_advanced_step_item_undo_message, view ->
                         mAdapter.insertItem(item, position));
         snackbar.show();
