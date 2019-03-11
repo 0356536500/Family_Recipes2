@@ -84,13 +84,13 @@ public class HtmlElementsAdapter extends RecyclerView.Adapter<HtmlElementsAdapte
         private CheckBox.OnCheckedChangeListener checkboxListener = (compoundButton, b) -> {
             if (elements.get(getAdapterPosition()) != null) {
                 switch (compoundButton.getId()) {
-                    case R.id.advanced_step_bold_checkBox:
+                    case R.id.row_html_bold_checkBox:
                         elements.get(getAdapterPosition()).setBold(b);
                         break;
-                    case R.id.advanced_step_under_score_checkBox:
+                    case R.id.row_html_under_score_checkBox:
                         elements.get(getAdapterPosition()).setUnderscore(b);
                         break;
-                    case R.id.advanced_step_horizontal_divider:
+                    case R.id.row_html_horizontal_divider:
                         elements.get(getAdapterPosition()).setDivider(b);
                         break;
                 }
@@ -99,11 +99,11 @@ public class HtmlElementsAdapter extends RecyclerView.Adapter<HtmlElementsAdapte
 
         FlexibleHtmlStructureHolder(View view) {
             super(view);
-            spinner = view.findViewById(R.id.advanced_step_choose_type);
-            checkBoxDivider = view.findViewById(R.id.advanced_step_horizontal_divider);
-            checkBoxBold = view.findViewById(R.id.advanced_step_bold_checkBox);
-            checkBoxUnderScore = view.findViewById(R.id.advanced_step_under_score_checkBox);
-            editText = view.findViewById(R.id.advanced_step_details_editText);
+            spinner = view.findViewById(R.id.row_html_choose_type);
+            checkBoxDivider = view.findViewById(R.id.row_html_horizontal_divider);
+            checkBoxBold = view.findViewById(R.id.row_html_bold_checkBox);
+            checkBoxUnderScore = view.findViewById(R.id.row_html_under_score_checkBox);
+            editText = view.findViewById(R.id.row_html_details_editText);
         }
 
         private void bindTo(HtmlModel model) {

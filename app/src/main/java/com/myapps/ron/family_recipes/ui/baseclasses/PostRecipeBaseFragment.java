@@ -34,7 +34,7 @@ public abstract class PostRecipeBaseFragment extends MyFragment {
 
     protected abstract void onMyViewCreated(View view, Bundle savedInstanceState);
 
-    public void toggleFab(boolean show) { activity.toggleFab(show); }
+    protected void toggleFab(boolean show) { activity.toggleFab(show); }
 
     protected boolean showsFab() { return false; }
 

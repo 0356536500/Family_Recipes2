@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
  */
 public abstract class MyRecyclerScroll extends RecyclerView.OnScrollListener {
 
-    private static final float MINIMUM = 40;
+    private static final float MINIMUM = 100;
     private int scrollDist = 0;
     private boolean isVisible = true;
 

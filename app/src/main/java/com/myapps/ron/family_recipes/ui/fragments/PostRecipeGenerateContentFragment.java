@@ -10,18 +10,16 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView;
-import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnItemDragListener;
-import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnItemSwipeListener;
-import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnListScrollListener;
 import com.google.android.material.snackbar.Snackbar;
 import com.leinardi.android.speeddial.SpeedDialActionItem;
 import com.leinardi.android.speeddial.SpeedDialView;
 import com.myapps.ron.family_recipes.R;
-import com.myapps.ron.family_recipes.recycler.adapters.HtmlElementsAdapter;
+import com.myapps.ron.family_recipes.ViewHider;
 import com.myapps.ron.family_recipes.model.HtmlModel;
+import com.myapps.ron.family_recipes.recycler.adapters.HtmlElementsAdapter;
 import com.myapps.ron.family_recipes.recycler.adapters.MyDragDropSwipeAdapter;
 import com.myapps.ron.family_recipes.recycler.helpers.MyRecyclerScroll;
+import com.myapps.ron.family_recipes.recycler.helpers.SwipeAndDragHelper;
 import com.myapps.ron.family_recipes.ui.baseclasses.PostRecipeBaseFragment;
 import com.myapps.ron.family_recipes.utils.Constants;
 import com.myapps.ron.family_recipes.viewmodels.PostRecipeViewModel;
@@ -36,8 +34,9 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.SimpleItemAnimator;
 
 /**
  * Created by ronginat on 29/10/2018.
@@ -48,7 +47,6 @@ public class PostRecipeGenerateContentFragment extends PostRecipeBaseFragment {
     private ViewGroup rootView;
     private List<HtmlModel> elements;
     private MyDragDropSwipeAdapter mDragDropSwipeAdapter;
-    private DragDropSwipeRecyclerView mList;
     private HtmlElementsAdapter mAdapter;
     private RecyclerView recyclerView;
     private Button preview, sample, reset;
@@ -57,6 +55,7 @@ public class PostRecipeGenerateContentFragment extends PostRecipeBaseFragment {
     private PostRecipeViewModel viewModel;
 
     private SpeedDialView mSpeedDialView;
+    private ViewHider floatingMenuHider;
 
     @Override
     public boolean onBackPressed() {
@@ -76,12 +75,13 @@ public class PostRecipeGenerateContentFragment extends PostRecipeBaseFragment {
 
     @Override
     public void onMyViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        mList = view.findViewById(R.id.advanced_step_recycler);
+        recyclerView = view.findViewById(R.id.advanced_step_recycler);
         mSpeedDialView = view.findViewById(R.id.advanced_step_speedDial);
         viewModel =  ViewModelProviders.of(activity).get(PostRecipeViewModel.class);
 
         initFloatingMenu(savedInstanceState == null);
         initDragDropSwipeRecycler();
+        floatingMenuHider = ViewHider.of(mSpeedDialView).setDirection(ViewHider.BOTTOM).build();
         //initRecycler();
 
         //viewModel =  ViewModelProviders.of(activity).get(PostRecipeViewModel.class);
@@ -117,6 +117,12 @@ public class PostRecipeGenerateContentFragment extends PostRecipeBaseFragment {
                 activity.setFabExtended(false, 1000);
             }
         };
+    }
+
+    @Override
+    protected void toggleFab(boolean show) {
+        super.toggleFab(show);
+        toggleFloatingMenu(show);
     }
 
     // endregion
@@ -252,63 +258,44 @@ public class PostRecipeGenerateContentFragment extends PostRecipeBaseFragment {
         });
     }
 
-    /*private Toast mToast;
-    private Snackbar mSnackbar;
-
-    private void showToast(String text) {
-        if (mToast != null) {
-            mToast.cancel();
-        }
-        mToast = Toast.makeText(activity, text, Toast.LENGTH_LONG);
-        mToast.show();
+    private void toggleFloatingMenu(boolean show) {
+        if (show) this.floatingMenuHider.show();
+        else this.floatingMenuHider.hide();
     }
-
-    private void showSnackbar(String text) {
-        mSnackbar = Snackbar.make(getView(), text, Snackbar.LENGTH_SHORT);
-        mSnackbar.setAction("Close", view -> mSnackbar.dismiss());
-        mSnackbar.show();
-    }*/
 
     // endregion Floating Menu
 
     private void initDragDropSwipeRecycler() {
-        List<String> list = Arrays.asList("1", "2", "3", "4");
-        mDragDropSwipeAdapter = new MyDragDropSwipeAdapter(list);
-        mList.setLayoutManager(new LinearLayoutManager(activity));
-        mList.setOrientation(DragDropSwipeRecyclerView.ListOrientation.VERTICAL_LIST_WITH_VERTICAL_DRAGGING);
-        mList.setAdapter(mDragDropSwipeAdapter);
+        List<String> list = new ArrayList<>( Arrays.asList("1", "2", "3", "4"));
+        mDragDropSwipeAdapter = new MyDragDropSwipeAdapter(list, this::removeItem);
+        SwipeAndDragHelper swipeAndDragHelper = new SwipeAndDragHelper(mDragDropSwipeAdapter);
+        ItemTouchHelper touchHelper = new ItemTouchHelper(swipeAndDragHelper);
 
-        setListListeners();
-    }
+        SimpleItemAnimator itemAnimator = new DefaultItemAnimator();
+        itemAnimator.setSupportsChangeAnimations(false);
+        recyclerView.setItemAnimator(itemAnimator);
+        recyclerView.setAdapter(mDragDropSwipeAdapter);
+        touchHelper.attachToRecyclerView(recyclerView);
 
-    private void setListListeners() {
-        mList.setSwipeListener((OnItemSwipeListener<String>) (position, swipeDirection, item) -> {
-            Log.e(TAG, "onSwipe");
-            removeItem(item, position);
-            return false;
-        });
-        mList.setDragListener(new OnItemDragListener<String>() {
+        recyclerView.addOnScrollListener(new MyRecyclerScroll() {
             @Override
-            public void onItemDropped(int i, int i1, String s) {
-                // Handle action of item being dragged from one position to another
-                Log.e(TAG, mDragDropSwipeAdapter.getDataSet().toString());
+            public void show() {
+                toggleFab(true);
             }
 
             @Override
-            public void onItemDragged(int i, int i1, String s) {
-                // Handle action of item dropped
+            public void hide() {
+                toggleFab(false);
             }
         });
-        mList.setScrollListener((scrollDirection, distance) -> {
-            // Handle scrolling
-        });
     }
+
 
     private void removeItem(String item, int position) {
         Snackbar
                 .make(rootView, getString(R.string.post_recipe_advanced_step_item_removed_message, item), Snackbar.LENGTH_LONG)
                 .setAction(R.string.post_recipe_advanced_step_item_undo_message, view ->
-                        mDragDropSwipeAdapter.insertItem(position, item, false))
+                        mDragDropSwipeAdapter.insertItem(item, position))
                 .show();
     }
 

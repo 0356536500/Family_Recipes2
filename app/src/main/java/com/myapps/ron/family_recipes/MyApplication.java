@@ -1,15 +1,13 @@
 package com.myapps.ron.family_recipes;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.PowerManager;
 import android.provider.Settings;
 
-import com.google.firebase.iid.FirebaseInstanceId;
 import com.myapps.ron.family_recipes.utils.Constants;
 import com.myapps.ron.family_recipes.utils.LocaleHelper;
 import com.myapps.ron.family_recipes.utils.SharedPreferencesHandler;
@@ -29,7 +27,7 @@ public class MyApplication extends Application {
         mContext = this;
     }
 
-    public boolean checkInternetConnection(){
+    /*public boolean checkInternetConnection(){
         ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
         if (connectivityManager != null) {
             //we are connected to a network
@@ -37,7 +35,7 @@ public class MyApplication extends Application {
                     connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED;
         }
         return false;
-    }
+    }*/
 
     public void applyTheme(Activity activity) {
         SharedPreferences sPref = SharedPreferencesHandler.getSharedPreferences(this);
@@ -93,6 +91,7 @@ public class MyApplication extends Application {
         return hour < 6 || hour > 18;
     }
 
+    @SuppressLint("HardwareIds")
     public static String getDeviceId() {
         //return FirebaseInstanceId.getInstance().getId();
         return Settings.Secure.getString(mContext.getContentResolver(), Settings.Secure.ANDROID_ID);
