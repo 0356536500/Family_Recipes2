@@ -11,6 +11,7 @@ import android.widget.TextView;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.model.HtmlModel;
 import com.myapps.ron.family_recipes.recycler.helpers.SwipeAndDragHelper;
+import com.myapps.ron.family_recipes.recycler.helpers.SwipeAndDragHelper.SwipingRecycler;
 
 import java.util.List;
 
@@ -40,8 +41,8 @@ public class MyDragDropSwipeAdapter extends RecyclerView.Adapter<MyDragDropSwipe
             super(view);
             //expanded layout
             expandedLayout = view.findViewById(R.id.row_html_expanded_layout);
-            spinner = view.findViewById(R.id.row_html_choose_type);
-            checkBoxDivider = view.findViewById(R.id.row_html_horizontal_divider);
+            spinner = view.findViewById(R.id.row_html_choose_type_spinner);
+            checkBoxDivider = view.findViewById(R.id.row_html_horizontal_divider_checkBox);
             checkBoxBold = view.findViewById(R.id.row_html_bold_checkBox);
             checkBoxUnderScore = view.findViewById(R.id.row_html_under_score_checkBox);
             editText = view.findViewById(R.id.row_html_details_editText);
@@ -50,7 +51,7 @@ public class MyDragDropSwipeAdapter extends RecyclerView.Adapter<MyDragDropSwipe
             //collapsed layout
             collapsedLayout = view.findViewById(R.id.row_html_collapsed_layout);
             expandButton = view.findViewById(R.id.row_html_expand_button);
-            collapsedTextView = view.findViewById(R.id.row_html_collapsed_text);
+            collapsedTextView = view.findViewById(R.id.row_html_collapsed_textView);
 
             setCollapsingListeners();
         }
@@ -138,7 +139,7 @@ public class MyDragDropSwipeAdapter extends RecyclerView.Adapter<MyDragDropSwipe
     public void onViewSwiped(int position) {
         String item = elements.remove(position);
         notifyItemRemoved(position);
-        swipingListener.onItemRemoved(item, position);
+        //swipingListener.onItemRemoved(item, position);
     }
 
     // endregion
@@ -151,9 +152,5 @@ public class MyDragDropSwipeAdapter extends RecyclerView.Adapter<MyDragDropSwipe
     public void insertItem(String item, int position) {
         this.elements.add(position, item);
         notifyItemInserted(position);
-    }
-
-    public interface SwipingRecycler {
-        void onItemRemoved(String item, int position);
     }
 }

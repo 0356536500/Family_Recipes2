@@ -2,8 +2,6 @@ package com.myapps.ron.family_recipes.recycler.adapters;
 
 import android.content.Context;
 import android.text.Editable;
-import android.text.TextWatcher;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,11 +9,15 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.ImageButton;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.model.HtmlModel;
+import com.myapps.ron.family_recipes.recycler.helpers.SwipeAndDragHelper;
 import com.myapps.ron.family_recipes.utils.Constants;
 import com.myapps.ron.family_recipes.utils.HtmlHelper;
 
@@ -26,62 +28,80 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatEditText;
 import androidx.recyclerview.widget.RecyclerView;
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnCheckedChanged;
+import butterknife.OnClick;
+import butterknife.OnItemSelected;
+import butterknife.OnTextChanged;
 
 /**
  * Created by ronginat on 01/11/2018.
  */
-public class HtmlElementsAdapter extends RecyclerView.Adapter<HtmlElementsAdapter.FlexibleHtmlStructureHolder>{
+public class HtmlElementsAdapter extends RecyclerView.Adapter<HtmlElementsAdapter.FlexibleHtmlStructureHolder>
+        implements SwipeAndDragHelper.ActionCompletionContract{
     private final String TAG = getClass().getSimpleName();
     public static final int UNORDERED_LIST_POS = 3;
     public static final int ORDERED_LIST_POS = 4;
 
     private List<HtmlModel> elements;
     private Context context;
+    private SwipeAndDragHelper.SwipingRecycler swipingListener;
 
-    class FlexibleHtmlStructureHolder extends RecyclerView.ViewHolder {
-        private Spinner spinner;
-        private CheckBox checkBoxDivider, checkBoxBold, checkBoxUnderScore ;
-        private AppCompatEditText editText;
+    class FlexibleHtmlStructureHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+        @BindView(R.id.row_html_expanded_layout)
+        ViewGroup expandedLayout;
+        @BindView(R.id.row_html_collapsed_layout)
+        ViewGroup collapsedLayout;
+        @BindView(R.id.row_html_choose_type_spinner)
+        Spinner spinner;
+        @BindView(R.id.row_html_horizontal_divider_checkBox)
+        CheckBox checkBoxDivider;
+        @BindView(R.id.row_html_bold_checkBox)
+        CheckBox checkBoxBold;
+        @BindView(R.id.row_html_under_score_checkBox)
+        CheckBox checkBoxUnderScore;
+        @BindView(R.id.row_html_details_editText)
+        AppCompatEditText editText;
+        @BindView(R.id.row_html_collapsed_textView)
+        TextView collapsedTextView;
+        @BindView(R.id.row_html_collapse_button)
+        ImageButton collapseButton;
+        @BindView(R.id.row_html_expand_button)
+        ImageButton expandButton;
 
-        private AdapterView.OnItemSelectedListener spinnerListener =
-                new AdapterView.OnItemSelectedListener() {
-                    @Override
-                    public void onItemSelected(AdapterView<?> adapterView, View view, int pos, long l) {
-                        //Log.e(TAG, "onItemSelected, before " + elements.get(getAdapterPosition()).getSpinnerPos() + ", after " + pos);
-                        elements.get(getAdapterPosition()).setSpinnerPos(pos);
+        private boolean shouldShowHtmlListMessage; //post_recipe_advanced_step_list_message
 
-                        if (pos >= UNORDERED_LIST_POS && pos <= ORDERED_LIST_POS) {
-                            Toast toast = Toast.makeText(context, R.string.post_recipe_advanced_step_list_message, Toast.LENGTH_LONG);
-                            toast.setGravity(Gravity.CENTER, 0, 0);
-                            toast.show();
-                        }
-                    }
+        @SuppressWarnings("UnusedParameters")
+        @OnItemSelected(value = R.id.row_html_choose_type_spinner, callback = OnItemSelected.Callback.ITEM_SELECTED)
+        void onItemSelected(AdapterView<?> adapterView, View view, int pos, long l) {
+            //Log.e(TAG, "onItemSelected, before " + elements.get(getAdapterPosition()).getSpinnerPos() + ", after " + pos);
+            elements.get(getAdapterPosition()).setSpinnerPos(pos);
+            collapsedTextView.setText(context.getResources().getStringArray(R.array.html_elements)[pos]);
 
-                    @Override
-                    public void onNothingSelected(AdapterView<?> adapterView) {
-                        //Log.e(TAG, "onNothingSelected");
-                        elements.get(getAdapterPosition()).setSpinnerPos(-1);
-                    }
-                };
-
-        private TextWatcher textWatcher = new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
+            if (pos >= UNORDERED_LIST_POS && pos <= ORDERED_LIST_POS && shouldShowHtmlListMessage) {
+                Toast toast = Toast.makeText(context, R.string.post_recipe_advanced_step_list_message, Toast.LENGTH_LONG);
+                toast.setGravity(Gravity.CENTER, 0, 0);
+                toast.show();
             }
 
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            shouldShowHtmlListMessage = true;
+        }
 
-            }
+        /*@OnItemSelected(value = R.id.row_html_choose_type_spinner, callback = OnItemSelected.Callback.NOTHING_SELECTED)
+        void onNothingSelected(AdapterView<?> adapterView) {
+            //Log.e(TAG, "onNothingSelected");
+            elements.get(getAdapterPosition()).setSpinnerPos(-1);
+        }*/
 
-            @Override
-            public void afterTextChanged(Editable editable) {
+        @OnTextChanged(value = R.id.row_html_details_editText, callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
+        void afterTextChanged(Editable editable) {
+            if (editText.isFocused())
                 elements.get(getAdapterPosition()).setText(editable);
-            }
-        };
+        }
 
-        private CheckBox.OnCheckedChangeListener checkboxListener = (compoundButton, b) -> {
+        @OnCheckedChanged({R.id.row_html_horizontal_divider_checkBox, R.id.row_html_bold_checkBox, R.id.row_html_under_score_checkBox})
+        void onCheckedChanged(CompoundButton compoundButton, boolean b) {
             if (elements.get(getAdapterPosition()) != null) {
                 switch (compoundButton.getId()) {
                     case R.id.row_html_bold_checkBox:
@@ -90,53 +110,80 @@ public class HtmlElementsAdapter extends RecyclerView.Adapter<HtmlElementsAdapte
                     case R.id.row_html_under_score_checkBox:
                         elements.get(getAdapterPosition()).setUnderscore(b);
                         break;
-                    case R.id.row_html_horizontal_divider:
+                    case R.id.row_html_horizontal_divider_checkBox:
                         elements.get(getAdapterPosition()).setDivider(b);
                         break;
                 }
             }
-        };
+        }
 
         FlexibleHtmlStructureHolder(View view) {
             super(view);
-            spinner = view.findViewById(R.id.row_html_choose_type);
-            checkBoxDivider = view.findViewById(R.id.row_html_horizontal_divider);
-            checkBoxBold = view.findViewById(R.id.row_html_bold_checkBox);
-            checkBoxUnderScore = view.findViewById(R.id.row_html_under_score_checkBox);
-            editText = view.findViewById(R.id.row_html_details_editText);
+            ButterKnife.bind(this, view);
+            setSpinnerAdapter();
+            collapsedTextView.setText(context.getResources().getStringArray(R.array.html_elements)[0]);
         }
 
         private void bindTo(HtmlModel model) {
+            shouldShowHtmlListMessage = true;
             if (model != null) {
                 if (model.getText() != null)
                     editText.setText(model.getText());
-                if (model.getSpinnerPos() >= 0)
-                    spinner.setSelection(model.getSpinnerPos());
+                if (model.getSpinnerPos() >= 0) {
+                    shouldShowHtmlListMessage = false;
+                    spinner.setSelection(model.getSpinnerPos(), false);
+                }
                 checkBoxBold.setChecked(model.isBold());
                 checkBoxUnderScore.setChecked(model.isUnderscore());
                 checkBoxDivider.setChecked(model.isDivider());
-
-                setListeners();
             }
         }
 
-        private void setListeners() {
+        private void setSpinnerAdapter() {
             //init the spinner
             ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(context,
                     R.array.html_elements, android.R.layout.simple_spinner_item);
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             spinner.setAdapter(adapter);
-
-            spinner.setOnItemSelectedListener(spinnerListener);
-            editText.addTextChangedListener(textWatcher);
-            checkBoxBold.setOnCheckedChangeListener(checkboxListener);
-            checkBoxUnderScore.setOnCheckedChangeListener(checkboxListener);
-            checkBoxDivider.setOnCheckedChangeListener(checkboxListener);
         }
+
+        private void resetViewsOnRecycle() {
+            setExpanded(true);
+            spinner.setSelection(0, false);
+            editText.clearFocus();
+            editText.setText("");
+            collapsedTextView.setText(context.getResources().getStringArray(R.array.html_elements)[0]);
+        }
+
+        // region expand/collapse view holder
+
+        private void setExpanded(boolean isExpanded) {
+            expandedLayout.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
+            collapsedLayout.setVisibility(!isExpanded ? View.VISIBLE : View.GONE);
+        }
+
+        @OnClick({R.id.row_html_collapse_button, R.id.row_html_expand_button, R.id.row_html_collapsed_layout})
+        @Override
+        public void onClick(View view) {
+            switch (view.getId()) {
+                case R.id.row_html_collapse_button:
+                    setExpanded(false);
+                    break;
+                case R.id.row_html_expand_button: // same as below
+                case R.id.row_html_collapsed_layout:
+                    setExpanded(true);
+                    break;
+            }
+            notifyItemChanged(getAdapterPosition());
+        }
+
+        // endregion
+
     }
 
-    public HtmlElementsAdapter(Context context, @Nullable List<HtmlModel> elements) {
+    public HtmlElementsAdapter(Context context, @NonNull SwipeAndDragHelper.SwipingRecycler swipingListener, @Nullable List<HtmlModel> elements) {
         this.context = context;
+        this.swipingListener = swipingListener;
         if (elements != null) {
             this.elements = elements;
             notifyItemRangeInserted(0 , getItemCount());
@@ -159,8 +206,13 @@ public class HtmlElementsAdapter extends RecyclerView.Adapter<HtmlElementsAdapte
 
     @Override
     public void onBindViewHolder(@NonNull FlexibleHtmlStructureHolder holder, int position) {
-        //Log.e(TAG, "bind view position = " + position);
         holder.bindTo(elements.get(position));
+    }
+
+    @Override
+    public void onViewRecycled(@NonNull FlexibleHtmlStructureHolder holder) {
+        super.onViewRecycled(holder);
+        holder.resetViewsOnRecycle();
     }
 
     @Override
@@ -178,6 +230,33 @@ public class HtmlElementsAdapter extends RecyclerView.Adapter<HtmlElementsAdapte
         elements.add(new HtmlModel());
         notifyItemInserted(elements.size() - 1);
     }
+
+    public void insertItem(HtmlModel item, int position) {
+        this.elements.add(position, item);
+        notifyItemInserted(position);
+    }
+
+    // region swipe and drag
+
+    @Override
+    public void onViewMoved(int oldPosition, int newPosition) {
+        HtmlModel item = elements.get(oldPosition);
+        //User user = new User(targetUser);
+        elements.remove(oldPosition);
+        elements.add(newPosition, item);
+        notifyItemMoved(oldPosition, newPosition);
+    }
+
+    @Override
+    public void onViewSwiped(int position) {
+        HtmlModel item = elements.remove(position);
+        notifyItemRemoved(position);
+        swipingListener.onItemRemoved(item, position);
+    }
+
+    // endregion
+
+
 
     public boolean checkValidInput() {
         int numberOfValidElements = 0;
@@ -210,7 +289,6 @@ public class HtmlElementsAdapter extends RecyclerView.Adapter<HtmlElementsAdapte
         int size = elements.size();
         elements.clear();
         notifyItemRangeRemoved(0, size);
-        Log.e("reset", "addElementToScreen");
         addElementToScreen();
     }
 

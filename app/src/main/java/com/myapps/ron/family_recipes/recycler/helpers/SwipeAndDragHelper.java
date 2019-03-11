@@ -10,6 +10,7 @@ import android.view.View;
 
 import com.myapps.ron.family_recipes.MyApplication;
 import com.myapps.ron.family_recipes.R;
+import com.myapps.ron.family_recipes.model.HtmlModel;
 
 import java.util.Objects;
 
@@ -145,5 +146,9 @@ public class SwipeAndDragHelper extends ItemTouchHelper.Callback {
         void onViewMoved(int oldPosition, int newPosition);
 
         void onViewSwiped(int position);
+    }
+
+    public interface SwipingRecycler {
+        void onItemRemoved(HtmlModel item, int position);
     }
 }
