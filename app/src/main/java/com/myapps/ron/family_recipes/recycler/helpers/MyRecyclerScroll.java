@@ -31,8 +31,15 @@ public abstract class MyRecyclerScroll extends RecyclerView.OnScrollListener {
             scrollDist += dy;
         }
 
+        //checkOnBottom(recyclerView);
     }
+
+    /*private void checkOnBottom(RecyclerView recyclerView) {
+        if (!recyclerView.canScrollVertically(1))
+            onBottom();
+    }*/
 
     public abstract void show();
     public abstract void hide();
+    //public abstract void onBottom();
 }

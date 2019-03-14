@@ -1,6 +1,9 @@
 package com.myapps.ron.family_recipes.recycler.adapters;
 
 import android.content.Context;
+import android.os.Build;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.text.Editable;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -37,18 +40,21 @@ import butterknife.OnTextChanged;
 
 /**
  * Created by ronginat on 01/11/2018.
+ * Implementing {@link com.myapps.ron.family_recipes.recycler.helpers.SwipeAndDragHelper.ActionCompletionContract}
+ * for Drag, Drop snd Swipe and deleting items
  */
-public class HtmlElementsAdapter extends RecyclerView.Adapter<HtmlElementsAdapter.FlexibleHtmlStructureHolder>
+public class HtmlElementsAdapter extends RecyclerView.Adapter<HtmlElementsAdapter.HtmlContentHolder>
         implements SwipeAndDragHelper.ActionCompletionContract{
-    private final String TAG = getClass().getSimpleName();
+    //private final String TAG = getClass().getSimpleName();
     public static final int UNORDERED_LIST_POS = 3;
     public static final int ORDERED_LIST_POS = 4;
 
     private List<HtmlModel> elements;
     private Context context;
     private SwipeAndDragHelper.SwipingRecycler swipingListener;
+    private Vibrator vibrator;
 
-    class FlexibleHtmlStructureHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    class HtmlContentHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         @BindView(R.id.row_html_expanded_layout)
         ViewGroup expandedLayout;
         @BindView(R.id.row_html_collapsed_layout)
@@ -63,8 +69,10 @@ public class HtmlElementsAdapter extends RecyclerView.Adapter<HtmlElementsAdapte
         CheckBox checkBoxUnderScore;
         @BindView(R.id.row_html_details_editText)
         AppCompatEditText editText;
-        @BindView(R.id.row_html_collapsed_textView)
-        TextView collapsedTextView;
+        @BindView(R.id.row_html_collapsed_title_textView)
+        TextView titleCollapsedTextView;
+        @BindView(R.id.row_html_collapsed_more_details_textView)
+        TextView moreDetailsCollapsedTextView;
         @BindView(R.id.row_html_collapse_button)
         ImageButton collapseButton;
         @BindView(R.id.row_html_expand_button)
@@ -77,7 +85,7 @@ public class HtmlElementsAdapter extends RecyclerView.Adapter<HtmlElementsAdapte
         void onItemSelected(AdapterView<?> adapterView, View view, int pos, long l) {
             //Log.e(TAG, "onItemSelected, before " + elements.get(getAdapterPosition()).getSpinnerPos() + ", after " + pos);
             elements.get(getAdapterPosition()).setSpinnerPos(pos);
-            collapsedTextView.setText(context.getResources().getStringArray(R.array.html_elements)[pos]);
+            titleCollapsedTextView.setText(context.getResources().getStringArray(R.array.html_elements)[pos]);
 
             if (pos >= UNORDERED_LIST_POS && pos <= ORDERED_LIST_POS && shouldShowHtmlListMessage) {
                 Toast toast = Toast.makeText(context, R.string.post_recipe_advanced_step_list_message, Toast.LENGTH_LONG);
@@ -98,6 +106,7 @@ public class HtmlElementsAdapter extends RecyclerView.Adapter<HtmlElementsAdapte
         void afterTextChanged(Editable editable) {
             if (editText.isFocused())
                 elements.get(getAdapterPosition()).setText(editable);
+            moreDetailsCollapsedTextView.setText(editable);
         }
 
         @OnCheckedChanged({R.id.row_html_horizontal_divider_checkBox, R.id.row_html_bold_checkBox, R.id.row_html_under_score_checkBox})
@@ -117,11 +126,11 @@ public class HtmlElementsAdapter extends RecyclerView.Adapter<HtmlElementsAdapte
             }
         }
 
-        FlexibleHtmlStructureHolder(View view) {
+        HtmlContentHolder(View view) {
             super(view);
             ButterKnife.bind(this, view);
             setSpinnerAdapter();
-            collapsedTextView.setText(context.getResources().getStringArray(R.array.html_elements)[0]);
+            titleCollapsedTextView.setText(context.getResources().getStringArray(R.array.html_elements)[0]);
         }
 
         private void bindTo(HtmlModel model) {
@@ -152,12 +161,17 @@ public class HtmlElementsAdapter extends RecyclerView.Adapter<HtmlElementsAdapte
             spinner.setSelection(0, false);
             editText.clearFocus();
             editText.setText("");
-            collapsedTextView.setText(context.getResources().getStringArray(R.array.html_elements)[0]);
+            titleCollapsedTextView.setText(context.getResources().getStringArray(R.array.html_elements)[0]);
         }
 
         // region expand/collapse view holder
 
         private void setExpanded(boolean isExpanded) {
+            vibrate();
+            if (!isExpanded) {
+                // Hide the textView when it's showing any text
+                moreDetailsCollapsedTextView.setVisibility(moreDetailsCollapsedTextView.getText().length() > 0 ? View.VISIBLE : View.GONE);
+            }
             expandedLayout.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
             collapsedLayout.setVisibility(!isExpanded ? View.VISIBLE : View.GONE);
         }
@@ -177,6 +191,14 @@ public class HtmlElementsAdapter extends RecyclerView.Adapter<HtmlElementsAdapte
             notifyItemChanged(getAdapterPosition());
         }
 
+        private void vibrate() {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                vibrator.vibrate(VibrationEffect.createOneShot(40, VibrationEffect.DEFAULT_AMPLITUDE));
+            } else {
+                vibrator.vibrate(40);
+            }
+        }
+
         // endregion
 
     }
@@ -192,25 +214,26 @@ public class HtmlElementsAdapter extends RecyclerView.Adapter<HtmlElementsAdapte
             this.elements = new ArrayList<>();
             addElementToScreen();
         }
+        this.vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
     }
 
     @NonNull
     @Override
-    public FlexibleHtmlStructureHolder onCreateViewHolder(@NonNull ViewGroup parent, int position) {
+    public HtmlContentHolder onCreateViewHolder(@NonNull ViewGroup parent, int position) {
         //Log.e(TAG, "onCreateViewHolder , pos " + position);
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.row_item_flexible_html_structure, parent, false);
 
-        return new FlexibleHtmlStructureHolder(itemView);
+        return new HtmlContentHolder(itemView);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull FlexibleHtmlStructureHolder holder, int position) {
+    public void onBindViewHolder(@NonNull HtmlContentHolder holder, int position) {
         holder.bindTo(elements.get(position));
     }
 
     @Override
-    public void onViewRecycled(@NonNull FlexibleHtmlStructureHolder holder) {
+    public void onViewRecycled(@NonNull HtmlContentHolder holder) {
         super.onViewRecycled(holder);
         holder.resetViewsOnRecycle();
     }

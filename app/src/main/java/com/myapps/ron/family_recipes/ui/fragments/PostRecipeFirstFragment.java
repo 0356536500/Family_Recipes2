@@ -85,7 +85,7 @@ public class PostRecipeFirstFragment extends PostRecipeBaseFragment implements F
     }
 
     @Override
-    protected boolean showsFab() {
+    protected boolean showExtendedFab() {
         return true;
     }
 

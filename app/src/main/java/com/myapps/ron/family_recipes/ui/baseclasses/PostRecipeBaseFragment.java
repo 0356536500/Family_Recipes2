@@ -36,13 +36,23 @@ public abstract class PostRecipeBaseFragment extends MyFragment {
 
     protected void toggleFab(boolean show) { activity.toggleFab(show); }
 
-    protected boolean showsFab() { return false; }
+    /**
+     * @return boolean that tells the fragment whether to show the fab extended or not
+     * default is collapsed, expanded in {@link com.myapps.ron.family_recipes.ui.fragments.PostRecipeFirstFragment}
+     */
+    protected boolean showExtendedFab() { return false; }
+
+    /**
+     * @return boolean that tells the activity {@link PostRecipeActivity} whether to show the fab menu or not
+     * default is hidden, visible in {@link com.myapps.ron.family_recipes.ui.fragments.PostRecipeGenerateContentFragment}
+     */
+    public int menuFabVisibility() { return View.GONE; }
 
     private void togglePersistentUi() {
-        //toggleFab(showsFab());
-        if (!showsFab())
+        //toggleFab(showExtendedFab());
+        if (!showExtendedFab())
             setFabExtended(false);
-        else if (!restoredFromBackStack() && showsFab()) {
+        else if (!restoredFromBackStack() && showExtendedFab()) {
             setFabExtended(true);
             setFabExtended(false, 2000);
         }

@@ -91,6 +91,11 @@ public class PostRecipeGenerateContentFragment extends PostRecipeBaseFragment {
     }
 
     @Override
+    public int menuFabVisibility() {
+        return View.VISIBLE;
+    }
+
+    @Override
     protected View.OnClickListener getFabClickListener() {
         return view -> {
             if(mAdapter.checkValidInput()) {

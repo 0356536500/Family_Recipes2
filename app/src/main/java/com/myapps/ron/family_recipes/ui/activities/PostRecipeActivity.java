@@ -18,7 +18,7 @@ import com.myapps.ron.family_recipes.ViewHider;
 import com.myapps.ron.family_recipes.background.services.PostRecipeToServerService;
 import com.myapps.ron.family_recipes.dal.Injection;
 import com.myapps.ron.family_recipes.ui.baseclasses.MyBaseActivity;
-import com.myapps.ron.family_recipes.ui.baseclasses.MyFragment;
+import com.myapps.ron.family_recipes.ui.baseclasses.PostRecipeBaseFragment;
 import com.myapps.ron.family_recipes.ui.fragments.PostRecipeGenerateContentFragment;
 import com.myapps.ron.family_recipes.ui.fragments.PostRecipeFirstFragment;
 import com.myapps.ron.family_recipes.ui.fragments.PostRecipePickPhotosFragment;
@@ -46,7 +46,7 @@ public class PostRecipeActivity extends MyBaseActivity {
     public SpeedDialView mSpeedDialView;
     public ViewHider floatingMenuHider;
     private PostRecipeViewModel viewModel;
-    private List<MyFragment> fragments;
+    private List<PostRecipeBaseFragment> fragments;
 
     public MaterialButton expandedButton;
     private FabExtensionAnimator fabExtensionAnimator;
@@ -204,9 +204,7 @@ public class PostRecipeActivity extends MyBaseActivity {
     public void onBackPressed() {
         Log.e(getClass().getSimpleName(), "backPressed");
         if (inPreview) {
-            FragmentManager manager = getSupportFragmentManager();
-            manager.popBackStack();
-            inPreview = false;
+            backFromPreview();
             return;
         }
         if(!fragments.get(currentIndex).onBackPressed()) {
@@ -219,9 +217,7 @@ public class PostRecipeActivity extends MyBaseActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             if (inPreview) {
-                FragmentManager manager = getSupportFragmentManager();
-                manager.popBackStack();
-                inPreview = false;
+                backFromPreview();
                 return true;
             }
             if (currentIndex > 0) {
@@ -236,6 +232,14 @@ public class PostRecipeActivity extends MyBaseActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    private void backFromPreview() {
+        FragmentManager manager = getSupportFragmentManager();
+        manager.popBackStack();
+        inPreview = false;
+        expandedButton.setVisibility(View.VISIBLE);
+        mSpeedDialView.setVisibility(fragments.get(currentIndex).menuFabVisibility());
+    }
+
     public void showMyDialog(String html) {
         Fragment newFragment = new PreviewDialogFragment();
         Bundle bundle = new Bundle();
@@ -247,6 +251,8 @@ public class PostRecipeActivity extends MyBaseActivity {
         transaction.addToBackStack(null);
         transaction.commit();
 
+        mSpeedDialView.setVisibility(View.GONE);
+        expandedButton.setVisibility(View.GONE);
         inPreview = true;
     }
 
