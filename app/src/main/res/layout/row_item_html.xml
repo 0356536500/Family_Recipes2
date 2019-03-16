@@ -141,7 +141,7 @@
             android:fontFamily="@font/open_sans"
             android:hint="@string/post_recipe_hint"
             android:inputType="textMultiLine"
-            android:lines="4"
+            android:lines="3"
             android:overScrollMode="ifContentScrolls"
             android:scrollbarStyle="insideInset"
             android:scrollbars="vertical"
