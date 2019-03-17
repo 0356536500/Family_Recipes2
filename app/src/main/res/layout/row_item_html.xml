@@ -66,26 +66,16 @@
         android:orientation="vertical">
 
         <LinearLayout
-            android:id="@+id/attributes_container1"
+            android:id="@+id/row_html_attributes_container1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal" >
-
-            <CheckBox
-                android:id="@+id/row_html_horizontal_divider_checkBox"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.3"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="8dp"
-                android:text="@string/post_recipe_advanced_step_hr" />
 
             <Spinner
                 android:id="@+id/row_html_choose_type_spinner"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.5"
+                android:layout_weight="0.8"
                 android:textAlignment="center"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp" />
@@ -102,7 +92,7 @@
 
 
         <LinearLayout
-            android:id="@+id/attributes_container2"
+            android:id="@+id/row_html_attributes_container2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal" >
@@ -125,6 +115,15 @@
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
                 android:text="@string/post_recipe_advanced_step_under_score" />
+
+            <CheckBox
+                android:id="@+id/row_html_horizontal_divider_checkBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:text="@string/post_recipe_advanced_step_hr" />
 
         </LinearLayout>
 

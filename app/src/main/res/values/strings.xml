@@ -119,7 +119,16 @@
     <string name="post_recipe_pick_photos_camera_empty_message">You haven\'t take a picture</string>
 
     <!--#region PostRecipe Instructions -->
-    <string name="post_recipe_instructions_general_help1">How to use this awesome flexible list to create the most readable recipe</string>
+    <string name="post_recipe_instructions_general_help1">How to use this awesome flexible list to create the most readable recipe possible</string>
+    <string name="post_recipe_instructions_general_help2">You can create a recipe with varied elements like header, list or simple text</string>
+    <string name="post_recipe_instructions_general_help3">Each element can be styled with bold text, underscore and a horizontal divider below</string>
+
+    <string name="post_recipe_instructions_card_with_html_for_header">Big Bold Header</string>
+    <string name="post_recipe_instructions_card_with_html_for_paragraph_with_underscore">Regular text with underscore</string>
+    <string name="post_recipe_instructions_card_with_html_for_unordered_list">First row\nSecond row\nSeparated by new line (Enter)</string>
+
+    <string name="post_recipe_instructions_recycler_features_drag_drop_swipe">Drag and drop an item to relocate it vertically\nSwipe to delete</string>
+    <string name="post_recipe_instructions_recycler_features_expand_collapse">Each item can be expanded and collapsed for your convenience</string>
 
     <!--#endregion PostRecipe Instructions -->
 

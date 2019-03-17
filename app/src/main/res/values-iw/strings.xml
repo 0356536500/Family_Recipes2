@@ -104,7 +104,15 @@
 
     <!--#region PostRecipe Instructions -->
     <string name="post_recipe_instructions_general_help1"></string>
+    <string name="post_recipe_instructions_general_help2"></string>
+    <string name="post_recipe_instructions_general_help3"></string>
 
+    <string name="post_recipe_instructions_card_with_html_for_header"></string>
+    <string name="post_recipe_instructions_card_with_html_for_paragraph_with_underscore"></string>
+    <string name="post_recipe_instructions_card_with_html_for_unordered_list"></string>
+
+    <string name="post_recipe_instructions_recycler_features_drag_drop_swipe"></string>
+    <string name="post_recipe_instructions_recycler_features_expand_collapse"></string>
     <!--#endregion PostRecipe Instructions -->
 
     <string name="post_recipe_advanced_step_reset_message">מה שכתבת יימחק. להמשיך?</string>
