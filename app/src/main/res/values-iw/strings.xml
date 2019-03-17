@@ -81,7 +81,7 @@
     <!-- Recipe Activity Share a recipe -->
     <string name="recipe_share_pre_url">תראו את המתכון הזה!</string>
 
-    <!-- CreateRecipe Activity -->
+    <!--#region PostRecipe Activity -->
     <string name="yes">כן</string>
     <string name="no">לא</string>
     <string name="post_recipe_name">שם המתכון</string>
@@ -102,6 +102,11 @@
     <string name="post_recipe_advanced_step_fab_reset">איפוס</string>
     <!--#endregion Fab Menu -->
 
+    <!--#region PostRecipe Instructions -->
+    <string name="post_recipe_instructions_general_help1"></string>
+
+    <!--#endregion PostRecipe Instructions -->
+
     <string name="post_recipe_advanced_step_reset_message">מה שכתבת יימחק. להמשיך?</string>
     <string name="post_recipe_advanced_step_list_message">לחיצה על אנטר מפרידה בין פריטים ברשימה</string>
     <string name="post_recipe_advanced_step_validation_message">צריך לפחות %1$d שדות מלאים</string>
@@ -120,6 +125,8 @@
         <item>רשימה לא ממוספרת</item>
         <item>רשימה ממוספרת</item>
     </string-array>
+
+    <!--#endregion PostRecipe Activity -->
 
     <!-- SettingsActivity -->
     <string name="settings_category_display">תצוגה</string>
