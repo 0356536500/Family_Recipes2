@@ -66,7 +66,7 @@
                 <View
                     android:layout_width="224dp"
                     android:layout_height="22dp"
-                    android:background="@drawable/background_title_element"
+                    android:background="@drawable/background_pager_element"
                     />
 
                 <View
@@ -74,7 +74,7 @@
                     android:layout_width="224dp"
                     android:layout_height="8dp"
                     android:layout_marginTop="16dp"
-                    android:background="@drawable/background_text_element"
+                    android:background="@drawable/background_pager_layout"
                     />
 
                 <View
@@ -82,7 +82,7 @@
                     android:layout_width="150dp"
                     android:layout_height="8dp"
                     android:layout_marginTop="8dp"
-                    android:background="@drawable/background_text_element"
+                    android:background="@drawable/background_pager_layout"
                     />
             </LinearLayout>
         </android.support.constraint.ConstraintLayout>

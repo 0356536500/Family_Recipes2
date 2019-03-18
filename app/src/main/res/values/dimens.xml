@@ -37,7 +37,11 @@
 
         <!--#region PostRecipe Instructions -->
     <dimen name="instructions_fab_menu_size">70dp</dimen>
-    <dimen name="instructions_fab_button_size">50dp</dimen>
+    <dimen name="instructions_small_margins">10dp</dimen>
+    <dimen name="instructions_medium_margins">20dp</dimen>
+    <dimen name="instructions_large_margins">50dp</dimen>
+    <dimen name="instructions_elevation_element">3dp</dimen>
+    <dimen name="pager_text_padding">10dp</dimen>
         <!--#endregion PostRecipe Instructions -->
 
     <!--#endregion PostRecipe Activity-->

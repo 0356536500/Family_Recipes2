@@ -1,5 +1,7 @@
 package com.myapps.ron.family_recipes.utils;
 
+import com.myapps.ron.family_recipes.model.RecipeEntity;
+
 public class Constants {
     // region Notifications
     public static final String BODY = "message";
@@ -33,6 +35,7 @@ public class Constants {
 
     //RecipeActivity
     public static final int MAX_FILES_TO_UPLOAD = com.myapps.ron.family_recipes.network.Constants.MAX_FILES_TO_UPLOAD;
+    public static final String PAGER_FOOD_IMAGES = RecipeEntity.KEY_FOOD_FILES;
 
     //PostRecipeActivity
     public static final int MIN_NUMBER_OF_HTML_ELEMENTS = 2;

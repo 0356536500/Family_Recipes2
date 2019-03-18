@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -49,6 +50,13 @@ public class RecipeViewModel extends ViewModel {
 
     public LiveData<RecipeEntity> getRecipe() {
         return recipe;
+    }
+
+    @Nullable
+    public ArrayList<String> getFoodFiles() {
+        if (recipe.getValue() != null)
+            return new ArrayList<>(recipe.getValue().getFoodFiles());
+        return null;
     }
 
     public LiveData<Boolean> isUserLiked() {

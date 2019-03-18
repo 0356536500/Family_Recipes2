@@ -211,7 +211,8 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
             DialogFragment newFragment = new PagerDialogFragment();
             Bundle bundle = new Bundle();
             //TODO: fix this
-            //bundle.putParcelable(Constants.RECIPE, recipe);
+            bundle.putSerializable(PagerDialogFragment.PAGER_TYPE_KEY, PagerDialogFragment.PAGER_TYPE.IMAGES);
+            bundle.putStringArrayList(Constants.PAGER_FOOD_IMAGES, viewModel.getFoodFiles());
             newFragment.setArguments(bundle);
             newFragment.show(ft, "dialog");
         });

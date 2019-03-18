@@ -1,36 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/pager_instructions_drag_drop_swipe_image"
         android:layout_width="match_parent"
-        android:layout_height="250dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:layout_centerInParent="true" />
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/instructions_medium_margins"
+        android:background="@drawable/background_pager_element"
+        android:layout_alignParentTop="true" />
 
-    <TextView
-        android:id="@+id/pager_instructions_drag_drop_swipe_info1_textView"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginTop="40dp"
-        android:textAppearance="@style/Base.TextAppearance.AppCompat.Large"
-        android:fontFamily="@font/open_sans_bold"
-        android:layout_below="@id/pager_instructions_drag_drop_swipe_image" />
+        android:orientation="vertical"
+        android:layout_marginBottom="@dimen/instructions_medium_margins"
+        android:background="@drawable/background_pager_layout"
+        android:layout_alignParentBottom="true">
 
-    <TextView
-        android:id="@+id/pager_instructions_drag_drop_swipe_info2_textView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginTop="30dp"
-        android:textAppearance="@style/Base.TextAppearance.AppCompat.Large"
-        android:fontFamily="@font/open_sans_bold"
-        android:layout_below="@id/pager_instructions_drag_drop_swipe_info1_textView" />
+        <TextView
+            android:id="@+id/pager_instructions_drag_drop_swipe_info1_textView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/instructions_medium_margins"
+            android:layout_marginEnd="@dimen/instructions_medium_margins"
+            android:layout_marginTop="@dimen/instructions_medium_margins"
+            android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
+            android:fontFamily="@font/open_sans_bold"
+            android:elevation="@dimen/instructions_elevation_element"
+            android:background="@drawable/background_pager_element" />
+
+        <TextView
+            android:id="@+id/pager_instructions_drag_drop_swipe_info2_textView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/instructions_medium_margins"
+            android:layout_marginEnd="@dimen/instructions_medium_margins"
+            android:layout_marginTop="@dimen/instructions_medium_margins"
+            android:layout_marginBottom="@dimen/instructions_medium_margins"
+            android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
+            android:fontFamily="@font/open_sans_bold"
+            android:elevation="@dimen/instructions_elevation_element"
+            android:background="@drawable/background_pager_element" />
+
+
+    </LinearLayout>
 
 </RelativeLayout>

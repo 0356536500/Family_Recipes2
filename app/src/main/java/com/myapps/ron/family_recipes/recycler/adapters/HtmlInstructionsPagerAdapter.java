@@ -1,8 +1,8 @@
 package com.myapps.ron.family_recipes.recycler.adapters;
 
 import android.content.Context;
-import android.graphics.Typeface;
 import android.text.Editable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,23 +31,35 @@ import androidx.viewpager.widget.PagerAdapter;
  * Created by ronginat on 17/03/2019.
  */
 public class HtmlInstructionsPagerAdapter extends PagerAdapter {
-
-    private static final float DIMMED_VIEWS_ALPHA = 0.4f;
+    private final String TAG = getClass().getSimpleName();
+    private static final float DIMMED_VIEWS_ALPHA = 0.5f;
     //@SuppressWarnings("FieldCanBeLocal")
     private final int INSTRUCTIONS_SIZE = 5;
     private Context context;
-    private Animation fadeIn = new AlphaAnimation(0f, 1f);
+    private Animation fadeIn;
 
     public HtmlInstructionsPagerAdapter(Context context) {
         this.context = context;
+        fadeIn = new AlphaAnimation(0f, 1f);
+        fadeIn.setDuration(1000);
     }
 
     @NonNull
     @Override
     public Object instantiateItem(@NonNull ViewGroup container, int position) {
-        if (position < INSTRUCTIONS_SIZE)
-            return inflateItem(container, position);
+        Log.e(TAG, "instantiateItem");
+        if (position < INSTRUCTIONS_SIZE) {
+            View item = inflateItem(container, position);
+            container.addView(item);
+            return item;
+        }
         return super.instantiateItem(container, position);
+    }
+
+    @Override
+    public void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
+        Log.e(TAG, "destroyItem");
+        container.removeView((View) object);
     }
 
     @Override
@@ -114,13 +126,18 @@ public class HtmlInstructionsPagerAdapter extends PagerAdapter {
         TextView textView2 = view.findViewById(R.id.pager_instructions_general_textView2);
         TextView textView3 = view.findViewById(R.id.pager_instructions_general_textView3);
 
-        Typeface typeFaceBold = Typeface.createFromAsset(context.getAssets(), "font/open_sans_bold.ttf");
+        /*Typeface typeFaceBold;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            typeFaceBold = context.getResources().getFont(R.font.open_sans_extrabold);
+        } else {
+            typeFaceBold = ResourcesCompat.getFont(context, R.font.open_sans_extrabold);
+        }*/
         //Typeface typeFaceSemiBold = Typeface.createFromAsset(context.getAssets(), "font/open_sans_semibold.ttf");
         textView1.setText(R.string.post_recipe_instructions_general_help1);
         textView2.setText(R.string.post_recipe_instructions_general_help2);
         textView3.setText(R.string.post_recipe_instructions_general_help3);
 
-        textView1.setTypeface(typeFaceBold);
+        //textView1.setTypeface(typeFaceBold);
 
         // animate the views with fade in animation
         textView1.startAnimation(fadeIn);
@@ -133,9 +150,7 @@ public class HtmlInstructionsPagerAdapter extends PagerAdapter {
      * @param view to populate with content
      */
     private void generateCardWithHtmlForHeader(@NonNull View view) {
-        dimmedViews(view, R.id.row_html_attributes_container2);
-        /*view.findViewById(R.id.row_html_attributes_container2).setAlpha(DIMMED_VIEWS_ALPHA);
-        view.findViewById(R.id.row_html_horizontal_divider_checkBox).setAlpha(DIMMED_VIEWS_ALPHA);*/
+        dimmedViews(view, R.id.row_html_bold_checkBox, R.id.row_html_under_score_checkBox, R.id.row_html_horizontal_divider_checkBox);
 
         EditText elementEditText = view.findViewById(R.id.row_html_details_editText);
         WebView webView = view.findViewById(R.id.pager_instructions_cardView_with_webView_html);
@@ -143,7 +158,7 @@ public class HtmlInstructionsPagerAdapter extends PagerAdapter {
         disableAllViewsInCardWithHtmlLayout(view);
 
         // populate views
-        setSpinnerAdapterAndSelection(view.findViewById(R.id.row_html_choose_type_spinner), Constants.HTML_SAMPLE_SPINNER.PARAGRAPH.ordinal());
+        setSpinnerAdapterAndSelection(view.findViewById(R.id.row_html_choose_type_spinner), Constants.HTML_SAMPLE_SPINNER.HEADER.ordinal());
 
         Editable editable = getEditableFromResource(R.string.post_recipe_instructions_card_with_html_for_header);
         elementEditText.setText(editable);
@@ -224,11 +239,11 @@ public class HtmlInstructionsPagerAdapter extends PagerAdapter {
     // region Helpers
 
     private void disableAllViewsInCardWithHtmlLayout(@NonNull View view) {
-        view.findViewById(R.id.row_html_bold_checkBox).setEnabled(false);
-        view.findViewById(R.id.row_html_under_score_checkBox).setEnabled(false);
-        view.findViewById(R.id.row_html_horizontal_divider_checkBox).setEnabled(false);
-        view.findViewById(R.id.row_html_choose_type_spinner).setEnabled(false);
-        view.findViewById(R.id.row_html_details_editText).setEnabled(false);
+        view.findViewById(R.id.row_html_bold_checkBox).setClickable(false);
+        view.findViewById(R.id.row_html_under_score_checkBox).setClickable(false);
+        view.findViewById(R.id.row_html_horizontal_divider_checkBox).setClickable(false);
+        view.findViewById(R.id.row_html_choose_type_spinner).setClickable(false);
+        view.findViewById(R.id.row_html_details_editText).setClickable(false);
         //view.findViewById(R.id.pager_instructions_cardView_with_webView_html).setEnabled(false);
     }
 

@@ -170,7 +170,7 @@ public class PostRecipeGenerateContentFragment extends PostRecipeBaseFragment {
                     mAdapter.addElementToScreen();
                     break;
                 case R.id.fab_preview_action:
-                    activity.showMyDialog(mAdapter.generateHtml("some name" , "long description"));
+                    activity.showPreviewDialog(mAdapter.generateHtml("some name" , "long description"));
                     break;
                 case R.id.fab_template_action:
                     if (shouldDisplayDialog())

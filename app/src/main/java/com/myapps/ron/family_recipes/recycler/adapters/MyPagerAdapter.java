@@ -12,6 +12,7 @@ import com.myapps.ron.family_recipes.model.RecipeEntity;
 import com.myapps.ron.family_recipes.utils.GlideApp;
 
 import java.io.File;
+import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatImageView;
@@ -24,11 +25,11 @@ import androidx.viewpager.widget.PagerAdapter;
 public class MyPagerAdapter extends PagerAdapter {
 
     private Context context;
-    private RecipeEntity recipe;
+    private List<String> images;
 
-    public MyPagerAdapter(Context context, RecipeEntity recipe) {
+    public MyPagerAdapter(Context context, List<String> foodFiles) {
         this.context = context;
-        this.recipe = recipe;
+        this.images = foodFiles;
     }
 
 
@@ -45,8 +46,8 @@ public class MyPagerAdapter extends PagerAdapter {
     }
 
     @Override public int getCount() {
-        if(recipe!= null && recipe.getFoodFiles() != null)
-            return recipe.getFoodFiles().size();
+        if(images != null)
+            return images.size();
         return 0;
     }
 
@@ -61,10 +62,10 @@ public class MyPagerAdapter extends PagerAdapter {
 
 
     private void loadImage(final AppCompatImageView view, final int position) {
-        if (recipe != null && recipe.getFoodFiles() != null && recipe.getFoodFiles().size() > position) {
+        if (images != null && images.size() > position) {
 
             //.apply(RequestOptions.circleCropTransform())
-            StorageWrapper.getFoodFile(context, recipe.getFoodFiles().get(position), path -> {
+            StorageWrapper.getFoodFile(context, images.get(position), path -> {
                 if(path != null) {
                     CircularProgressDrawable circularProgressDrawable = new CircularProgressDrawable(context);
                     circularProgressDrawable.setStrokeWidth(5f);

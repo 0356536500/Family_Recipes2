@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <padding
+        android:left="@dimen/pager_text_padding"
+        android:top="@dimen/pager_text_padding"
+        android:bottom="@dimen/pager_text_padding"
+        android:right="@dimen/pager_text_padding" />
+    <corners android:radius="6dp"/>
+    <solid android:color="@color/grey_100"/>
+    <stroke android:width="1.5dp" android:color="@color/grey_500" />
+</shape>

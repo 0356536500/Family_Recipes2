@@ -5,6 +5,7 @@ import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -19,6 +20,7 @@ import com.myapps.ron.family_recipes.background.services.PostRecipeToServerServi
 import com.myapps.ron.family_recipes.dal.Injection;
 import com.myapps.ron.family_recipes.ui.baseclasses.MyBaseActivity;
 import com.myapps.ron.family_recipes.ui.baseclasses.PostRecipeBaseFragment;
+import com.myapps.ron.family_recipes.ui.fragments.PagerDialogFragment;
 import com.myapps.ron.family_recipes.ui.fragments.PostRecipeGenerateContentFragment;
 import com.myapps.ron.family_recipes.ui.fragments.PostRecipeFirstFragment;
 import com.myapps.ron.family_recipes.ui.fragments.PostRecipePickPhotosFragment;
@@ -32,22 +34,29 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.app.NavUtils;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProviders;
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnTouch;
 
 /**
  * Created by ronginat on 29/10/2018.
  */
 public class PostRecipeActivity extends MyBaseActivity {
 
+    @BindView(R.id.create_recipe_container)
     public CoordinatorLayout coordinatorLayout;
+    @BindView(R.id.advanced_step_speedDial)
     public SpeedDialView mSpeedDialView;
     public ViewHider floatingMenuHider;
     private PostRecipeViewModel viewModel;
     private List<PostRecipeBaseFragment> fragments;
 
+    @BindView(R.id.create_recipe_expanded_button)
     public MaterialButton expandedButton;
     private FabExtensionAnimator fabExtensionAnimator;
     private View.OnClickListener expandedButtonListener;
@@ -62,40 +71,10 @@ public class PostRecipeActivity extends MyBaseActivity {
         //super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post_recipe);
 
-        coordinatorLayout = findViewById(R.id.create_recipe_container);
-        mSpeedDialView = findViewById(R.id.advanced_step_speedDial);
-        expandedButton = findViewById(R.id.create_recipe_expanded_button);
+        ButterKnife.bind(this);
         viewModel = ViewModelProviders.of(this, Injection.provideViewModelFactory(this)).get(PostRecipeViewModel.class);
 
-        floatingMenuHider = ViewHider.of(mSpeedDialView).setDirection(ViewHider.BOTTOM).build();
-        fabHider = ViewHider.of(expandedButton).setDirection(ViewHider.BOTTOM).build();
-        fabExtensionAnimator = new FabExtensionAnimator(expandedButton);
-        //fabExtensionAnimator.setExtended(false);
-        expandedButton.setOnTouchListener((view, motionEvent) -> {
-            if (fabExtensionAnimator == null)
-                return false;
-            switch (motionEvent.getAction()) {
-                case MotionEvent.ACTION_DOWN:
-                    setFabExtended(true);
-                    break;
-                case MotionEvent.ACTION_UP:
-                    Rect rect = new Rect(view.getLeft(), view.getTop(), view.getRight(), view.getBottom());
-                    if (rect.contains(view.getLeft() + (int) motionEvent.getX(),view.getTop () + (int) motionEvent.getY())) {
-                        // user lift his fingers inside the button borders
-                        if (expandedButtonListener != null) {
-                            if (fabExtensionAnimator.isAnimating())
-                                new Handler().postDelayed(() -> expandedButtonListener.onClick(view), FabExtensionAnimator.EXTENSION_DURATION);
-                            else
-                                expandedButtonListener.onClick(view);
-                        }
-                    } else {
-                        // user lift his finger outside the button borders
-                        setFabExtended(false);
-                    }
-                    break;
-            }
-            return false;
-        });
+        initFloatingElementsAndHelpers();
 
         setFragments();
 
@@ -104,6 +83,40 @@ public class PostRecipeActivity extends MyBaseActivity {
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
+    }
+
+    private void initFloatingElementsAndHelpers() {
+        floatingMenuHider = ViewHider.of(mSpeedDialView).setDirection(ViewHider.BOTTOM).build();
+        fabHider = ViewHider.of(expandedButton).setDirection(ViewHider.BOTTOM).build();
+        fabExtensionAnimator = new FabExtensionAnimator(expandedButton);
+        //fabExtensionAnimator.setExtended(false);
+    }
+
+    @OnTouch(R.id.create_recipe_expanded_button)
+    public boolean expandedButtonOnTouchListener(View view, MotionEvent motionEvent) {
+        if (fabExtensionAnimator == null)
+            return false;
+        switch (motionEvent.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                setFabExtended(true);
+                break;
+            case MotionEvent.ACTION_UP:
+                Rect rect = new Rect(view.getLeft(), view.getTop(), view.getRight(), view.getBottom());
+                if (rect.contains(view.getLeft() + (int) motionEvent.getX(),view.getTop () + (int) motionEvent.getY())) {
+                    // user lift his fingers inside the button borders
+                    if (expandedButtonListener != null) {
+                        if (fabExtensionAnimator.isAnimating())
+                            new Handler().postDelayed(() -> expandedButtonListener.onClick(view), FabExtensionAnimator.EXTENSION_DURATION);
+                        else
+                            expandedButtonListener.onClick(view);
+                    }
+                } else {
+                    // user lift his finger outside the button borders
+                    setFabExtended(false);
+                }
+                break;
+        }
+        return false;
     }
 
     // region FAB methods
@@ -149,6 +162,8 @@ public class PostRecipeActivity extends MyBaseActivity {
             getSupportActionBar().setTitle(title);
         }
     }
+
+    // region Fragments
 
     private void setFragments() {
         fragments = new ArrayList<>();
@@ -213,21 +228,35 @@ public class PostRecipeActivity extends MyBaseActivity {
         //finish();
     }
 
+    // endregion
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.post_recipe_menu, menu);
+        return true;
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            if (inPreview) {
-                backFromPreview();
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                if (inPreview) {
+                    backFromPreview();
+                    return true;
+                }
+                if (currentIndex > 0) {
+                    previousFragmentDelayed();
+                    return true;
+                }
+                else {
+                    setResult(RESULT_CANCELED);
+                    NavUtils.navigateUpFromSameTask(this);
+                }
+                break;
+            case R.id.action_help:
+                showInstructionDialog();
                 return true;
-            }
-            if (currentIndex > 0) {
-                previousFragmentDelayed();
-                return true;
-            }
-            else {
-                setResult(RESULT_CANCELED);
-                NavUtils.navigateUpFromSameTask(this);
-            }
         }
         return super.onOptionsItemSelected(item);
     }
@@ -240,7 +269,7 @@ public class PostRecipeActivity extends MyBaseActivity {
         mSpeedDialView.setVisibility(fragments.get(currentIndex).menuFabVisibility());
     }
 
-    public void showMyDialog(String html) {
+    public void showPreviewDialog(String html) {
         Fragment newFragment = new PreviewDialogFragment();
         Bundle bundle = new Bundle();
         bundle.putString("html", html);
@@ -254,6 +283,22 @@ public class PostRecipeActivity extends MyBaseActivity {
         mSpeedDialView.setVisibility(View.GONE);
         expandedButton.setVisibility(View.GONE);
         inPreview = true;
+    }
+
+    private void showInstructionDialog() {
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        Fragment prev = getSupportFragmentManager().findFragmentByTag("dialog");
+        if (prev != null) {
+            ft.remove(prev);
+        }
+        ft.addToBackStack(null);
+
+        // Create and show the dialog.
+        DialogFragment newFragment = new PagerDialogFragment();
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(PagerDialogFragment.PAGER_TYPE_KEY, PagerDialogFragment.PAGER_TYPE.INSTRUCTIONS);
+        newFragment.setArguments(bundle);
+        newFragment.show(ft, "dialog");
     }
 
     public void postRecipe() {

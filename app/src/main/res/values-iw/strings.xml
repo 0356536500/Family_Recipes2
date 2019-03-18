@@ -9,6 +9,7 @@
     <string name="action_share">שיתוף</string>
     <string name="action_add_photo">הוספת תמונה</string>
     <string name="action_refresh">רענן</string>
+    <string name="action_help">עזרה</string>
     <string name="search_hint">הקלד/י לחיפוש…</string>
 
     <!--ForgotPasswordActivity-->
