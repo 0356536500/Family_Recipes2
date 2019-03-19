@@ -139,7 +139,7 @@ public class PostRecipeGenerateContentFragment extends PostRecipeBaseFragment {
                     .setLabel(R.string.post_recipe_advanced_step_fab_add)
                     .setLabelColor(ResourcesCompat.getColor(getResources(), R.color.md_blue_grey_600,
                             activity.getTheme()))
-                    .setLabelBackgroundColor(Color.TRANSPARENT)
+                    .setLabelBackgroundColor(Color.WHITE)
                     .create());
 
             mSpeedDialView.addActionItem(new SpeedDialActionItem.Builder(R.id.fab_preview_action, R.drawable.ic_preview_fab)
@@ -148,7 +148,7 @@ public class PostRecipeGenerateContentFragment extends PostRecipeBaseFragment {
                     .setLabel(R.string.post_recipe_advanced_step_fab_preview)
                     .setLabelColor(ResourcesCompat.getColor(getResources(), R.color.md_blue_700,
                             activity.getTheme()))
-                    .setLabelBackgroundColor(Color.TRANSPARENT)
+                    .setLabelBackgroundColor(Color.WHITE)
                     .create());
 
             mSpeedDialView.addActionItem(new SpeedDialActionItem.Builder(R.id.fab_template_action, R.drawable.ic_template_fab)
@@ -157,7 +157,7 @@ public class PostRecipeGenerateContentFragment extends PostRecipeBaseFragment {
                     .setLabel(R.string.post_recipe_advanced_step_fab_template)
                     .setLabelColor(ResourcesCompat.getColor(getResources(), R.color.md_light_green_800,
                             activity.getTheme()))
-                    .setLabelBackgroundColor(Color.TRANSPARENT)
+                    .setLabelBackgroundColor(Color.WHITE)
                     //.setTheme(R.style.AppTheme_Purple)
                     .create());
 
@@ -167,7 +167,7 @@ public class PostRecipeGenerateContentFragment extends PostRecipeBaseFragment {
                     .setLabel(R.string.post_recipe_advanced_step_fab_reset)
                     .setLabelColor(ResourcesCompat.getColor(getResources(), R.color.md_grey_900,
                             activity.getTheme()))
-                    .setLabelBackgroundColor(Color.TRANSPARENT)
+                    .setLabelBackgroundColor(Color.WHITE)
                     .create());
         }
     }
