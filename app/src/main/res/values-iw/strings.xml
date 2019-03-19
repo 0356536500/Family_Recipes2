@@ -104,16 +104,16 @@
     <!--#endregion Fab Menu -->
 
     <!--#region PostRecipe Instructions -->
-    <string name="post_recipe_instructions_general_help1"></string>
-    <string name="post_recipe_instructions_general_help2"></string>
-    <string name="post_recipe_instructions_general_help3"></string>
+    <string name="post_recipe_instructions_general_help1">כתיבת המתכון בצורה הטובה האפשרית</string>
+    <string name="post_recipe_instructions_general_help2">אפשר להשתמש בכתיבת המתכון באלמנטים כמו כותרת, רשימת פריטים וטקסט רגיל</string>
+    <string name="post_recipe_instructions_general_help3">עצבו כל אלמנט בעזרת הדגשת הטקסט, קו תחתון או קו הפרדה לרוחב הדף</string>
 
-    <string name="post_recipe_instructions_card_with_html_for_header"></string>
-    <string name="post_recipe_instructions_card_with_html_for_paragraph_with_underscore"></string>
-    <string name="post_recipe_instructions_card_with_html_for_unordered_list"></string>
+    <string name="post_recipe_instructions_card_with_html_for_header">כותרת גדולה ומודגשת</string>
+    <string name="post_recipe_instructions_card_with_html_for_paragraph_with_underscore">כיתוב רגיל עם קו תחתון</string>
+    <string name="post_recipe_instructions_card_with_html_for_unordered_list">שורה ראשונה\nשורה שנייה\nמופרדות באמצעות שורה חדשה (אנטר)</string>
 
-    <string name="post_recipe_instructions_recycler_features_drag_drop_swipe"></string>
-    <string name="post_recipe_instructions_recycler_features_expand_collapse"></string>
+    <string name="post_recipe_instructions_recycler_features_drag_drop_swipe">גרירה ושחרור של אלמנט בצורה אנכית כדי לשנות את מיקומו.\nמחיקה בהחלקה הצידה</string>
+    <string name="post_recipe_instructions_recycler_features_expand_collapse">ניתן להרחיב ולצמצמם כל אלמנט לנוחיותך</string>
     <!--#endregion PostRecipe Instructions -->
 
     <string name="post_recipe_advanced_step_reset_message">מה שכתבת יימחק. להמשיך?</string>

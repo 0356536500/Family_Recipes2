@@ -1,6 +1,5 @@
 package com.myapps.ron.family_recipes.ui.activities;
 
-import android.annotation.SuppressLint;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Handler;
@@ -21,8 +20,8 @@ import com.myapps.ron.family_recipes.dal.Injection;
 import com.myapps.ron.family_recipes.ui.baseclasses.MyBaseActivity;
 import com.myapps.ron.family_recipes.ui.baseclasses.PostRecipeBaseFragment;
 import com.myapps.ron.family_recipes.ui.fragments.PagerDialogFragment;
-import com.myapps.ron.family_recipes.ui.fragments.PostRecipeGenerateContentFragment;
 import com.myapps.ron.family_recipes.ui.fragments.PostRecipeFirstFragment;
+import com.myapps.ron.family_recipes.ui.fragments.PostRecipeGenerateContentFragment;
 import com.myapps.ron.family_recipes.ui.fragments.PostRecipePickPhotosFragment;
 import com.myapps.ron.family_recipes.ui.fragments.PreviewDialogFragment;
 import com.myapps.ron.family_recipes.viewmodels.PostRecipeViewModel;
@@ -65,10 +64,8 @@ public class PostRecipeActivity extends MyBaseActivity {
     private boolean inPreview = false;
 
 
-    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onMyCreate(@Nullable Bundle savedInstanceState) {
-        //super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post_recipe);
 
         ButterKnife.bind(this);
@@ -285,7 +282,7 @@ public class PostRecipeActivity extends MyBaseActivity {
         inPreview = true;
     }
 
-    private void showInstructionDialog() {
+    public void showInstructionDialog() {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         Fragment prev = getSupportFragmentManager().findFragmentByTag("dialog");
         if (prev != null) {

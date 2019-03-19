@@ -2,11 +2,8 @@ package com.myapps.ron.family_recipes.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
 
 import com.myapps.ron.family_recipes.R;
-
-import androidx.core.content.SharedPreferencesCompat;
 
 public class SharedPreferencesHandler {
     public static SharedPreferences getSharedPreferences(Context context) {
@@ -48,6 +45,11 @@ public class SharedPreferencesHandler {
     public static boolean getBoolean(Context ctx, String key) {
         SharedPreferences sharedPreferences = ctx.getSharedPreferences(ctx.getString(R.string.sharedPreferences), Context.MODE_PRIVATE);
         return sharedPreferences.getBoolean(key, false);
+    }
+
+    public static boolean getBoolean(Context ctx, String key, boolean defValue) {
+        SharedPreferences sharedPreferences = ctx.getSharedPreferences(ctx.getString(R.string.sharedPreferences), Context.MODE_PRIVATE);
+        return sharedPreferences.getBoolean(key, defValue);
     }
 
     public static String getString(Context ctx, String key) {

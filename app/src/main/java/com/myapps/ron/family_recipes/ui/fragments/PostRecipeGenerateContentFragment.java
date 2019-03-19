@@ -3,6 +3,7 @@ package com.myapps.ron.family_recipes.ui.fragments;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +20,7 @@ import com.myapps.ron.family_recipes.recycler.helpers.MyRecyclerScroll;
 import com.myapps.ron.family_recipes.recycler.helpers.SwipeAndDragHelper;
 import com.myapps.ron.family_recipes.ui.baseclasses.PostRecipeBaseFragment;
 import com.myapps.ron.family_recipes.utils.Constants;
+import com.myapps.ron.family_recipes.utils.SharedPreferencesHandler;
 import com.myapps.ron.family_recipes.viewmodels.PostRecipeViewModel;
 
 import java.util.List;
@@ -73,6 +75,7 @@ public class PostRecipeGenerateContentFragment extends PostRecipeBaseFragment {
 
         initFloatingMenu(savedInstanceState == null);
         initRecycler();
+        firstTimeInstructionsDialogDelayed();
     }
 
     @Override
@@ -81,6 +84,13 @@ public class PostRecipeGenerateContentFragment extends PostRecipeBaseFragment {
         isDestroyed = true;
         mSpeedDialView.setVisibility(View.GONE);
         this.elements = mAdapter.getElements();
+    }
+
+    private void firstTimeInstructionsDialogDelayed() {
+        if (SharedPreferencesHandler.getBoolean(activity, getString(R.string.preference_key_first_post_recipe), true)) {
+            SharedPreferencesHandler.writeBoolean(activity, getString(R.string.preference_key_first_post_recipe), false);
+            new Handler().postDelayed(activity::showInstructionDialog, 1500);
+        }
     }
 
     // region PostRecipeBaseFragment Overrides
