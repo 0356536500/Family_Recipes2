@@ -36,6 +36,7 @@ public class FabExtensionAnimator {
     public static final int EXTENSION_DURATION = 150;
     private static final String ROTATION_Y_PROPERTY = "rotationY";
 
+    private final int initialCornerRadius;
     private final int collapsedFabSize;
     private final int extendedFabHeight;
     private boolean isAnimating;
@@ -44,11 +45,14 @@ public class FabExtensionAnimator {
     private final MaterialButton button;
 
     private final Transition.TransitionListener listener = new Transition.TransitionListener() {
-        public void onTransitionStart(@NonNull Transition transition) { isAnimating = true; }
+        public void onTransitionStart(@NonNull Transition transition) {
+            isAnimating = true;
+            button.setBackground(getDrawable());
+        }
 
         public void onTransitionEnd(@NonNull Transition transition) { isAnimating = false; }
 
-        public void onTransitionCancel(@NonNull Transition transition) {isAnimating = false; }
+        public void onTransitionCancel(@NonNull Transition transition) { isAnimating = false; }
 
         public void onTransitionPause(@NonNull Transition transition) { }
 
@@ -57,6 +61,7 @@ public class FabExtensionAnimator {
 
     public FabExtensionAnimator(MaterialButton button) {
         this.button = button;
+        this.initialCornerRadius = button.getCornerRadius();
         collapsedFabSize = button.getResources().getDimensionPixelSize(R.dimen.collapsed_fab_size);
         extendedFabHeight = button.getResources().getDimensionPixelSize(R.dimen.extended_fab_height);
         button.setBackground(getDrawable());
@@ -126,6 +131,10 @@ public class FabExtensionAnimator {
         set.start();
     }
 
+    private int getInitialCorenerRadius() {
+        return this.initialCornerRadius;
+    }
+
     @SuppressWarnings("WeakerAccess")
     protected int getCollapsedFabSize() { return collapsedFabSize;}
 
@@ -139,7 +148,7 @@ public class FabExtensionAnimator {
 
     @SuppressLint("RestrictedApi")
     private Drawable getDrawable() {
-        int cornerRadius = getCollapsedFabSize();
+        int cornerRadius = isExtended() ? getInitialCorenerRadius() : getCollapsedFabSize();
         int strokeWidth = button.getStrokeWidth();
         ColorStateList rippleColor = button.getRippleColor();
         ColorStateList strokeColor = button.getStrokeColor();

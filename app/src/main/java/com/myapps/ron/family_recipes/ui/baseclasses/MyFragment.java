@@ -6,9 +6,7 @@ import androidx.fragment.app.Fragment;
  * Created by ronginat on 20/10/2018.
  */
 public abstract class MyFragment extends Fragment {
-    //private static final String VIEW_DESTROYED = "com.myapps.ron.family_recipes.ui.baseclasses.MyFragment.view.destroyed";
-
-    protected boolean isDestroyed = false;
+    boolean isDestroyed = false;
 
     /**
      *

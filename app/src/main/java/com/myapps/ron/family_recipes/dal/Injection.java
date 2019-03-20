@@ -38,6 +38,7 @@ public class Injection {
     public static ViewModelFactory provideViewModelFactory(Context context) {
         RecipeRepository dataSource1 = provideRecipeRepository(context);
         CategoryRepository dataSource2 = provideCategoryRepository(context);
-        return new ViewModelFactory(dataSource1, dataSource2);
+        PendingRecipeRepository dataSource3 = providePendingRecipeRepository(context);
+        return new ViewModelFactory(dataSource1, dataSource2, dataSource3);
     }
 }

@@ -133,6 +133,12 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        compositeDisposable.clear();
+    }
+
     private void loadColorsFromTheme() {
         TypedValue primaryValue = new TypedValue();
         TypedValue secondValue = new TypedValue();
@@ -473,9 +479,6 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int itemId = item.getItemId();
 
         switch (itemId) {
@@ -587,7 +590,6 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
                         && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
 
                     showChooseDialog();
-
                 }
                 break;
             }

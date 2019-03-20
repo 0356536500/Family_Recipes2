@@ -8,6 +8,7 @@ import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
+import io.reactivex.Completable;
 
 /**
  * Created by ronginat on 20/02/2019.
@@ -18,7 +19,7 @@ public interface PendingRecipeDao {
     List<PendingRecipeEntity> getAll();
 
     @Insert
-    void insert(PendingRecipeEntity recipe);
+    Completable insert(PendingRecipeEntity recipe);
 
     @Insert
     void insertAll(PendingRecipeEntity... recipes);

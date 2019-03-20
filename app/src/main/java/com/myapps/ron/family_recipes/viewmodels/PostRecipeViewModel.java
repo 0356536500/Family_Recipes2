@@ -3,11 +3,20 @@ package com.myapps.ron.family_recipes.viewmodels;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
-import android.content.Context;
+import androidx.work.WorkManager;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.schedulers.Schedulers;
 
+import android.content.Context;
+import android.util.Log;
+
+import com.myapps.ron.family_recipes.background.workers.PostRecipeScheduledWorker;
 import com.myapps.ron.family_recipes.dal.repository.CategoryRepository;
+import com.myapps.ron.family_recipes.dal.repository.PendingRecipeRepository;
 import com.myapps.ron.family_recipes.dal.storage.StorageWrapper;
 import com.myapps.ron.family_recipes.model.CategoryEntity;
+import com.myapps.ron.family_recipes.model.PendingRecipeEntity;
 import com.myapps.ron.family_recipes.model.RecipeEntity;
 
 import java.io.File;
@@ -21,8 +30,13 @@ public class PostRecipeViewModel extends ViewModel {
     private MutableLiveData<String> recipePath = new MutableLiveData<>();
     private LiveData<List<CategoryEntity>> categoryList; // list of categories from local db
 
-    public PostRecipeViewModel(CategoryRepository categoryRepository) {
+    private CompositeDisposable compositeDisposable;
+    private final PendingRecipeRepository pendingRecipeRepository;
+
+    public PostRecipeViewModel(CategoryRepository categoryRepository, PendingRecipeRepository pendingRecipeRepository) {
         this.categoryList = categoryRepository.getAllCategoriesLiveData();
+        this.pendingRecipeRepository = pendingRecipeRepository;
+        this.compositeDisposable = new CompositeDisposable();
     }
 
     private File recipeFile;
@@ -60,5 +74,26 @@ public class PostRecipeViewModel extends ViewModel {
             }*/
             recipe.setFoodFiles(paths);
         }
+    }
+
+    public void postRecipe() {
+        this.compositeDisposable.add(
+                this.pendingRecipeRepository
+                        .insertOrUpdatePendingRecipe(new PendingRecipeEntity(this.recipe))
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(this::initWorker, error -> Log.e(getClass().getSimpleName(), error.getMessage()))
+        );
+    }
+
+    private void initWorker() {
+        this.compositeDisposable.clear();
+        WorkManager.getInstance().enqueue(PostRecipeScheduledWorker.createPostRecipesWorker());
+    }
+
+    @Override
+    protected void onCleared() {
+        this.compositeDisposable.clear();
+        super.onCleared();
     }
 }

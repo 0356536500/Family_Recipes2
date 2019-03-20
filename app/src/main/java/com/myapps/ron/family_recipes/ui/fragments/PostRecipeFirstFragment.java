@@ -9,6 +9,7 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.myapps.ron.family_recipes.R;
@@ -27,9 +28,11 @@ import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.AppCompatEditText;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProviders;
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnTextChanged;
 
 /**
  * Created by ronginat on 29/10/2018.
@@ -37,8 +40,12 @@ import androidx.lifecycle.ViewModelProviders;
 public class PostRecipeFirstFragment extends PostRecipeBaseFragment implements FilterListener<CategoryEntity> {
     private final String TAG = getClass().getSimpleName();
 
-    private AppCompatEditText editTextName, editTextDesc;
-    private Filter<CategoryEntity> mFilter;
+    @BindView(R.id.recipe_name_editText)
+    EditText editTextName;
+    @BindView(R.id.recipe_desc_editText)
+    EditText editTextDesc;
+    @BindView(R.id.first_step_filter)
+    Filter<CategoryEntity> mFilter;
     private List<CategoryEntity> allTags;
     private List<String> chosenTags;
 
@@ -64,17 +71,13 @@ public class PostRecipeFirstFragment extends PostRecipeBaseFragment implements F
     }
 
     @Override
-    public void onMyViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         Log.e(getClass().getSimpleName(), "on view created");
-        //activity.setTitle(getString(R.string.nav_main_post_recipe) + " 1/3");
 
-        mFilter = view.findViewById(R.id.first_step_filter);
-
-        editTextName = view.findViewById(R.id.recipe_name_editText);
-        editTextDesc = view.findViewById(R.id.recipe_desc_editText);
-
+        ButterKnife.bind(this, view);
         initViewModel();
-        setListeners();
+        //setListeners();
     }
 
     // region PostRecipeBaseFragment Overrides
@@ -145,6 +148,27 @@ public class PostRecipeFirstFragment extends PostRecipeBaseFragment implements F
         activity.getTheme().resolveAttribute(R.attr.searchFilterTextColor, textValue, true);
         filterBackgroundColor = backgroundValue.data;
         filterTextColor = textValue.data;
+    }
+
+    @OnTextChanged(value = R.id.recipe_name_editText, callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
+    void afterTextChangedNameListener(Editable editable) {
+        if (editable != null) {
+            afterTextChangedGeneral(editTextName, editable);
+            name = editable.toString();
+        }
+    }
+
+    @OnTextChanged(value = R.id.recipe_desc_editText, callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
+    void afterTextChangedDescriptionListener(Editable editable) {
+        if (editable != null) {
+            afterTextChangedGeneral(editTextDesc, editable);
+            desc = editable.toString();
+        }
+    }
+
+    private void afterTextChangedGeneral(@NonNull View view, @NonNull Editable editable) {
+        if(!editable.toString().isEmpty())
+            view.getBackground().setTint(Color.BLACK);
     }
 
     private void setListeners() {

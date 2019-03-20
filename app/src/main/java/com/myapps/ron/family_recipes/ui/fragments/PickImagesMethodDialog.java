@@ -26,15 +26,6 @@ public class PickImagesMethodDialog extends DialogFragment {
     public enum Option { CAMERA, GALLERY, CANCEL }
     public PublishSubject<Option> dispatchInfo;
 
-    /*@BindView(R.id.pick_image_dialog_camera)
-    TextView cameraTextView;
-
-    @BindView(R.id.pick_image_dialog_gallery)
-    TextView galleryTextView;
-
-    @BindView(R.id.pick_image_dialog_cancel)
-    TextView cancelTextView;*/
-
     public PickImagesMethodDialog() {
         this.dispatchInfo = PublishSubject.create();
     }
@@ -59,22 +50,23 @@ public class PickImagesMethodDialog extends DialogFragment {
         }
 
         ButterKnife.bind(this, view);
-        //bindUI(view);
-        //bindViewListeners(view);
     }
 
+    @SuppressWarnings("UnusedParameters")
     @OnClick(R.id.pick_image_dialog_camera)
-    public void camera(View view) {
+    void camera(View view) {
         delayedDispatch(Option.CAMERA);
     }
 
+    @SuppressWarnings("UnusedParameters")
     @OnClick(R.id.pick_image_dialog_gallery)
-    public void gallery(View view) {
+    void gallery(View view) {
         delayedDispatch(Option.GALLERY);
     }
 
+    @SuppressWarnings("UnusedParameters")
     @OnClick(R.id.pick_image_dialog_cancel)
-    public void cancel(View view) {
+    void cancel(View view) {
         delayedDispatch(Option.CANCEL);
     }
 

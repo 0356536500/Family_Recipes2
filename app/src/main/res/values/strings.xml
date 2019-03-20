@@ -115,9 +115,9 @@
     <string name="post_recipe_advanced_step_validation_message">Need at least %1$d non empty elements</string>
     <string name="post_recipe_advanced_step_item_removed_message">%1$s was removed</string>
     <string name="post_recipe_advanced_step_item_undo_message">undo</string>
-    <string name="post_recipe_pick_photos_button">browse</string>
-    <string name="post_recipe_shoot_photos_button">camera</string>
-    <string name="post_recipe_reset_photos_button">reset</string>
+    <string name="post_recipe_pick_photos_button">Photos</string>
+    <string name="post_recipe_pick_photos_reset_button">Reset</string>
+    <string name="post_recipe_pick_photos_initial_state">No photos</string>
     <string name="post_recipe_pick_photos_browse_empty_message">You haven\'t picked any Image</string>
     <string name="post_recipe_pick_photos_camera_empty_message">You haven\'t take a picture</string>
 

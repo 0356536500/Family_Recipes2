@@ -28,6 +28,11 @@ public class DateUtil {
         return DATE_FORMAT.format(new Date());
     }
 
+    public static long getUTCTimeLong() {
+        //DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC"));
+        return Calendar.getInstance(TimeZone.getTimeZone("UTC")).getTime().getTime();
+    }
+
     public static String getLocalFromUTC(String dateUTC) {
         DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC"));
         try {

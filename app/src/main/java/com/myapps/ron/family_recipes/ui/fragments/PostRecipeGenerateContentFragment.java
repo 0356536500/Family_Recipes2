@@ -67,7 +67,8 @@ public class PostRecipeGenerateContentFragment extends PostRecipeBaseFragment {
     }
 
     @Override
-    public void onMyViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         recyclerView = view.findViewById(R.id.advanced_step_recycler);
         mSpeedDialView = activity.mSpeedDialView;
         //mSpeedDialView = view.findViewById(R.id.advanced_step_speedDial);
@@ -81,7 +82,6 @@ public class PostRecipeGenerateContentFragment extends PostRecipeBaseFragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        isDestroyed = true;
         mSpeedDialView.setVisibility(View.GONE);
         this.elements = mAdapter.getElements();
     }

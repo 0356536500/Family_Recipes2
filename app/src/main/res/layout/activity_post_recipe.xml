@@ -23,6 +23,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|start"
+        app:cornerRadius="@dimen/material_corner_radius"
+        android:textSize="@dimen/button_text_size_large"
+        android:fontFamily="@font/open_sans_bold"
         app:layout_behavior="@string/bottom_transient_bar_behavior"
         android:layout_margin="@dimen/single_margin" />
     <!--style="@style/Widget.MaterialComponents.Button.UnelevatedButton"

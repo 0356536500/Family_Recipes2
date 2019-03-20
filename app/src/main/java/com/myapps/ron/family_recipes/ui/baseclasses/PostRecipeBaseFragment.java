@@ -27,12 +27,10 @@ public abstract class PostRecipeBaseFragment extends MyFragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        onMyViewCreated(view, savedInstanceState);
+        super.onViewCreated(view, savedInstanceState);
 
         togglePersistentUi();
     }
-
-    protected abstract void onMyViewCreated(View view, Bundle savedInstanceState);
 
     protected void toggleFab(boolean show) { activity.toggleFab(show); }
 

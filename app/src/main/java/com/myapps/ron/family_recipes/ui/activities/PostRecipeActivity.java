@@ -15,11 +15,11 @@ import com.leinardi.android.speeddial.SpeedDialView;
 import com.myapps.ron.family_recipes.FabExtensionAnimator;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.ViewHider;
-import com.myapps.ron.family_recipes.background.services.PostRecipeToServerService;
 import com.myapps.ron.family_recipes.dal.Injection;
 import com.myapps.ron.family_recipes.ui.baseclasses.MyBaseActivity;
 import com.myapps.ron.family_recipes.ui.baseclasses.PostRecipeBaseFragment;
 import com.myapps.ron.family_recipes.ui.fragments.PagerDialogFragment;
+import com.myapps.ron.family_recipes.ui.fragments.PickImagesMethodDialog;
 import com.myapps.ron.family_recipes.ui.fragments.PostRecipeFirstFragment;
 import com.myapps.ron.family_recipes.ui.fragments.PostRecipeGenerateContentFragment;
 import com.myapps.ron.family_recipes.ui.fragments.PostRecipePickPhotosFragment;
@@ -61,7 +61,7 @@ public class PostRecipeActivity extends MyBaseActivity {
     private View.OnClickListener expandedButtonListener;
     private ViewHider fabHider;
     private int currentIndex = 0;
-    private boolean inPreview = false;
+    private boolean inPreview = false, fabMayExpand;
 
 
     @Override
@@ -130,11 +130,13 @@ public class PostRecipeActivity extends MyBaseActivity {
     }
 
     public void setFabExtended(boolean extended) {
-        fabExtensionAnimator.setExtended(extended);
+        if (fabMayExpand)
+            fabExtensionAnimator.setExtended(extended);
     }
 
     public void setFabExtended(boolean extended, long delay) {
-        fabExtensionAnimator.setExtended(extended, delay);
+        if (fabMayExpand)
+            fabExtensionAnimator.setExtended(extended, delay);
     }
 
     public void updateFab(FabExtensionAnimator.GlyphState glyphState) {
@@ -148,6 +150,16 @@ public class PostRecipeActivity extends MyBaseActivity {
 
     public boolean isFabExtended() {
         return fabExtensionAnimator.isExtended();
+    }
+
+    public void setFabGravity(int gravity) {
+        expandedButton.setVisibility(View.INVISIBLE);
+        ((CoordinatorLayout.LayoutParams) expandedButton.getLayoutParams()).gravity = gravity;
+        expandedButton.setVisibility(View.VISIBLE);
+    }
+
+    public void setFabMayExpand(boolean fabMayExpand) {
+        this.fabMayExpand = fabMayExpand;
     }
 
     // endregion
@@ -175,7 +187,8 @@ public class PostRecipeActivity extends MyBaseActivity {
                 .addToBackStack(null)
                 .commit();
 
-        new Handler().postDelayed(this::nextFragmentDelayed, 700);
+        new Handler().postDelayed(this::nextFragmentDelayed, 600);
+        new Handler().postDelayed(this::nextFragmentDelayed, 600);
     }
 
     public void nextFragmentDelayed() {
@@ -298,11 +311,28 @@ public class PostRecipeActivity extends MyBaseActivity {
         newFragment.show(ft, "dialog");
     }
 
+    public PickImagesMethodDialog showPickImagesDialog() {
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        Fragment prev = getSupportFragmentManager().findFragmentByTag("photos_dialog");
+        if (prev != null) {
+            ft.remove(prev);
+        }
+        ft.addToBackStack(null);
+
+        // Create and show the dialog.
+        PickImagesMethodDialog pickImageDialog = new PickImagesMethodDialog();
+        pickImageDialog.show(ft, "photos_dialog");
+
+        return pickImageDialog;
+    }
+
     public void postRecipe() {
         Toast.makeText(this, "posting the recipe...", Toast.LENGTH_SHORT).show();
-        PostRecipeToServerService.startActionPostRecipe(this, viewModel.recipe);
+        viewModel.postRecipe();
         setResult(RESULT_OK);
-        finish();
+        new Handler().postDelayed(this::finish, 500);
+        //PostRecipeToServerService.startActionPostRecipe(this, viewModel.recipe);
+        //finish();
     }
 
     /*public void postRecipe1() {

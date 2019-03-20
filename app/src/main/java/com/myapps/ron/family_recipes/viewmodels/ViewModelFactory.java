@@ -1,6 +1,7 @@
 package com.myapps.ron.family_recipes.viewmodels;
 
 import com.myapps.ron.family_recipes.dal.repository.CategoryRepository;
+import com.myapps.ron.family_recipes.dal.repository.PendingRecipeRepository;
 import com.myapps.ron.family_recipes.dal.repository.RecipeRepository;
 
 import java.lang.reflect.InvocationTargetException;
@@ -16,14 +17,12 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
 
     private final RecipeRepository mDataSource1;
     private final CategoryRepository mDataSource2;
+    private final PendingRecipeRepository mDataSource3;
 
-    /*public ViewModelFactory(RecipeRepository recipeRepository) {
-        this.mDataSource1 = recipeRepository;
-    }*/
-
-    public ViewModelFactory(RecipeRepository recipeRepository, CategoryRepository categoryRepository) {
+    public ViewModelFactory(RecipeRepository recipeRepository, CategoryRepository categoryRepository, PendingRecipeRepository pendingRecipeRepository) {
         this.mDataSource1 = recipeRepository;
         this.mDataSource2 = categoryRepository;
+        this.mDataSource3 = pendingRecipeRepository;
     }
 
     @NonNull
@@ -37,7 +36,7 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
             }
         } else if (modelClass.isAssignableFrom(PostRecipeViewModel.class)) {
             try {
-                return modelClass.getConstructor(CategoryRepository.class).newInstance(mDataSource2);
+                return modelClass.getConstructor(CategoryRepository.class, PendingRecipeRepository.class).newInstance(mDataSource2, mDataSource3);
             } catch (ClassCastException | IllegalAccessException | NoSuchMethodException | InstantiationException | InvocationTargetException e) {
                 throw new RuntimeException("Cannot create an instance of " + modelClass, e);
             }

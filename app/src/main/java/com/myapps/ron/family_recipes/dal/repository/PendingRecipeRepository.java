@@ -6,6 +6,8 @@ import com.myapps.ron.family_recipes.model.PendingRecipeEntity;
 import java.util.List;
 import java.util.concurrent.Executor;
 
+import io.reactivex.Completable;
+
 /**
  * Created by ronginat on 26/02/2019.
  */
@@ -35,9 +37,10 @@ public class PendingRecipeRepository {
         return recipeDao.getAll();
     }
 
-    public void insertOrUpdatePendingRecipe(PendingRecipeEntity recipeEntity) {
-        executor.execute(() ->
-                recipeDao.insert(recipeEntity));
+    public Completable insertOrUpdatePendingRecipe(PendingRecipeEntity recipeEntity) {
+        return recipeDao.insert(recipeEntity);
+        /*executor.execute(() ->
+                recipeDao.insert(recipeEntity));*/
     }
 
     public void delete(PendingRecipeEntity recipe) {

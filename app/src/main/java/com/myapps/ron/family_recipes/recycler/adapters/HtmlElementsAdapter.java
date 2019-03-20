@@ -104,7 +104,7 @@ public class HtmlElementsAdapter extends RecyclerView.Adapter<HtmlElementsAdapte
 
         @OnTextChanged(value = R.id.row_html_details_editText, callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
         void afterTextChanged(Editable editable) {
-            if (editText.isFocused())
+            if (editText.isFocused()) // only when user typed, not when displaying basic template
                 elements.get(getAdapterPosition()).setText(editable);
             moreDetailsCollapsedTextView.setText(editable);
         }

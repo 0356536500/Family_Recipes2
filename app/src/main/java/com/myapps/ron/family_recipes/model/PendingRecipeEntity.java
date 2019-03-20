@@ -1,7 +1,8 @@
 package com.myapps.ron.family_recipes.model;
 
+import com.myapps.ron.family_recipes.utils.DateUtil;
+
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -24,7 +25,7 @@ public class PendingRecipeEntity {
     @NonNull
     @PrimaryKey
     @ColumnInfo(name = KEY_CREATED)
-    private Date creationDate;
+    private Long creationDate;
     @ColumnInfo(name = KEY_NAME)
     private String name;
     @ColumnInfo(name = KEY_DESCRIPTION)
@@ -37,17 +38,25 @@ public class PendingRecipeEntity {
     private List<String> foodFiles;
 
     public PendingRecipeEntity() {
-        this.creationDate = new Date();
+        this.creationDate = DateUtil.getUTCTimeLong();
         categories = new ArrayList<>();
         foodFiles = new ArrayList<>();
     }
 
-    @NonNull
-    public Date getCreationDate() {
+    public PendingRecipeEntity(RecipeEntity entity) {
+        this.creationDate = entity.getCreationDate();
+        this.name = entity.getName();
+        this.description = entity.getDescription();
+        this.recipeFile = entity.getRecipeFile();
+        this.categories = entity.getCategories();
+        this.foodFiles = entity.getFoodFiles();
+    }
+
+    public long getCreationDate() {
         return creationDate;
     }
 
-    public void setCreationDate(@NonNull Date creationDate) {
+    public void setCreationDate(long creationDate) {
         this.creationDate = creationDate;
     }
 

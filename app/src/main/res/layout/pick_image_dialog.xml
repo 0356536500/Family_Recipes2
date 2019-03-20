@@ -47,13 +47,14 @@
 
                 <TextView
                     android:id="@+id/pick_image_dialog_camera"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingStart="15dp"
                     android:paddingEnd="15dp"
                     android:paddingTop="10dp"
                     android:paddingBottom="10dp"
                     android:layout_weight="0.5"
+                    android:textAlignment="textStart"
                     android:drawableStart="@drawable/ic_camera"
                     android:drawablePadding="10dp"
                     android:background="?attr/selectableItemBackground"
@@ -62,13 +63,14 @@
 
                 <TextView
                     android:id="@+id/pick_image_dialog_gallery"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingStart="15dp"
                     android:paddingEnd="15dp"
                     android:paddingTop="10dp"
                     android:paddingBottom="10dp"
                     android:layout_weight="0.5"
+                    android:textAlignment="textStart"
                     android:drawableStart="@drawable/ic_gallery"
                     android:drawablePadding="10dp"
                     android:background="?attr/selectableItemBackground"
