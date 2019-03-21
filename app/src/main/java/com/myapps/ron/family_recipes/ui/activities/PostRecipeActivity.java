@@ -16,6 +16,7 @@ import com.myapps.ron.family_recipes.FabExtensionAnimator;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.ViewHider;
 import com.myapps.ron.family_recipes.dal.Injection;
+import com.myapps.ron.family_recipes.network.MiddleWareForNetwork;
 import com.myapps.ron.family_recipes.ui.baseclasses.MyBaseActivity;
 import com.myapps.ron.family_recipes.ui.baseclasses.PostRecipeBaseFragment;
 import com.myapps.ron.family_recipes.ui.fragments.PagerDialogFragment;
@@ -327,8 +328,11 @@ public class PostRecipeActivity extends MyBaseActivity {
     }
 
     public void postRecipe() {
-        Toast.makeText(this, "posting the recipe...", Toast.LENGTH_SHORT).show();
         viewModel.postRecipe();
+        if (MiddleWareForNetwork.checkInternetConnection(this))
+            Toast.makeText(this, R.string.post_recipe_online_upload_message, Toast.LENGTH_LONG).show();
+        else
+            Toast.makeText(this, R.string.post_recipe_offline_upload_message, Toast.LENGTH_LONG).show();
         setResult(RESULT_OK);
         new Handler().postDelayed(this::finish, 500);
         //PostRecipeToServerService.startActionPostRecipe(this, viewModel.recipe);

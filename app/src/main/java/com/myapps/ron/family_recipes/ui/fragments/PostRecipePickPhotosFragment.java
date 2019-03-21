@@ -16,10 +16,12 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.myapps.ron.family_recipes.FabExtensionAnimator;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.dal.storage.StorageWrapper;
 import com.myapps.ron.family_recipes.ui.baseclasses.PostRecipeBaseFragment;
+import com.myapps.ron.family_recipes.utils.Constants;
 import com.myapps.ron.family_recipes.utils.GlideApp;
 import com.myapps.ron.family_recipes.viewmodels.PostRecipeViewModel;
 
@@ -64,6 +66,7 @@ public class PostRecipePickPhotosFragment extends PostRecipeBaseFragment {
     private Uri imageUri;
 
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
+    private Snackbar maxImagesSnackbar;
 
 
     @Override
@@ -91,6 +94,8 @@ public class PostRecipePickPhotosFragment extends PostRecipeBaseFragment {
         activity.setFabGravity(Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL);
         activity.setFabExtended(true, 1000);
         activity.setFabMayExpand(false);
+
+        maxImagesSnackbar = Snackbar.make(view, getString(R.string.alert_dialog_upload_photos_max_limit, Constants.MAX_FILES_TO_UPLOAD), Snackbar.LENGTH_INDEFINITE);
     }
 
     @Override
@@ -135,6 +140,10 @@ public class PostRecipePickPhotosFragment extends PostRecipeBaseFragment {
     @SuppressWarnings("UnusedParameters")
     @OnClick(R.id.pick_photos_choose_button)
     void photosClickListener(View view){
+        if (imagesPathsToUpload.size() >= Constants.MAX_FILES_TO_UPLOAD) {
+            maxImagesSnackbar.show();
+            return;
+        }
         if (hasStoragePermission())
             showChooseDialog();
     }
@@ -276,7 +285,11 @@ public class PostRecipePickPhotosFragment extends PostRecipeBaseFragment {
 
                         int pickedImageCounter;
 
-                        for (pickedImageCounter = 0; pickedImageCounter < mClipData.getItemCount(); pickedImageCounter++) {
+                        if (imagesPathsToUpload.size() + mClipData.getItemCount() > Constants.MAX_FILES_TO_UPLOAD)
+                            maxImagesSnackbar.show();
+
+                        for (pickedImageCounter = 0; pickedImageCounter < mClipData.getItemCount()
+                                && imagesPathsToUpload.size() <= Constants.MAX_FILES_TO_UPLOAD; pickedImageCounter++) {
                             Log.e(TAG, mClipData.getItemAt(pickedImageCounter).getUri().getPath());
                             String path = StorageWrapper.getRealPathFromURI(activity, mClipData.getItemAt(pickedImageCounter).getUri());
                             imagesPathsToUpload.add(path);

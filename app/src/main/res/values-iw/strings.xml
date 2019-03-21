@@ -95,6 +95,8 @@
     <string name="post_recipe_advanced_step_hr">קו הפרדה</string>
     <string name="post_recipe_advanced_step_bold">טקסט מודגש</string>
     <string name="post_recipe_advanced_step_under_score">קו תחתון</string>
+    <string name="post_recipe_offline_upload_message">יעלה כשתתחבר/י לאינטרנט</string>
+    <string name="post_recipe_online_upload_message">מעלה את המתכון…</string>
 
     <!--#region Fab Menu -->
     <string name="post_recipe_advanced_step_fab_add">בלוק חדש</string>
