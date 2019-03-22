@@ -5,6 +5,8 @@ import com.myapps.ron.family_recipes.model.CommentEntity;
 
 import java.util.Objects;
 
+import androidx.annotation.NonNull;
+
 /**
  * Created by ronginat on 14/01/2019.
  */
@@ -14,26 +16,27 @@ public class CommentTO {
     @SerializedName("user")
     private String user;
     @SerializedName("creationDate")
-    private String creationDate;
+    private Long creationDate;
 
     public CommentTO() {
         super();
     }
 
-    public CommentTO(CommentEntity comment) {
+    /*public CommentTO(CommentEntity comment) {
         this();
         if (comment != null) {
             this.message = comment.getMessage();
             this.user = comment.getUser();
             this.creationDate = comment.getDate();
         }
-    }
+    }*/
 
     public CommentEntity toEntity() {
         CommentEntity entity = new CommentEntity();
         entity.setMessage(this.message);
         entity.setUser(this.user);
-        entity.setDate(this.creationDate);
+        if (this.creationDate != null)
+            entity.setDate(this.creationDate);
         return entity;
     }
 
@@ -53,14 +56,15 @@ public class CommentTO {
         this.user = user;
     }
 
-    public String getCreationDate() {
+    public Long getCreationDate() {
         return creationDate;
     }
 
-    public void setCreationDate(String creationDate) {
+    public void setCreationDate(Long creationDate) {
         this.creationDate = creationDate;
     }
 
+    @NonNull
     @Override
     public String toString() {
         if (message == null || user == null || creationDate == null)

@@ -25,9 +25,9 @@ public class RecipeTO implements PostRecipe {
     @SerializedName("description")
     private String description;
     @SerializedName("creationDate")
-    private String creationDate;
+    private Long creationDate;
     @SerializedName("lastModifiedDate")
-    private String lastModifiedDate;
+    private Long lastModifiedDate;
     @SerializedName("recipeFile")
     private String recipeFile;
     @SerializedName("uploader")
@@ -41,6 +41,7 @@ public class RecipeTO implements PostRecipe {
 
 
     public RecipeTO() {
+        super();
     }
 
     public RecipeTO (RecipeEntity recipe) {
@@ -54,12 +55,6 @@ public class RecipeTO implements PostRecipe {
             this.recipeFile = recipe.getRecipeFile();
             this.uploader = recipe.getUploader();
             this.categories = recipe.getCategories();
-            /*if (recipe.getComments() != null) {
-                this.comments = new ArrayList<>();
-                for (RecipeEntity.Comment comment: recipe.getComments()) {
-                    this.comments.add(new Comment(comment));
-                }
-            }*/
             this.foodFiles = recipe.getFoodFiles();
             this.likes = recipe.getLikes();
         }
@@ -76,14 +71,6 @@ public class RecipeTO implements PostRecipe {
         rv.setRecipeFile(this.recipeFile);
         rv.setUploader(this.uploader);
         rv.setCategories(this.categories);
-        /*List<RecipeEntity.Comment> commentsRv = null;
-        if (this.comments != null) {
-            commentsRv = new ArrayList<>();
-            for (Comment comment: this.comments) {
-                commentsRv.add(comment.toEntity());
-            }
-        }
-        rv.setComments(commentsRv);*/
         rv.setFoodFiles(this.foodFiles);
         rv.setLikes(this.likes);
 
@@ -102,7 +89,7 @@ public class RecipeTO implements PostRecipe {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, creationDate, lastModifiedDate, recipeFile, uploader, categories/*, comments*/, foodFiles, likes);
+        return Objects.hash(id, name, description, creationDate, lastModifiedDate, recipeFile, uploader, categories, foodFiles, likes);
     }
 
     public String getId() {
@@ -133,21 +120,21 @@ public class RecipeTO implements PostRecipe {
         this.description = description;
     }
 
-    public String getCreationDate() {
-        if(creationDate != null)
-            return creationDate;
-        return com.myapps.ron.family_recipes.network.Constants.DEFAULT_UPDATED_TIME;
+    public Long getCreationDate() {
+        //if(creationDate != null)
+        return creationDate;
+        //return com.myapps.ron.family_recipes.network.Constants.DEFAULT_UPDATED_TIME;
     }
 
-    public void setCreationDate(String creationDate) {
+    public void setCreationDate(Long creationDate) {
         this.creationDate = creationDate;
     }
 
-    public String getLastModifiedDate() {
+    public long getLastModifiedDate() {
         return lastModifiedDate;
     }
 
-    public void setLastModifiedDate(String lastModifiedDate) {
+    public void setLastModifiedDate(long lastModifiedDate) {
         this.lastModifiedDate = lastModifiedDate;
     }
 

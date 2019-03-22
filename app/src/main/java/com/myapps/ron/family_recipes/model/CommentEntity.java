@@ -10,9 +10,10 @@ import androidx.annotation.NonNull;
 public class CommentEntity {
     private String message;
     private String user;
-    private String date;
+    private long date;
 
     public CommentEntity(){
+        super();
     }
 
     public String getMessage() {
@@ -31,18 +32,18 @@ public class CommentEntity {
         this.user = user;
     }
 
-    public String getDate() {
+    public long getDate() {
         return date;
     }
 
-    public void setDate(String date) {
+    public void setDate(long date) {
         this.date = date;
     }
 
     @NonNull
     @Override
     public String toString() {
-        if (message == null || user == null || date == null)
+        if (message == null || user == null)
             return "null";
         return "CommentEntity{" +
                 "message='" + message + '\'' +
@@ -58,7 +59,7 @@ public class CommentEntity {
         CommentEntity comment = (CommentEntity) o;
         return this.message.equals(comment.message) &&
                 this.user.equals(comment.user) &&
-                this.date.equals(comment.date);
+                this.date == comment.date;
     }
 
     @Override

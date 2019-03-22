@@ -10,7 +10,7 @@ public class SharedPreferencesHandler {
         return context.getSharedPreferences(context.getString(R.string.sharedPreferences), Context.MODE_PRIVATE);
     }
 
-    public static void wipeSharedPreferences(Context ctx) {
+    /*public static void wipeSharedPreferences(Context ctx) {
         SharedPreferences sharedPref = ctx.getSharedPreferences(ctx.getString(R.string.sharedPreferences), Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
         if (getBoolean(ctx, "rememberMe")) {
@@ -19,12 +19,12 @@ public class SharedPreferencesHandler {
         }
         editor.clear();
         editor.apply();
-    }
+    }*/
 
-    public static void writeInt(Context ctx, String key, int value) {
+    public static void writeLong(Context ctx, String key, long value) {
         SharedPreferences sharedPref = ctx.getSharedPreferences(ctx.getString(R.string.sharedPreferences), Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putInt(key, value);
+        editor.putLong(key, value);
         editor.apply();
     }
 
@@ -50,6 +50,11 @@ public class SharedPreferencesHandler {
     public static boolean getBoolean(Context ctx, String key, boolean defValue) {
         SharedPreferences sharedPreferences = ctx.getSharedPreferences(ctx.getString(R.string.sharedPreferences), Context.MODE_PRIVATE);
         return sharedPreferences.getBoolean(key, defValue);
+    }
+
+    public static long getLong(Context ctx, String key, long defValue) {
+        SharedPreferences sharedPref = ctx.getSharedPreferences(ctx.getString(R.string.sharedPreferences), Context.MODE_PRIVATE);
+        return sharedPref.getLong(key, defValue);
     }
 
     public static String getString(Context ctx, String key) {

@@ -18,7 +18,6 @@ import java.util.concurrent.Executor;
 
 import androidx.lifecycle.LiveData;
 import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableCompletableObserver;
@@ -82,7 +81,7 @@ public class CategoryRepository {
     public void fetchCategories(final Context context) {
         if(MiddleWareForNetwork.checkInternetConnection(context)
                 && DateUtil.shouldUpdateCategories(context)) {
-            final String time = DateUtil.getUTCTime();
+            final long time = DateUtil.getUTCTime();
             APICallsHandler.getAllCategories(DateUtil.getLastUpdateTime(context), AppHelper.getAccessToken(), categories -> {
                 if(categories != null) {
                     DateUtil.updateServerTime(context, time);
@@ -99,7 +98,7 @@ public class CategoryRepository {
     public void fetchCategoriesReactive(final Context context) {
         if(MiddleWareForNetwork.checkInternetConnection(context)
                 && DateUtil.shouldUpdateCategories(context)) {
-            final String time = DateUtil.getUTCTime();
+            final long time = DateUtil.getUTCTime();
 
             Observable<Response<List<CategoryTO>>> categoryObservable = APICallsHandler
                     .getAllCategoriesObservable(DateUtil.getLastCategoriesUpdateTime(context), AppHelper.getAccessToken());

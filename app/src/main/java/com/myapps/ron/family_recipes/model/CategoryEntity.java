@@ -21,6 +21,7 @@ import androidx.room.PrimaryKey;
  * Created by ronginat on 01/01/2019.
  */
 @Entity(tableName = AppDatabases.TABLE_CATEGORIES)
+@SuppressWarnings("WeakerAccess")
 public class CategoryEntity implements FilterModel {
     public static final String KEY_NAME = "name";
     public static final String KEY_COLOR = "color";
@@ -38,6 +39,7 @@ public class CategoryEntity implements FilterModel {
     private static final Gson gson = new Gson();
 
     public CategoryEntity() {
+        super();
     }
 
     @NonNull
@@ -83,7 +85,7 @@ public class CategoryEntity implements FilterModel {
         return gson.toJson(getCategories());
     }
 
-    public void setStringCategories(String categories) {
+    private void setStringCategories(String categories) {
         //Log.e(getClass().getSimpleName(), "set string categories, " + categories);
         Type type = new TypeToken<List<CategoryEntity>>() {}.getType();
         List<CategoryEntity> value = gson.fromJson(categories, type);

@@ -1,6 +1,5 @@
 package com.myapps.ron.family_recipes.network;
 
-import com.google.gson.JsonObject;
 import com.myapps.ron.family_recipes.network.modelTO.CategoryTO;
 import com.myapps.ron.family_recipes.network.modelTO.CommentTO;
 import com.myapps.ron.family_recipes.network.modelTO.RecipeTO;
@@ -58,7 +57,7 @@ public interface RecipeInterface {
     @GET(recipes)
     Observable<Response<List<RecipeTO>>> getAllRecipesObservable(
             @Header(Constants.AUTHORIZATION) String auth,
-            @Query(Constants.DATE_QUERY) String date,
+            @Query(Constants.DATE_QUERY) long date,
             @Query(Constants.EXCLUSIVE_START_KEY_QUERY) String startKey,
             @Query(Constants.LIMIT_QUERY) Integer limit
     );
@@ -66,7 +65,7 @@ public interface RecipeInterface {
     @GET(recipes)
     Call<List<RecipeTO>> getAllRecipesPagination(
             @Header(Constants.AUTHORIZATION) String auth,
-            @Query(Constants.DATE_QUERY) String date,
+            @Query(Constants.DATE_QUERY) long date,
             @Query(Constants.EXCLUSIVE_START_KEY_QUERY) String startKey,
             @Query(Constants.LIMIT_QUERY) int limit
     );
@@ -81,7 +80,7 @@ public interface RecipeInterface {
     Call<RecipeTO> patchRecipe(
             @HeaderMap Map<String, String> headers,
             @Path(Constants.ID_QUERY) String id,
-            @Query(Constants.LAST_MODIFIED_QUERY) String lastModifiedDate,
+            @Query(Constants.LAST_MODIFIED_QUERY) Long lastModifiedDate,
             @Body Map<String, Object> body
     );
 
@@ -89,7 +88,7 @@ public interface RecipeInterface {
     Call<Void> postComment(
             @HeaderMap Map<String, String> headers,
             @Path(Constants.ID_QUERY) String id,
-            @Query(Constants.LAST_MODIFIED_QUERY) String lastModifiedDate,
+            @Query(Constants.LAST_MODIFIED_QUERY) Long lastModifiedDate,
             @Body Map<String, Object> body
     );
 
@@ -100,13 +99,13 @@ public interface RecipeInterface {
     @GET(categories)
     Call<List<CategoryTO>> getAllCategories(
             @Header(Constants.AUTHORIZATION) String auth,
-            @Query(Constants.DATE_QUERY) String date
+            @Query(Constants.DATE_QUERY) long date
     );
 
     @GET(categories)
     Observable<Response<List<CategoryTO>>> getAllCategoriesObservable(
             @Header(Constants.AUTHORIZATION) String auth,
-            @Query(Constants.DATE_QUERY) String date
+            @Query(Constants.DATE_QUERY) long date
     );
 
     //endregion
@@ -116,7 +115,7 @@ public interface RecipeInterface {
     Call<List<String>> requestFoodUrls(
             @Header(Constants.AUTHORIZATION) String auth,
             @Path(Constants.ID_QUERY) String id,
-            @Query(Constants.LAST_MODIFIED_QUERY) String lastModifiedDate,
+            @Query(Constants.LAST_MODIFIED_QUERY) Long lastModifiedDate,
             @Body Map<String, String> body
     );
 

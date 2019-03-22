@@ -52,7 +52,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.MyView
 
         holder.sender.setText(comment.getUser());
         holder.message.setText(comment.getMessage());
-        holder.time.setText(DateUtil.getDateFromDateTime(comment.getDate()));
+        holder.time.setText(DateUtil.getPrettyDateFromTime(comment.getDate()));
     }
 
     @Override

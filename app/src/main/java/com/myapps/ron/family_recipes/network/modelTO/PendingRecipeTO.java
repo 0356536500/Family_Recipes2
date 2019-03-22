@@ -11,7 +11,6 @@ import java.util.List;
  */
 public class PendingRecipeTO implements PostRecipe {
 
-    //private Date creationDate;
     private String name;
     private String description;
     private String recipeFile;
@@ -21,7 +20,6 @@ public class PendingRecipeTO implements PostRecipe {
     public PendingRecipeTO(PendingRecipeEntity entity) {
         this.name = entity.getName();
         this.description = entity.getDescription();
-        //this.creationDate = entity.getCreationDate();
         this.recipeFile = entity.getRecipeFile();
         this.categories = new ArrayList<>(entity.getCategories());
         this.foodFiles = new ArrayList<>(entity.getFoodFiles());
@@ -38,8 +36,8 @@ public class PendingRecipeTO implements PostRecipe {
     }
 
     @Override
-    public String getLastModifiedDate() {
-        return null;
+    public long getLastModifiedDate() {
+        return 0L;
     }
 
     @Override

@@ -74,7 +74,7 @@ public class PostRecipeToServerService extends IntentService {
      *
      * @see IntentService
      */
-    public static void startActionPostImages(Context context, String id, String lastModifiedDate, List<String> files) {
+    public static void startActionPostImages(Context context, String id, long lastModifiedDate, List<String> files) {
         Intent intent = new Intent(context, PostRecipeToServerService.class);
         intent.setAction(ACTION_POST_IMAGES);
         intent.putStringArrayListExtra(EXTRA_PARAM1, new ArrayList<>(files));
@@ -104,7 +104,7 @@ public class PostRecipeToServerService extends IntentService {
                     case ACTION_POST_IMAGES:
                         final List<String> files = intent.getStringArrayListExtra(EXTRA_PARAM1);
                         String id = intent.getStringExtra(EXTRA_PARAM2);
-                        String lastModifiedDate = intent.getStringExtra(EXTRA_PARAM3);
+                        long lastModifiedDate = intent.getLongExtra(EXTRA_PARAM3, 0L);
                         handleActionPostImagesSync(id, lastModifiedDate, compressFiles(files));
                         //deleteLocalFiles(files);
                         break;
@@ -217,7 +217,7 @@ public class PostRecipeToServerService extends IntentService {
      * Handle action {@link PostRecipeToServerService#ACTION_POST_IMAGES} in the provided background thread
      * with the provided parameters.
      */
-    private void handleActionPostImagesSync(String id, String lastModifiedDate, List<String> foodFiles) {
+    private void handleActionPostImagesSync(String id, long lastModifiedDate, List<String> foodFiles) {
         //uploadFoodFilesSync(id, localPaths);
         Log.e(TAG, "handle post images");
         Log.e(TAG, "id = " + id + "\n files: " + foodFiles);

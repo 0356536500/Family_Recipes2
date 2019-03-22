@@ -113,7 +113,7 @@ public abstract class AppDatabases extends RoomDatabase {
                         .id(name + i)
                         .name(name + i)
                         .description("desc " + name + i)
-                        .creationDate(DateUtil.getUTCTimeLong())
+                        .creationDate(DateUtil.getUTCTime())
                         .categories(categories)
                         .buildTest());
 

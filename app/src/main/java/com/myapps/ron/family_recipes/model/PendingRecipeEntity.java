@@ -14,6 +14,7 @@ import androidx.room.PrimaryKey;
  * Created by ronginat on 20/02/2019.
  */
 @Entity(tableName = "pendingRecipes")
+@SuppressWarnings("WeakerAccess")
 public class PendingRecipeEntity {
 
     public static final String KEY_NAME = "name";
@@ -38,7 +39,7 @@ public class PendingRecipeEntity {
     private List<String> foodFiles;
 
     public PendingRecipeEntity() {
-        this.creationDate = DateUtil.getUTCTimeLong();
+        this.creationDate = DateUtil.getUTCTime();
         categories = new ArrayList<>();
         foodFiles = new ArrayList<>();
     }
@@ -52,11 +53,12 @@ public class PendingRecipeEntity {
         this.foodFiles = entity.getFoodFiles();
     }
 
-    public long getCreationDate() {
+    @NonNull
+    public Long getCreationDate() {
         return creationDate;
     }
 
-    public void setCreationDate(long creationDate) {
+    public void setCreationDate(@NonNull Long creationDate) {
         this.creationDate = creationDate;
     }
 

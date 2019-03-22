@@ -3,6 +3,8 @@ package com.myapps.ron.family_recipes.model;
 import java.util.List;
 import java.util.Objects;
 
+import androidx.annotation.NonNull;
+
 /**
  * Created by ronginat on 02/01/2019.
  *
@@ -96,6 +98,7 @@ public class RecipeMinimal {
         return Objects.hash(id, name, description, uploader, categories, foodFiles, likes);
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "RecipeMinimal{" +

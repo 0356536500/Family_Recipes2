@@ -6,6 +6,8 @@ import com.myapps.ron.family_recipes.model.CategoryEntity;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.annotation.NonNull;
+
 /**
  * Created by ronginat on 01/01/2019.
  */
@@ -19,9 +21,10 @@ public class CategoryTO {
 
 
     public CategoryTO() {
+        super();
     }
 
-    public CategoryTO(CategoryEntity categoryEntity) {
+    /*public CategoryTO(CategoryEntity categoryEntity) {
         if (categoryEntity != null) {
             setName(categoryEntity.getName());
             setColor(categoryEntity.getColor());
@@ -32,7 +35,7 @@ public class CategoryTO {
                 }
             }
         }
-    }
+    }*/
 
     public CategoryEntity toEntity() {
         CategoryEntity rv = new CategoryEntity();
@@ -86,6 +89,7 @@ public class CategoryTO {
         return result;
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "CategoryTO{" +
