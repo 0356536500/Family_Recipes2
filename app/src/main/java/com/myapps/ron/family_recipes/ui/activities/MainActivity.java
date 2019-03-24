@@ -75,8 +75,8 @@ public class MainActivity extends MyBaseActivity {
     private int toolbarColorPrimary, toolbarColorSecond;
 
     @Override
-    protected void onMyCreate(Bundle savedInstanceState) {
-        //super.onCreate(savedInstanceState);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         //setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 

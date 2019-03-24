@@ -46,6 +46,9 @@
     <dimen name="instructions_large_margins">50dp</dimen>
     <dimen name="instructions_elevation_element">3dp</dimen>
     <dimen name="pager_text_padding">10dp</dimen>
+
+    <dimen name="instructions_text_large">22sp</dimen>
+    <dimen name="instructions_text_medium">18sp</dimen>
         <!--#endregion PostRecipe Instructions -->
 
     <!--#endregion PostRecipe Activity-->

@@ -96,6 +96,7 @@ public class PostRecipePickPhotosFragment extends PostRecipeBaseFragment {
         activity.setFabMayExpand(false);
 
         maxImagesSnackbar = Snackbar.make(view, getString(R.string.alert_dialog_upload_photos_max_limit, Constants.MAX_FILES_TO_UPLOAD), Snackbar.LENGTH_INDEFINITE);
+        maxImagesSnackbar.setAction(R.string.post_recipe_snacbar_close, view1 -> maxImagesSnackbar.dismiss());
     }
 
     @Override
@@ -140,7 +141,7 @@ public class PostRecipePickPhotosFragment extends PostRecipeBaseFragment {
     @SuppressWarnings("UnusedParameters")
     @OnClick(R.id.pick_photos_choose_button)
     void photosClickListener(View view){
-        if (imagesPathsToUpload.size() >= Constants.MAX_FILES_TO_UPLOAD) {
+        if (imagesPathsToUpload.size() > Constants.MAX_FILES_TO_UPLOAD) {
             maxImagesSnackbar.show();
             return;
         }
@@ -289,7 +290,7 @@ public class PostRecipePickPhotosFragment extends PostRecipeBaseFragment {
                             maxImagesSnackbar.show();
 
                         for (pickedImageCounter = 0; pickedImageCounter < mClipData.getItemCount()
-                                && imagesPathsToUpload.size() <= Constants.MAX_FILES_TO_UPLOAD; pickedImageCounter++) {
+                                && imagesPathsToUpload.size() < Constants.MAX_FILES_TO_UPLOAD; pickedImageCounter++) {
                             Log.e(TAG, mClipData.getItemAt(pickedImageCounter).getUri().getPath());
                             String path = StorageWrapper.getRealPathFromURI(activity, mClipData.getItemAt(pickedImageCounter).getUri());
                             imagesPathsToUpload.add(path);

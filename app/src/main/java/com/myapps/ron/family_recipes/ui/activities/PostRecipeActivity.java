@@ -66,7 +66,8 @@ public class PostRecipeActivity extends MyBaseActivity {
 
 
     @Override
-    protected void onMyCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post_recipe);
 
         ButterKnife.bind(this);

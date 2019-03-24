@@ -214,7 +214,7 @@
 
     <style name="Material.Dark" parent="Theme.MaterialComponents.Light.DarkActionBar">
         <!-- Material Button background -->
-        <item name="colorPrimary">@color/grey_400</item>
+        <item name="colorPrimary">@color/md_light_green_900</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <!-- Edit text line color -->
         <item name="colorAccent">@color/white</item>

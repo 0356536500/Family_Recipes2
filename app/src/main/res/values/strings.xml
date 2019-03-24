@@ -100,6 +100,7 @@
     <string name="post_recipe_advanced_step_under_score">Underscore</string>
     <string name="post_recipe_offline_upload_message">Upload when connection is established</string>
     <string name="post_recipe_online_upload_message">Uploading the recipe…</string>
+    <string name="post_recipe_snacbar_close">Close</string>
 
     <string name="preference_key_first_post_recipe" translatable="false">first_recipe</string>
 

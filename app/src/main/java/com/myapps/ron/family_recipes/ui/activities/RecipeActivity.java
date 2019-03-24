@@ -114,8 +114,8 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
     private ShareActionProvider mShareActionProvider;
 
     @Override
-    protected void onMyCreate(Bundle savedInstanceState) {
-        //super.onCreate(savedInstanceState);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipe);
 
         loadColorsFromTheme();

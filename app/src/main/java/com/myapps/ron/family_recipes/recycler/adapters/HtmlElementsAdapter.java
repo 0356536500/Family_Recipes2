@@ -151,7 +151,7 @@ public class HtmlElementsAdapter extends RecyclerView.Adapter<HtmlElementsAdapte
         private void setSpinnerAdapter() {
             //init the spinner
             ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(context,
-                    R.array.html_elements, android.R.layout.simple_spinner_item);
+                    R.array.html_elements, R.layout.spinner_item_simple);
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             spinner.setAdapter(adapter);
         }

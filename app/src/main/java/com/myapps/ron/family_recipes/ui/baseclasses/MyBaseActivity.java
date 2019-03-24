@@ -31,11 +31,8 @@ public abstract class MyBaseActivity extends AppCompatActivity implements Shared
         super.onCreate(savedInstanceState);
         Log.e(getClass().getSimpleName(), "on create");
         ((MyApplication)getApplication()).applyTheme(this);
-        onMyCreate(savedInstanceState);
         //getSharedPreferences(getString(R.string.sharedPreferences), MODE_PRIVATE).registerOnSharedPreferenceChangeListener(this);
     }
-
-    protected abstract void onMyCreate(@Nullable Bundle savedInstanceState);
 
     @Override
     protected void onPostCreate(@Nullable Bundle savedInstanceState) {

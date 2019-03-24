@@ -38,7 +38,8 @@ public class SettingsActivity extends MyBaseActivity
     public static PublishSubject<Integer> publishSubject = PublishSubject.create();
 
     @Override
-    protected void onMyCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
         //new Handler().postDelayed(this::startPublish, 1000);
