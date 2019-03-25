@@ -257,9 +257,9 @@ public class RecipeRepository {
         mayRefresh.getAndSet(false);
         new Handler().postDelayed(() -> mayRefresh.getAndSet(true), com.myapps.ron.family_recipes.utils.Constants.REFRESH_DELAY);
         if(MiddleWareForNetwork.checkInternetConnection(context)) {
-            final long time = DateUtil.getUTCTime();
+            final String time = DateUtil.getUTCTime();
 
-            long lastUpdate = DateUtil.getLastUpdateTime(context);
+            String lastUpdate = DateUtil.getLastUpdateTime(context);
 
             Observable<Response<List<RecipeTO>>> recipeObservable = APICallsHandler
                     .getAllRecipesObservable(lastUpdate, LIMIT, null, AppHelper.getAccessToken());
@@ -300,7 +300,7 @@ public class RecipeRepository {
     }
 
     // make more api calls with pagination if necessary, using lastEvaluatedKey header from api response
-    private void fetchMoreRecipesReactive(final Context context, @NonNull String lastKey, long lastUpdate, final AddedModifiedSize addedModifiedSize, final long currentTimeStamp) {
+    private void fetchMoreRecipesReactive(final Context context, @NonNull String lastKey, String lastUpdate, final AddedModifiedSize addedModifiedSize, final String currentTimeStamp) {
         if(MiddleWareForNetwork.checkInternetConnection(context)) {
             Observable<Response<List<RecipeTO>>> recipeObservable = APICallsHandler
                     .getAllRecipesObservable(lastUpdate, LIMIT, lastKey, AppHelper.getAccessToken());

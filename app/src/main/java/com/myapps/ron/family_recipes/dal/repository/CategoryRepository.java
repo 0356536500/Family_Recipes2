@@ -81,7 +81,7 @@ public class CategoryRepository {
     public void fetchCategories(final Context context) {
         if(MiddleWareForNetwork.checkInternetConnection(context)
                 && DateUtil.shouldUpdateCategories(context)) {
-            final long time = DateUtil.getUTCTime();
+            final String time = DateUtil.getUTCTime();
             APICallsHandler.getAllCategories(DateUtil.getLastUpdateTime(context), AppHelper.getAccessToken(), categories -> {
                 if(categories != null) {
                     DateUtil.updateServerTime(context, time);
@@ -98,7 +98,7 @@ public class CategoryRepository {
     public void fetchCategoriesReactive(final Context context) {
         if(MiddleWareForNetwork.checkInternetConnection(context)
                 && DateUtil.shouldUpdateCategories(context)) {
-            final long time = DateUtil.getUTCTime();
+            final String time = DateUtil.getUTCTime();
 
             Observable<Response<List<CategoryTO>>> categoryObservable = APICallsHandler
                     .getAllCategoriesObservable(DateUtil.getLastCategoriesUpdateTime(context), AppHelper.getAccessToken());

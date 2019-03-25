@@ -26,7 +26,7 @@ public class PendingRecipeEntity {
     @NonNull
     @PrimaryKey
     @ColumnInfo(name = KEY_CREATED)
-    private Long creationDate;
+    private String creationDate;
     @ColumnInfo(name = KEY_NAME)
     private String name;
     @ColumnInfo(name = KEY_DESCRIPTION)
@@ -54,11 +54,11 @@ public class PendingRecipeEntity {
     }
 
     @NonNull
-    public Long getCreationDate() {
+    public String getCreationDate() {
         return creationDate;
     }
 
-    public void setCreationDate(@NonNull Long creationDate) {
+    public void setCreationDate(@NonNull String creationDate) {
         this.creationDate = creationDate;
     }
 

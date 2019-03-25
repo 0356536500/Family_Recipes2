@@ -36,8 +36,8 @@ public class PendingRecipeTO implements PostRecipe {
     }
 
     @Override
-    public long getLastModifiedDate() {
-        return 0L;
+    public String getLastModifiedDate() {
+        return null;
     }
 
     @Override

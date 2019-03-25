@@ -134,7 +134,7 @@ public class APICallsHandler {
         return fields;
     }
 
-    public static void patchRecipe(Map<String, Object> attributes, String id, Long lastModifiedDate, String token, final MyCallback<RecipeTO> callback) {
+    public static void patchRecipe(Map<String, Object> attributes, String id, String lastModifiedDate, String token, final MyCallback<RecipeTO> callback) {
         Map<String, String> headers = new HashMap<>();
         headers.put(Constants.CONTENT_TYPE, "application/json");
         headers.put(Constants.AUTHORIZATION, token);
@@ -174,7 +174,7 @@ public class APICallsHandler {
         });
     }
 
-    public static void postComment(Map<String, Object> attributes, String id, Long lastModifiedDate, String token, final MyCallback<Boolean> callback) {
+    public static void postComment(Map<String, Object> attributes, String id, String lastModifiedDate, String token, final MyCallback<Boolean> callback) {
         Map<String, String> headers = new HashMap<>();
         headers.put(Constants.CONTENT_TYPE, "application/json");
         headers.put(Constants.AUTHORIZATION, token);
@@ -211,7 +211,7 @@ public class APICallsHandler {
         });
     }
 
-    public static void getAllCategories(long date, String token, final MyCallback<List<CategoryTO>> callback) {
+    public static void getAllCategories(String date, String token, final MyCallback<List<CategoryTO>> callback) {
         RecipeInterface service = getRetrofitInstance().create(RecipeInterface.class);
         Call<List<CategoryTO>> call = service.getAllCategories(token, date);
 
@@ -275,7 +275,7 @@ public class APICallsHandler {
 
     }*/
 
-    public static List<String> requestUrlsForFoodPicturesSync(String id, Long lastModifiedDate, int numOfFiles, String token) {
+    public static List<String> requestUrlsForFoodPicturesSync(String id, String lastModifiedDate, int numOfFiles, String token) {
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
                 .permitAll().build();
         StrictMode.setThreadPolicy(policy);
@@ -297,7 +297,7 @@ public class APICallsHandler {
         }
     }
 
-    public static APIResponse<List<RecipeTO>> getAllRecipesSync(long date, String startKey, int limit, String token) {
+    public static APIResponse<List<RecipeTO>> getAllRecipesSync(String date, String startKey, int limit, String token) {
         RecipeInterface service = getRetrofitInstance().create(RecipeInterface.class);
         Call<List<RecipeTO>> call = service.getAllRecipesPagination(token, date, startKey, limit);
 
@@ -328,7 +328,7 @@ public class APICallsHandler {
         return service.getRecipeObservable(token, id);
     }
 
-    public static Observable<Response<List<CategoryTO>>> getAllCategoriesObservable(long date, String token) {
+    public static Observable<Response<List<CategoryTO>>> getAllCategoriesObservable(String date, String token) {
         RecipeInterface service = getReactiveRetrofitInstance().create(RecipeInterface.class);
 
         return service.getAllCategoriesObservable(token, date);
@@ -339,7 +339,7 @@ public class APICallsHandler {
         return service.getAllRecipesObservable(token, date, null, null);
     }*/
 
-    public static Observable<Response<List<RecipeTO>>> getAllRecipesObservable(long date, int limit, String startKey, String token) {
+    public static Observable<Response<List<RecipeTO>>> getAllRecipesObservable(String date, int limit, String startKey, String token) {
         RecipeInterface service = getReactiveRetrofitInstance().create(RecipeInterface.class);
         return service.getAllRecipesObservable(token, date, startKey, limit);
     }

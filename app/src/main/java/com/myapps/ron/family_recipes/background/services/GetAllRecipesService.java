@@ -115,7 +115,7 @@ public class GetAllRecipesService extends IntentService {
         String lastKey = null;
         if (!MiddleWareForNetwork.checkInternetConnection(getApplicationContext()))
             return;
-        final long time = DateUtil.getUTCTime();
+        final String time = DateUtil.getUTCTime();
         do {
             APIResponse<List<RecipeTO>> response = APICallsHandler.getAllRecipesSync(
                     DateUtil.getLastUpdateTime(getApplicationContext()), lastKey, 50, AppHelper.getAccessToken());

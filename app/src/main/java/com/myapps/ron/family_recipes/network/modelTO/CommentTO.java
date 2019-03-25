@@ -16,7 +16,7 @@ public class CommentTO {
     @SerializedName("user")
     private String user;
     @SerializedName("creationDate")
-    private Long creationDate;
+    private String creationDate;
 
     public CommentTO() {
         super();
@@ -35,8 +35,7 @@ public class CommentTO {
         CommentEntity entity = new CommentEntity();
         entity.setMessage(this.message);
         entity.setUser(this.user);
-        if (this.creationDate != null)
-            entity.setDate(this.creationDate);
+        entity.setDate(this.creationDate);
         return entity;
     }
 
@@ -56,11 +55,11 @@ public class CommentTO {
         this.user = user;
     }
 
-    public Long getCreationDate() {
+    public String getCreationDate() {
         return creationDate;
     }
 
-    public void setCreationDate(Long creationDate) {
+    public void setCreationDate(String creationDate) {
         this.creationDate = creationDate;
     }
 

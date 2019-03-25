@@ -8,7 +8,7 @@ import java.util.List;
 public interface PostRecipe {
     String getName();
     String getDescription();
-    long getLastModifiedDate();
+    String getLastModifiedDate();
     String getRecipeFile();
     List<String> getFoodFiles();
     List<String> getCategories();

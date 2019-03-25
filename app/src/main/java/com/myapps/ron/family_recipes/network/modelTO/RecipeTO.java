@@ -25,9 +25,9 @@ public class RecipeTO implements PostRecipe {
     @SerializedName("description")
     private String description;
     @SerializedName("creationDate")
-    private Long creationDate;
+    private String creationDate;
     @SerializedName("lastModifiedDate")
-    private Long lastModifiedDate;
+    private String lastModifiedDate;
     @SerializedName("recipeFile")
     private String recipeFile;
     @SerializedName("uploader")
@@ -120,21 +120,21 @@ public class RecipeTO implements PostRecipe {
         this.description = description;
     }
 
-    public Long getCreationDate() {
-        //if(creationDate != null)
-        return creationDate;
-        //return com.myapps.ron.family_recipes.network.Constants.DEFAULT_UPDATED_TIME;
+    public String getCreationDate() {
+        if(creationDate != null)
+            return creationDate;
+        return com.myapps.ron.family_recipes.network.Constants.DEFAULT_UPDATED_TIME;
     }
 
-    public void setCreationDate(Long creationDate) {
+    public void setCreationDate(String creationDate) {
         this.creationDate = creationDate;
     }
 
-    public long getLastModifiedDate() {
+    public String getLastModifiedDate() {
         return lastModifiedDate;
     }
 
-    public void setLastModifiedDate(long lastModifiedDate) {
+    public void setLastModifiedDate(String lastModifiedDate) {
         this.lastModifiedDate = lastModifiedDate;
     }
 

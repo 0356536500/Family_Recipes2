@@ -2,7 +2,6 @@ package com.myapps.ron.family_recipes.recycler.adapters;
 
 import android.content.Context;
 import android.text.Editable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,9 +30,7 @@ import androidx.viewpager.widget.PagerAdapter;
  * Created by ronginat on 17/03/2019.
  */
 public class HtmlInstructionsPagerAdapter extends PagerAdapter {
-    private final String TAG = getClass().getSimpleName();
     private static final float DIMMED_VIEWS_ALPHA = 0.5f;
-    //@SuppressWarnings("FieldCanBeLocal")
     private final int INSTRUCTIONS_SIZE = 5;
     private Context context;
     private Animation fadeIn;
@@ -47,7 +44,6 @@ public class HtmlInstructionsPagerAdapter extends PagerAdapter {
     @NonNull
     @Override
     public Object instantiateItem(@NonNull ViewGroup container, int position) {
-        Log.e(TAG, "instantiateItem");
         if (position < INSTRUCTIONS_SIZE) {
             View item = inflateItem(container, position);
             container.addView(item);
@@ -58,7 +54,6 @@ public class HtmlInstructionsPagerAdapter extends PagerAdapter {
 
     @Override
     public void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
-        Log.e(TAG, "destroyItem");
         container.removeView((View) object);
     }
 

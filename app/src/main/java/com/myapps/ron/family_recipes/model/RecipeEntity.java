@@ -51,9 +51,9 @@ public class RecipeEntity implements Parcelable{
     @ColumnInfo(name = KEY_DESCRIPTION)
     private String description;
     @ColumnInfo(name = KEY_CREATED)
-    private Long creationDate;
+    private String creationDate;
     @ColumnInfo(name = KEY_MODIFIED)
-    private Long lastModifiedDate;
+    private String lastModifiedDate;
     @ColumnInfo(name = "recipeFile")
     private String recipeFile;
     @ColumnInfo(name = KEY_UPLOADER)
@@ -88,8 +88,8 @@ public class RecipeEntity implements Parcelable{
         this.id = Objects.requireNonNull(in.readString());
         this.name = in.readString();
         this.description = in.readString();
-        this.creationDate = in.readLong();
-        this.lastModifiedDate = in.readLong();
+        this.creationDate = in.readString();
+        this.lastModifiedDate = in.readString();
         this.recipeFile = in.readString();
         this.uploader = in.readString();
 
@@ -145,9 +145,13 @@ public class RecipeEntity implements Parcelable{
         if (categories != null && other.getFilters() != null)
             cats = getCategoriesToString().equals(other.getCategoriesToString());*/
 
-        boolean created = getCreationDate() == other.getCreationDate();
+        boolean created = getCreationDate() == null && other.getCreationDate() == null;
+        if (getCreationDate() != null && other.getCreationDate() != null)
+            created = getCreationDate().equals(other.getCreationDate());
 
-        boolean modified = getLastModifiedDate() == other.getLastModifiedDate();
+        boolean modified = getLastModifiedDate() == null && other.getLastModifiedDate() == null;
+        if (getLastModifiedDate() != null && other.getLastModifiedDate() != null)
+            modified = getLastModifiedDate().equals(other.getLastModifiedDate());
 
         boolean file = getRecipeFile() == null && other.getRecipeFile() == null;
         if (getRecipeFile() != null && other.getRecipeFile() != null)
@@ -238,27 +242,22 @@ public class RecipeEntity implements Parcelable{
         this.description = description;
     }
 
-    public Long getCreationDate() {
+    public String getCreationDate() {
         if(creationDate != null)
             return creationDate;
         return com.myapps.ron.family_recipes.network.Constants.DEFAULT_UPDATED_TIME;
     }
 
-    public void setCreationDate(Long creationDate) {
-        if (creationDate != null)
-            this.creationDate = creationDate;
+    public void setCreationDate(String creationDate) {
+        this.creationDate = creationDate;
     }
 
-    public Long getLastModifiedDate() {
-        if (lastModifiedDate != null) {
-            return lastModifiedDate;
-        }
-        return com.myapps.ron.family_recipes.network.Constants.DEFAULT_UPDATED_TIME;
+    public String getLastModifiedDate() {
+        return lastModifiedDate;
     }
 
-    public void setLastModifiedDate(Long lastModifiedDate) {
-        if (lastModifiedDate != null)
-            this.lastModifiedDate = lastModifiedDate;
+    public void setLastModifiedDate(String lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
     }
 
     public String getRecipeFile() {
@@ -351,8 +350,8 @@ public class RecipeEntity implements Parcelable{
         dest.writeString(this.id);
         dest.writeString(this.name);
         dest.writeString(this.description);
-        dest.writeLong(this.creationDate);
-        dest.writeLong(this.lastModifiedDate);
+        dest.writeString(this.creationDate);
+        dest.writeString(this.lastModifiedDate);
         dest.writeString(this.recipeFile);
         dest.writeString(this.uploader);
         dest.writeList(this.categories);
@@ -366,8 +365,8 @@ public class RecipeEntity implements Parcelable{
         private String builderId;
         private String builderName;
         private String builderDescription;
-        private long builderCreatedAt;
-        private long builderLastModifiedAt;
+        private String builderCreatedAt;
+        private String builderLastModifiedAt;
         private String builderRecipeFile;
         private String builderUploader;
         private String builderCategories;
@@ -396,12 +395,12 @@ public class RecipeEntity implements Parcelable{
             return this;
         }
 
-        public RecipeEntity.RecipeBuilder creationDate(long createdAt) {
+        public RecipeEntity.RecipeBuilder creationDate(String createdAt) {
             this.builderCreatedAt = createdAt;
             return this;
         }
 
-        public RecipeEntity.RecipeBuilder lastModifiedAt (long lastModifiedAt) {
+        public RecipeEntity.RecipeBuilder lastModifiedAt (String lastModifiedAt) {
             this.builderLastModifiedAt = lastModifiedAt;
             return this;
         }
