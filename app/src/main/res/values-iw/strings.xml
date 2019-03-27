@@ -178,4 +178,15 @@
     <string name="pick_image_dialog_choose">בחירה</string>
     <string name="pick_image_dialog_cancel">ביטול</string>
 
+
+    <!--#region Shortcuts -->
+    <string name="shortcut_post_recipe_short_label">מתכון חדש</string>
+    <string name="shortcut_post_recipe_long_label">כתיבת מתכון חדש</string>
+    <string name="shortcut_post_recipe_disabled_message">לא ניתן לכתוב מתכון חדש</string>
+
+    <string name="shortcut_favorites_short_label">מועדפים</string>
+    <string name="shortcut_favorites_long_label">מתכונים שסומנו ב\'אהבתי\'</string>
+    <string name="shortcut_favorites_disabled_message">לא ניתן לצפות במתכונים</string>
+    <!--#endregion Shortcuts -->
+
 </resources>

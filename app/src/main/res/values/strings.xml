@@ -251,6 +251,18 @@
 
     <!-- Strings related to Settings -->
 
+    <!--#region Shortcuts -->
+    <string name="shortcut_post_recipe_short_label">New Recipe</string>
+    <string name="shortcut_post_recipe_long_label">Post New Recipe</string>
+    <string name="shortcut_post_recipe_disabled_message">Can\'t post a recipe</string>
+
+    <string name="shortcut_favorites_short_label">Favorites</string>
+    <string name="shortcut_favorites_long_label">Favorites</string>
+    <string name="shortcut_favorites_disabled_message">Can\'t display favorites</string>
+    <!--#endregion Shortcuts -->
+
+
+
     <!-- Example General settings -->
     <string name="pref_header_general" translatable="false">General</string>
 

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="post"
+        android:enabled="true"
+        android:icon="@drawable/ic_action_post_black"
+        android:shortcutShortLabel="@string/shortcut_post_recipe_short_label"
+        android:shortcutLongLabel="@string/shortcut_post_recipe_long_label"
+        android:shortcutDisabledMessage="@string/shortcut_post_recipe_disabled_message"
+        tools:targetApi="n_mr1">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.myapps.ron.family_recipes"
+            android:targetClass="com.myapps.ron.family_recipes.ui.activities.SplashActivity" />
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.myapps.ron.family_recipes"
+            android:targetClass="com.myapps.ron.family_recipes.ui.activities.PostRecipeActivity" />
+        <!-- If your shortcut is associated with multiple intents, include them
+             here. The last intent in the list determines what the user sees when
+             they launch this shortcut. -->
+        <categories android:name="android.shortcut.conversation" />
+    </shortcut>
+
+    <shortcut
+        android:shortcutId="favorites"
+        android:enabled="true"
+        android:icon="@drawable/ic_status_logo"
+        android:shortcutShortLabel="@string/shortcut_post_recipe_short_label"
+        android:shortcutLongLabel="@string/shortcut_post_recipe_long_label"
+        android:shortcutDisabledMessage="@string/shortcut_post_recipe_disabled_message"
+        tools:targetApi="n_mr1">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.myapps.ron.family_recipes"
+            android:targetClass="com.myapps.ron.family_recipes.ui.activities.MainActivity" />
+        <!-- If your shortcut is associated with multiple intents, include them
+             here. The last intent in the list determines what the user sees when
+             they launch this shortcut. -->
+        <categories android:name="android.shortcut.conversation" />
+    </shortcut>
+
+</shortcuts>

@@ -1,5 +1,6 @@
 package com.myapps.ron.family_recipes.ui.activities;
 
+import android.content.Intent;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Handler;
@@ -34,6 +35,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.app.NavUtils;
+import androidx.core.app.TaskStackBuilder;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -223,7 +225,7 @@ public class PostRecipeActivity extends MyBaseActivity {
             manager.popBackStack();
         }
         else
-            super.onBackPressed();
+            onBackPressed();
     }
 
 
@@ -235,7 +237,8 @@ public class PostRecipeActivity extends MyBaseActivity {
             return;
         }
         if(!fragments.get(currentIndex).onBackPressed()) {
-            NavUtils.navigateUpFromSameTask(this);
+            exit();
+            //NavUtils.navigateUpFromSameTask(this);
         }
         //finish();
     }
@@ -263,7 +266,8 @@ public class PostRecipeActivity extends MyBaseActivity {
                 }
                 else {
                     setResult(RESULT_CANCELED);
-                    NavUtils.navigateUpFromSameTask(this);
+                    exit();
+                    //NavUtils.navigateUpFromSameTask(this);
                 }
                 break;
             case R.id.action_help:
@@ -273,9 +277,33 @@ public class PostRecipeActivity extends MyBaseActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    private void exit() {
+        Intent upIntent = NavUtils.getParentActivityIntent(this);
+        Log.e(getClass().getSimpleName(), "upIntent != null ? " + Boolean.toString(upIntent != null));
+        if (upIntent != null) {
+            if (NavUtils.shouldUpRecreateTask(this, upIntent)) {
+                Log.e(getClass().getSimpleName(), "shouldUpRecreateTask");
+                // This activity is NOT part of this app's task, so create a new task
+                // when navigating up, with a synthesized back stack.
+                TaskStackBuilder.create(this)
+                        // Add all of this activity's parents to the back stack
+                        .addNextIntentWithParentStack(upIntent)
+                        // Navigate up to the closest parent
+                        .startActivities();
+            } else {
+                Log.e(getClass().getSimpleName(), "NOT shouldUpRecreateTask");
+                // This activity is part of this app's task, so simply
+                // navigate up to the logical parent activity.
+                NavUtils.navigateUpTo(this, upIntent);
+            }
+        }
+        else
+            finish();
+    }
+
     private void backFromPreview() {
-        FragmentManager manager = getSupportFragmentManager();
-        manager.popBackStack();
+        getSupportFragmentManager()
+                .popBackStack();
         inPreview = false;
         expandedButton.setVisibility(View.VISIBLE);
         mSpeedDialView.setVisibility(fragments.get(currentIndex).menuFabVisibility());
@@ -335,7 +363,7 @@ public class PostRecipeActivity extends MyBaseActivity {
         else
             Toast.makeText(this, R.string.post_recipe_offline_upload_message, Toast.LENGTH_LONG).show();
         setResult(RESULT_OK);
-        new Handler().postDelayed(this::finish, 500);
+        new Handler().postDelayed(this::exit, 500);
         //PostRecipeToServerService.startActionPostRecipe(this, viewModel.recipe);
         //finish();
     }
