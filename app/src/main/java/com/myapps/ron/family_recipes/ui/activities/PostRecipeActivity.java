@@ -64,7 +64,7 @@ public class PostRecipeActivity extends MyBaseActivity {
     private View.OnClickListener expandedButtonListener;
     private ViewHider fabHider;
     private int currentIndex = 0;
-    private boolean inPreview = false, fabMayExpand;
+    private boolean inPreview = false, fabMayChangeExpandState = true;
 
 
     @Override
@@ -134,12 +134,12 @@ public class PostRecipeActivity extends MyBaseActivity {
     }
 
     public void setFabExtended(boolean extended) {
-        if (fabMayExpand)
+        if (fabMayChangeExpandState)
             fabExtensionAnimator.setExtended(extended);
     }
 
     public void setFabExtended(boolean extended, long delay) {
-        if (fabMayExpand)
+        if (fabMayChangeExpandState)
             fabExtensionAnimator.setExtended(extended, delay);
     }
 
@@ -162,8 +162,8 @@ public class PostRecipeActivity extends MyBaseActivity {
         expandedButton.setVisibility(View.VISIBLE);
     }
 
-    public void setFabMayExpand(boolean fabMayExpand) {
-        this.fabMayExpand = fabMayExpand;
+    public void setFabMayChangeExpandState(boolean fabMayExpand) {
+        this.fabMayChangeExpandState = fabMayExpand;
     }
 
     // endregion
@@ -191,8 +191,8 @@ public class PostRecipeActivity extends MyBaseActivity {
                 .addToBackStack(null)
                 .commit();
 
-        new Handler().postDelayed(this::nextFragmentDelayed, 600);
-        new Handler().postDelayed(this::nextFragmentDelayed, 600);
+        //new Handler().postDelayed(this::nextFragmentDelayed, 2500);
+        //new Handler().postDelayed(this::nextFragmentDelayed, 5000);
     }
 
     public void nextFragmentDelayed() {
@@ -237,8 +237,8 @@ public class PostRecipeActivity extends MyBaseActivity {
             return;
         }
         if(!fragments.get(currentIndex).onBackPressed()) {
-            exit();
-            //NavUtils.navigateUpFromSameTask(this);
+            //exit();
+            NavUtils.navigateUpFromSameTask(this);
         }
         //finish();
     }
@@ -266,10 +266,10 @@ public class PostRecipeActivity extends MyBaseActivity {
                 }
                 else {
                     setResult(RESULT_CANCELED);
-                    exit();
-                    //NavUtils.navigateUpFromSameTask(this);
+                    //exit();
+                    NavUtils.navigateUpFromSameTask(this);
+                    return true;
                 }
-                break;
             case R.id.action_help:
                 showInstructionDialog();
                 return true;
@@ -277,7 +277,7 @@ public class PostRecipeActivity extends MyBaseActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void exit() {
+    /*private void exit() {
         Intent upIntent = NavUtils.getParentActivityIntent(this);
         Log.e(getClass().getSimpleName(), "upIntent != null ? " + Boolean.toString(upIntent != null));
         if (upIntent != null) {
@@ -297,9 +297,10 @@ public class PostRecipeActivity extends MyBaseActivity {
                 NavUtils.navigateUpTo(this, upIntent);
             }
         }
-        else
+        else {
             finish();
-    }
+        }
+    }*/
 
     private void backFromPreview() {
         getSupportFragmentManager()
@@ -363,7 +364,7 @@ public class PostRecipeActivity extends MyBaseActivity {
         else
             Toast.makeText(this, R.string.post_recipe_offline_upload_message, Toast.LENGTH_LONG).show();
         setResult(RESULT_OK);
-        new Handler().postDelayed(this::exit, 500);
+        new Handler().postDelayed(/*this::exit*/() -> NavUtils.navigateUpFromSameTask(this), 500);
         //PostRecipeToServerService.startActionPostRecipe(this, viewModel.recipe);
         //finish();
     }

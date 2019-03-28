@@ -56,6 +56,7 @@
     <string name="nav_drawer_close">Close navigation drawer</string>
     <string name="Username">Username</string>
     <string name="Password">Password</string>
+    <string name="ok" translatable="false">OK</string>
 
     <!-- AllRecipes Fragment -->
     <string name="str_all_selected">All categories</string>
@@ -110,7 +111,7 @@
     <string name="post_recipe_advanced_step_fab_template">Basic Template</string>
     <string name="post_recipe_advanced_step_fab_reset">Reset</string>
 
-    <string name="bottom_transient_bar_behavior" translatable="false">com.myapps.ron.family_recipes.TransientBarBehavior</string>
+    <string name="bottom_transient_bar_behavior" translatable="false">com.myapps.ron.family_recipes.utils.ui.TransientBarBehavior</string>
     <!--#endregion Fab Menu -->
 
     <string name="post_recipe_advanced_step_reset_message">What you wrote will be deleted. Continue?</string>

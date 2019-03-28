@@ -18,7 +18,6 @@ import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.myapps.ron.family_recipes.utils.ui.MyDividerItemDecoration;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.model.CategoryEntity;
 import com.myapps.ron.family_recipes.model.QueryModel;
@@ -205,10 +204,10 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
 
     // region init Views
     private void initRecycler() {
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(activity.getApplicationContext());
-        recyclerView.setLayoutManager(mLayoutManager);
+        //RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(activity.getApplicationContext());
+        //recyclerView.setLayoutManager(mLayoutManager);
         //recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.addItemDecoration(new MyDividerItemDecoration(activity, DividerItemDecoration.VERTICAL, 36));
+        //recyclerView.addItemDecoration(new MyDividerItemDecoration(activity, DividerItemDecoration.VERTICAL, 36));
         //recyclerView.setAdapter(mAdapter);
         recyclerView.setItemAnimator(new FiltersListItemAnimator());
         recyclerView.addOnScrollListener(new MyRecyclerScroll() {

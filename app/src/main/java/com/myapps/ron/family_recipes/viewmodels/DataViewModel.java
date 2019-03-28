@@ -70,9 +70,10 @@ public class DataViewModel extends ViewModel {
     }
 
 
-    public void fetchFromServerJustedLoggedIn(Context context) {
-        GetAllRecipesService.startActionGetAllRecipes(context);
-        categoryRepository.fetchCategoriesReactive(context);
+    public void fetchFromServerJustLoggedIn(Context context) {
+        GetAllRecipesService.startActionFetchUserDetails(context);
+        //GetAllRecipesService.startActionGetAllRecipes(context);
+        //categoryRepository.fetchCategoriesReactive(context);
     }
 
     public void fetchFromServer(Context context) {

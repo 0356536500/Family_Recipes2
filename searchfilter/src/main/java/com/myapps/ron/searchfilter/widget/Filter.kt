@@ -181,7 +181,7 @@ class Filter<T : FilterModel> : FrameLayout, FilterItemListener, CollapseListene
     }
 
     fun isCollapsed(): Boolean {
-        return isCollapsed!!
+        return isCollapsed == null || isCollapsed!!
     }
 
     private fun collapse(duration: Long) {

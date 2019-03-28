@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.Set;
 
 import io.reactivex.subjects.PublishSubject;
-
+@SuppressWarnings("UnusedDeclaration")
 public class AppHelper {
     private static final String TAG = "AppHelper";
     // App settings
@@ -140,17 +140,17 @@ public class AppHelper {
         emailVerified = false;
         emailAvailable = false;
 
-        currUserAttributes = new HashSet<String>();
-        currDisplayedItems = new ArrayList<ItemToDisplay>();
-        trustedDevices = new ArrayList<ItemToDisplay>();
-        firstTimeLogInDetails = new ArrayList<ItemToDisplay>();
-        firstTimeLogInUpDatedAttributes= new HashMap<String, String>();
+        currUserAttributes = new HashSet<>();
+        currDisplayedItems = new ArrayList<>();
+        trustedDevices = new ArrayList<>();
+        firstTimeLogInDetails = new ArrayList<>();
+        firstTimeLogInUpDatedAttributes= new HashMap<>();
 
         newDevice = null;
         thisDevice = null;
         thisDeviceTrustState = false;
 
-        mfaOptions = new ArrayList<ItemToDisplay>();
+        mfaOptions = new ArrayList<>();
     }
 
     public static CognitoUserPool getPool() {
@@ -195,7 +195,7 @@ public class AppHelper {
      * subscribe to {@link AppHelper#currSessionObservable} for updates on {@link AppHelper#currSession}
      * @param context application context
      */
-    public static void setUserSessionBackground(Context context) {
+    private static void setUserSessionBackground(Context context) {
         CognitoUser user = getPool().getCurrentUser();
         String username = user.getUserId();
         //user saved in cache
@@ -207,6 +207,10 @@ public class AppHelper {
         else {
             signInUser(context);
         }
+    }
+
+    public static void signOutUser() {
+        getPool().getUser(user).signOut();
     }
 
     private static void signInUser(Context context) {
@@ -313,7 +317,7 @@ public class AppHelper {
                 (context, Constants.COGNITO_IDENTITY_POOL_ID, Constants.COGNITO_REGION);
 
         // Set up as a credentials provider.
-        Map<String, String> logins = new HashMap<String, String>();
+        Map<String, String> logins = new HashMap<>();
         logins.put(Constants.COGNITO_IDENTITY_LOGIN, cognitoUserSession.getIdToken().getJWTToken());
         credentialsProvider.setLogins(logins);
     }
@@ -359,7 +363,7 @@ public class AppHelper {
     }
 
     public static List<String> getNewAvailableOptions() {
-        List<String> newOption = new ArrayList<String>();
+        List<String> newOption = new ArrayList<>();
         for(String attribute : attributeDisplaySeq) {
             if(!(currUserAttributes.contains(attribute))) {
                 newOption.add(attribute);
@@ -377,7 +381,7 @@ public class AppHelper {
 
         if(temp != null && temp.length() > 0) {
             formattedString = temp.split("\\(")[0];
-            if(temp != null && temp.length() > 0) {
+            if(formattedString != null && formattedString.length() > 0) {
                 return formattedString;
             }
         }
@@ -415,13 +419,13 @@ public class AppHelper {
     public static void setUserAttributeForDisplayFirstLogIn(Map<String, String> currAttributes, List<String> requiredAttributes) {
         firstTimeLogInUserAttributes = currAttributes;
         firstTimeLogInRequiredAttributes = requiredAttributes;
-        firstTimeLogInUpDatedAttributes = new HashMap<String, String>();
+        firstTimeLogInUpDatedAttributes = new HashMap<>();
         refreshDisplayItemsForFirstTimeLogin();
     }
 
     public static void setUserAttributeForFirstTimeLogin(String attributeName, String attributeValue) {
         if (firstTimeLogInUserAttributes ==  null) {
-            firstTimeLogInUserAttributes = new HashMap<String, String>();
+            firstTimeLogInUserAttributes = new HashMap<>();
         }
         firstTimeLogInUserAttributes.put(attributeName, attributeValue);
         firstTimeLogInUpDatedAttributes.put(attributeName, attributeValue);
@@ -442,7 +446,7 @@ public class AppHelper {
 
     private static void refreshDisplayItemsForFirstTimeLogin() {
         firstTimeLogInItemsCount = 0;
-        firstTimeLogInDetails = new ArrayList<ItemToDisplay>();
+        firstTimeLogInDetails = new ArrayList<>();
 
         for(Map.Entry<String, String> attr: firstTimeLogInUserAttributes.entrySet()) {
             if ("phone_number_verified".equals(attr.getKey()) || "email_verified".equals(attr.getKey())) {
@@ -475,7 +479,7 @@ public class AppHelper {
         trustedDevicesCount = 0;
         thisDeviceTrustState = false;
         deviceDetails = devicesList;
-        trustedDevices = new ArrayList<ItemToDisplay>();
+        trustedDevices = new ArrayList<>();
         for(CognitoDevice device: devicesList) {
             if (thisDevice != null && thisDevice.getDeviceKey().equals(device.getDeviceKey())) {
                 thisDeviceTrustState = true;
@@ -498,7 +502,7 @@ public class AppHelper {
 
     public static void setMfaOptionsForDisplay(List<String> options, Map<String, String> parameters) {
         mfaAllOptionsCode = options;
-        mfaOptions = new ArrayList<ItemToDisplay>();
+        mfaOptions = new ArrayList<>();
         String textToDisplay = "";
         for (String option: options) {
             if ("SMS_MFA".equals(option)) {
@@ -557,7 +561,7 @@ public class AppHelper {
 
     private static void setData() {
         // Set attribute display sequence
-        attributeDisplaySeq = new ArrayList<String>();
+        attributeDisplaySeq = new ArrayList<>();
         attributeDisplaySeq.add("given_name");
         attributeDisplaySeq.add("middle_name");
         attributeDisplaySeq.add("family_name");
@@ -565,7 +569,7 @@ public class AppHelper {
         attributeDisplaySeq.add("phone_number");
         attributeDisplaySeq.add("email");
 
-        signUpFieldsC2O = new HashMap<String, String>();
+        signUpFieldsC2O = new HashMap<>();
         signUpFieldsC2O.put("Given name", "given_name");
         signUpFieldsC2O.put("Family name", "family_name");
         signUpFieldsC2O.put("Nick name", "nickname");
@@ -575,7 +579,7 @@ public class AppHelper {
         signUpFieldsC2O.put("Email","email");
         signUpFieldsC2O.put("Middle name","middle_name");
 
-        signUpFieldsO2C = new HashMap<String, String>();
+        signUpFieldsO2C = new HashMap<>();
         signUpFieldsO2C.put("given_name", "Given name");
         signUpFieldsO2C.put("family_name", "Family name");
         signUpFieldsO2C.put("nickname", "Nick name");
@@ -598,7 +602,7 @@ public class AppHelper {
         emailAvailable = false;
         phoneAvailable = false;
 
-        currDisplayedItems = new ArrayList<ItemToDisplay>();
+        currDisplayedItems = new ArrayList<>();
         currUserAttributes.clear();
         itemCount = 0;
 

@@ -93,7 +93,7 @@ public class PostRecipePickPhotosFragment extends PostRecipeBaseFragment {
         initViewModel();
         activity.setFabGravity(Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL);
         activity.setFabExtended(true, 1000);
-        activity.setFabMayExpand(false);
+        activity.setFabMayChangeExpandState(false);
 
         maxImagesSnackbar = Snackbar.make(view, getString(R.string.alert_dialog_upload_photos_max_limit, Constants.MAX_FILES_TO_UPLOAD), Snackbar.LENGTH_INDEFINITE);
         maxImagesSnackbar.setAction(R.string.post_recipe_snacbar_close, view1 -> maxImagesSnackbar.dismiss());
@@ -103,7 +103,7 @@ public class PostRecipePickPhotosFragment extends PostRecipeBaseFragment {
     public void onDestroyView() {
         super.onDestroyView();
         activity.setFabGravity(Gravity.BOTTOM | Gravity.START);
-        activity.setFabMayExpand(true);
+        activity.setFabMayChangeExpandState(true);
     }
 
     @Override

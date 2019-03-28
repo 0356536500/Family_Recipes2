@@ -49,14 +49,13 @@ public class SplashActivity extends AppCompatActivity {
 
         AppHelper.init(getApplicationContext());
 
-        if(MiddleWareForNetwork.checkInternetConnection(this))
+        if (MiddleWareForNetwork.checkInternetConnection(this))
             findCurrent();
-        else if(SharedPreferencesHandler.getString(this, USERNAME) != null &&
-                SharedPreferencesHandler.getString(this, PASSWORD) != null){
+        else if (SharedPreferencesHandler.getString(this, USERNAME) != null &&
+                SharedPreferencesHandler.getString(this, PASSWORD) != null) {
             Toast.makeText(this, "you are offline", Toast.LENGTH_LONG).show();
             launchMain();
-        }
-        else
+        } else
             Toast.makeText(this, "Please connect to internet and then log in", Toast.LENGTH_LONG).show();
     }
 
@@ -138,50 +137,59 @@ public class SplashActivity extends AppCompatActivity {
     };
 
     private void launchMain() {
-        startActivity(new Intent(this, PostRecipeActivity.class));
-        finish();
-        if (false) {
-            if (getIntent() != null) {
-                Intent receivedIntent = getIntent();
-                SPLASH_ACTIVITY_CODES action = (SPLASH_ACTIVITY_CODES) receivedIntent.getSerializableExtra(Constants.SPLASH_ACTIVITY_CODE);
-                if (action != null) {
-                    if (action == SPLASH_ACTIVITY_CODES.RECIPE) {
-                        // Open a specific recipe from deep link. Open as a single activity, without back stack
-                        String recipeId = receivedIntent.getStringExtra(Constants.RECIPE_ID);
-                        if (recipeId != null && !"".equals(recipeId)) {
-                            Intent recipeIntent = new Intent(SplashActivity.this, RecipeActivity.class);
-                            recipeIntent.putExtra(Constants.RECIPE_ID, recipeId);
-                            recipeIntent.addFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
-                            startActivity(recipeIntent);
-                            finish();
-                        }
-                    } else if (action == SPLASH_ACTIVITY_CODES.POST) {
-                        // Post recipe shortcut, open with MainActivity in back stack
-                        TaskStackBuilder.create(this)
-                                .addNextIntent(new Intent(this, MainActivity.class))
-                                .addNextIntent(new Intent(this, PostRecipeActivity.class))
-                                .startActivities();
-                        finish();
-                    } else if (action == SPLASH_ACTIVITY_CODES.MAIN) {
-                        // open main activity but not with the default fragment
-                        Intent intent = new Intent(SplashActivity.this, MainActivity.class);
-                        intent.putExtra(Constants.MAIN_ACTIVITY_FIRST_FRAGMENT, receivedIntent.getSerializableExtra(Constants.MAIN_ACTIVITY_FIRST_FRAGMENT));
-                        startActivity(intent);
+        /*startActivity(new Intent(this, PostRecipeActivity.class));
+        finish();*/
+        if (getIntent() != null) {
+            Intent receivedIntent = getIntent();
+            SPLASH_ACTIVITY_CODES action = (SPLASH_ACTIVITY_CODES) receivedIntent.getSerializableExtra(Constants.SPLASH_ACTIVITY_CODE);
+            if (action != null) {
+                if (action == SPLASH_ACTIVITY_CODES.RECIPE) {
+                    // Open a specific recipe from deep link. Open as a single activity, without back stack
+                    String recipeId = receivedIntent.getStringExtra(Constants.RECIPE_ID);
+                    if (recipeId != null && !"".equals(recipeId)) {
+                        Intent recipeIntent = new Intent(SplashActivity.this, RecipeActivity.class);
+                        recipeIntent.putExtra(Constants.RECIPE_ID, recipeId);
+                        recipeIntent.addFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
+                        startActivity(recipeIntent);
                         finish();
                     }
+                } else if (action == SPLASH_ACTIVITY_CODES.POST) {
+                    // Post recipe shortcut, open with MainActivity in back stack
+                    TaskStackBuilder.create(this)
+                            .addNextIntent(new Intent(this, MainActivity.class))
+                            .addNextIntent(new Intent(this, PostRecipeActivity.class))
+                            .startActivities();
+                    finish();
+                } else if (action == SPLASH_ACTIVITY_CODES.MAIN) {
+                    // open main activity but not with the default fragment
+                    Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+                    intent.putExtra(Constants.MAIN_ACTIVITY_FIRST_FRAGMENT, receivedIntent.getSerializableExtra(Constants.MAIN_ACTIVITY_FIRST_FRAGMENT));
+                    startActivity(intent);
+                    finish();
                 }
             } else {
-                // regular open of the app from launcher
-                Intent intent = new Intent(SplashActivity.this, MainActivity.class);
-                intent.putExtra(Constants.MAIN_ACTIVITY_FIRST_FRAGMENT, Constants.MAIN_ACTIVITY_FRAGMENTS.ALL);
-                startActivity(intent);
-                finish();
+                launchedFromMainFlow();
             }
+        } else {
+            // regular open of the app from launcher
+            launchedFromMainFlow();
         }
     }
 
+    /**
+     * triggered when user launch the application from the app icon in the app drawer
+     */
+    private void launchedFromMainFlow() {
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.putExtra(Constants.MAIN_ACTIVITY_FIRST_FRAGMENT, Constants.MAIN_ACTIVITY_FRAGMENTS.ALL);
+        startActivity(intent);
+        finish();
+    }
+
+
     private void launchLogin() {
         Intent intent = new Intent(SplashActivity.this, LoginActivity.class);
+        intent.putExtras(getIntent());
         startActivity(intent);
         finish();
     }

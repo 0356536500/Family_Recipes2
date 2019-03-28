@@ -252,8 +252,10 @@ public class RecipeRepository {
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     public void fetchRecipesReactive(final Context context) {
-        if (!mayRefresh.get())
+        if (!mayRefresh.get()){
+            dispatchInfo.onNext(context.getString(R.string.refresh_error_message));
             return;
+        }
         mayRefresh.getAndSet(false);
         new Handler().postDelayed(() -> mayRefresh.getAndSet(true), com.myapps.ron.family_recipes.utils.Constants.REFRESH_DELAY);
         if(MiddleWareForNetwork.checkInternetConnection(context)) {

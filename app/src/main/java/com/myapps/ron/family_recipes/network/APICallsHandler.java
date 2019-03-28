@@ -364,9 +364,10 @@ public class APICallsHandler {
                 else {
                     try {
                         if (response.errorBody() != null) {
-                            Log.e(TAG, "error registerNewToken, code = " + response.code() + "\n errorBody: " + response.errorBody().string()
+                            String err = response.errorBody().string();
+                            Log.e(TAG, "error registerNewToken, code = " + response.code() + "\n errorBody: " + err
                                     + "\n message: " + response.message());
-                            callback.onFinished(response.errorBody().string());
+                            callback.onFinished(err);
                         }
                     } catch (IOException e) {
                         e.printStackTrace();

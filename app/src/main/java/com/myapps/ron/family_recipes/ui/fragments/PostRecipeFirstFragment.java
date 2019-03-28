@@ -3,7 +3,6 @@ package com.myapps.ron.family_recipes.ui.fragments;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -38,7 +37,7 @@ import butterknife.OnTextChanged;
  * Created by ronginat on 29/10/2018.
  */
 public class PostRecipeFirstFragment extends PostRecipeBaseFragment implements FilterListener<CategoryEntity> {
-    private final String TAG = getClass().getSimpleName();
+    //private final String TAG = getClass().getSimpleName();
 
     @BindView(R.id.recipe_name_editText)
     EditText editTextName;
@@ -77,7 +76,6 @@ public class PostRecipeFirstFragment extends PostRecipeBaseFragment implements F
 
         ButterKnife.bind(this, view);
         initViewModel();
-        //setListeners();
     }
 
     // region PostRecipeBaseFragment Overrides
@@ -169,48 +167,6 @@ public class PostRecipeFirstFragment extends PostRecipeBaseFragment implements F
     private void afterTextChangedGeneral(@NonNull View view, @NonNull Editable editable) {
         if(!editable.toString().isEmpty())
             view.getBackground().setTint(Color.BLACK);
-    }
-
-    private void setListeners() {
-        editTextName.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-                if(!editable.toString().isEmpty()) {
-                    editTextName.getBackground().setTint(Color.BLACK);
-                    name = editable.toString();
-                }
-            }
-        });
-
-        editTextDesc.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-                if(!editable.toString().isEmpty()) {
-                    editTextDesc.getBackground().setTint(Color.BLACK);
-                    desc = editable.toString();
-                }
-            }
-        });
     }
 
     private boolean checkValidation() {

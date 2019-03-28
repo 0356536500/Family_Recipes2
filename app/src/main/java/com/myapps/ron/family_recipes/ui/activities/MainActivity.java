@@ -23,21 +23,17 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUser;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.iid.FirebaseInstanceId;
-import com.google.firebase.iid.InstanceIdResult;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.dal.Injection;
 import com.myapps.ron.family_recipes.network.MiddleWareForNetwork;
 import com.myapps.ron.family_recipes.network.cognito.AppHelper;
+import com.myapps.ron.family_recipes.ui.baseclasses.MyBaseActivity;
+import com.myapps.ron.family_recipes.ui.baseclasses.MyFragment;
 import com.myapps.ron.family_recipes.ui.fragments.AllRecipesFragment;
 import com.myapps.ron.family_recipes.ui.fragments.FavoritesRecipesFragment;
 import com.myapps.ron.family_recipes.utils.Constants;
-import com.myapps.ron.family_recipes.ui.baseclasses.MyBaseActivity;
-import com.myapps.ron.family_recipes.ui.baseclasses.MyFragment;
 import com.myapps.ron.family_recipes.utils.logic.SharedPreferencesHandler;
 import com.myapps.ron.family_recipes.viewmodels.DataViewModel;
 
@@ -66,9 +62,7 @@ public class MainActivity extends MyBaseActivity {
     //public MenuItem sortMenuItem;
 
     private MyFragment currentFragment, allRecipesFragment, favoritesRecipesFragment;
-    private DataViewModel viewModel;
 
-    private CognitoUser user;
     private IntentFilter customFilter;
     private String lastOrderBy;
 
@@ -78,7 +72,6 @@ public class MainActivity extends MyBaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         bindUI();
         loadColorsFromTheme();
@@ -90,10 +83,26 @@ public class MainActivity extends MyBaseActivity {
         initFragments();
         isRTL = isRTL();
 
-        viewModel =  ViewModelProviders.of(this, Injection.provideViewModelFactory(this)).get(DataViewModel.class);
+        DataViewModel viewModel = ViewModelProviders.of(this, Injection.provideViewModelFactory(this)).get(DataViewModel.class);
         //viewModel = ViewModelProviders.of(this).get(DataViewModel.class);
 
-        new Handler().postDelayed(this::startWithDefaultFragment, 100);
+        //handle data from intent
+        if (getIntent() != null && getIntent().getSerializableExtra(Constants.MAIN_ACTIVITY_FIRST_FRAGMENT) != null) {
+            Constants.MAIN_ACTIVITY_FRAGMENTS firstFragmentEnum = (Constants.MAIN_ACTIVITY_FRAGMENTS) getIntent().getSerializableExtra(Constants.MAIN_ACTIVITY_FIRST_FRAGMENT);
+
+            if (firstFragmentEnum.equals(Constants.MAIN_ACTIVITY_FRAGMENTS.ALL))
+                new Handler().postDelayed(() -> startWithDefaultFragment(allRecipesFragment), 100);
+            else if (firstFragmentEnum.equals(Constants.MAIN_ACTIVITY_FRAGMENTS.FAVORITES))
+                new Handler().postDelayed(() -> startWithDefaultFragment(favoritesRecipesFragment), 100);
+        } else
+            new Handler().postDelayed(() -> startWithDefaultFragment(allRecipesFragment), 100);
+
+        //check if got here from login activity
+        if (getIntent() != null) {
+            if (getIntent().getBooleanExtra("from_login", false))
+                new Handler().postDelayed(() -> viewModel.fetchFromServerJustLoggedIn(this), 10000);
+        }
+
         // white background notification bar
         //whiteNotificationBar(recyclerView);
         getFirebaseToken();
@@ -101,15 +110,14 @@ public class MainActivity extends MyBaseActivity {
 
     private void getFirebaseToken() {
         FirebaseInstanceId.getInstance().getInstanceId()
-                .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<InstanceIdResult> task) {
-                        if (!task.isSuccessful()) {
-                            Log.w(TAG, "getInstanceId failed", task.getException());
-                            return;
-                        }
+                .addOnCompleteListener(task -> {
+                    if (!task.isSuccessful()) {
+                        Log.w(TAG, "getInstanceId failed", task.getException());
+                        return;
+                    }
 
-                        // Get new Instance ID token
+                    // Get new Instance ID token
+                    if (task.getResult() != null) {
                         String token = task.getResult().getToken();
 
                         // Log and toast
@@ -187,8 +195,6 @@ public class MainActivity extends MyBaseActivity {
     }
 
     private void init() {
-        user = AppHelper.getPool().getUser(SharedPreferencesHandler.getString(getApplicationContext(), com.myapps.ron.family_recipes.network.Constants.USERNAME));
-
         /*regularFilter = new IntentFilter();
         regularFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);*/
 
@@ -406,8 +412,8 @@ public class MainActivity extends MyBaseActivity {
         favoritesRecipesFragment = new FavoritesRecipesFragment();
     }
 
-    private void startWithDefaultFragment() {
-        currentFragment = allRecipesFragment;
+    private void startWithDefaultFragment(@NonNull MyFragment startingFragment) {
+        currentFragment = startingFragment;
         /*if (getIntent().getBooleanExtra("load_likes", false)) {
             currentFragment.setArguments(getIntent().getExtras());
         }*/
@@ -421,7 +427,7 @@ public class MainActivity extends MyBaseActivity {
 
     // Sign out user
     private void signOut() {
-        user.signOut();
+        AppHelper.signOutUser();
         SharedPreferencesHandler.removeString(this, com.myapps.ron.family_recipes.network.Constants.USERNAME);
         SharedPreferencesHandler.removeString(this, com.myapps.ron.family_recipes.network.Constants.PASSWORD);
         exit();

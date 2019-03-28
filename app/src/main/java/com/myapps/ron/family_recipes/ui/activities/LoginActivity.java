@@ -1,20 +1,21 @@
 package com.myapps.ron.family_recipes.ui.activities;
 
-import android.app.ProgressDialog;
+import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoDevice;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUser;
@@ -29,12 +30,18 @@ import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.Authentic
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.ForgotPasswordHandler;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.network.cognito.AppHelper;
+import com.myapps.ron.family_recipes.utils.Constants;
 import com.myapps.ron.family_recipes.utils.logic.LocaleHelper;
 import com.myapps.ron.family_recipes.utils.logic.SharedPreferencesHandler;
 
 import java.util.Locale;
 import java.util.Map;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.TaskStackBuilder;
+
+@SuppressLint("SetTextI18n")
 public class LoginActivity extends AppCompatActivity {
     private final String TAG = getClass().getSimpleName();
 
@@ -42,8 +49,8 @@ public class LoginActivity extends AppCompatActivity {
     //private DrawerLayout mDrawer;
     //private ActionBarDrawerToggle mDrawerToggle;
     //private Toolbar toolbar;
-    private AlertDialog userDialog;
-    private ProgressDialog waitDialog;
+    //private AlertDialog userDialog;
+    private ProgressBar waitDialog;
 
     // Screen fields
     private EditText inUsername;
@@ -164,7 +171,7 @@ public class LoginActivity extends AppCompatActivity {
                     String name = data.getStringExtra("TODO");
                     if(name != null) {
                         if (!name.isEmpty()) {
-                            name.equals("exit");
+                            //name.equals("exit");
                             onBackPressed();
                         }
                     }
@@ -173,7 +180,7 @@ public class LoginActivity extends AppCompatActivity {
             case 6:
                 //New password
                 closeWaitDialog();
-                Boolean continueSignIn = false;
+                boolean continueSignIn = false;
                 if (resultCode == RESULT_OK) {
                    continueSignIn = data.getBooleanExtra("continueSignIn", false);
                 }
@@ -248,22 +255,14 @@ public class LoginActivity extends AppCompatActivity {
 
     private void signInUser() {
         username = inUsername.getText().toString();
-        if(username == null || username.length() < 1) {
+        if(inPassword.getText() == null || username.length() < 1) {
             TextView label = findViewById(R.id.textViewUserIdMessage);
-            label.setText(inUsername.getHint().toString().concat(" cannot be empty"));
+            label.setText(new StringBuilder(inUsername.getHint()).append((" cannot be empty")));
             inUsername.setBackground(getDrawable(R.drawable.text_border_error));
             return;
         }
 
         AppHelper.setUser(username);
-
-        password = inPassword.getText().toString();
-        if(password == null || password.length() < 1) {
-            TextView label = findViewById(R.id.textViewUserPasswordMessage);
-            label.setText(inPassword.getHint().toString().concat(" cannot be empty"));
-            inPassword.setBackground(getDrawable(R.drawable.text_border_error));
-            return;
-        }
 
         showWaitDialog("Signing in...");
         AppHelper.getPool().getUser(username).getSessionInBackground(authenticationHandler);
@@ -271,16 +270,9 @@ public class LoginActivity extends AppCompatActivity {
 
     private void forgotpasswordUser() {
         username = inUsername.getText().toString();
-        if(username == null) {
+        if(inPassword.getText() == null || username.length() < 1) {
             TextView label = findViewById(R.id.textViewUserIdMessage);
-            label.setText(inUsername.getHint()+" cannot be empty");
-            inUsername.setBackground(getDrawable(R.drawable.text_border_error));
-            return;
-        }
-
-        if(username.length() < 1) {
-            TextView label = findViewById(R.id.textViewUserIdMessage);
-            label.setText(inUsername.getHint()+" cannot be empty");
+            label.setText(new StringBuilder(inUsername.getHint()).append(" cannot be empty"));
             inUsername.setBackground(getDrawable(R.drawable.text_border_error));
             return;
         }
@@ -353,11 +345,69 @@ public class LoginActivity extends AppCompatActivity {
 
     }*/
 
+    /*@SuppressWarnings("UnusedDeclaration")
     private void launchUser() {
-        Intent mainIntent = new Intent(this, SettingsActivity.class);
+        Intent mainIntent = new Intent(this, MainActivity.class);
         mainIntent.putExtra("name", username);
         mainIntent.putExtra("from_login", true);
+        if (getIntent() != null)
+            mainIntent.putExtra(Constants.MAIN_ACTIVITY_FIRST_FRAGMENT, getIntent().getSerializableExtra(Constants.MAIN_ACTIVITY_FIRST_FRAGMENT));
         startActivity(mainIntent);
+        finish();
+    }*/
+
+    private void launchMain() {
+        Log.e(TAG, "launchMain");
+        if (getIntent() != null) {
+            Log.e(TAG, "getIntent() != null");
+            Intent receivedIntent = getIntent();
+            Constants.SPLASH_ACTIVITY_CODES action = (Constants.SPLASH_ACTIVITY_CODES) receivedIntent.getSerializableExtra(Constants.SPLASH_ACTIVITY_CODE);
+            if (action != null) {
+                Log.e(TAG, "code from splash != null");
+                if (action == Constants.SPLASH_ACTIVITY_CODES.RECIPE) {
+                    // Open a specific recipe from deep link. Open as a single activity, without back stack
+                    String recipeId = receivedIntent.getStringExtra(Constants.RECIPE_ID);
+                    if (recipeId != null && !"".equals(recipeId)) {
+                        Intent recipeIntent = new Intent(this, RecipeActivity.class);
+                        recipeIntent.putExtra(Constants.RECIPE_ID, recipeId);
+                        recipeIntent.addFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
+                        startActivity(recipeIntent);
+                        finish();
+                    }
+                } else if (action == Constants.SPLASH_ACTIVITY_CODES.POST) {
+                    // Post recipe shortcut, open with MainActivity in back stack
+                    TaskStackBuilder.create(this)
+                            .addNextIntent(new Intent(this, MainActivity.class))
+                            .addNextIntent(new Intent(this, PostRecipeActivity.class))
+                            .startActivities();
+                    finish();
+                } else if (action == Constants.SPLASH_ACTIVITY_CODES.MAIN) {
+                    // open main activity but not with the default fragment
+                    Intent mainIntent = new Intent(this, MainActivity.class);
+                    mainIntent.putExtra(Constants.MAIN_ACTIVITY_FIRST_FRAGMENT, receivedIntent.getSerializableExtra(Constants.MAIN_ACTIVITY_FIRST_FRAGMENT));
+                    mainIntent.putExtra("name", username);
+                    mainIntent.putExtra("from_login", true);
+                    startActivity(mainIntent);
+                    finish();
+                }
+            } else {
+                loginFromMainFlow();
+            }
+        } else {
+            // regular open of the app from launcher
+            loginFromMainFlow();
+        }
+    }
+
+    /**
+     * triggered when user launch the application from the app icon in the app drawer
+     */
+    private void loginFromMainFlow() {
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.putExtra(Constants.MAIN_ACTIVITY_FIRST_FRAGMENT, Constants.MAIN_ACTIVITY_FRAGMENTS.ALL);
+        intent.putExtra("name", username);
+        intent.putExtra("from_login", true);
+        startActivity(intent);
         finish();
     }
 
@@ -379,14 +429,7 @@ public class LoginActivity extends AppCompatActivity {
         if(this.password == null) {
             inUsername.setText(username);
             password = inPassword.getText().toString();
-            if(password == null) {
-                TextView label = findViewById(R.id.textViewUserPasswordMessage);
-                label.setText(inPassword.getHint().toString().concat(" enter password"));
-                inPassword.setBackground(getDrawable(R.drawable.text_border_error));
-                return;
-            }
-
-            if(password.length() < 1) {
+            if(inPassword.getText() == null || password.length() < 1) {
                 TextView label = findViewById(R.id.textViewUserPasswordMessage);
                 label.setText(inPassword.getHint().toString().concat(" enter password"));
                 inPassword.setBackground(getDrawable(R.drawable.text_border_error));
@@ -491,12 +534,12 @@ public class LoginActivity extends AppCompatActivity {
 
             closeWaitDialog();
             writeCredentialsToSharedPref();
-            launchUser();
+            launchMain();
         }
 
         @Override
         public void getAuthenticationDetails(AuthenticationContinuation authenticationContinuation, String username) {
-            closeWaitDialog();
+            //closeWaitDialog();
             Locale.setDefault(Locale.US);
             getUserAuthentication(authenticationContinuation, username);
         }
@@ -560,35 +603,32 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void showWaitDialog(String message) {
-        closeWaitDialog();
-        waitDialog = new ProgressDialog(this);
-        waitDialog.setTitle(message);
-        waitDialog.show();
+        //closeWaitDialog();
+        //waitDialog.setTitle(message);
+        if (waitDialog == null) {
+            waitDialog = new ProgressBar(this, null, android.R.attr.progressBarStyleLarge);
+            waitDialog.setIndeterminate(true);
+            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            params.addRule(RelativeLayout.CENTER_IN_PARENT);
+            ((RelativeLayout) findViewById(R.id.activity_login_container)).addView(waitDialog, params);
+        }
+        waitDialog.setVisibility(View.VISIBLE);
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
     private void showDialogMessage(String title, String body) {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(title).setMessage(body).setNeutralButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                try {
-                    userDialog.dismiss();
-                } catch (Exception e) {
-                    //
-                }
-            }
-        });
-        userDialog = builder.create();
+        final AlertDialog userDialog = new AlertDialog.Builder(this)
+                .setTitle(title)
+                .setMessage(body)
+                .setNeutralButton(R.string.ok, (dialog, which) -> dialog.dismiss())
+                .create();
+
         userDialog.show();
     }
 
     private void closeWaitDialog() {
-        try {
-            waitDialog.dismiss();
-        }
-        catch (Exception e) {
-            //
-        }
+        if (waitDialog != null)
+            waitDialog.setVisibility(View.GONE);
     }
 
     private void writeCredentialsToSharedPref() {
