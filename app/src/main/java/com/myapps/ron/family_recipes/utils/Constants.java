@@ -12,6 +12,19 @@ public class Constants {
 
     // endregion
 
+    // region Splash Activity
+    public enum SPLASH_ACTIVITY_CODES { MAIN, POST, RECIPE }
+    public static final String SPLASH_ACTIVITY_CODE = "splash_code";
+
+    // endregion
+
+    // region Main Activity
+
+    public static final String MAIN_ACTIVITY_FIRST_FRAGMENT = "first_fragment";
+    public enum MAIN_ACTIVITY_FRAGMENTS { ALL, FAVORITES }
+
+    // endregion
+
     public static final String RECIPE_ID = "recipe";
     public static final String RECIPE_PATH = "recipe_file";
     public static final String DEFAULT_RECIPE_PATH = "/recipe/default.html";

@@ -13,9 +13,9 @@ import android.widget.Toast;
 
 import com.google.android.material.button.MaterialButton;
 import com.leinardi.android.speeddial.SpeedDialView;
-import com.myapps.ron.family_recipes.FabExtensionAnimator;
+import com.myapps.ron.family_recipes.utils.ui.FabExtensionAnimator;
 import com.myapps.ron.family_recipes.R;
-import com.myapps.ron.family_recipes.ViewHider;
+import com.myapps.ron.family_recipes.utils.ui.ViewHider;
 import com.myapps.ron.family_recipes.dal.Injection;
 import com.myapps.ron.family_recipes.network.MiddleWareForNetwork;
 import com.myapps.ron.family_recipes.ui.baseclasses.MyBaseActivity;

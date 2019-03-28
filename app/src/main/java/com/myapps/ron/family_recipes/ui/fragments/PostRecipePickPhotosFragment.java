@@ -17,7 +17,7 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.google.android.material.snackbar.Snackbar;
-import com.myapps.ron.family_recipes.FabExtensionAnimator;
+import com.myapps.ron.family_recipes.utils.ui.FabExtensionAnimator;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.dal.storage.StorageWrapper;
 import com.myapps.ron.family_recipes.ui.baseclasses.PostRecipeBaseFragment;

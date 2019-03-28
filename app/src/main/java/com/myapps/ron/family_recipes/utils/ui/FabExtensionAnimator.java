@@ -1,4 +1,4 @@
-package com.myapps.ron.family_recipes;
+package com.myapps.ron.family_recipes.utils.ui;
 
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.ripple.RippleUtils;
+import com.myapps.ron.family_recipes.R;
 
 import java.util.Objects;
 

@@ -12,7 +12,7 @@ import android.util.Log;
 import com.myapps.ron.family_recipes.network.Constants;
 import com.myapps.ron.family_recipes.network.MiddleWareForNetwork;
 import com.myapps.ron.family_recipes.network.S3.OnlineStorageWrapper;
-import com.myapps.ron.family_recipes.utils.DateUtil;
+import com.myapps.ron.family_recipes.utils.logic.DateUtil;
 import com.myapps.ron.family_recipes.utils.MyCallback;
 
 import java.io.File;

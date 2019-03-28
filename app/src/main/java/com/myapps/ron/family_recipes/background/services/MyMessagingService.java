@@ -147,6 +147,7 @@ public class MyMessagingService extends FirebaseMessagingService {
             bundle.putBoolean("notification", true);
             bundle.putString("channel", channelId);
             intent.putExtras(bundle);*/
+            intent.putExtra(Constants.SPLASH_ACTIVITY_CODE, Constants.SPLASH_ACTIVITY_CODES.RECIPE);
             intent.putExtra(Constants.RECIPE_ID, data.get(Constants.ID));
             intent.putExtra(Constants.NOTIFICATION, true);
             intent.putExtra(Constants.CHANNEL, channelId); // whether to fetch new recipes or just load comments normally

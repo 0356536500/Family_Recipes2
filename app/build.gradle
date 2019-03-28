@@ -35,12 +35,12 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
 
     // androidx library
-    implementation 'androidx.appcompat:appcompat:1.1.0-alpha01'
-    implementation 'com.google.android.material:material:1.1.0-alpha02'
-    implementation 'androidx.recyclerview:recyclerview:1.1.0-alpha01'
+    implementation 'androidx.appcompat:appcompat:1.1.0-alpha03'
+    implementation 'com.google.android.material:material:1.1.0-alpha05'
+    implementation 'androidx.recyclerview:recyclerview:1.1.0-alpha03'
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'androidx.preference:preference:1.1.0-alpha03'
+    implementation 'androidx.preference:preference:1.1.0-alpha04'
 
     implementation 'androidx.constraintlayout:constraintlayout:2.0.0-alpha3'
 
@@ -60,7 +60,7 @@ dependencies {
     // endregion
 
     // region Room db
-    def room_version = "2.1.0-alpha03"
+    def room_version = "2.1.0-alpha06"
     implementation "androidx.room:room-runtime:$room_version"
     annotationProcessor "androidx.room:room-compiler:$room_version" // use kapt for Kotlin
 
@@ -72,13 +72,13 @@ dependencies {
     // endregion
 
     // region WorkManager
-    def work_version = "1.0.0"
+    def work_version = "2.0.0"
 
-    implementation "android.arch.work:work-runtime:$work_version"
+    implementation "androidx.work:work-runtime:$work_version"
     // For Kotlin+Coroutines use work-runtime-ktx
 
     // optional - RxJava2 support
-    implementation "android.arch.work:work-rxjava2:$work_version"
+    implementation "androidx.work:work-rxjava2:$work_version"
 
     // endregion
 
@@ -97,7 +97,7 @@ dependencies {
 
     // region RxJava
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
-    implementation 'io.reactivex.rxjava2:rxjava:2.2.7'
+    implementation 'io.reactivex.rxjava2:rxjava:2.2.8'
 
     // endregion
 
@@ -149,8 +149,8 @@ dependencies {
     implementation 'com.google.android:flexbox:1.1.0'
 
         // region Firebase
-    implementation 'com.google.firebase:firebase-core:16.0.7'
-    implementation 'com.google.firebase:firebase-messaging:17.4.0'
+    implementation 'com.google.firebase:firebase-core:16.0.8'
+    implementation 'com.google.firebase:firebase-messaging:17.5.0'
 
     // endregion
     // endregion

@@ -1,6 +1,6 @@
 package com.myapps.ron.family_recipes.model;
 
-import com.myapps.ron.family_recipes.utils.DateUtil;
+import com.myapps.ron.family_recipes.utils.logic.DateUtil;
 
 import java.util.ArrayList;
 import java.util.List;

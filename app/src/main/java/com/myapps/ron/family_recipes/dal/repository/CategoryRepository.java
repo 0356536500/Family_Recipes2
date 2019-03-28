@@ -11,7 +11,7 @@ import com.myapps.ron.family_recipes.network.APICallsHandler;
 import com.myapps.ron.family_recipes.network.MiddleWareForNetwork;
 import com.myapps.ron.family_recipes.network.cognito.AppHelper;
 import com.myapps.ron.family_recipes.network.modelTO.CategoryTO;
-import com.myapps.ron.family_recipes.utils.DateUtil;
+import com.myapps.ron.family_recipes.utils.logic.DateUtil;
 
 import java.util.List;
 import java.util.concurrent.Executor;

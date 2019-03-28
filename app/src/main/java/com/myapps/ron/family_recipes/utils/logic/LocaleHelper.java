@@ -1,4 +1,4 @@
-package com.myapps.ron.family_recipes.utils;
+package com.myapps.ron.family_recipes.utils.logic;
 
 import android.annotation.TargetApi;
 import android.content.Context;

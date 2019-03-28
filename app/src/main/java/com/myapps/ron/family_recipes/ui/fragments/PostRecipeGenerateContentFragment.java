@@ -20,7 +20,7 @@ import com.myapps.ron.family_recipes.recycler.helpers.MyRecyclerScroll;
 import com.myapps.ron.family_recipes.recycler.helpers.SwipeAndDragHelper;
 import com.myapps.ron.family_recipes.ui.baseclasses.PostRecipeBaseFragment;
 import com.myapps.ron.family_recipes.utils.Constants;
-import com.myapps.ron.family_recipes.utils.SharedPreferencesHandler;
+import com.myapps.ron.family_recipes.utils.logic.SharedPreferencesHandler;
 import com.myapps.ron.family_recipes.viewmodels.PostRecipeViewModel;
 
 import java.util.List;

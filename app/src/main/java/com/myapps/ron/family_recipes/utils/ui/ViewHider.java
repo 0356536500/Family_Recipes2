@@ -1,4 +1,4 @@
-package com.myapps.ron.family_recipes;
+package com.myapps.ron.family_recipes.utils.ui;
 
 import android.graphics.Point;
 import androidx.annotation.IntDef;

@@ -22,7 +22,7 @@ import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.model.HtmlModel;
 import com.myapps.ron.family_recipes.recycler.helpers.SwipeAndDragHelper;
 import com.myapps.ron.family_recipes.utils.Constants;
-import com.myapps.ron.family_recipes.utils.HtmlHelper;
+import com.myapps.ron.family_recipes.utils.logic.HtmlHelper;
 
 import java.util.ArrayList;
 import java.util.List;

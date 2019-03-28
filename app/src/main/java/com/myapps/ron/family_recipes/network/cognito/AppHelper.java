@@ -20,7 +20,7 @@ import com.amazonaws.regions.Regions;
 import com.amazonaws.services.cognitoidentityprovider.model.AttributeType;
 import com.myapps.ron.family_recipes.MyApplication;
 import com.myapps.ron.family_recipes.network.Constants;
-import com.myapps.ron.family_recipes.utils.SharedPreferencesHandler;
+import com.myapps.ron.family_recipes.utils.logic.SharedPreferencesHandler;
 
 import java.util.ArrayList;
 import java.util.Date;

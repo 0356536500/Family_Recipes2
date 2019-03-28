@@ -17,8 +17,8 @@ import com.myapps.ron.family_recipes.network.Constants;
 import com.myapps.ron.family_recipes.network.MiddleWareForNetwork;
 import com.myapps.ron.family_recipes.network.cognito.AppHelper;
 import com.myapps.ron.family_recipes.network.modelTO.RecipeTO;
-import com.myapps.ron.family_recipes.utils.DateUtil;
-import com.myapps.ron.family_recipes.utils.SharedPreferencesHandler;
+import com.myapps.ron.family_recipes.utils.logic.DateUtil;
+import com.myapps.ron.family_recipes.utils.logic.SharedPreferencesHandler;
 
 import java.io.IOException;
 import java.lang.reflect.Type;

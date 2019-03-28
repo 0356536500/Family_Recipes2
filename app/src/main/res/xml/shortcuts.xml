@@ -4,7 +4,7 @@
     <shortcut
         android:shortcutId="post"
         android:enabled="true"
-        android:icon="@drawable/ic_action_post_black"
+        android:icon="@drawable/ic_shortcut_create"
         android:shortcutShortLabel="@string/shortcut_post_recipe_short_label"
         android:shortcutLongLabel="@string/shortcut_post_recipe_long_label"
         android:shortcutDisabledMessage="@string/shortcut_post_recipe_disabled_message"
@@ -12,11 +12,11 @@
         <intent
             android:action="android.intent.action.VIEW"
             android:targetPackage="com.myapps.ron.family_recipes"
-            android:targetClass="com.myapps.ron.family_recipes.ui.activities.SplashActivity" />
-        <intent
-            android:action="android.intent.action.VIEW"
-            android:targetPackage="com.myapps.ron.family_recipes"
-            android:targetClass="com.myapps.ron.family_recipes.ui.activities.PostRecipeActivity" />
+            android:targetClass="com.myapps.ron.family_recipes.ui.activities.SplashActivity">
+            <extra
+                android:name="com.myapps.ron.family_recipes.utils.Constants$SPLASH_ACTIVITY_CODE"
+                android:value="com.myapps.ron.family_recipes.utils.Constants$SPLASH_ACTIVITY_CODES$POST" />
+        </intent>
         <!-- If your shortcut is associated with multiple intents, include them
              here. The last intent in the list determines what the user sees when
              they launch this shortcut. -->
@@ -26,15 +26,25 @@
     <shortcut
         android:shortcutId="favorites"
         android:enabled="true"
-        android:icon="@drawable/ic_status_logo"
-        android:shortcutShortLabel="@string/shortcut_post_recipe_short_label"
-        android:shortcutLongLabel="@string/shortcut_post_recipe_long_label"
-        android:shortcutDisabledMessage="@string/shortcut_post_recipe_disabled_message"
+        android:icon="@drawable/ic_shortcut_favorite"
+        android:shortcutShortLabel="@string/shortcut_favorites_short_label"
+        android:shortcutLongLabel="@string/shortcut_favorites_long_label"
+        android:shortcutDisabledMessage="@string/shortcut_favorites_disabled_message"
         tools:targetApi="n_mr1">
         <intent
             android:action="android.intent.action.VIEW"
             android:targetPackage="com.myapps.ron.family_recipes"
-            android:targetClass="com.myapps.ron.family_recipes.ui.activities.MainActivity" />
+            android:targetClass="com.myapps.ron.family_recipes.ui.activities.SplashActivity">
+
+            <extra
+                android:name="com.myapps.ron.family_recipes.utils.Constants$SPLASH_ACTIVITY_CODE"
+                android:value="com.myapps.ron.family_recipes.utils.Constants$SPLASH_ACTIVITY_CODES$POST" />
+
+            <extra
+                android:name="com.myapps.ron.family_recipes.utils.Constants$MAIN_ACTIVITY_FIRST_FRAGMENT"
+                android:value="com.myapps.ron.family_recipes.utils.Constants$MAIN_ACTIVITY_FRAGMENTS$FAVORITES" />
+
+        </intent>
         <!-- If your shortcut is associated with multiple intents, include them
              here. The last intent in the list determines what the user sees when
              they launch this shortcut. -->

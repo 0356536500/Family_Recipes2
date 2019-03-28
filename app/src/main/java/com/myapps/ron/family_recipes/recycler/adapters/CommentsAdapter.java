@@ -12,7 +12,7 @@ import android.widget.TextView;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.model.CommentEntity;
 import com.myapps.ron.family_recipes.recycler.helpers.CommentsDiffCallback;
-import com.myapps.ron.family_recipes.utils.DateUtil;
+import com.myapps.ron.family_recipes.utils.logic.DateUtil;
 
 import java.util.ArrayList;
 import java.util.List;

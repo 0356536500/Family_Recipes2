@@ -10,7 +10,7 @@ import com.myapps.ron.family_recipes.network.APICallsHandler;
 import com.myapps.ron.family_recipes.network.Constants;
 import com.myapps.ron.family_recipes.network.MiddleWareForNetwork;
 import com.myapps.ron.family_recipes.network.cognito.AppHelper;
-import com.myapps.ron.family_recipes.utils.SharedPreferencesHandler;
+import com.myapps.ron.family_recipes.utils.logic.SharedPreferencesHandler;
 
 import java.util.AbstractMap;
 import java.util.HashMap;

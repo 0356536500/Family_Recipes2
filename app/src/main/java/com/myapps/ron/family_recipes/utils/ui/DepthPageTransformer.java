@@ -1,4 +1,4 @@
-package com.myapps.ron.family_recipes.utils;
+package com.myapps.ron.family_recipes.utils.ui;
 
 import androidx.annotation.NonNull;
 import androidx.viewpager.widget.ViewPager;

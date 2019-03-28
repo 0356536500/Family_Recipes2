@@ -5,7 +5,7 @@ import android.text.Editable;
 
 import com.myapps.ron.family_recipes.MyApplication;
 import com.myapps.ron.family_recipes.R;
-import com.myapps.ron.family_recipes.utils.HtmlHelper;
+import com.myapps.ron.family_recipes.utils.logic.HtmlHelper;
 
 import java.io.Serializable;
 

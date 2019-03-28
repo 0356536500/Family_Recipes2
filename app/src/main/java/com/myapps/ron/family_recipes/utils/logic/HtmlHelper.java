@@ -1,4 +1,4 @@
-package com.myapps.ron.family_recipes.utils;
+package com.myapps.ron.family_recipes.utils.logic;
 
 import java.util.Stack;
 

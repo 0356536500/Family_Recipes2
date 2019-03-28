@@ -29,7 +29,7 @@ import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
-import com.myapps.ron.family_recipes.MyDividerItemDecoration;
+import com.myapps.ron.family_recipes.utils.ui.MyDividerItemDecoration;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.recycler.adapters.CommentsAdapter;
 import com.myapps.ron.family_recipes.dal.Injection;

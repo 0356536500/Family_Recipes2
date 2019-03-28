@@ -9,8 +9,8 @@ import android.os.PowerManager;
 import android.provider.Settings;
 
 import com.myapps.ron.family_recipes.utils.Constants;
-import com.myapps.ron.family_recipes.utils.LocaleHelper;
-import com.myapps.ron.family_recipes.utils.SharedPreferencesHandler;
+import com.myapps.ron.family_recipes.utils.logic.LocaleHelper;
+import com.myapps.ron.family_recipes.utils.logic.SharedPreferencesHandler;
 
 import java.util.Calendar;
 

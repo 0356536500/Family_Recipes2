@@ -6,7 +6,7 @@ import android.util.Log;
 import com.myapps.ron.family_recipes.model.CategoryEntity;
 import com.myapps.ron.family_recipes.model.PendingRecipeEntity;
 import com.myapps.ron.family_recipes.model.RecipeEntity;
-import com.myapps.ron.family_recipes.utils.DateUtil;
+import com.myapps.ron.family_recipes.utils.logic.DateUtil;
 
 import java.util.ArrayList;
 import java.util.List;

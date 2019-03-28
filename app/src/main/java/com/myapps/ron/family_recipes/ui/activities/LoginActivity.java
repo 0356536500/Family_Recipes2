@@ -29,8 +29,8 @@ import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.Authentic
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.ForgotPasswordHandler;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.network.cognito.AppHelper;
-import com.myapps.ron.family_recipes.utils.LocaleHelper;
-import com.myapps.ron.family_recipes.utils.SharedPreferencesHandler;
+import com.myapps.ron.family_recipes.utils.logic.LocaleHelper;
+import com.myapps.ron.family_recipes.utils.logic.SharedPreferencesHandler;
 
 import java.util.Locale;
 import java.util.Map;

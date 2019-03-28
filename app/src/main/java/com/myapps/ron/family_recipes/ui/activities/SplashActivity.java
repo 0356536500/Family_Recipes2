@@ -3,7 +3,6 @@ package com.myapps.ron.family_recipes.ui.activities;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -16,12 +15,19 @@ import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.Chal
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.MultiFactorAuthenticationContinuation;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.AuthenticationHandler;
 import com.myapps.ron.family_recipes.R;
-import com.myapps.ron.family_recipes.network.Constants;
 import com.myapps.ron.family_recipes.network.MiddleWareForNetwork;
 import com.myapps.ron.family_recipes.network.cognito.AppHelper;
-import com.myapps.ron.family_recipes.utils.SharedPreferencesHandler;
+import com.myapps.ron.family_recipes.utils.Constants;
+import com.myapps.ron.family_recipes.utils.Constants.SPLASH_ACTIVITY_CODES;
+import com.myapps.ron.family_recipes.utils.logic.SharedPreferencesHandler;
 
 import java.util.Locale;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.TaskStackBuilder;
+
+import static com.myapps.ron.family_recipes.network.Constants.PASSWORD;
+import static com.myapps.ron.family_recipes.network.Constants.USERNAME;
 
 
 public class SplashActivity extends AppCompatActivity {
@@ -45,8 +51,8 @@ public class SplashActivity extends AppCompatActivity {
 
         if(MiddleWareForNetwork.checkInternetConnection(this))
             findCurrent();
-        else if(SharedPreferencesHandler.getString(this, Constants.USERNAME) != null &&
-                SharedPreferencesHandler.getString(this, Constants.PASSWORD) != null){
+        else if(SharedPreferencesHandler.getString(this, USERNAME) != null &&
+                SharedPreferencesHandler.getString(this, PASSWORD) != null){
             Toast.makeText(this, "you are offline", Toast.LENGTH_LONG).show();
             launchMain();
         }
@@ -134,24 +140,43 @@ public class SplashActivity extends AppCompatActivity {
     private void launchMain() {
         startActivity(new Intent(this, PostRecipeActivity.class));
         finish();
-        if (false && getIntent() != null) {
-            Intent receivedIntent = getIntent();
-            String recipeId = receivedIntent.getStringExtra(com.myapps.ron.family_recipes.utils.Constants.RECIPE_ID);
-            if (recipeId != null && !"".equals(recipeId)) {
-                Intent recipeIntent = new Intent(SplashActivity.this, RecipeActivity.class);
-                recipeIntent.putExtra(com.myapps.ron.family_recipes.utils.Constants.RECIPE_ID, recipeId);
-                recipeIntent.addFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
-                startActivity(recipeIntent);
-                finish();
+        if (false) {
+            if (getIntent() != null) {
+                Intent receivedIntent = getIntent();
+                SPLASH_ACTIVITY_CODES action = (SPLASH_ACTIVITY_CODES) receivedIntent.getSerializableExtra(Constants.SPLASH_ACTIVITY_CODE);
+                if (action != null) {
+                    if (action == SPLASH_ACTIVITY_CODES.RECIPE) {
+                        // Open a specific recipe from deep link. Open as a single activity, without back stack
+                        String recipeId = receivedIntent.getStringExtra(Constants.RECIPE_ID);
+                        if (recipeId != null && !"".equals(recipeId)) {
+                            Intent recipeIntent = new Intent(SplashActivity.this, RecipeActivity.class);
+                            recipeIntent.putExtra(Constants.RECIPE_ID, recipeId);
+                            recipeIntent.addFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
+                            startActivity(recipeIntent);
+                            finish();
+                        }
+                    } else if (action == SPLASH_ACTIVITY_CODES.POST) {
+                        // Post recipe shortcut, open with MainActivity in back stack
+                        TaskStackBuilder.create(this)
+                                .addNextIntent(new Intent(this, MainActivity.class))
+                                .addNextIntent(new Intent(this, PostRecipeActivity.class))
+                                .startActivities();
+                        finish();
+                    } else if (action == SPLASH_ACTIVITY_CODES.MAIN) {
+                        // open main activity but not with the default fragment
+                        Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+                        intent.putExtra(Constants.MAIN_ACTIVITY_FIRST_FRAGMENT, receivedIntent.getSerializableExtra(Constants.MAIN_ACTIVITY_FIRST_FRAGMENT));
+                        startActivity(intent);
+                        finish();
+                    }
+                }
             } else {
+                // regular open of the app from launcher
                 Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+                intent.putExtra(Constants.MAIN_ACTIVITY_FIRST_FRAGMENT, Constants.MAIN_ACTIVITY_FRAGMENTS.ALL);
                 startActivity(intent);
                 finish();
             }
-        } else if(false){
-            Intent intent = new Intent(SplashActivity.this, MainActivity.class);
-            startActivity(intent);
-            finish();
         }
     }
 
@@ -162,8 +187,8 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     private void signInUser() {
-        username = SharedPreferencesHandler.getString(this, Constants.USERNAME);
-        password = SharedPreferencesHandler.getString(this, Constants.PASSWORD);
+        username = SharedPreferencesHandler.getString(this, USERNAME);
+        password = SharedPreferencesHandler.getString(this, PASSWORD);
         if(username != null && password != null) {
             AppHelper.setUser(username);
 
@@ -181,7 +206,7 @@ public class SplashActivity extends AppCompatActivity {
             AppHelper.setUser(username);
         }
         if(this.password == null) {
-            password = SharedPreferencesHandler.getString(this, Constants.PASSWORD);
+            password = SharedPreferencesHandler.getString(this, PASSWORD);
             if(password == null) {
                 Log.e(TAG, "enter password1");
                 return;
