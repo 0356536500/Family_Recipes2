@@ -13,15 +13,18 @@ public class Constants {
     // endregion
 
     // region Splash Activity
-    public enum SPLASH_ACTIVITY_CODES { MAIN, POST, RECIPE }
     public static final String SPLASH_ACTIVITY_CODE = "splash_code";
+    public static final String SPLASH_ACTIVITY_CODE_MAIN = "splash_code_main";
+    public static final String SPLASH_ACTIVITY_CODE_POST = "splash_code_post";
+    public static final String SPLASH_ACTIVITY_CODE_RECIPE = "splash_code_recipe";
 
     // endregion
 
     // region Main Activity
 
     public static final String MAIN_ACTIVITY_FIRST_FRAGMENT = "first_fragment";
-    public enum MAIN_ACTIVITY_FRAGMENTS { ALL, FAVORITES }
+    public static final String MAIN_ACTIVITY_FRAGMENT_ALL = "fragment_all";
+    public static final String MAIN_ACTIVITY_FRAGMENT_FAVORITES = "fragment_favorites";
 
     // endregion
 

@@ -37,6 +37,7 @@ import com.myapps.ron.family_recipes.utils.Constants;
 import com.myapps.ron.family_recipes.utils.logic.SharedPreferencesHandler;
 import com.myapps.ron.family_recipes.viewmodels.DataViewModel;
 
+import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -88,14 +89,15 @@ public class MainActivity extends MyBaseActivity {
 
         //handle data from intent
         if (getIntent() != null && getIntent().getSerializableExtra(Constants.MAIN_ACTIVITY_FIRST_FRAGMENT) != null) {
-            Constants.MAIN_ACTIVITY_FRAGMENTS firstFragmentEnum = (Constants.MAIN_ACTIVITY_FRAGMENTS) getIntent().getSerializableExtra(Constants.MAIN_ACTIVITY_FIRST_FRAGMENT);
+            String firstFragment = getIntent().getStringExtra(Constants.MAIN_ACTIVITY_FIRST_FRAGMENT);
+            Log.e(TAG, "firstFragment = " + firstFragment);
 
-            if (firstFragmentEnum.equals(Constants.MAIN_ACTIVITY_FRAGMENTS.ALL))
-                new Handler().postDelayed(() -> startWithDefaultFragment(allRecipesFragment), 100);
-            else if (firstFragmentEnum.equals(Constants.MAIN_ACTIVITY_FRAGMENTS.FAVORITES))
-                new Handler().postDelayed(() -> startWithDefaultFragment(favoritesRecipesFragment), 100);
+            if (firstFragment.equals(Constants.MAIN_ACTIVITY_FRAGMENT_ALL))
+                new Handler().postDelayed(() -> startWithDefaultFragment(allRecipesFragment, 0), 100);
+            else if (firstFragment.equals(Constants.MAIN_ACTIVITY_FRAGMENT_FAVORITES))
+                new Handler().postDelayed(() -> startWithDefaultFragment(favoritesRecipesFragment, 1), 100);
         } else
-            new Handler().postDelayed(() -> startWithDefaultFragment(allRecipesFragment), 100);
+            new Handler().postDelayed(() -> startWithDefaultFragment(allRecipesFragment, 0), 100);
 
         //check if got here from login activity
         if (getIntent() != null) {
@@ -399,7 +401,7 @@ public class MainActivity extends MyBaseActivity {
             getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.main_frame, fragment)
-                    //.addToBackStack(null)
+                    .addToBackStack(null)
                     .commit();
             /*FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             transaction.replace(R.id.main_frame, fragment);
@@ -412,12 +414,14 @@ public class MainActivity extends MyBaseActivity {
         favoritesRecipesFragment = new FavoritesRecipesFragment();
     }
 
-    private void startWithDefaultFragment(@NonNull MyFragment startingFragment) {
+    private void startWithDefaultFragment(@NonNull MyFragment startingFragment, int drawerPosition) {
         currentFragment = startingFragment;
         /*if (getIntent().getBooleanExtra("load_likes", false)) {
             currentFragment.setArguments(getIntent().getExtras());
         }*/
-        navDrawer.getMenu().getItem(0).setChecked(true);
+        if (getSupportActionBar() != null)
+            getSupportActionBar().setTitle(navDrawer.getMenu().getItem(drawerPosition).getTitle());
+        navDrawer.getMenu().getItem(drawerPosition).setChecked(true);
         getSupportFragmentManager()
                 .beginTransaction()
                 .add(R.id.main_frame, currentFragment)

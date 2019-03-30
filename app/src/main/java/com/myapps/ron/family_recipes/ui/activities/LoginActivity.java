@@ -357,14 +357,11 @@ public class LoginActivity extends AppCompatActivity {
     }*/
 
     private void launchMain() {
-        Log.e(TAG, "launchMain");
         if (getIntent() != null) {
-            Log.e(TAG, "getIntent() != null");
             Intent receivedIntent = getIntent();
-            Constants.SPLASH_ACTIVITY_CODES action = (Constants.SPLASH_ACTIVITY_CODES) receivedIntent.getSerializableExtra(Constants.SPLASH_ACTIVITY_CODE);
+            String action = receivedIntent.getStringExtra(Constants.SPLASH_ACTIVITY_CODE);
             if (action != null) {
-                Log.e(TAG, "code from splash != null");
-                if (action == Constants.SPLASH_ACTIVITY_CODES.RECIPE) {
+                if (action.equals(Constants.SPLASH_ACTIVITY_CODE_RECIPE)) {
                     // Open a specific recipe from deep link. Open as a single activity, without back stack
                     String recipeId = receivedIntent.getStringExtra(Constants.RECIPE_ID);
                     if (recipeId != null && !"".equals(recipeId)) {
@@ -374,14 +371,15 @@ public class LoginActivity extends AppCompatActivity {
                         startActivity(recipeIntent);
                         finish();
                     }
-                } else if (action == Constants.SPLASH_ACTIVITY_CODES.POST) {
+                } else if (action.equals(Constants.SPLASH_ACTIVITY_CODE_POST)) {
                     // Post recipe shortcut, open with MainActivity in back stack
                     TaskStackBuilder.create(this)
-                            .addNextIntent(new Intent(this, MainActivity.class))
+                            .addNextIntent(new Intent(this, MainActivity.class)
+                                    .putExtra(Constants.MAIN_ACTIVITY_FIRST_FRAGMENT, Constants.MAIN_ACTIVITY_FRAGMENT_ALL))
                             .addNextIntent(new Intent(this, PostRecipeActivity.class))
                             .startActivities();
                     finish();
-                } else if (action == Constants.SPLASH_ACTIVITY_CODES.MAIN) {
+                } else if (action.equals(Constants.SPLASH_ACTIVITY_CODE_MAIN)) {
                     // open main activity but not with the default fragment
                     Intent mainIntent = new Intent(this, MainActivity.class);
                     mainIntent.putExtra(Constants.MAIN_ACTIVITY_FIRST_FRAGMENT, receivedIntent.getSerializableExtra(Constants.MAIN_ACTIVITY_FIRST_FRAGMENT));
@@ -404,7 +402,7 @@ public class LoginActivity extends AppCompatActivity {
      */
     private void loginFromMainFlow() {
         Intent intent = new Intent(this, MainActivity.class);
-        intent.putExtra(Constants.MAIN_ACTIVITY_FIRST_FRAGMENT, Constants.MAIN_ACTIVITY_FRAGMENTS.ALL);
+        intent.putExtra(Constants.MAIN_ACTIVITY_FIRST_FRAGMENT, Constants.MAIN_ACTIVITY_FRAGMENT_ALL);
         intent.putExtra("name", username);
         intent.putExtra("from_login", true);
         startActivity(intent);

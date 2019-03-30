@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Family Recipes</string>
     <!-- Menu and Navigation drawer-->
@@ -58,6 +59,23 @@
     <string name="Password">Password</string>
     <string name="ok" translatable="false">OK</string>
 
+    <!--#region UNUSED SplashActivity -->
+    <!-- values equal to com.myapps.ron.family_recipes.utils.Constants$SPLASH_ACTIVITY_CODE -->
+    <string name="splash_activity_code" translatable="false">splash_code</string>
+    <string name="splash_activity_code_main" translatable="false">splash_code_main</string>
+    <string name="splash_activity_code_post" translatable="false">splash_code_post</string>
+    <string name="splash_activity_code_recipe" translatable="false">splash_code_recipe</string>
+
+    <!--#endregion UNUSED SplashActivity -->
+
+    <!--#region UNUSED MainActivity -->
+    <!-- values equal to com.myapps.ron.family_recipes.utils.Constants$MAIN_ACTIVITY_FIRST_FRAGMENT -->
+    <string name="main_activity_first_fragment" translatable="false">first_fragment</string>
+    <string name="main_activity_first_fragment_all" translatable="false">fragment_all</string>
+    <string name="main_activity_first_fragment_favorites" translatable="false">fragment_favorites</string>
+
+    <!--#endregion UNUSED MainActivity -->
+
     <!-- AllRecipes Fragment -->
     <string name="str_all_selected">All categories</string>
     <string name="refresh_error_message">can refresh once every minute</string>
@@ -105,14 +123,14 @@
 
     <string name="preference_key_first_post_recipe" translatable="false">first_recipe</string>
 
-    <!--#region Fab Menu -->
+    <!--#region PostRecipe Fab Menu -->
     <string name="post_recipe_advanced_step_fab_add">New Block</string>
     <string name="post_recipe_advanced_step_fab_preview">Preview</string>
     <string name="post_recipe_advanced_step_fab_template">Basic Template</string>
     <string name="post_recipe_advanced_step_fab_reset">Reset</string>
 
     <string name="bottom_transient_bar_behavior" translatable="false">com.myapps.ron.family_recipes.utils.ui.TransientBarBehavior</string>
-    <!--#endregion Fab Menu -->
+    <!--#endregion PostRecipe Fab Menu -->
 
     <string name="post_recipe_advanced_step_reset_message">What you wrote will be deleted. Continue?</string>
     <string name="post_recipe_advanced_step_list_message">Press ENTER to separate between items</string>

@@ -38,7 +38,7 @@ public class SharedActivity extends AppCompatActivity {
                 if (!"".equals(recipeId)) {
                     Intent splashIntent = new Intent(SharedActivity.this, SplashActivity.class);
                     splashIntent.putExtra(Constants.RECIPE_ID, recipeId);
-                    splashIntent.putExtra(Constants.SPLASH_ACTIVITY_CODE, Constants.SPLASH_ACTIVITY_CODES.RECIPE);
+                    splashIntent.putExtra(Constants.SPLASH_ACTIVITY_CODE, Constants.SPLASH_ACTIVITY_CODE_RECIPE);
                     startActivityForResult(splashIntent, OPEN_RECIPE_REQUEST);
                 }
             }
