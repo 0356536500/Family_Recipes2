@@ -41,6 +41,7 @@ public class FavoritesRecipesFragment extends RecyclerWithFiltersAbstractFragmen
             if(recipes != null) {
                 //Log.e(TAG, recipes.toString());
                 mAdapter.submitList(recipes);
+                scrollToTop();
             }
         });
         // already have values from AllRecipesFragment

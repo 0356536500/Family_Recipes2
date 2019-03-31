@@ -110,7 +110,7 @@
             android:name=".background.services.PostEnqueuedRecipesService"
             android:exported="false" />
         <service
-            android:name=".background.services.GetAllRecipesService"
+            android:name=".background.services.GetUserDetailsService"
             android:exported="false" />
         <service
             android:name=".background.services.MyMessagingService"

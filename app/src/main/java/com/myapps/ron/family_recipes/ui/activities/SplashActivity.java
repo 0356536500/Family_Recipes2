@@ -160,7 +160,7 @@ public class SplashActivity extends AppCompatActivity {
                             .addNextIntent(new Intent(this, PostRecipeActivity.class))
                             .startActivities();
                     finish();
-                } else if (action.equals(Constants.SPLASH_ACTIVITY_CODE_MAIN)) { ;
+                } else if (action.equals(Constants.SPLASH_ACTIVITY_CODE_MAIN)) {
                     // open main activity but not with the default fragment
                     Intent intent = new Intent(SplashActivity.this, MainActivity.class);
                     intent.putExtra(Constants.MAIN_ACTIVITY_FIRST_FRAGMENT, receivedIntent.getSerializableExtra(Constants.MAIN_ACTIVITY_FIRST_FRAGMENT));

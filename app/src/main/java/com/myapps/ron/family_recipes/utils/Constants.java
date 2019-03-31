@@ -3,6 +3,8 @@ package com.myapps.ron.family_recipes.utils;
 import com.myapps.ron.family_recipes.model.RecipeEntity;
 
 public class Constants {
+    public static final String FIRST_APP_LAUNCH = "first_app_launch";
+
     // region Notifications
     public static final String BODY = "message";
     public static final String TITLE = "title";

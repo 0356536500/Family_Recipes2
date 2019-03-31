@@ -6,10 +6,10 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.myapps.ron.family_recipes.R;
+import com.myapps.ron.family_recipes.background.services.GetUserDetailsService;
 import com.myapps.ron.family_recipes.recycler.adapters.RecipesAdapter;
 import com.myapps.ron.family_recipes.dal.Injection;
 import com.myapps.ron.family_recipes.model.CategoryEntity;
-import com.myapps.ron.family_recipes.background.services.GetAllRecipesService;
 import com.myapps.ron.family_recipes.viewmodels.DataViewModel;
 import com.myapps.ron.searchfilter.listener.FilterListener;
 
@@ -34,7 +34,7 @@ public class AllRecipesFragment extends RecyclerWithFiltersAbstractFragment impl
 
         if(activity.getIntent().getBooleanExtra("login", false)) {
             new Handler().postDelayed(() ->
-                    GetAllRecipesService.startActionFetchUserDetails(getContext()), 5000);
+                    GetUserDetailsService.startActionFetchUserDetails(getContext()), 5000);
         }
     }
 
@@ -55,8 +55,10 @@ public class AllRecipesFragment extends RecyclerWithFiltersAbstractFragment impl
             firstLoadingProgressBar.setVisibility(View.GONE);
             swipeRefreshLayout.setRefreshing(false);
 
-            if (recipesList != null)
+            if (recipesList != null) {
                 mAdapter.submitList(recipesList);
+                scrollToTop();
+            }
         });
 
         viewModel.getCategories().observe(this, categories -> {

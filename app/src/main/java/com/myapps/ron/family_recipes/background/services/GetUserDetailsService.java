@@ -35,8 +35,8 @@ import retrofit2.Response;
  * TODO: Customize class - update intent actions, extra parameters and static
  * helper methods.
  */
-public class GetAllRecipesService extends IntentService {
-    private static final String TAG = GetAllRecipesService.class.getSimpleName();
+public class GetUserDetailsService extends IntentService {
+    private static final String TAG = GetUserDetailsService.class.getSimpleName();
 
     // IntentService can perform, e.g. ACTION_FETCH_NEW_ITEMS
     private static final String ACTION_GET_ALL = "com.myapps.ron.family_recipes.background.services.action.GET_ALL";
@@ -46,17 +46,10 @@ public class GetAllRecipesService extends IntentService {
     private static final String EXTRA_PARAM1 = "com.myapps.ron.family_recipes.background.services.extra.PARAM1";
     private static final String EXTRA_PARAM2 = "com.myapps.ron.family_recipes.background.services.extra.PARAM2";
 
-    public GetAllRecipesService() {
-        super("GetAllRecipesService");
+    public GetUserDetailsService() {
+        super("GetUserDetailsService");
     }
 
-    @Override
-    public void onDestroy() {
-        /*if (asyncRecipeUpdateList != null)
-            for (MyAsyncRecipeUpdate asyncRecipeUpdate: asyncRecipeUpdateList)
-                asyncRecipeUpdate.cancel(false);*/
-        super.onDestroy();
-    }
 
     /**
      * Starts this service to perform action Foo with the given parameters. If
@@ -66,7 +59,7 @@ public class GetAllRecipesService extends IntentService {
      */
     public static void startActionGetAllRecipes(Context context) {
         Log.e(TAG, "startActionGetAllRecipes");
-        Intent intent = new Intent(context, GetAllRecipesService.class);
+        Intent intent = new Intent(context, GetUserDetailsService.class);
         intent.setAction(ACTION_GET_ALL);
         context.startService(intent);
     }
@@ -78,7 +71,7 @@ public class GetAllRecipesService extends IntentService {
      * @see IntentService
      */
     public static void startActionFetchUserDetails(Context context) {
-        Intent intent = new Intent(context, GetAllRecipesService.class);
+        Intent intent = new Intent(context, GetUserDetailsService.class);
         intent.setAction(ACTION_FETCH_USER_DETAILS);
         context.startService(intent);
     }

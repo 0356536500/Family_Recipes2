@@ -8,11 +8,15 @@ import android.content.SharedPreferences;
 import android.os.PowerManager;
 import android.provider.Settings;
 
+import com.myapps.ron.family_recipes.background.workers.DeleteOldFilesWorker;
 import com.myapps.ron.family_recipes.utils.Constants;
 import com.myapps.ron.family_recipes.utils.logic.LocaleHelper;
 import com.myapps.ron.family_recipes.utils.logic.SharedPreferencesHandler;
 
 import java.util.Calendar;
+
+import androidx.work.ExistingPeriodicWorkPolicy;
+import androidx.work.WorkManager;
 
 
 public class MyApplication extends Application {
@@ -25,6 +29,19 @@ public class MyApplication extends Application {
     public void onCreate() {
         super.onCreate();
         mContext = this;
+
+        enqueueFilesWorker();
+    }
+
+    private void enqueueFilesWorker() {
+        if (SharedPreferencesHandler.getBoolean(this, Constants.FIRST_APP_LAUNCH, true)) {
+            SharedPreferencesHandler.writeBoolean(this, Constants.FIRST_APP_LAUNCH, false);
+
+            WorkManager.getInstance().enqueueUniquePeriodicWork(
+                    DeleteOldFilesWorker.class.getSimpleName(),
+                    ExistingPeriodicWorkPolicy.REPLACE,
+                    DeleteOldFilesWorker.createPostRecipesWorker());
+        }
     }
 
     /*public boolean checkInternetConnection(){

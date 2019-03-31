@@ -48,7 +48,6 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -418,7 +417,8 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
                 .subscribe(recipeEntity -> {
                     DialogFragment newFragment = new PagerDialogFragment();
                     Bundle bundle = new Bundle();
-                    bundle.putParcelable(Constants.RECIPE_ID, recipeEntity);
+                    bundle.putSerializable(PagerDialogFragment.PAGER_TYPE_KEY, PagerDialogFragment.PAGER_TYPE.IMAGES);
+                    bundle.putStringArrayList(Constants.PAGER_FOOD_IMAGES, new ArrayList<>(recipeEntity.getFoodFiles()));
                     newFragment.setArguments(bundle);
                     newFragment.show(ft, "dialog");
                 }, error -> Log.e(TAG, error.getMessage()));
@@ -429,6 +429,13 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
     public void onCurrentSizeChanged(int size) {
         if (mFilter != null)
             mFilter.setCustomTextView(getString(R.string.number_of_recipes_indicator, size));
+    }
+
+    void scrollToTop() {
+        LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+        if (layoutManager != null) {
+            layoutManager.scrollToPositionWithOffset(0, 0);
+        }
     }
 
     // endregion

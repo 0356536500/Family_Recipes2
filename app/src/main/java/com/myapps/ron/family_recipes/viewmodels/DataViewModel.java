@@ -2,6 +2,7 @@ package com.myapps.ron.family_recipes.viewmodels;
 
 import android.content.Context;
 
+import com.myapps.ron.family_recipes.background.services.GetUserDetailsService;
 import com.myapps.ron.family_recipes.dal.repository.CategoryRepository;
 import com.myapps.ron.family_recipes.dal.repository.RecipeRepository;
 import com.myapps.ron.family_recipes.dal.repository.RepoSearchResults;
@@ -9,14 +10,12 @@ import com.myapps.ron.family_recipes.model.CategoryEntity;
 import com.myapps.ron.family_recipes.model.QueryModel;
 import com.myapps.ron.family_recipes.model.RecipeEntity;
 import com.myapps.ron.family_recipes.model.RecipeMinimal;
-import com.myapps.ron.family_recipes.background.services.GetAllRecipesService;
 
 import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 import androidx.paging.PagedList;
@@ -71,8 +70,8 @@ public class DataViewModel extends ViewModel {
 
 
     public void fetchFromServerJustLoggedIn(Context context) {
-        GetAllRecipesService.startActionFetchUserDetails(context);
-        //GetAllRecipesService.startActionGetAllRecipes(context);
+        GetUserDetailsService.startActionFetchUserDetails(context);
+        //GetUserDetailsService.startActionGetAllRecipes(context);
         //categoryRepository.fetchCategoriesReactive(context);
     }
 
