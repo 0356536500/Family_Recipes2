@@ -11,20 +11,21 @@ import com.myapps.ron.family_recipes.MyApplication;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.utils.logic.LocaleHelper;
 import com.myapps.ron.family_recipes.utils.logic.SharedPreferencesHandler;
+import com.myapps.ron.localehelper.LocaleAwareCompatActivity;
 
 /**
  * Created by ronginat on 13/12/2018.
  */
-public abstract class MyBaseActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
+public abstract class MyBaseActivity extends LocaleAwareCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
-    /**
+    /*
      * this method is useful when changing language at runtime
      * @param newBase new base context for the activity
      */
-    @Override
+    /*@Override
     protected void attachBaseContext(Context newBase) {
         super.attachBaseContext(LocaleHelper.onAttach(newBase));
-    }
+    }*/
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

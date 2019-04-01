@@ -1,0 +1,192 @@
+<resources>
+    <string name="app_name">Family Recipes</string>
+    <!-- Menu and Navigation drawer-->
+    <string name="action_settings">הגדרות</string>
+    <string name="toolbar_title">מתכונים</string>
+    <string name="action_search">חיפוש</string>
+    <string name="action_filter">סינון</string>
+    <string name="action_sort_toggle">מיון לפי</string>
+    <string name="action_share">שיתוף</string>
+    <string name="action_add_photo">הוספת תמונה</string>
+    <string name="action_refresh">רענן</string>
+    <string name="action_help">עזרה</string>
+    <string name="search_hint">הקלד/י לחיפוש…</string>
+
+    <!--ForgotPasswordActivity-->
+    <string name="Menu">תפריט</string>
+
+    <!-- Sort Menu in MainActivity -->
+    <string name="sort_action_recent">אחרונים</string>
+    <string name="sort_action_popular">פופולריים</string>
+    <string name="sort_action_recent_modified">השתנו לאחרונה</string>
+
+    <!-- Item in recycler -->
+    <string name="recycler_item_name">שם מתכון</string>
+    <string name="recycler_item_description">תיאור מעולה שמתאר את המתכון בקצרה במשפט או שניים כדי שהקורא יקבל רושם ראשוני על המתכון.</string>
+    <string name="recycler_item_uploader">מעלה המתכון</string>
+    <string name="recycler_item_number_of_likes">12</string>
+
+    <string name="sort_toggle_text_on">חדשים</string>
+    <string name="sort_toggle_text_off">פופלריים</string>
+
+    <string name="title_activity_recipe">מתכון</string>
+    <string name="title_activity_create_recipe">מתכון חדש</string>
+    <string name="title_activity_new_password">סיסמא חדשה</string>
+    <string name="title_activity_forgot_password">שכחתי סיסמא</string>
+    <string name="title_activity_login">כניסה</string>
+    <string name="title_activity_settings">הגדרות</string>
+
+    <!-- strings for navigation drawer -->
+    <string name="nav_main_post">תרומה לקהילה</string>
+    <string name="nav_main_post_recipe">מתכון חדש</string>
+    <string name="nav_main_all_recipes">כל המתכונים</string>
+    <string name="nav_main_favorites">מועדפים</string>
+    <string name="nav_main_settings">הגדרות</string>
+    <string name="nav_main_sign_out">התנתק</string>
+    <string name="nav_main_about">אודות</string>
+
+    <!-- Strings related to login -->
+    <string name="app_main_screen">Sign in</string>
+    <string name="app_main_screen_title">Cognito Identity</string>
+    <string name="app_main_desc">A sample app to showcase Cognito Identity and the SDK for Android.</string>
+    <string name="nav_drawer_open">Open navigation drawer</string>
+    <string name="nav_drawer_close">Close navigation drawer</string>
+    <string name="Username">שם משתמש</string>
+    <string name="Password">סיסמה</string>
+
+    <!-- AllRecipes Fragment -->
+    <string name="str_all_selected">כל הקטגוריות</string>
+    <string name="load_error_message">קרתה תקלה בשרת</string>
+    <string name="refresh_error_message">אפשר לרענן פעם בדקה</string>
+    <string name="message_from_fetch_recipes">נוספו %1$d, עודכנו %2$d</string>
+    <string name="message_from_fetch_recipes_not_modified">אין חדש</string>
+    <string name="message_from_fetch_categories">נוספו %1$d, עודכנו %2$d קטגוריות</string>
+    <string name="number_of_recipes_indicator">מתכונים %1$d</string>
+    <string name="error_message_from_fetch_categories">שגיאה בשליפת הקטגוריות מהשרת</string>
+
+    <!-- Recipe Activity -->
+    <string name="recipe_content_not_found">המתכון לא נמצא</string>
+    <string name="recipe_not_in_server">המתכון לא קיים בשרת</string>
+    <string name="no_internet_message">אין חיבור לרשת</string>
+    <string name="post_comment_error">אי אפשר לשלוח הודעה ריקה</string>
+    <string name="comments">תגובות (%1$d)</string>
+    <string name="no_comments">תגובות (0)</string>
+    <string name="post_comment_hint">תגובה חדשה</string>
+    <string name="post_comment_succeeded">ההודעה נשלחה בהצלחה</string>
+    <string name="alert_dialog_upload_photos_confirmation">אישור</string>
+    <string name="alert_dialog_upload_photos_cancel">ביטול</string>
+    <string name="alert_dialog_upload_photos_finish">העלה %1$d תמונות</string>
+    <string name="alert_dialog_upload_photos_take_more">עוד</string>
+    <string name="alert_dialog_upload_photos_max_limit">מותר להעלות עד %1$d תמונות</string>
+
+    <!-- Recipe Activity Share a recipe -->
+    <string name="recipe_share_pre_url">תראו את המתכון הזה!</string>
+
+    <!--#region PostRecipe Activity -->
+    <string name="yes">כן</string>
+    <string name="no">לא</string>
+    <string name="post_recipe_name">שם המתכון</string>
+    <string name="post_recipe_description">תיאור המתכון</string>
+    <string name="post_recipe_next">הבא</string>
+    <string name="post_recipe_finish">סיום</string>
+    <string name="post_recipe_field_required">שדה חובה</string>
+    <string name="post_recipe_tags_required">לבחור לפחות %1$d קטגוריות</string>
+    <string name="post_recipe_hint">הקלד כאן</string>
+    <string name="post_recipe_advanced_step_hr">קו הפרדה</string>
+    <string name="post_recipe_advanced_step_bold">טקסט מודגש</string>
+    <string name="post_recipe_advanced_step_under_score">קו תחתון</string>
+    <string name="post_recipe_offline_upload_message">יעלה כשתתחבר/י לאינטרנט</string>
+    <string name="post_recipe_online_upload_message">מעלה את המתכון…</string>
+    <string name="post_recipe_snacbar_close">סגור</string>
+
+    <!--#region Fab Menu -->
+    <string name="post_recipe_advanced_step_fab_add">בלוק חדש</string>
+    <string name="post_recipe_advanced_step_fab_preview">תצוגה מקדימה</string>
+    <string name="post_recipe_advanced_step_fab_template">דוגמא</string>
+    <string name="post_recipe_advanced_step_fab_reset">איפוס</string>
+    <!--#endregion Fab Menu -->
+
+    <!--#region PostRecipe Instructions -->
+    <string name="post_recipe_instructions_general_help1">כתיבת המתכון בצורה הטובה האפשרית</string>
+    <string name="post_recipe_instructions_general_help2">אפשר להשתמש בכתיבת המתכון באלמנטים כמו כותרת, רשימת פריטים וטקסט רגיל</string>
+    <string name="post_recipe_instructions_general_help3">עצבו כל אלמנט בעזרת הדגשת הטקסט, קו תחתון או קו הפרדה לרוחב הדף</string>
+
+    <string name="post_recipe_instructions_card_with_html_for_header">כותרת גדולה ומודגשת</string>
+    <string name="post_recipe_instructions_card_with_html_for_paragraph_with_underscore">כיתוב רגיל עם קו תחתון</string>
+    <string name="post_recipe_instructions_card_with_html_for_unordered_list">שורה ראשונה\nשורה שנייה\nמופרדות באמצעות שורה חדשה (אנטר)</string>
+
+    <string name="post_recipe_instructions_recycler_features_drag_drop_swipe">גרירה ושחרור של אלמנט בצורה אנכית כדי לשנות את מיקומו.\nמחיקה בהחלקה הצידה</string>
+    <string name="post_recipe_instructions_recycler_features_expand_collapse">ניתן להרחיב ולצמצמם כל אלמנט לנוחיותך</string>
+    <!--#endregion PostRecipe Instructions -->
+
+    <string name="post_recipe_advanced_step_reset_message">מה שכתבת יימחק. להמשיך?</string>
+    <string name="post_recipe_advanced_step_list_message">לחיצה על אנטר מפרידה בין פריטים ברשימה</string>
+    <string name="post_recipe_advanced_step_validation_message">צריך לפחות %1$d שדות מלאים</string>
+    <string name="post_recipe_advanced_step_item_removed_message">%1$s הוסר</string>
+    <string name="post_recipe_advanced_step_item_undo_message">ביטול</string>
+    <string name="post_recipe_pick_photos_button">תמונות</string>
+    <string name="post_recipe_pick_photos_reset_button">איפוס</string>
+    <string name="post_recipe_pick_photos_initial_state">לא נבחרו תמונות</string>
+    <string name="post_recipe_pick_photos_browse_empty_message">לא נבחרו תמונות</string>
+    <string name="post_recipe_pick_photos_camera_empty_message">לא צולמה תמונה</string>
+
+    <string-array name="html_elements">
+        <item>כותרת</item>
+        <item>כותרת משנה</item>
+        <item>טקסט רגיל</item>
+        <item>רשימה לא ממוספרת</item>
+        <item>רשימה ממוספרת</item>
+    </string-array>
+
+    <!--#endregion PostRecipe Activity -->
+
+    <!-- SettingsActivity -->
+    <string name="settings_category_display">תצוגה</string>
+    <string name="settings_category_notifications">התראות</string>
+    <string name="settings_category_general">כללי</string>
+
+    <string name="pref_title_notification_new_recipe">מתכונים חדשים</string>
+    <string name="pref_title_notification_comment">תגובות</string>
+    <string name="pref_title_notification_like">סימון \'אהבתי\'</string>
+
+    <string name="pref_summary_notification_new_recipe">קבלת עדכונים על מתכונים חדשים</string>
+    <string name="pref_summary_notification_comment">הודע לי כאשר מישהו מגיב על המתכונים שלי</string>
+    <string name="pref_summary_notification_like">הודע לי כאשר מישהו מסמן \'אהבתי\' על המתכונים שלי</string>
+
+    <string name="pref_title_dark_theme">מצב כהה</string>
+    <string name="pref_description_dark_theme">מצב כהה של אפליקציות מומלץ מאוד וחוסך בחיי הסוללה
+    </string>
+
+    <string-array name="pref_dark_theme_list_titles">
+        <item>תמיד</item>
+        <item>אוטומטי (בלילה או במצב חסכון בסוללה)</item>
+        <item>במצב חסכון בסוללה</item>
+        <item>אף פעם</item>
+    </string-array>
+
+    <string name="pref_title_choose_language">בחירת שפה</string>
+    <string-array name="pref_languages_list_titles">
+        <item>אנגלית</item>
+        <item>עברית</item>
+        <!--<item>תימנית</item>-->
+    </string-array>
+
+
+    <!-- pick image dialog -->
+    <string name="pick_image_dialog_camera">מצלמה</string>
+    <string name="pick_image_dialog_gallery">גלריה</string>
+    <string name="pick_image_dialog_choose">בחירה</string>
+    <string name="pick_image_dialog_cancel">ביטול</string>
+
+
+    <!--#region Shortcuts -->
+    <string name="shortcut_post_recipe_short_label">מתכון חדש</string>
+    <string name="shortcut_post_recipe_long_label">כתיבת מתכון חדש</string>
+    <string name="shortcut_post_recipe_disabled_message">לא ניתן לכתוב מתכון חדש</string>
+
+    <string name="shortcut_favorites_short_label">מועדפים</string>
+    <string name="shortcut_favorites_long_label">מתכונים שסומנו ב\'אהבתי\'</string>
+    <string name="shortcut_favorites_disabled_message">לא ניתן לצפות במתכונים</string>
+    <!--#endregion Shortcuts -->
+
+</resources>

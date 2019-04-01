@@ -120,27 +120,10 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
     }
 
     @Override
-    public void onAttach(@NonNull Context context) {
-        Log.e(TAG, "on attach");
-        super.onAttach(context);
-        /*if (parent != null) {
-            //parent.removeAllViews();
-            parent.addView(swipeRefreshLayout);
-            parent.addView(mFilter);
-        }*/
-    }
-
-    @Override
     public void onDetach() {
-        Log.e(TAG, "on detach");
+        //Log.e(TAG, "on detach");
         super.onDetach();
         //parent.removeAllViews();
-    }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        //setRetainInstance(true);
     }
 
     @Nullable

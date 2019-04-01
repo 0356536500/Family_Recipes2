@@ -10,9 +10,10 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.myapps.ron.family_recipes.R;
-import com.myapps.ron.family_recipes.utils.logic.LocaleHelper;
 import com.myapps.ron.family_recipes.ui.baseclasses.MyBaseActivity;
 import com.myapps.ron.family_recipes.viewmodels.SettingsViewModel;
+
+import java.util.Locale;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -26,7 +27,6 @@ import androidx.preference.SwitchPreferenceCompat;
 import androidx.preference.TwoStatePreference;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.RecyclerView;
-import io.reactivex.subjects.PublishSubject;
 
 /**
  * Created by ronginat on 12/12/2018.
@@ -35,14 +35,11 @@ public class SettingsActivity extends MyBaseActivity
         implements PreferenceFragmentCompat.OnPreferenceStartFragmentCallback{
 
     private int fragmentCounter = 0;
-    public static PublishSubject<Integer> publishSubject = PublishSubject.create();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
-
-        //new Handler().postDelayed(this::startPublish, 1000);
 
         setupActionBar();
         ViewModelProviders.of(this).get(SettingsViewModel.class)
@@ -56,21 +53,14 @@ public class SettingsActivity extends MyBaseActivity
                 .commit();
 
         fragmentCounter++;
-
-        //Log.e(getClass().getSimpleName(), "call worker");
-        //WorkManager.getInstance().enqueue(PostRecipeScheduledWorker.createPostRecipesWorker());
     }
 
-    private void startPublish() {
-        try {
-            for (int i = 0; i < 4; i++) {
-                Thread.sleep(1000);
-                publishSubject.onNext(i);
-            }
-            publishSubject.onComplete();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.e(getClass().getSimpleName(), getResources().getConfiguration().locale.toLanguageTag());
+        //Log.e(getClass().getSimpleName(), getResources().getConfiguration().getLocales().get(0).toLanguageTag());
+        Log.e(getClass().getSimpleName(), Locale.getDefault().toLanguageTag());
     }
 
     /**
@@ -122,8 +112,9 @@ public class SettingsActivity extends MyBaseActivity
         }
         if (key.equals(getString(R.string.preference_key_language))) {
             Log.e(getClass().getSimpleName(), "new lang, " + sharedPreferences.getString(key, "he"));
-            LocaleHelper.setLocale(SettingsActivity.this, sharedPreferences.getString(key, "he"));
-            recreate();
+            updateLocale(new Locale(sharedPreferences.getString(key, "he")));
+            /*LocaleHelper.setLocale(SettingsActivity.this, sharedPreferences.getString(key, "he"));
+            recreate();*/
         }
     }
 
@@ -228,16 +219,20 @@ public class SettingsActivity extends MyBaseActivity
             super.onCreate(savedInstanceState);
 
             SwitchPreferenceCompat switchNewRecipe = findPreference("notifications_new_message_vibrate");
-            switchNewRecipe.setOnPreferenceChangeListener((preference, newValue) -> {
-                new Handler().postDelayed(() -> Log.e(getClass().getSimpleName(), "delayed operation, value = " + newValue), 1500);
-                return true;
-            });
+            if (switchNewRecipe != null) {
+                switchNewRecipe.setOnPreferenceChangeListener((preference, newValue) -> {
+                    new Handler().postDelayed(() -> Log.e(getClass().getSimpleName(), "delayed operation, value = " + newValue), 1500);
+                    return true;
+                });
+            }
 
             if (getActivity() != null) {
                 SettingsViewModel viewModel = ViewModelProviders.of(getActivity()).get(SettingsViewModel.class);
                 viewModel.changeKeyToValue.observe(this, entry -> {
                     TwoStatePreference statePreference = findPreference(entry.getKey());
-                    statePreference.setChecked(entry.getValue());
+                    if (statePreference != null) {
+                        statePreference.setChecked(entry.getValue());
+                    }
                 });
             }
             //addPreferencesFromResource(R.xml.pref_notification);

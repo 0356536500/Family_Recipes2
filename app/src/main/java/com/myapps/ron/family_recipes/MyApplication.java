@@ -2,7 +2,6 @@ package com.myapps.ron.family_recipes;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.PowerManager;
@@ -10,8 +9,8 @@ import android.provider.Settings;
 
 import com.myapps.ron.family_recipes.background.workers.DeleteOldFilesWorker;
 import com.myapps.ron.family_recipes.utils.Constants;
-import com.myapps.ron.family_recipes.utils.logic.LocaleHelper;
 import com.myapps.ron.family_recipes.utils.logic.SharedPreferencesHandler;
+import com.myapps.ron.localehelper.LocaleAwareApplication;
 
 import java.util.Calendar;
 
@@ -19,7 +18,7 @@ import androidx.work.ExistingPeriodicWorkPolicy;
 import androidx.work.WorkManager;
 
 
-public class MyApplication extends Application {
+public class MyApplication extends LocaleAwareApplication {
 
     public static final String TAG = MyApplication.class.getSimpleName();
 
@@ -87,10 +86,10 @@ public class MyApplication extends Application {
         //activity.setTheme(sPref.getBoolean(getString(R.string.preference_key_dark_theme), false) ? R.style.AppTheme_Dark : R.style.AppTheme_Light);
     }
 
-    @Override
+    /*@Override
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(LocaleHelper.onAttach(base, "en"));
-    }
+    }*/
 
     public static Context getContext() {
         return mContext;

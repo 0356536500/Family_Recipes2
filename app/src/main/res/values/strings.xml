@@ -182,7 +182,8 @@
 
     <!-- Keys to Settings -->
     <string name="preference_key_dark_theme" translatable="false">dark_theme</string>
-    <string name="preference_key_language" translatable="false">system_language</string>
+    <string name="preference_key_language" translatable="false">Locale.Helper.Selected.Language</string>
+    <!--<string name="preference_key_language" translatable="false">system_language</string>-->
     <string name="preference_key_notification_new_recipe" translatable="false">@string/notification_new_recipe_channel_id</string>
     <string name="preference_key_notification_comment" translatable="false">@string/notification_comment_channel_id</string>
     <string name="preference_key_notification_likes" translatable="false">@string/notification_like_channel_id</string>
@@ -222,7 +223,7 @@
     </string-array>
     <string-array name="pref_languages_list_values">
         <item>en</item>
-        <item>iw</item>
+        <item>he</item>
         <!--<item>2</item>-->
     </string-array>
 

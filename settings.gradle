@@ -1,1 +1,1 @@
-include ':app', ':searchfilter'
+include ':app', ':searchfilter', ':localehelper'
