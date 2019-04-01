@@ -25,22 +25,22 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
-import com.myapps.ron.family_recipes.utils.ui.MyDividerItemDecoration;
 import com.myapps.ron.family_recipes.R;
-import com.myapps.ron.family_recipes.recycler.adapters.CommentsAdapter;
+import com.myapps.ron.family_recipes.background.services.PostRecipeToServerService;
 import com.myapps.ron.family_recipes.dal.Injection;
 import com.myapps.ron.family_recipes.dal.storage.StorageWrapper;
 import com.myapps.ron.family_recipes.model.RecipeEntity;
-import com.myapps.ron.family_recipes.background.services.PostRecipeToServerService;
+import com.myapps.ron.family_recipes.recycler.adapters.CommentsAdapter;
+import com.myapps.ron.family_recipes.ui.baseclasses.MyBaseActivity;
 import com.myapps.ron.family_recipes.ui.fragments.PagerDialogFragment;
 import com.myapps.ron.family_recipes.ui.fragments.PickImagesMethodDialog;
 import com.myapps.ron.family_recipes.utils.Constants;
-import com.myapps.ron.family_recipes.utils.GlideApp;
-import com.myapps.ron.family_recipes.ui.baseclasses.MyBaseActivity;
+import com.myapps.ron.family_recipes.utils.ui.MyDividerItemDecoration;
 import com.myapps.ron.family_recipes.viewmodels.RecipeViewModel;
 import com.myapps.ron.searchfilter.animator.FiltersListItemAnimator;
 
@@ -91,7 +91,7 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
     private ContentLoadingProgressBar progressBar;
     private WebView myWebView;
     private String recipeId;
-    private TextView textViewCommentTitle;
+    private TextView textViewCommentTitle, textViewDescription;
     private RecipeViewModel viewModel;
 
     private ViewGroup commentsLayout;
@@ -112,6 +112,8 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     private ShareActionProvider mShareActionProvider;
+
+    // region Activity Overrides
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -139,6 +141,8 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
         compositeDisposable.clear();
     }
 
+    // endregion
+
     private void loadColorsFromTheme() {
         TypedValue primaryValue = new TypedValue();
         TypedValue secondValue = new TypedValue();
@@ -161,6 +165,7 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
         collapsingToolbarLayout = findViewById(R.id.toolbar_layout);
         imageViewCollapsingImage = findViewById(R.id.recipe_collapsing_image);
         toolbar = findViewById(R.id.recipe_toolbar);
+        textViewDescription = findViewById(R.id.recipe_content_description);
         like = findViewById(R.id.recipe_like);
         progressBar = findViewById(R.id.recipe_content_progressBar);
         myWebView = findViewById(R.id.recipe_content_webView);
@@ -249,7 +254,10 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
 
         viewModel.getRecipe().observe(this, recipe -> {
             if (recipe != null) {
-                setTitle(recipe.getName());
+                collapsingToolbarLayout.setTitle(recipe.getName());
+                textViewDescription.setText(recipe.getDescription());
+                textViewDescription.animate().alpha(1f).setDuration(1000).start();
+                //textViewDescription.setAlpha(1f);
                 loadRecipe();
             }
         });
@@ -276,14 +284,15 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
                     commentsLayout.setVisibility(View.VISIBLE), 1500);
         });
         viewModel.getImagePath().observe(this, path -> {
+            /*CircularProgressDrawable circularProgressDrawable = new CircularProgressDrawable(getBaseContext());
+            circularProgressDrawable.setStrokeWidth(10f);
+            circularProgressDrawable.setCenterRadius(80f);
+            circularProgressDrawable.start();*/
+
             if (path != null) {
                 Log.e(TAG, "found path: " + path);
-                /*CircularProgressDrawable circularProgressDrawable = new CircularProgressDrawable(getBaseContext());
-                circularProgressDrawable.setStrokeWidth(5f);
-                circularProgressDrawable.setCenterRadius(35f);
-                circularProgressDrawable.start();*/
 
-                GlideApp.with(getApplicationContext())
+                Glide.with(getApplicationContext())
                         .asDrawable()
                         .load(path)
                         //.placeholder(circularProgressDrawable)
@@ -291,9 +300,10 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
                         .into(imageViewCollapsingImage);
             } else {
                 //TODO: load default picture
-                GlideApp.with(getApplicationContext())
+                Glide.with(getApplicationContext())
                         .asDrawable()
                         .load(RecipeEntity.image)
+                        //.placeholder(circularProgressDrawable)
                         .error(android.R.drawable.stat_notify_error)
                         .into(imageViewCollapsingImage);
             }

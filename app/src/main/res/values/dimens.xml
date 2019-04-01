@@ -7,7 +7,7 @@
     <dimen name="comment_time">13sp</dimen>
     <dimen name="comment_secondary">15sp</dimen>
 
-    <!-- Recipe Activity -->
+    <!-- region Recipe Activity -->
     <dimen name="recipe_activity_margin">4dp</dimen>
     <dimen name="recipe_activity_minus_margin">-4dp</dimen>
 
@@ -16,7 +16,11 @@
     <dimen name="app_bar_height1">150dp</dimen>
     <dimen name="app_bar_height">256dp</dimen>
     <dimen name="text_margin">16dp</dimen>
-    <dimen name="recipe_content_margin">10dp</dimen>
+    <dimen name="recipe_content_margin_small">10dp</dimen>
+    <dimen name="recipe_content_margin_medium">20dp</dimen>
+    <dimen name="recipe_content_margin_large">30dp</dimen>
+
+    <!-- endregion Recipe Activity -->
 
     <!-- Item in recycler -->
     <dimen name="item_name_text_size">22sp</dimen>

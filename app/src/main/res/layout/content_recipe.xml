@@ -15,7 +15,18 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:layout_margin="@dimen/recipe_content_margin">
+        android:layout_margin="@dimen/recipe_content_margin_small">
+
+        <TextView
+            android:id="@+id/recipe_content_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/recipe_content_margin_large"
+            android:layout_marginBottom="@dimen/recipe_content_margin_medium"
+            android:elevation="@dimen/instructions_elevation_element"
+            android:fontFamily="@font/open_sans_bold"
+            android:alpha="0"
+            android:background="@drawable/background_pager_element" />
 
         <WebView
             android:id="@+id/recipe_content_webView"
@@ -59,7 +70,8 @@
                 android:layout_marginTop="@dimen/recipe_activity_minus_margin"
                 android:layout_marginStart="@dimen/recipe_activity_margin"
                 android:layout_marginEnd="@dimen/recipe_activity_margin"
-                android:foreground="?attr/textColorSecond"/>
+                android:foreground="?attr/textColorSecond"
+                android:foregroundTint="?attr/textColorSecond"/>
 
 
             <androidx.recyclerview.widget.RecyclerView

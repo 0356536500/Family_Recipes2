@@ -10,8 +10,8 @@
     android:focusable="true"
     android:layout_marginTop="5dp"
     android:layout_marginBottom="5dp"
-    android:layout_marginStart="@dimen/recipe_content_margin"
-    android:layout_marginEnd="@dimen/recipe_content_margin"
+    android:layout_marginStart="@dimen/recipe_content_margin_small"
+    android:layout_marginEnd="@dimen/recipe_content_margin_small"
     android:padding="@dimen/row_padding">
 
     <androidx.constraintlayout.widget.ConstraintLayout

@@ -111,7 +111,6 @@ public class SettingsActivity extends MyBaseActivity
             recreate();
         }
         if (key.equals(getString(R.string.preference_key_language))) {
-            Log.e(getClass().getSimpleName(), "new lang, " + sharedPreferences.getString(key, "he"));
             updateLocale(new Locale(sharedPreferences.getString(key, "he")));
             /*LocaleHelper.setLocale(SettingsActivity.this, sharedPreferences.getString(key, "he"));
             recreate();*/
