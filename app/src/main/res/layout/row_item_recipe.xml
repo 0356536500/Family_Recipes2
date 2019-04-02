@@ -118,7 +118,22 @@
             app:layout_constraintEnd_toStartOf="@+id/heart_image"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <androidx.appcompat.widget.AppCompatImageView
+        <androidx.appcompat.widget.AppCompatToggleButton
+            android:id="@+id/heart_image"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="8dp"
+            android:alpha="0.85"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:background="@drawable/favorite_selector"
+            android:checked="false"
+            android:text=""
+            android:textOff=""
+            android:textOn=""
+             />
+        <!--<androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/heart_image"
             android:layout_width="20dp"
             android:layout_height="20dp"
@@ -127,7 +142,7 @@
             android:alpha="0.85"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_heart" />
+            app:srcCompat="@drawable/ic_heart" />-->
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

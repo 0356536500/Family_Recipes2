@@ -105,11 +105,14 @@ public class MainActivity extends MyBaseActivity {
                 if (getIntent().getBooleanExtra("from_login", false))
                     new Handler().postDelayed(() -> viewModel.fetchFromServerJustLoggedIn(this), 10000);
             }
+            getFirebaseToken();
+        } else {
+            currentFragment = (MyFragment) getSupportFragmentManager()
+                    .findFragmentById(R.id.main_frame);
         }
 
         // white background notification bar
         //whiteNotificationBar(recyclerView);
-        getFirebaseToken();
     }
 
     private void getFirebaseToken() {
@@ -350,8 +353,6 @@ public class MainActivity extends MyBaseActivity {
     // Handle when the a navigation item is selected
     private void setNavDrawer() {
         navDrawer.setNavigationItemSelectedListener(item -> {
-            // set item as selected to persist highlight
-            item.setChecked(true);
             if (getSupportActionBar() != null)
                 getSupportActionBar().setTitle(item.getTitle());
             // close drawer when item is tapped
@@ -398,6 +399,9 @@ public class MainActivity extends MyBaseActivity {
         }
 
         if(fragment != null) {
+            // set item as selected to persist highlight
+            item.setChecked(true);
+
             getSupportFragmentManager().findFragmentByTag("all");
             currentFragment = fragment;
             getSupportFragmentManager()

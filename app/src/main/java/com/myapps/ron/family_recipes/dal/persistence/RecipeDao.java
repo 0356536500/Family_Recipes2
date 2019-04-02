@@ -28,7 +28,7 @@ public interface RecipeDao {
     String recipeMinimalFields = RecipeEntity.KEY_ID + ", " + RecipeEntity.KEY_NAME + ", " +
             RecipeEntity.KEY_DESCRIPTION + ", " + RecipeEntity.KEY_UPLOADER + ", " +
             RecipeEntity.KEY_CATEGORIES + ", " + RecipeEntity.KEY_FOOD_FILES + ", " +
-            RecipeEntity.KEY_LIKES;
+            RecipeEntity.KEY_LIKES + ", " + RecipeEntity.KEY_FAVORITE;
 
    /* @Query("SELECT " + recipeMinimalFields + " FROM " + AppDatabases.TABLE_RECIPES + " ORDER BY " + RecipeEntity.KEY_CREATED + " DESC")
     DataSource.Factory<Integer, RecipeMinimal> getRecipesDataMinimalOrderByCreation();

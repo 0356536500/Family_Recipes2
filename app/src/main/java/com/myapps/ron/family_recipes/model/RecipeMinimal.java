@@ -19,6 +19,7 @@ public class RecipeMinimal {
     private List<String> categories;
     private List<String> foodFiles;
     private int likes;
+    private int meLike;
 
     public RecipeMinimal() {
     }
@@ -78,13 +79,20 @@ public class RecipeMinimal {
     public void setLikes(int likes) {
         this.likes = likes;
     }
+    public int getMeLike() {
+        return meLike;
+    }
+
+    public void setMeLike(int meLike) {
+        this.meLike = meLike;
+    }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         RecipeMinimal that = (RecipeMinimal) o;
-        return likes == that.likes &&
+        return likes == that.likes && meLike == that.meLike &&
                 Objects.equals(id, that.id) &&
                 Objects.equals(name, that.name) &&
                 Objects.equals(description, that.description) &&
@@ -95,7 +103,7 @@ public class RecipeMinimal {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, uploader, categories, foodFiles, likes);
+        return Objects.hash(id, name, description, uploader, categories, foodFiles, likes, meLike);
     }
 
     @NonNull
@@ -106,4 +114,5 @@ public class RecipeMinimal {
                 ", name='" + name + '\'' +
                 '}';
     }
+
 }
