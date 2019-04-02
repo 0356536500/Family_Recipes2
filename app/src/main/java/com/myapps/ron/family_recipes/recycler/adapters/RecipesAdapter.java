@@ -2,13 +2,20 @@ package com.myapps.ron.family_recipes.recycler.adapters;
 
 import android.content.Context;
 import android.graphics.PorterDuff;
+import android.os.Handler;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.ScaleAnimation;
+import android.widget.CompoundButton;
 import android.widget.HorizontalScrollView;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.dal.storage.StorageWrapper;
@@ -16,70 +23,132 @@ import com.myapps.ron.family_recipes.model.CategoryEntity;
 import com.myapps.ron.family_recipes.model.RecipeEntity;
 import com.myapps.ron.family_recipes.model.RecipeMinimal;
 import com.myapps.ron.family_recipes.recycler.helpers.RecipesAdapterHelper;
+import com.myapps.ron.family_recipes.utils.Constants;
 import com.myapps.ron.family_recipes.utils.GlideApp;
 
 import java.util.List;
-import java.util.Random;
 
+import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
-import androidx.appcompat.widget.AppCompatImageView;
 import androidx.paging.PagedListAdapter;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable;
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnCheckedChanged;
+import butterknife.OnClick;
 
 
 public class RecipesAdapter extends PagedListAdapter<RecipeMinimal, RecipesAdapter.MyViewHolder> {
-    private int[] colors;
-    private Random random;
     private Context context;
 
     private List<CategoryEntity> categoryList;
 
     private RecipesAdapterListener listener;
-    //private StorageWrapper storageWrapper;
+    private Animation scaleAnimation;
+    @ColorInt
+    private int circularColor;
 
     class MyViewHolder extends RecyclerView.ViewHolder {
-        TextView name, description, uploader, numberOfLikes;
-        AppCompatImageView thumbnail;
+        @BindView(R.id.name)
+        TextView name;
+        @BindView(R.id.description)
+        TextView description;
+        @BindView(R.id.uploader)
+        TextView uploader;
+        @BindView(R.id.number_of_likes)
+        TextView numberOfLikes;
+        @BindView(R.id.thumbnail)
+        ImageView thumbnail;
+        @BindView(R.id.categories_scroll_container)
         HorizontalScrollView horizontalScrollView;
+        @BindView(R.id.favorite_button)
+        ToggleButton favoriteToggleButton;
 
         MyViewHolder(View itemView) {
             super(itemView);
-            name = itemView.findViewById(R.id.name);
+            itemView.setOnClickListener(view ->
+                    listener.onItemSelected(getItem(getAdapterPosition())));
+
+            ButterKnife.bind(this, itemView);
+            /*name = itemView.findViewById(R.id.name);
             description = itemView.findViewById(R.id.description);
             thumbnail = itemView.findViewById(R.id.thumbnail);
             uploader = itemView.findViewById(R.id.uploader);
             numberOfLikes = itemView.findViewById(R.id.number_of_likes);
             horizontalScrollView = itemView.findViewById(R.id.categories_scroll_container);
+            favoriteToggleButton = itemView.findViewById(R.id.favorite_toggle_button);
 
-            this.itemView.setTag(this);
-
-            itemView.setOnClickListener(view ->
-                    listener.onItemSelected(getItem(getAdapterPosition())));
 
             thumbnail.setOnClickListener(view ->
                     listener.onImageClicked(getItem((getAdapterPosition()))));
 
+            favoriteToggleButton.setOnCheckedChangeListener((compoundButton, b) -> {
+                if (compoundButton.isPressed()) {
+                    // not when programmatically changing checked value
+                    //listener.onFavoriteCheckedChanged(getItem(getAdapterPosition()));
+                    CircularProgressDrawable circularProgressDrawable = new CircularProgressDrawable(context);
+                    circularProgressDrawable.setStrokeWidth(4f);
+                    circularProgressDrawable.setCenterRadius(25f);
+                    circularProgressDrawable.start();
+                    compoundButton.setBackground(circularProgressDrawable);
+                    new Handler().postDelayed(() -> {
+                        compoundButton.setBackgroundResource(R.drawable.favorite_selector);
+                        compoundButton.startAnimation(scaleAnimation);
+                        }, 2000);
+                    Log.e(getClass().getSimpleName(), "checked changed, " + Boolean.toString(b));
+                }
+            });*/
+        }
+
+        @SuppressWarnings("UnusedParameters")
+        @OnClick(R.id.thumbnail)
+        void onClickThumbnailListener(View view) {
+            listener.onImageClicked(getItem(getAdapterPosition()));
+        }
+
+        @OnCheckedChanged(R.id.favorite_button)
+        void onCheckedChangedFavoriteListener(CompoundButton compoundButton, boolean b) {
+            if (compoundButton.isPressed()) {
+                // not when programmatically changing checked value
+                CircularProgressDrawable circularProgressDrawable = new CircularProgressDrawable(context);
+                circularProgressDrawable.setColorFilter(circularColor, PorterDuff.Mode.SRC_ATOP);
+                circularProgressDrawable.setStrokeWidth(5f);
+                circularProgressDrawable.setCenterRadius(25f);
+                circularProgressDrawable.start();
+                compoundButton.setBackground(circularProgressDrawable);
+                compoundButton.setEnabled(false);
+
+                listener.onFavoriteClicked(getItem(getAdapterPosition()));
+                new Handler().postDelayed(() -> {
+                    compoundButton.setBackgroundResource(R.drawable.favorite_selector);
+                    compoundButton.startAnimation(scaleAnimation);
+                    compoundButton.setEnabled(true);
+
+                }, 1500);
+
+                Log.e(getClass().getSimpleName(), "checked changed, " + Boolean.toString(b));
+            }
         }
 
         void bindTo(RecipeMinimal recipe) {
-            if (recipe.getName() != null)
-                this.name.setText(recipe.getName());
-            else
-                this.name.setText(com.myapps.ron.family_recipes.utils.Constants.DEFAULT_RECIPE_NAME);
+            this.name.setText(recipe.getName() != null ?
+                    recipe.getName() :
+                    com.myapps.ron.family_recipes.utils.Constants.DEFAULT_RECIPE_NAME);
 
-            if (recipe.getDescription() != null)
-                this.description.setText(recipe.getDescription());
-            else
-                this.description.setText(com.myapps.ron.family_recipes.utils.Constants.DEFAULT_RECIPE_DESC);
+            this.description.setText(recipe.getDescription() != null ?
+                    recipe.getDescription() :
+                    com.myapps.ron.family_recipes.utils.Constants.DEFAULT_RECIPE_DESC);
 
-            if (recipe.getUploader() != null)
-                this.uploader.setText(recipe.getUploader());
-            else
-                this.uploader.setText(com.myapps.ron.family_recipes.utils.Constants.DEFAULT_RECIPE_UPLOADER);
+            this.uploader.setText(recipe.getUploader() != null ?
+                    recipe.getUploader() :
+                    com.myapps.ron.family_recipes.utils.Constants.DEFAULT_RECIPE_UPLOADER);
 
             this.numberOfLikes.setText(String.valueOf(recipe.getLikes()));
+            this.favoriteToggleButton.setBackgroundResource(R.drawable.favorite_selector);
+            this.favoriteToggleButton.setChecked(recipe.getMeLike() == Constants.TRUE);
+            this.favoriteToggleButton.setEnabled(true);
 
             //inflate categories
             if (categoryList != null)
@@ -97,8 +166,13 @@ public class RecipesAdapter extends PagedListAdapter<RecipeMinimal, RecipesAdapt
         this.context = context;
         this.listener = listener;
 
-        this.colors = context.getResources().getIntArray(R.array.colors);
-        this.random = new Random();
+        this.scaleAnimation = new ScaleAnimation(0.7f, 1f, 0.7f, 1f,
+                Animation.RELATIVE_TO_SELF, 0.7f, Animation.RELATIVE_TO_SELF, 0.7f);
+        scaleAnimation.setDuration(500);
+
+        TypedValue typedValue = new TypedValue();
+        context.getTheme().resolveAttribute(R.attr.textColorMain, typedValue, true);
+        circularColor = typedValue.data;
     }
 
     public void setCategoryList(List<CategoryEntity> categoryList) {
@@ -191,10 +265,6 @@ public class RecipesAdapter extends PagedListAdapter<RecipeMinimal, RecipesAdapt
         }
     }
 
-    private int pickColor() {
-        return colors[random.nextInt(colors.length)];
-    }
-
     private void loadDefaultImage(final MyViewHolder holder) {
         CircularProgressDrawable circularProgressDrawable = new CircularProgressDrawable(context);
         circularProgressDrawable.setStrokeWidth(5f);
@@ -253,6 +323,7 @@ public class RecipesAdapter extends PagedListAdapter<RecipeMinimal, RecipesAdapt
 
 
     public interface RecipesAdapterListener {
+        void onFavoriteClicked(RecipeMinimal recipe);
         void onItemSelected(RecipeMinimal recipe);
         void onImageClicked(RecipeMinimal recipe);
         void onCurrentSizeChanged(int size);

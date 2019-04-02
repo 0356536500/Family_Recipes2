@@ -363,7 +363,12 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
     // endregion
 
     // region Recycler Listener
-    //private Disposable onItemSelectedDisposable;
+
+    @Override
+    public void onFavoriteClicked(RecipeMinimal recipe) {
+        // change recipe on server
+    }
+
     @Override
     public void onItemSelected(RecipeMinimal recipeMinimal) {
         Log.e(TAG, "onItemSelected, " + recipeMinimal);

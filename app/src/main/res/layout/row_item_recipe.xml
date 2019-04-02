@@ -115,11 +115,11 @@
             android:fontFamily="@font/open_sans_light"
             android:text="@string/recycler_item_number_of_likes"
             android:textSize="@dimen/item_likes_text_size"
-            app:layout_constraintEnd_toStartOf="@+id/heart_image"
+            app:layout_constraintEnd_toStartOf="@+id/favorite_button"
             app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.appcompat.widget.AppCompatToggleButton
-            android:id="@+id/heart_image"
+            android:id="@+id/favorite_button"
             android:layout_width="25dp"
             android:layout_height="25dp"
             android:layout_marginTop="10dp"

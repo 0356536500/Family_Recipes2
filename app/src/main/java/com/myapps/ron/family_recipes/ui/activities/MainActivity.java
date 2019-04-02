@@ -37,12 +37,18 @@ import com.myapps.ron.family_recipes.utils.Constants;
 import com.myapps.ron.family_recipes.utils.logic.SharedPreferencesHandler;
 import com.myapps.ron.family_recipes.viewmodels.DataViewModel;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProviders;
 
 public class MainActivity extends MyBaseActivity {
@@ -55,18 +61,34 @@ public class MainActivity extends MyBaseActivity {
     private Paint backgroundPaint;
     private boolean isRTL;
 
-    //private SearchView searchView;
+    private DataViewModel viewModel;
 
     public Menu menu;
     public MenuItem searchMenuItem;
     //public MenuItem sortMenuItem;
 
-    private MyFragment currentFragment, allRecipesFragment, favoritesRecipesFragment;
+    private List<MyFragment> myFragments;
+    private MyFragment currentFragment;//, allRecipesFragment, favoritesRecipesFragment;
 
     private IntentFilter customFilter;
     private String lastOrderBy;
 
     private int toolbarColorPrimary, toolbarColorSecond;
+
+    private final FragmentManager.FragmentLifecycleCallbacks fragmentLifecycleCallbacks = new FragmentManager.FragmentLifecycleCallbacks() {
+        @Override
+        public void onFragmentResumed(@NonNull FragmentManager fm, @NonNull Fragment f) {
+            super.onFragmentResumed(fm, f);
+            if (f instanceof MyFragment) {
+                if (getSupportActionBar() != null)
+                    getSupportActionBar().setTitle(f.getTag());
+                currentFragment = (MyFragment) f;
+                int index = myFragments.indexOf(currentFragment);
+                if (index >= 0)
+                    navDrawer.getMenu().getItem(index).setChecked(true);
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,28 +105,12 @@ public class MainActivity extends MyBaseActivity {
         initFragments();
         isRTL = isRTL();
 
-        DataViewModel viewModel = ViewModelProviders.of(this, Injection.provideViewModelFactory(this)).get(DataViewModel.class);
+        viewModel = ViewModelProviders.of(this, Injection.provideViewModelFactory(this)).get(DataViewModel.class);
         //viewModel = ViewModelProviders.of(this).get(DataViewModel.class);
 
         // create fragments only when first created, not after change language
         if (savedInstanceState == null) {
-            //handle data from intent
-            if (getIntent() != null && getIntent().getSerializableExtra(Constants.MAIN_ACTIVITY_FIRST_FRAGMENT) != null) {
-                String firstFragment = getIntent().getStringExtra(Constants.MAIN_ACTIVITY_FIRST_FRAGMENT);
-                Log.e(TAG, "firstFragment = " + firstFragment);
-
-                if (firstFragment.equals(Constants.MAIN_ACTIVITY_FRAGMENT_ALL))
-                    new Handler().postDelayed(() -> startWithDefaultFragment(allRecipesFragment, 0), 100);
-                else if (firstFragment.equals(Constants.MAIN_ACTIVITY_FRAGMENT_FAVORITES))
-                    new Handler().postDelayed(() -> startWithDefaultFragment(favoritesRecipesFragment, 1), 100);
-            } else
-                new Handler().postDelayed(() -> startWithDefaultFragment(allRecipesFragment, 0), 100);
-
-            //check if got here from login activity
-            if (getIntent() != null) {
-                if (getIntent().getBooleanExtra("from_login", false))
-                    new Handler().postDelayed(() -> viewModel.fetchFromServerJustLoggedIn(this), 10000);
-            }
+            handleDataFromIntentAndStart();
             getFirebaseToken();
         } else {
             currentFragment = (MyFragment) getSupportFragmentManager()
@@ -113,6 +119,26 @@ public class MainActivity extends MyBaseActivity {
 
         // white background notification bar
         //whiteNotificationBar(recyclerView);
+    }
+
+    private void handleDataFromIntentAndStart() {
+        //handle data from intent
+        if (getIntent() != null && getIntent().getSerializableExtra(Constants.MAIN_ACTIVITY_FIRST_FRAGMENT) != null) {
+            String firstFragment = getIntent().getStringExtra(Constants.MAIN_ACTIVITY_FIRST_FRAGMENT);
+            Log.e(TAG, "firstFragment = " + firstFragment);
+
+            if (firstFragment.equals(Constants.MAIN_ACTIVITY_FRAGMENT_ALL))
+                new Handler().postDelayed(() -> startWithDefaultFragment(myFragments.get(0), 0), 100);
+            else if (firstFragment.equals(Constants.MAIN_ACTIVITY_FRAGMENT_FAVORITES))
+                new Handler().postDelayed(() -> startWithDefaultFragment(myFragments.get(1), 1), 100);
+        } else
+            new Handler().postDelayed(() -> startWithDefaultFragment(myFragments.get(0), 0), 100);
+
+        //check if got here from login activity
+        if (getIntent() != null) {
+            if (getIntent().getBooleanExtra("from_login", false))
+                new Handler().postDelayed(() -> viewModel.fetchFromServerJustLoggedIn(this), 10000);
+        }
     }
 
     private void getFirebaseToken() {
@@ -372,11 +398,11 @@ public class MainActivity extends MyBaseActivity {
         switch(item.getItemId()) {
             case R.id.nav_main_all_recipes:
                 // Add a new attribute
-                fragment = allRecipesFragment;
+                fragment = myFragments.get(0);//allRecipesFragment;
                 break;
             case R.id.nav_main_favorites:
                 // Add a new attribute
-                fragment = favoritesRecipesFragment;
+                fragment = myFragments.get(1);//favoritesRecipesFragment;
                 break;
             case R.id.nav_main_settings:
                 // Show user settings
@@ -398,17 +424,18 @@ public class MainActivity extends MyBaseActivity {
                 startActivityForResult(intent, Constants.POST_RECIPE_ACTIVITY_CODE);
         }
 
-        if(fragment != null) {
+        if(fragment != null && fragment != currentFragment) {
             // set item as selected to persist highlight
             item.setChecked(true);
-
-            getSupportFragmentManager().findFragmentByTag("all");
-            currentFragment = fragment;
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.main_frame, fragment)
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            Fragment prev = getSupportFragmentManager().findFragmentByTag(item.getTitle().toString());
+            if (prev != null)
+                ft.remove(prev);
+            ft
+                    .replace(R.id.main_frame, fragment, item.getTitle().toString())
                     .addToBackStack(null)
                     .commit();
+            currentFragment = fragment;
             /*FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             transaction.replace(R.id.main_frame, fragment);
             transaction.commit();*/
@@ -416,8 +443,11 @@ public class MainActivity extends MyBaseActivity {
     }
 
     private void initFragments() {
-        allRecipesFragment = new AllRecipesFragment();
-        favoritesRecipesFragment = new FavoritesRecipesFragment();
+        myFragments = new ArrayList<>();
+        myFragments.add(new AllRecipesFragment());
+        myFragments.add(new FavoritesRecipesFragment());
+        /*allRecipesFragment = new AllRecipesFragment();
+        favoritesRecipesFragment = new FavoritesRecipesFragment();*/
     }
 
     private void startWithDefaultFragment(@NonNull MyFragment startingFragment, int drawerPosition) {
@@ -425,14 +455,22 @@ public class MainActivity extends MyBaseActivity {
         /*if (getIntent().getBooleanExtra("load_likes", false)) {
             currentFragment.setArguments(getIntent().getExtras());
         }*/
-        if (getSupportActionBar() != null)
-            getSupportActionBar().setTitle(navDrawer.getMenu().getItem(drawerPosition).getTitle());
-        navDrawer.getMenu().getItem(drawerPosition).setChecked(true);
+        /*if (getSupportActionBar() != null)
+            getSupportActionBar().setTitle(navDrawer.getMenu().getItem(drawerPosition).getTitle());*/
+        //navDrawer.getMenu().getItem(drawerPosition).setChecked(true);
         getSupportFragmentManager()
                 .beginTransaction()
-                .add(R.id.main_frame, currentFragment)
+                .add(R.id.main_frame, currentFragment, navDrawer.getMenu().getItem(drawerPosition).getTitle().toString())
                 //.addToBackStack(null)
                 .commit();
+    }
+
+    private boolean popBackFragment() {
+        if (getSupportFragmentManager().getBackStackEntryCount() > 1) {
+            getSupportFragmentManager().popBackStack();
+            return true;
+        }
+        return false;
     }
 
     // Sign out user
@@ -474,6 +512,7 @@ public class MainActivity extends MyBaseActivity {
             if (manager.getBackStackEntryCount() > 1)
                 manager.popBackStack();
             else*/
+            if (!popBackFragment())
                 super.onBackPressed();
         }
     }
@@ -512,12 +551,14 @@ public class MainActivity extends MyBaseActivity {
     protected void onStart() {
         super.onStart();
         registerReceiver(mReceiver, customFilter);
+        getSupportFragmentManager().registerFragmentLifecycleCallbacks(fragmentLifecycleCallbacks, false);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         unregisterReceiver(mReceiver);
+        getSupportFragmentManager().unregisterFragmentLifecycleCallbacks(fragmentLifecycleCallbacks);
     }
 
     /**

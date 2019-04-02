@@ -7,12 +7,15 @@ import com.myapps.ron.family_recipes.utils.Constants;
 
 import java.util.List;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 /**
  * Created by ronginat on 30/12/2018.
  */
 public class RecipesAdapterHelper {
 
-    public static int getCategoryColorByName(List<CategoryEntity> categoryList, String name) {
+    public static int getCategoryColorByName(@Nullable List<CategoryEntity> categoryList, @NonNull String name) {
         if (categoryList != null) {
             for (CategoryEntity category : categoryList) {
                 if (category.getName().equals(name))
@@ -28,7 +31,7 @@ public class RecipesAdapterHelper {
         return Color.parseColor(Constants.DEFAULT_COLOR);
     }
 
-    private static int getSubCategoryColorByName(List<CategoryEntity> categoryList, String name) {
+    private static int getSubCategoryColorByName(@NonNull List<CategoryEntity> categoryList, @NonNull String name) {
         int color = - 1;
         for (CategoryEntity category: categoryList) {
             if (category.getName().equals(name)) {
