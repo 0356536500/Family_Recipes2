@@ -1,6 +1,5 @@
 package com.myapps.ron.family_recipes.ui.activities;
 
-import android.content.Intent;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Handler;
@@ -35,7 +34,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.app.NavUtils;
-import androidx.core.app.TaskStackBuilder;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -204,10 +202,10 @@ public class PostRecipeActivity extends MyBaseActivity {
             getSupportFragmentManager()
                     .beginTransaction()
                     .setCustomAnimations(
-                            R.anim.fragment_slide_left_enter,
-                            R.anim.fragment_slide_left_exit,
-                            R.anim.fragment_slide_right_enter,
-                            R.anim.fragment_slide_right_exit)
+                            R.anim.slide_enter_from_left,
+                            R.anim.slide_right_to_exit,
+                            R.anim.slide_enter_from_right,
+                            R.anim.slide_left_to_exit)
                     .replace(R.id.create_fragment_container, fragments.get(++currentIndex))
                     .addToBackStack(null)
                     .commit();

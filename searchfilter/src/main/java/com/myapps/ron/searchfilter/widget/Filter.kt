@@ -107,6 +107,9 @@ class Filter<T : FilterModel> : FrameLayout, FilterItemListener, CollapseListene
         }
 
         mItems.clear()
+        mainFilters.clear()
+        mSelectedItems.clear()
+        mSelectedFilters.clear()
 
         expandedFilter.post {
             adapter?.items?.forEach { item ->
@@ -370,7 +373,7 @@ class Filter<T : FilterModel> : FrameLayout, FilterItemListener, CollapseListene
             putParcelable(STATE_SUPER, superState)
             var collapsed: Boolean? = isCollapsed
             if(collapsed == null)
-                collapsed = false
+                collapsed = true
             putBoolean(STATE_COLLAPSED, collapsed)
             //putBoolean(STATE_COLLAPSED, isCollapsed!!)
             val selectedItems = mSelectedItems

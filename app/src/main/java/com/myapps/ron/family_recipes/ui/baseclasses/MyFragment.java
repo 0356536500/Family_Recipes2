@@ -1,5 +1,6 @@
 package com.myapps.ron.family_recipes.ui.baseclasses;
 
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 /**
@@ -7,6 +8,7 @@ import androidx.fragment.app.Fragment;
  */
 public abstract class MyFragment extends Fragment {
     boolean isDestroyed = false;
+    private String tag;
 
     /**
      *
@@ -29,4 +31,12 @@ public abstract class MyFragment extends Fragment {
         isDestroyed = true;
     }
 
+    @Nullable
+    public String getMyTag() {
+        return this.tag;
+    }
+
+    public void setMyTag(String tag) {
+        this.tag = tag;
+    }
 }

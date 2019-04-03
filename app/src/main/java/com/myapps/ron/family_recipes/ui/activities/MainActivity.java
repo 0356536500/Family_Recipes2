@@ -68,6 +68,7 @@ public class MainActivity extends MyBaseActivity {
     //public MenuItem sortMenuItem;
 
     private List<MyFragment> myFragments;
+    private List<MyFragment> backStack;
     private MyFragment currentFragment;//, allRecipesFragment, favoritesRecipesFragment;
 
     private IntentFilter customFilter;
@@ -80,9 +81,11 @@ public class MainActivity extends MyBaseActivity {
         public void onFragmentResumed(@NonNull FragmentManager fm, @NonNull Fragment f) {
             super.onFragmentResumed(fm, f);
             if (f instanceof MyFragment) {
-                if (getSupportActionBar() != null)
-                    getSupportActionBar().setTitle(f.getTag());
                 currentFragment = (MyFragment) f;
+
+                if (getSupportActionBar() != null)
+                    getSupportActionBar().setTitle(currentFragment.getMyTag());
+
                 int index = myFragments.indexOf(currentFragment);
                 if (index >= 0)
                     navDrawer.getMenu().getItem(index).setChecked(true);
@@ -128,11 +131,11 @@ public class MainActivity extends MyBaseActivity {
             Log.e(TAG, "firstFragment = " + firstFragment);
 
             if (firstFragment.equals(Constants.MAIN_ACTIVITY_FRAGMENT_ALL))
-                new Handler().postDelayed(() -> startWithDefaultFragment(myFragments.get(0), 0), 100);
+                new Handler().postDelayed(() -> startWithDefaultFragment(myFragments.get(0)), 100);
             else if (firstFragment.equals(Constants.MAIN_ACTIVITY_FRAGMENT_FAVORITES))
-                new Handler().postDelayed(() -> startWithDefaultFragment(myFragments.get(1), 1), 100);
+                new Handler().postDelayed(() -> startWithDefaultFragment(myFragments.get(1)), 100);
         } else
-            new Handler().postDelayed(() -> startWithDefaultFragment(myFragments.get(0), 0), 100);
+            new Handler().postDelayed(() -> startWithDefaultFragment(myFragments.get(0)), 100);
 
         //check if got here from login activity
         if (getIntent() != null) {
@@ -327,6 +330,8 @@ public class MainActivity extends MyBaseActivity {
 
     //endregion
 
+    // region Menu Methods
+
     public Menu getMenu() {
         return menu;
     }
@@ -418,56 +423,74 @@ public class MainActivity extends MyBaseActivity {
                 startActivity(aboutAppActivity);*/
                 break;
             case R.id.nav_main_post_recipe:
-                //unregisterReceiver(mReceiver);
-                //registerReceiver(mReceiver, customFilter);
                 Intent intent = new Intent(MainActivity.this, PostRecipeActivity.class);
                 startActivityForResult(intent, Constants.POST_RECIPE_ACTIVITY_CODE);
         }
 
         if(fragment != null && fragment != currentFragment) {
             // set item as selected to persist highlight
-            item.setChecked(true);
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            Fragment prev = getSupportFragmentManager().findFragmentByTag(item.getTitle().toString());
-            if (prev != null)
-                ft.remove(prev);
-            ft
-                    .replace(R.id.main_frame, fragment, item.getTitle().toString())
-                    .addToBackStack(null)
+            //item.setChecked(true);
+            int index = backStack.indexOf(fragment);
+            if (index > 0) {
+                // remove fragment from old index
+                backStack.remove(index);
+
+            }
+            // add the fragment to backStack at index 0
+            backStack.add(0, fragment);
+
+            //currentFragment = fragment;  // Redundant - lifecycleCallback onFragmentResumed will do it
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .setCustomAnimations(
+                            R.anim.slide_enter_from_left,
+                            R.anim.slide_right_to_exit,
+                            R.anim.slide_enter_from_right,
+                            R.anim.slide_left_to_exit)
+                    .replace(R.id.main_frame, fragment)
                     .commit();
-            currentFragment = fragment;
-            /*FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            transaction.replace(R.id.main_frame, fragment);
-            transaction.commit();*/
         }
     }
 
+    // endregion
+
     private void initFragments() {
+        backStack = new ArrayList<>();
         myFragments = new ArrayList<>();
         myFragments.add(new AllRecipesFragment());
+        myFragments.get(0).setMyTag(navDrawer.getMenu().getItem(0).getTitle().toString());
         myFragments.add(new FavoritesRecipesFragment());
+        myFragments.get(1).setMyTag(navDrawer.getMenu().getItem(1).getTitle().toString());
         /*allRecipesFragment = new AllRecipesFragment();
         favoritesRecipesFragment = new FavoritesRecipesFragment();*/
     }
 
-    private void startWithDefaultFragment(@NonNull MyFragment startingFragment, int drawerPosition) {
+    private void startWithDefaultFragment(@NonNull MyFragment startingFragment) {
         currentFragment = startingFragment;
-        /*if (getIntent().getBooleanExtra("load_likes", false)) {
-            currentFragment.setArguments(getIntent().getExtras());
-        }*/
-        /*if (getSupportActionBar() != null)
-            getSupportActionBar().setTitle(navDrawer.getMenu().getItem(drawerPosition).getTitle());*/
-        //navDrawer.getMenu().getItem(drawerPosition).setChecked(true);
+
         getSupportFragmentManager()
                 .beginTransaction()
-                .add(R.id.main_frame, currentFragment, navDrawer.getMenu().getItem(drawerPosition).getTitle().toString())
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                .add(R.id.main_frame, currentFragment)
                 //.addToBackStack(null)
                 .commit();
+        backStack.add(currentFragment); // index 0 is the currently displayed fragment
     }
 
-    private boolean popBackFragment() {
-        if (getSupportFragmentManager().getBackStackEntryCount() > 1) {
-            getSupportFragmentManager().popBackStack();
+    private boolean popFragmentFromBackStack() {
+        if (backStack.size() > 1) {
+            backStack.remove(0); // pop the current fragment out of the stack
+            MyFragment nextFragment = backStack.get(0); // new displaying fragment
+
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .setCustomAnimations(
+                            R.anim.slide_enter_from_right,
+                            R.anim.slide_left_to_exit,
+                            R.anim.slide_enter_from_left,
+                            R.anim.slide_right_to_exit)
+                    .replace(R.id.main_frame, nextFragment)
+                    .commit();
             return true;
         }
         return false;
@@ -508,16 +531,12 @@ public class MainActivity extends MyBaseActivity {
             return;
         }
         if(!currentFragment.onBackPressed()) {
-            /*FragmentManager manager = getSupportFragmentManager();
-            if (manager.getBackStackEntryCount() > 1)
-                manager.popBackStack();
-            else*/
-            if (!popBackFragment())
+            if (!popFragmentFromBackStack())
                 super.onBackPressed();
         }
     }
 
-/*    private void whiteNotificationBar(View view) {
+    /*private void whiteNotificationBar(View view) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             int flags = view.getSystemUiVisibility();
             flags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;

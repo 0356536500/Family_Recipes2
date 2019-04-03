@@ -91,6 +91,7 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
     QueryModel queryModel;
 
+    // region Fragment Override Methods
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -111,6 +112,15 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
     }
 
     @Override
+    public void onDetach() {
+        super.onDetach();
+        parent.removeAllViews();
+        parent = null;
+        view = null;
+        mFilter = null;
+    }
+
+    @Override
     public boolean onBackPressed() {
         if (!mFilter.isCollapsed()) {
             mFilter.collapse();
@@ -119,20 +129,13 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
         return false;
     }
 
-    @Override
-    public void onDetach() {
-        //Log.e(TAG, "on detach");
-        super.onDetach();
-        //parent.removeAllViews();
-    }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        Log.e(TAG, "on createView");
+        //Log.e(TAG, "on createView");
         if (parent == null) {
-            Log.e(TAG, "on createView parent was null");
+            //Log.e(TAG, "on createView parent was null");
             view = inflater.inflate(R.layout.content_main_recipes, container, false);
             parent = (FrameLayout) view;
         } else
@@ -142,9 +145,9 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
 
     @Override
     public void onViewCreated(@NonNull View itemView, @Nullable Bundle savedInstanceState) {
-        Log.e(TAG, "on viewCreated");
+        //Log.e(TAG, "on viewCreated");
         if (mFilter == null) {
-            Log.e(TAG, "on viewCreated mFilter was null");
+            //Log.e(TAG, "on viewCreated mFilter was null");
             swipeRefreshLayout = view.findViewById(R.id.content_main_refresh);
             recyclerView = view.findViewById(R.id.recycler_view);
             mFilter = view.findViewById(R.id.content_main_filters);
@@ -223,7 +226,7 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
             if(mayRefresh) {
                 Log.e(TAG, "in refresh listener, mayRefresh = true");
                 viewModel.fetchFromServer(getContext());
-                //activity.fetchRecipes(orderBy);
+
                 mayRefresh = false;
                 new Handler().postDelayed(() -> mayRefresh = true, Constants.REFRESH_DELAY);
             } else {
