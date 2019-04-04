@@ -2,6 +2,7 @@ package com.myapps.ron.family_recipes.recycler.adapters;
 
 import android.content.Context;
 import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.util.Log;
 import android.util.TypedValue;
@@ -17,6 +18,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.dal.storage.StorageWrapper;
 import com.myapps.ron.family_recipes.model.CategoryEntity;
@@ -24,7 +27,6 @@ import com.myapps.ron.family_recipes.model.RecipeEntity;
 import com.myapps.ron.family_recipes.model.RecipeMinimal;
 import com.myapps.ron.family_recipes.recycler.helpers.RecipesAdapterHelper;
 import com.myapps.ron.family_recipes.utils.Constants;
-import com.myapps.ron.family_recipes.utils.GlideApp;
 
 import java.util.List;
 
@@ -241,54 +243,38 @@ public class RecipesAdapter extends PagedListAdapter<RecipeMinimal, RecipesAdapt
     }
 
     private void loadImage(final MyViewHolder holder, final RecipeMinimal recipe) {
-        if(recipe.getFoodFiles() != null && recipe.getFoodFiles().size() > 0) {
-            //.apply(RequestOptions.circleCropTransform())
-            StorageWrapper.getThumbFile(context, recipe.getFoodFiles().get(0), path -> {
-                if(path != null) {
-                    CircularProgressDrawable circularProgressDrawable = new CircularProgressDrawable(context);
-                    circularProgressDrawable.setStrokeWidth(5f);
-                    circularProgressDrawable.setCenterRadius(35f);
-                    circularProgressDrawable.start();
-
-                    GlideApp.with(context)
-                            .load(path)
-                            .placeholder(circularProgressDrawable)
-                            //.apply(requestOptions)
-                            .into(holder.thumbnail);
-                }
-                else
-                    loadDefaultImage(holder);
-            });
-        }
-        else {
-            loadDefaultImage(holder);
-        }
-    }
-
-    private void loadDefaultImage(final MyViewHolder holder) {
         CircularProgressDrawable circularProgressDrawable = new CircularProgressDrawable(context);
         circularProgressDrawable.setStrokeWidth(5f);
         circularProgressDrawable.setCenterRadius(35f);
         circularProgressDrawable.start();
+        holder.thumbnail.setImageDrawable(circularProgressDrawable);
 
-        GlideApp.with(context)
+        if(recipe.getThumbnail() != null) {
+            //.apply(RequestOptions.circleCropTransform())
+            StorageWrapper.getThumbFile(context, recipe.getThumbnail(), path -> {
+                if(path != null) {
+
+                    Glide.with(context)
+                            .load(path)
+                            .placeholder(circularProgressDrawable)
+                            .transform(new RoundedCorners(50))
+                            //.optionalCircleCrop()
+                            .into(holder.thumbnail);
+                }
+                else
+                    loadDefaultImage(holder, circularProgressDrawable);
+            });
+        }
+        else {
+            loadDefaultImage(holder, circularProgressDrawable);
+        }
+    }
+
+    private void loadDefaultImage(@NonNull final MyViewHolder holder, @NonNull Drawable placeholder) {
+        Glide.with(context)
                 .load(RecipeEntity.image)
-                .placeholder(circularProgressDrawable)
-                /*.listener(new RequestListener<Drawable>() {
-                    @Override
-                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-                        holder.progressBar.setVisibility(View.GONE);
-                        holder.thumbnail.setImageResource(android.R.drawable.stat_notify_error);
-                        return false;
-                    }
-
-                    @Override
-                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-                        holder.progressBar.setVisibility(View.GONE);
-                        return false;
-                    }
-                })*/
-                //.apply(requestOptions)
+                .placeholder(placeholder)
+                .optionalCircleCrop()
                 .into(holder.thumbnail);
     }
 

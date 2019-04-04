@@ -8,6 +8,7 @@ import android.widget.Toast;
 
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.dal.persistence.AppDatabases;
+import com.myapps.ron.family_recipes.dal.persistence.Converters;
 import com.myapps.ron.family_recipes.dal.persistence.RecipeDao;
 import com.myapps.ron.family_recipes.dal.storage.ExternalStorageHelper;
 import com.myapps.ron.family_recipes.model.QueryModel;
@@ -33,6 +34,8 @@ import androidx.paging.PagedList;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
+import io.reactivex.SingleEmitter;
+import io.reactivex.SingleOnSubscribe;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableMaybeObserver;
@@ -83,10 +86,30 @@ public class RecipeRepository {
         this.mayRefresh = new AtomicBoolean(true);
     }
 
-    public Single<RecipeEntity> getRecipe(String id) {
+    /*public Single<RecipeEntity> getRecipe(String id) {
         return recipeDao.getRecipe(id);
+    }*/
+
+    /**
+     * @param id recipe id
+     * @return {@link Single} list of images file names to
+     * {@link com.myapps.ron.family_recipes.viewmodels.DataViewModel} used by {@link com.myapps.ron.family_recipes.ui.fragments.RecyclerWithFiltersAbstractFragment}
+     */
+    public Single<List<String>> getRecipeImages(String id) {
+        return Single.create(emitter ->
+                compositeDisposable.add(recipeDao.getRecipeImages(id)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(Schedulers.from(executor))
+                        .subscribe(string -> {emitter.onSuccess(Converters.fromString(string));
+                        }, emitter::onError)
+                ));
     }
 
+    /**
+     * @param id recipe id
+     * @return {@link Flowable} {@link RecipeEntity} to
+     * {@link com.myapps.ron.family_recipes.viewmodels.RecipeViewModel} used by {@link com.myapps.ron.family_recipes.ui.activities.RecipeActivity}
+     */
     public Flowable<RecipeEntity> getObservableRecipe(String id) {
         return recipeDao.getObservableRecipe(id);
     }

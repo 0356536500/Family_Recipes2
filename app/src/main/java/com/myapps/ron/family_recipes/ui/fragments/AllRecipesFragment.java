@@ -25,8 +25,8 @@ public class AllRecipesFragment extends RecyclerWithFiltersAbstractFragment impl
         setRefreshLayout();
 
         new Handler().postDelayed(() -> {
-            //firstLoadingProgressBar.setVisibility(View.VISIBLE);
-            //viewModel.fetchFromServer(getContext());
+            firstLoadingProgressBar.setVisibility(View.VISIBLE);
+            viewModel.fetchFromServer(getContext());
             viewModel.applyQuery(queryModel);
             /*activity.fetchCategories();
             activity.fetchRecipes(orderBy);*/

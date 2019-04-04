@@ -35,6 +35,7 @@ public class RecipeEntity implements Parcelable{
     public static final String KEY_CREATED = "creationDate";
     public static final String KEY_MODIFIED = "lastModifiedDate";
     public static final String KEY_UPLOADER = "uploader";
+    public static final String KEY_THUMBNAIL = "thumbnail";
     public static final String KEY_FOOD_FILES = "foodFiles";
     public static final String KEY_LIKES = "likes";
     public static final String KEY_FAVORITE = "meLike";
@@ -58,6 +59,8 @@ public class RecipeEntity implements Parcelable{
     private String recipeFile;
     @ColumnInfo(name = KEY_UPLOADER)
     private String uploader;
+    @ColumnInfo(name = KEY_THUMBNAIL)
+    private String thumbnail;
     @ColumnInfo(name = KEY_CATEGORIES)
     private List<String> categories;
     @ColumnInfo(name = KEY_FOOD_FILES)
@@ -92,6 +95,7 @@ public class RecipeEntity implements Parcelable{
         this.lastModifiedDate = in.readString();
         this.recipeFile = in.readString();
         this.uploader = in.readString();
+        this.thumbnail = in.readString();
 
         categories = new ArrayList<>();
         //comments = new ArrayList<>();
@@ -116,7 +120,7 @@ public class RecipeEntity implements Parcelable{
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, creationDate, lastModifiedDate, recipeFile, uploader, categories/*, comments*/, foodFiles, likes, meLike);
+        return Objects.hash(id, name, description, creationDate, lastModifiedDate, recipeFile, uploader, thumbnail, categories, foodFiles, likes, meLike);
     }
 
     /**
@@ -125,58 +129,23 @@ public class RecipeEntity implements Parcelable{
      * @return whether or not current and second recipes are exactly the same
      */
     public boolean identical(RecipeEntity other) {
-        boolean ids = getId().equals(other.getId());
-
-        boolean names = getName() == null && other.getName() == null;
-        if (getName() != null && other.getName() != null)
-            names = getName().equals(other.getName());
-
-        boolean descriptions = description == null && other.getDescription() == null;
-        if (description != null && other.getDescription() != null)
-            descriptions = description.equals(other.description);
-
-        boolean uploaders = getUploader() == null && other.getUploader() == null;
-        if (getUploader() != null && other.getUploader() != null)
-            uploaders = getUploader().equals(other.getUploader());
+        boolean ids = Objects.equals(getId(), other.getId());
+        boolean names = Objects.equals(getName(), other.getName());
+        boolean descriptions = Objects.equals(getDescription(), other.getDescription());
+        boolean uploaders = Objects.equals(getUploader(), other.getUploader());
+        boolean thumbnails = Objects.equals(getThumbnail(), other.getThumbnail());
+        boolean created = Objects.equals(getCreationDate(), other.getCreationDate());
+        boolean modified = Objects.equals(getCreationDate(), other.getCreationDate());
+        boolean file = Objects.equals(getRecipeFile(), other.getRecipeFile());
+        boolean likes = getLikes() == other.getLikes();
 
         boolean cats = getCategoriesToString().equals(other.getCategoriesToString());
 
-        /*boolean cats = categories == null && other.getFilters() == null;
-        if (categories != null && other.getFilters() != null)
-            cats = getCategoriesToString().equals(other.getCategoriesToString());*/
-
-        boolean created = getCreationDate() == null && other.getCreationDate() == null;
-        if (getCreationDate() != null && other.getCreationDate() != null)
-            created = getCreationDate().equals(other.getCreationDate());
-
-        boolean modified = getLastModifiedDate() == null && other.getLastModifiedDate() == null;
-        if (getLastModifiedDate() != null && other.getLastModifiedDate() != null)
-            modified = getLastModifiedDate().equals(other.getLastModifiedDate());
-
-        boolean file = getRecipeFile() == null && other.getRecipeFile() == null;
-        if (getRecipeFile() != null && other.getRecipeFile() != null)
-            file = getRecipeFile().equals(other.getRecipeFile());
-
         boolean images = getFoodFilesToString().equals(other.getFoodFilesToString());
-
-        /*boolean images = getFoodFiles() == null && other.getFoodFiles() == null;
-        if (getFoodFiles() != null && other.getFoodFiles() != null)
-            images = getFoodFilesToString().equals(other.getFoodFilesToString());*/
-
-        //boolean comments = getCommentsToString().equals(other.getCommentsToString());
-
-        boolean likes = getLikes() == other.getLikes();
         //boolean meLikes = getMeLike() == other.getMeLike();
 
-        return ids && names && descriptions && uploaders && cats && created && modified
-                && file && images /*&& comments*/ && likes/* && meLikes*/;
-
-        /*return getId().equals(other.getId()) && getName().equals(other.getName()) && getDescription().equals(other.getDescription())
-                && getUploader().equals(other.getUploader()) && getFilters().equals(other.getFilters())
-                && getCreationDate().equals(other.getCreationDate()) && getLastModifiedDate().equals(other.getLastModifiedDate())
-                //&& getRecipeFile().equals(other.getRecipeFile()) && getComments().equals(other.getComments())
-                && getFoodFiles().equals(other.getFoodFiles()) && getLikes() == other.getLikes()
-                && getMeLike() == other.getMeLike();*/
+        return ids && names && descriptions && uploaders && thumbnails && cats && created && modified
+                && file && images && likes/* && meLikes*/;
     }
 
     private String getCategoriesToString() {
@@ -278,6 +247,14 @@ public class RecipeEntity implements Parcelable{
         this.uploader = uploader;
     }
 
+    public String getThumbnail() {
+        return thumbnail;
+    }
+
+    public void setThumbnail(String thumbnail) {
+        this.thumbnail = thumbnail;
+    }
+
     public List<String> getCategories() {
         return categories;
     }
@@ -354,6 +331,7 @@ public class RecipeEntity implements Parcelable{
         dest.writeString(this.lastModifiedDate);
         dest.writeString(this.recipeFile);
         dest.writeString(this.uploader);
+        dest.writeString(this.thumbnail);
         dest.writeList(this.categories);
         dest.writeList(this.foodFiles);
         dest.writeInt(this.likes);
@@ -370,7 +348,7 @@ public class RecipeEntity implements Parcelable{
         private String builderRecipeFile;
         private String builderUploader;
         private String builderCategories;
-        //private String builderComments;
+        private String builderThumbnail;
         private String builderFoodFiles;
         private int builderLikes;
 
@@ -415,6 +393,11 @@ public class RecipeEntity implements Parcelable{
             return this;
         }
 
+        public RecipeEntity.RecipeBuilder thumbnail (String thumbnail) {
+            this.builderThumbnail = thumbnail;
+            return this;
+        }
+
         public RecipeEntity.RecipeBuilder categoriesJson (String categoriesJson) {
             this.builderCategories = categoriesJson;
             return this;
@@ -449,6 +432,7 @@ public class RecipeEntity implements Parcelable{
             recipe.setLastModifiedDate(builderLastModifiedAt);
             recipe.setRecipeFile(builderRecipeFile);
             recipe.setUploader(builderUploader);
+            recipe.setThumbnail(builderThumbnail);
             recipe.setStringCategories(builderCategories);
             recipe.setStringFoodFiles(builderFoodFiles);
             recipe.setLikes(builderLikes);

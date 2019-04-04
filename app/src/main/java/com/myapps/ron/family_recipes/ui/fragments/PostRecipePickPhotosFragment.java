@@ -16,13 +16,13 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.material.snackbar.Snackbar;
 import com.myapps.ron.family_recipes.utils.ui.FabExtensionAnimator;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.dal.storage.StorageWrapper;
 import com.myapps.ron.family_recipes.ui.baseclasses.PostRecipeBaseFragment;
 import com.myapps.ron.family_recipes.utils.Constants;
-import com.myapps.ron.family_recipes.utils.GlideApp;
 import com.myapps.ron.family_recipes.viewmodels.PostRecipeViewModel;
 
 import java.io.File;
@@ -315,7 +315,7 @@ public class PostRecipePickPhotosFragment extends PostRecipeBaseFragment {
         imageView.setLayoutParams(layoutParams);
 
         imagesContainer.addView(imageView);
-        GlideApp.with(activity)
+        Glide.with(activity)
                 .load(imagePath)
                 .into(imageView);
     }

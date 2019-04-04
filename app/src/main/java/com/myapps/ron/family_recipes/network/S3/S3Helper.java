@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import android.util.Log;
 
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferNetworkLossHandler;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferState;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
@@ -43,6 +44,7 @@ class S3Helper {
     }
     private S3Helper(Context context) {
         Util util = new Util();
+        TransferNetworkLossHandler.getInstance(context);
         transferUtility = util.getTransferUtility(context);
 
         /*transferUtility = TransferUtility.builder()

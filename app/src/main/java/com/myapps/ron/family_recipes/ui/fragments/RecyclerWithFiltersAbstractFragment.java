@@ -12,8 +12,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AccelerateInterpolator;
-import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -29,6 +27,7 @@ import com.myapps.ron.family_recipes.ui.activities.MainActivity;
 import com.myapps.ron.family_recipes.ui.activities.RecipeActivity;
 import com.myapps.ron.family_recipes.ui.baseclasses.MyFragment;
 import com.myapps.ron.family_recipes.utils.Constants;
+import com.myapps.ron.family_recipes.utils.ui.ViewHider;
 import com.myapps.ron.family_recipes.viewmodels.DataViewModel;
 import com.myapps.ron.searchfilter.adapter.FilterAdapter;
 import com.myapps.ron.searchfilter.animator.FiltersListItemAnimator;
@@ -72,6 +71,7 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
 
     private int filterBackgroundColor, filterTextColor;
 
+    private ViewHider filtersViewHider;
     private Filter<CategoryEntity> mFilter;
     List<CategoryEntity> tags;
     protected List<RecipeEntity> recipes;
@@ -173,6 +173,7 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
     protected abstract void optionRefresh();
 
     void initCategories() {
+        filtersViewHider = ViewHider.of(mFilter).setDirection(ViewHider.TOP).build();
         mFilter.setAdapter(new RecyclerWithFiltersAbstractFragment.Adapter(tags));
         mFilter.setListener(this);
 
@@ -199,14 +200,16 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
             @Override
             public void show() {
                 if (mFilter != null && mFilter.isCollapsed()) {
-                    mFilter.animate().translationY(0).setInterpolator(new DecelerateInterpolator(1.5f)).start();
+                    filtersViewHider.show();
+                    //mFilter.animate().translationY(0).setInterpolator(new DecelerateInterpolator(1.5f)).start();
                 }
             }
 
             @Override
             public void hide() {
                 if (mFilter != null && mFilter.isCollapsed()) {
-                    mFilter.animate().translationY(-mFilter.getHeight()).setInterpolator(new AccelerateInterpolator(2)).start();
+                    filtersViewHider.hide();
+                    //mFilter.animate().translationY(-mFilter.getHeight()).setInterpolator(new AccelerateInterpolator(2)).start();
                 }
             }
         });
@@ -378,7 +381,7 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
         Intent intent = new Intent(activity, RecipeActivity.class);
         intent.putExtra(Constants.RECIPE_ID, recipeMinimal.getId());
         startActivityForResult(intent, Constants.RECIPE_ACTIVITY_CODE);
-        /*onItemSelectedDisposable = viewModel.getRecipe(recipeMinimal.getId())
+        /*onItemSelectedDisposable = viewModel.getRecipeImages(recipeMinimal.getId())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(recipeEntity -> {
@@ -402,16 +405,18 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
         ft.addToBackStack(null);
 
         // Create and show the dialog.
-        Disposable disposable = viewModel.getRecipe(recipeMinimal.getId())
+        Disposable disposable = viewModel.getRecipeImages(recipeMinimal.getId())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(recipeEntity -> {
-                    DialogFragment newFragment = new PagerDialogFragment();
-                    Bundle bundle = new Bundle();
-                    bundle.putSerializable(PagerDialogFragment.PAGER_TYPE_KEY, PagerDialogFragment.PAGER_TYPE.IMAGES);
-                    bundle.putStringArrayList(Constants.PAGER_FOOD_IMAGES, new ArrayList<>(recipeEntity.getFoodFiles()));
-                    newFragment.setArguments(bundle);
-                    newFragment.show(ft, "dialog");
+                .subscribe(foodFiles -> {
+                    if (foodFiles != null) {
+                        DialogFragment newFragment = new PagerDialogFragment();
+                        Bundle bundle = new Bundle();
+                        bundle.putSerializable(PagerDialogFragment.PAGER_TYPE_KEY, PagerDialogFragment.PAGER_TYPE.IMAGES);
+                        bundle.putStringArrayList(Constants.PAGER_FOOD_IMAGES, new ArrayList<>(foodFiles));
+                        newFragment.setArguments(bundle);
+                        newFragment.show(ft, "dialog");
+                    }
                 }, error -> Log.e(TAG, error.getMessage()));
         compositeDisposable.add(disposable);
     }
@@ -426,6 +431,7 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
         LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
         if (layoutManager != null) {
             layoutManager.scrollToPositionWithOffset(0, 0);
+            filtersViewHider.show();
         }
     }
 

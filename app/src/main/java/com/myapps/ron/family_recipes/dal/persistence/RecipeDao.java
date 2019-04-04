@@ -27,7 +27,7 @@ public interface RecipeDao {
     // region recipeMinimal
     String recipeMinimalFields = RecipeEntity.KEY_ID + ", " + RecipeEntity.KEY_NAME + ", " +
             RecipeEntity.KEY_DESCRIPTION + ", " + RecipeEntity.KEY_UPLOADER + ", " +
-            RecipeEntity.KEY_CATEGORIES + ", " + RecipeEntity.KEY_FOOD_FILES + ", " +
+            RecipeEntity.KEY_CATEGORIES + ", " + RecipeEntity.KEY_THUMBNAIL + ", " +
             RecipeEntity.KEY_LIKES + ", " + RecipeEntity.KEY_FAVORITE;
 
    /* @Query("SELECT " + recipeMinimalFields + " FROM " + AppDatabases.TABLE_RECIPES + " ORDER BY " + RecipeEntity.KEY_CREATED + " DESC")
@@ -123,7 +123,7 @@ public interface RecipeDao {
 
     // endregion
 
-
+    // region Get Rx RecipeEntity by id
     @Query("SELECT * FROM " + AppDatabases.TABLE_RECIPES + " where " + RecipeEntity.KEY_ID + " = :id")
     Single<RecipeEntity> getRecipe(String id);
 
@@ -133,6 +133,17 @@ public interface RecipeDao {
     @Query("SELECT * FROM " + AppDatabases.TABLE_RECIPES + " where " + RecipeEntity.KEY_ID + " = :id")
     Maybe<RecipeEntity> getMaybeRecipe(String id);
 
+    // endregion
+
+    @Query("SELECT " + RecipeEntity.KEY_FOOD_FILES + " FROM " + AppDatabases.TABLE_RECIPES + " where " + RecipeEntity.KEY_ID + " = :id")
+    Single<String> getRecipeImages(String id);
+
+    // region Get Accessed Time
+
+    @Query("SELECT " + RecipeEntity.KEY_FOOD_FILES + " FROM " + AppDatabases.TABLE_RECIPES + " where " + RecipeEntity.KEY_ID + " = :id")
+    long getThumbAccessTime(String id);
+
+    // endregion
 
     // Emits the number of users added to the database.
     //@Insert

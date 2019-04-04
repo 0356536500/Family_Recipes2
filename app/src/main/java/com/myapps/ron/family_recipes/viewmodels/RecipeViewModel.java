@@ -108,7 +108,7 @@ public class RecipeViewModel extends ViewModel {
         //this.recipe = initialRecipe;
         //isUserLiked.setValue(initialRecipe.isUserLiked());
         this.recipeId = recipeId;
-        Disposable disposable = this.recipeRepository.getObservableRecipe(recipeId)
+        compositeDisposable.add(this.recipeRepository.getObservableRecipe(recipeId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(recipeEntity -> {
@@ -121,8 +121,7 @@ public class RecipeViewModel extends ViewModel {
                 }, error -> {
                     Log.e(getClass().getSimpleName(), error.getMessage());
                     setInfo(R.string.recipe_content_not_found);
-                });
-        compositeDisposable.add(disposable);
+                }));
     }
 
 

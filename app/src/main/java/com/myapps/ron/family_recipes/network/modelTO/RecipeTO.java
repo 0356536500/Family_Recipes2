@@ -32,6 +32,8 @@ public class RecipeTO implements PostRecipe {
     private String recipeFile;
     @SerializedName("uploader")
     private String uploader;
+    @SerializedName("thumbnail")
+    private String thumbnail;
     @SerializedName("categories")
     private List<String> categories;
     @SerializedName("foodFiles")
@@ -54,6 +56,7 @@ public class RecipeTO implements PostRecipe {
             this.lastModifiedDate = recipe.getLastModifiedDate();
             this.recipeFile = recipe.getRecipeFile();
             this.uploader = recipe.getUploader();
+            this.thumbnail = recipe.getThumbnail();
             this.categories = recipe.getCategories();
             this.foodFiles = recipe.getFoodFiles();
             this.likes = recipe.getLikes();
@@ -70,6 +73,7 @@ public class RecipeTO implements PostRecipe {
         rv.setLastModifiedDate(this.lastModifiedDate);
         rv.setRecipeFile(this.recipeFile);
         rv.setUploader(this.uploader);
+        rv.setThumbnail(this.thumbnail);
         rv.setCategories(this.categories);
         rv.setFoodFiles(this.foodFiles);
         rv.setLikes(this.likes);
@@ -89,7 +93,7 @@ public class RecipeTO implements PostRecipe {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, creationDate, lastModifiedDate, recipeFile, uploader, categories, foodFiles, likes);
+        return Objects.hash(id, name, description, creationDate, lastModifiedDate, recipeFile, uploader, thumbnail, categories, foodFiles, likes);
     }
 
     public String getId() {
@@ -156,6 +160,14 @@ public class RecipeTO implements PostRecipe {
         this.uploader = uploader;
     }
 
+    public String getThumbnail() {
+        return thumbnail;
+    }
+
+    public void setThumbnail(String thumbnail) {
+        this.thumbnail = thumbnail;
+    }
+
     public List<String> getCategories() {
         return categories;
     }
@@ -187,14 +199,15 @@ public class RecipeTO implements PostRecipe {
         return "RecipeTO{" +
                 "id='" + id + '\'' +
                 ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
+                /*", description='" + description + '\'' +*/
                 ", creationDate='" + creationDate + '\'' +
                 ", lastModifiedDate='" + lastModifiedDate + '\'' +
                 ", recipeFile='" + recipeFile + '\'' +
-                ", uploader='" + uploader + '\'' +
+                /*", uploader='" + uploader + '\'' +*/
+                ", thumbnail='" + thumbnail + '\'' +
                 ", categories=" + categories +
                 ", foodFiles=" + foodFiles +
-                ", likes=" + likes +
+                /*", likes=" + likes +*/
                 '}';
     }
 

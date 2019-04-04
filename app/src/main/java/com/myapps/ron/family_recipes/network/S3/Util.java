@@ -52,16 +52,14 @@ public class Util {
     }
 
     /**
-     * Gets an instance of a S3 client which is constructed using the given
-     * Context.
+     * Gets an instance of a S3 client.
      *
-     * @param context An Context instance.
      * @return A default S3 client.
      */
-    public AmazonS3Client getS3Client(Context context) {
+    private AmazonS3Client getS3Client() {
         if (sS3Client == null) {
-            sS3Client = new AmazonS3Client(AppHelper.getCredentialsProvider());
-            sS3Client.setRegion(Region.getRegion(Constants.COGNITO_REGION));
+            sS3Client = new AmazonS3Client(AppHelper.getCredentialsProvider(), Region.getRegion(Constants.COGNITO_REGION));
+            //sS3Client.setRegion(Region.getRegion(Constants.COGNITO_REGION));
             /*sS3Client = new AmazonS3Client(getCredProvider(context.getApplicationContext()));
             sS3Client.setRegion(Region.getRegion(Regions.fromName(Constants.BUCKET_REGION)));*/
         }
@@ -72,14 +70,14 @@ public class Util {
      * Gets an instance of the TransferUtility which is constructed using the
      * given Context
      *
-     * @param context
+     * @param context A Context instance.
      * @return a TransferUtility instance
      */
-    public TransferUtility getTransferUtility(Context context) {
+    TransferUtility getTransferUtility(Context context) {
         if (sTransferUtility == null) {
             sTransferUtility = TransferUtility.builder()
                     .context(context.getApplicationContext())
-                    .s3Client(getS3Client(context.getApplicationContext()))
+                    .s3Client(getS3Client())
                     .defaultBucket(Constants.BUCKET_NAME)
                     .build();
         }

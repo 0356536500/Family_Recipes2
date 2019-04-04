@@ -15,7 +15,7 @@ import android.view.ViewGroup;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.recycler.adapters.HtmlInstructionsPagerAdapter;
 import com.myapps.ron.family_recipes.utils.ui.DepthPageTransformer;
-import com.myapps.ron.family_recipes.recycler.adapters.MyPagerAdapter;
+import com.myapps.ron.family_recipes.recycler.adapters.ImagesPagerAdapter;
 import com.myapps.ron.family_recipes.utils.Constants;
 import com.tbuonomo.viewpagerdotsindicator.WormDotsIndicator;
 
@@ -96,7 +96,7 @@ public class PagerDialogFragment extends DialogFragment {
         if (this.pagerType != null) {
             switch (this.pagerType) {
                 case IMAGES:
-                    return new MyPagerAdapter(getContext(), foodFiles);
+                    return new ImagesPagerAdapter(getContext(), foodFiles);
                 case INSTRUCTIONS:
                     return new HtmlInstructionsPagerAdapter(getContext());
             }

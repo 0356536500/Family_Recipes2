@@ -80,8 +80,8 @@ public class DataViewModel extends ViewModel {
         categoryRepository.fetchCategoriesReactive(context);
     }
 
-    public Single<RecipeEntity> getRecipe(String id) {
-        return recipeRepository.getRecipe(id);
+    public Single<List<String>> getRecipeImages(String id) {
+        return recipeRepository.getRecipeImages(id);
     }
 
     public LiveData<List<CategoryEntity>> getCategories() {

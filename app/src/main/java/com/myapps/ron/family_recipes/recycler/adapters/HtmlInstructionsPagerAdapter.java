@@ -15,10 +15,10 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.model.HtmlModel;
 import com.myapps.ron.family_recipes.utils.Constants;
-import com.myapps.ron.family_recipes.utils.GlideApp;
 import com.myapps.ron.family_recipes.utils.logic.HtmlHelper;
 
 import androidx.annotation.IdRes;
@@ -223,7 +223,7 @@ public class HtmlInstructionsPagerAdapter extends PagerAdapter {
         dragDropSwipeTextView.startAnimation(fadeIn);
         expandCollapseTextView.startAnimation(fadeIn);
 
-        GlideApp.with(context)
+        Glide.with(context)
                 .asGif()
                 .load(R.drawable.drag_drop_swipe_animation) // try move the gif to R.raw folder
                 .into(imageView);

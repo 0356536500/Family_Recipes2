@@ -3,6 +3,8 @@ package com.myapps.ron.family_recipes.background.workers;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
+import android.system.ErrnoException;
+import android.system.Os;
 import android.util.Log;
 
 import com.myapps.ron.family_recipes.network.Constants;
@@ -43,32 +45,40 @@ public class DeleteOldFilesWorker extends Worker {
         Log.e(TAG, "doWork");
         File imagesFolder = getApplicationContext().getExternalFilesDir(Constants.FOOD_DIR);
         if (imagesFolder != null && folderSize(imagesFolder) > MIN_FOLDER_SIZE_TO_START_DELETING_CONTENT) {
-            Log.e(TAG, "images name = " + imagesFolder.getName() + ", size = " + imagesFolder.length());
-            File[] files = imagesFolder.listFiles();
-            Log.e(TAG, Arrays.asList(files).toString());
-            Arrays.sort(files, (file, t1) -> {
-                long result = getFileTimeWrapBuildVersion(file) - getFileTimeWrapBuildVersion(t1);
-                if (result > 0)
-                    return 1;
-                if (result < 0)
-                    return -1;
-                return 0;
-            });
-            Log.e(TAG, "images after sorting");
-            Log.e(TAG, Arrays.asList(files).toString());
-
-            List<File> filesToDelete = new ArrayList<>();
-            long medianTime = getMedianTime(files);
-            Log.e(TAG, "median = " + medianTime);
-            for (File file: files) {
-                if (getFileTimeWrapBuildVersion(file) < medianTime) {
-                    filesToDelete.add(file);
-                }
-            }
-
-            deleteFiles(filesToDelete);
+            deleteFilesByAccessTime(imagesFolder);
         }
         return Result.success();
+    }
+
+    private void deleteFilesByDb() {
+        
+    }
+
+    private void deleteFilesByAccessTime(@NonNull File imagesFolder) {
+        Log.e(TAG, "images name = " + imagesFolder.getName() + ", size = " + imagesFolder.length());
+        File[] files = imagesFolder.listFiles();
+        Log.e(TAG, Arrays.asList(files).toString());
+        Arrays.sort(files, (file, t1) -> {
+            long result = getFileTimeWrapBuildVersion(file) - getFileTimeWrapBuildVersion(t1);
+            if (result > 0)
+                return 1;
+            if (result < 0)
+                return -1;
+            return 0;
+        });
+        Log.e(TAG, "images after sorting");
+        Log.e(TAG, Arrays.asList(files).toString());
+
+        List<File> filesToDelete = new ArrayList<>();
+        long medianTime = getMedianTime(files);
+        Log.e(TAG, "median = " + medianTime);
+        for (File file: files) {
+            if (getFileTimeWrapBuildVersion(file) < medianTime) {
+                filesToDelete.add(file);
+            }
+        }
+
+        deleteFiles(filesToDelete);
     }
 
     private void deleteFiles(List<File> filesToDelete) {
@@ -104,13 +114,28 @@ public class DeleteOldFilesWorker extends Worker {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             return getLastAccessedTime(file.toPath());
         } else {
-            return getLastModifiedTime(file);
+            return getLastAccessedTimeLegacy(file.getPath());
         }
     }
 
-    private long getLastModifiedTime(@NonNull File file) {
+    /*private long getLastModifiedTime(@NonNull File file) {
         //Log.e(getClass().getSimpleName(), "getLastModifiedTime, name = " + file.getName() + ", date = " + new Date(file.lastModified()).toString());
         return file.lastModified();
+    }*/
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    private long getLastAccessedTimeLegacy(@NonNull String path) {
+        try {
+            return Os.stat(path).st_atime;
+        } catch (ErrnoException e) {
+            e.printStackTrace();
+        }
+        return 0L;
+        /*Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(t2);
+
+        SimpleDateFormat formatter =  new SimpleDateFormat("dd-MM-yyyy hh-MM-ss");
+        String formattedDate = formatter.format(calendar.getTime());*/
     }
 
     @TargetApi(Build.VERSION_CODES.O)
