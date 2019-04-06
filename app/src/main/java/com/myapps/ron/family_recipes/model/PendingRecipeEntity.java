@@ -1,5 +1,6 @@
 package com.myapps.ron.family_recipes.model;
 
+import com.myapps.ron.family_recipes.dal.persistence.AppDatabases;
 import com.myapps.ron.family_recipes.utils.logic.DateUtil;
 
 import java.util.ArrayList;
@@ -13,7 +14,7 @@ import androidx.room.PrimaryKey;
 /**
  * Created by ronginat on 20/02/2019.
  */
-@Entity(tableName = "pendingRecipes")
+@Entity(tableName = AppDatabases.TABLE_PENDING_RECIPES)
 @SuppressWarnings("WeakerAccess")
 public class PendingRecipeEntity {
 

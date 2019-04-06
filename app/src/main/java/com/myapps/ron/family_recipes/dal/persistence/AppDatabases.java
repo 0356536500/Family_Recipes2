@@ -1,8 +1,8 @@
 package com.myapps.ron.family_recipes.dal.persistence;
 
 import android.content.Context;
-import android.util.Log;
 
+import com.myapps.ron.family_recipes.model.AccessEntity;
 import com.myapps.ron.family_recipes.model.CategoryEntity;
 import com.myapps.ron.family_recipes.model.PendingRecipeEntity;
 import com.myapps.ron.family_recipes.model.RecipeEntity;
@@ -20,7 +20,7 @@ import androidx.room.TypeConverters;
 /**
  * Created by ronginat on 31/12/2018.
  */
-@Database(entities = {RecipeEntity.class, CategoryEntity.class, PendingRecipeEntity.class}, version = 1, exportSchema = false)
+@Database(entities = {RecipeEntity.class, CategoryEntity.class, PendingRecipeEntity.class, AccessEntity.class}, version = 1, exportSchema = false)
 @TypeConverters({Converters.class})
 public abstract class AppDatabases extends RoomDatabase {
 
@@ -28,9 +28,10 @@ public abstract class AppDatabases extends RoomDatabase {
 
     private static final String DATABASE_NAME = "family_recipes.db";
 
-    static final String TABLE_RECIPES = "recipes";
+    public static final String TABLE_RECIPES = "recipes";
     public static final String TABLE_CATEGORIES = "categories";
-    static final String TABLE_PENDING_RECIPES = "pendingRecipes";
+    public static final String TABLE_PENDING_RECIPES = "pendingRecipes";
+    public static final String TABLE_ACCESS = "access";
 
     public abstract RecipeDao recipeDao();
     public abstract CategoryDao categoriesDao();
@@ -123,9 +124,9 @@ public abstract class AppDatabases extends RoomDatabase {
             e.printStackTrace();
         }
 
-        for (RecipeEntity recipe: data) {
+        /*for (RecipeEntity recipe: data) {
             Log.e(AppDatabases.class.getSimpleName(), recipe.toString());
-        }
+        }*/
         return data;
     }
 

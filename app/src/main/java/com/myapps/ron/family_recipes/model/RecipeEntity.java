@@ -1,14 +1,12 @@
 package com.myapps.ron.family_recipes.model;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.myapps.ron.family_recipes.dal.persistence.AppDatabases;
 import com.myapps.ron.family_recipes.utils.Constants;
 
+import java.io.Serializable;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -25,8 +23,8 @@ import static com.myapps.ron.family_recipes.utils.Constants.TRUE;
  * Created by ronginat on 31/12/2018.
  */
 //@Fts4
-@Entity(tableName = "recipes"/*, indices = { @Index(value = {"name", "description"}), @Index("categories") }*/)
-public class RecipeEntity implements Parcelable{
+@Entity(tableName = AppDatabases.TABLE_RECIPES/*, indices = { @Index(value = {"name", "description"}), @Index("categories") }*/)
+public class RecipeEntity implements Serializable {
 
     public static final String KEY_ID = "id";
     public static final String KEY_NAME = "name";
@@ -34,6 +32,7 @@ public class RecipeEntity implements Parcelable{
     public static final String KEY_CATEGORIES = "categories";
     public static final String KEY_CREATED = "creationDate";
     public static final String KEY_MODIFIED = "lastModifiedDate";
+    public static final String KEY_RECIPE_FILE = "recipeFile";
     public static final String KEY_UPLOADER = "uploader";
     public static final String KEY_THUMBNAIL = "thumbnail";
     public static final String KEY_FOOD_FILES = "foodFiles";
@@ -55,7 +54,7 @@ public class RecipeEntity implements Parcelable{
     private String creationDate;
     @ColumnInfo(name = KEY_MODIFIED)
     private String lastModifiedDate;
-    @ColumnInfo(name = "recipeFile")
+    @ColumnInfo(name = KEY_RECIPE_FILE)
     private String recipeFile;
     @ColumnInfo(name = KEY_UPLOADER)
     private String uploader;
@@ -75,38 +74,6 @@ public class RecipeEntity implements Parcelable{
 
     public RecipeEntity() {
         super();
-    }
-
-    public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
-        public RecipeEntity createFromParcel(Parcel in) {
-            return new RecipeEntity(in);
-        }
-
-        public RecipeEntity[] newArray(int size) {
-            return new RecipeEntity[size];
-        }
-    };
-
-    private RecipeEntity(Parcel in) {
-        this.id = Objects.requireNonNull(in.readString());
-        this.name = in.readString();
-        this.description = in.readString();
-        this.creationDate = in.readString();
-        this.lastModifiedDate = in.readString();
-        this.recipeFile = in.readString();
-        this.uploader = in.readString();
-        this.thumbnail = in.readString();
-
-        categories = new ArrayList<>();
-        //comments = new ArrayList<>();
-        foodFiles = new ArrayList<>();
-
-        in.readList(this.categories, String.class.getClassLoader());
-        //in.readList(this.comments, RecipeEntity.Comment.class.getClassLoader());
-        in.readList(this.foodFiles, String.class.getClassLoader());
-
-        this.likes = in.readInt();
-        this.meLike = in.readInt();
     }
 
     @Override
@@ -316,28 +283,6 @@ public class RecipeEntity implements Parcelable{
                 ", meLike=" + meLike +
                 '}';
     }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(this.id);
-        dest.writeString(this.name);
-        dest.writeString(this.description);
-        dest.writeString(this.creationDate);
-        dest.writeString(this.lastModifiedDate);
-        dest.writeString(this.recipeFile);
-        dest.writeString(this.uploader);
-        dest.writeString(this.thumbnail);
-        dest.writeList(this.categories);
-        dest.writeList(this.foodFiles);
-        dest.writeInt(this.likes);
-        dest.writeInt(this.meLike);
-    }
-
 
     public static class RecipeBuilder {
         private String builderId;

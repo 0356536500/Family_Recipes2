@@ -64,6 +64,7 @@ public class PostRecipeToServerService extends IntentService {
         Intent intent = new Intent(context, PostRecipeToServerService.class);
         intent.setAction(ACTION_POST_RECIPE);
         intent.putExtra(EXTRA_PARAM1, recipe);
+        //intent.putExtra(EXTRA_PARAM1, recipe);
         //intent.putExtra(EXTRA_PARAM2, time);
         context.startService(intent);
     }
@@ -97,7 +98,7 @@ public class PostRecipeToServerService extends IntentService {
             if (action != null) {
                 switch (action) {
                     case ACTION_POST_RECIPE:
-                        final RecipeEntity recipe = intent.getParcelableExtra(EXTRA_PARAM1);
+                        final RecipeEntity recipe = (RecipeEntity) intent.getSerializableExtra(EXTRA_PARAM1);
                         //final String time = intent.getStringExtra(EXTRA_PARAM2);
                         handleActionPostRecipeSync(recipe);
                         break;

@@ -257,7 +257,7 @@ public class RecipesAdapter extends PagedListAdapter<RecipeMinimal, RecipesAdapt
                     Glide.with(context)
                             .load(path)
                             .placeholder(circularProgressDrawable)
-                            .transform(new RoundedCorners(50))
+                            .transform(new RoundedCorners(50))// TODO: change to constant
                             //.optionalCircleCrop()
                             .into(holder.thumbnail);
                 }

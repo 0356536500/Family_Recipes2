@@ -1,5 +1,7 @@
 package com.myapps.ron.family_recipes.dal.persistence;
 
+import com.myapps.ron.family_recipes.model.AccessEntity;
+import com.myapps.ron.family_recipes.model.AccessEntity.RecipeAccess;
 import com.myapps.ron.family_recipes.model.RecipeEntity;
 import com.myapps.ron.family_recipes.model.RecipeMinimal;
 import com.myapps.ron.family_recipes.utils.Constants;
@@ -140,8 +142,56 @@ public interface RecipeDao {
 
     // region Get Accessed Time
 
-    @Query("SELECT " + RecipeEntity.KEY_FOOD_FILES + " FROM " + AppDatabases.TABLE_RECIPES + " where " + RecipeEntity.KEY_ID + " = :id")
-    long getThumbAccessTime(String id);
+    String recipeAccessedFields =
+            AppDatabases.TABLE_RECIPES + "." + RecipeEntity.KEY_ID + ", " +
+            AppDatabases.TABLE_RECIPES + "." + RecipeEntity.KEY_RECIPE_FILE + ", " +
+            AppDatabases.TABLE_RECIPES + "." + RecipeEntity.KEY_THUMBNAIL + ", " +
+            AppDatabases.TABLE_RECIPES + "." + RecipeEntity.KEY_FOOD_FILES + ", " +
+            AppDatabases.TABLE_ACCESS + "." + AccessEntity.KEY_ACCESSED_THUMBNAIL + ", " +
+            AppDatabases.TABLE_ACCESS + "." + AccessEntity.KEY_ACCESSED_RECIPE + ", " +
+            AppDatabases.TABLE_ACCESS + "." + AccessEntity.KEY_ACCESSED_IMAGES;
+
+    @Query("SELECT " + recipeAccessedFields +
+            " FROM " + AppDatabases.TABLE_RECIPES + " INNER JOIN " + AppDatabases.TABLE_ACCESS +
+            " ON " + AppDatabases.TABLE_RECIPES + "." + RecipeEntity.KEY_ID + " = " + AppDatabases.TABLE_ACCESS + "." + AccessEntity.KEY_ID +
+            " WHERE " + AccessEntity.KEY_ACCESSED_THUMBNAIL + " IS NOT NULL" +
+            " ORDER BY access.lastAccessedThumbnail ASC")
+    List<RecipeAccess> getAccessTimeOrderByThumb();
+
+    @Query("SELECT " + recipeAccessedFields +
+            " FROM " + AppDatabases.TABLE_RECIPES + " INNER JOIN " + AppDatabases.TABLE_ACCESS +
+            " ON " + AppDatabases.TABLE_RECIPES + "." + RecipeEntity.KEY_ID + " = " + AppDatabases.TABLE_ACCESS + "." + AccessEntity.KEY_ID +
+            " WHERE " + AccessEntity.KEY_ACCESSED_RECIPE + " IS NOT NULL" +
+            " ORDER BY access.lastAccessedRecipe ASC")
+    List<RecipeAccess> getAccessTimeOrderByRecipe();
+
+    @Query("SELECT " + recipeAccessedFields +
+            " FROM " + AppDatabases.TABLE_RECIPES + " INNER JOIN " + AppDatabases.TABLE_ACCESS +
+            " ON " + AppDatabases.TABLE_RECIPES + "." + RecipeEntity.KEY_ID + " = " + AppDatabases.TABLE_ACCESS + "." + AccessEntity.KEY_ID +
+            " WHERE " + AccessEntity.KEY_ACCESSED_IMAGES + " IS NOT NULL" +
+            " ORDER BY access.lastAccessedImages ASC")
+    List<RecipeAccess> getAccessTimeOrderByImages();
+
+    @Query("SELECT * FROM " + AppDatabases.TABLE_ACCESS + " where " + AccessEntity.KEY_ID + " = :id")
+    AccessEntity getAccessById(String id);
+
+    @Query("SELECT * FROM " + AppDatabases.TABLE_ACCESS + " where " + AccessEntity.KEY_ID + " = :id")
+    Maybe<AccessEntity> getMaybeAccessById(String id);
+
+    @Query("SELECT * FROM " + AppDatabases.TABLE_ACCESS)
+    List<AccessEntity> getAllRecipeAccess();
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    void insertRecipeAccess(AccessEntity access);
+
+    @Update(onConflict = OnConflictStrategy.IGNORE)
+    void updateRecipeAccess(AccessEntity access);
+
+    /*@Query("UPDATE " + AppDatabases.TABLE_ACCESS + " SET lastAccessedThumbnail = :timestamp where " + AccessEntity.KEY_ID + " = :id")
+    void updateRecipeAccessThumbnailbyId(String id, long timestamp);
+
+    @Query("UPDATE " + AppDatabases.TABLE_ACCESS + " SET lastAccessedRecipe = :timestamp where " + AccessEntity.KEY_ID + " = :id")
+    void updateRecipeAccessFilesById(String id, long timestamp);*/
 
     // endregion
 
@@ -176,4 +226,11 @@ public interface RecipeDao {
 
     @Query("DELETE FROM " + AppDatabases.TABLE_RECIPES)
     void deleteAllRecipes();
+
+    // region tests
+
+    @Query("SELECT * FROM " + AppDatabases.TABLE_RECIPES + " where " + RecipeEntity.KEY_NAME + " = :name")
+    List<RecipeEntity> findRecipesByName(String name);
+
+    // endregion
 }

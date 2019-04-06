@@ -1,21 +1,16 @@
 package com.myapps.ron.family_recipes.background.workers;
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
-import android.system.ErrnoException;
-import android.system.Os;
 import android.util.Log;
 
+import com.myapps.ron.family_recipes.dal.Injection;
+import com.myapps.ron.family_recipes.dal.repository.RecipeRepository;
+import com.myapps.ron.family_recipes.model.AccessEntity;
+import com.myapps.ron.family_recipes.model.AccessEntity.RecipeAccess;
 import com.myapps.ron.family_recipes.network.Constants;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -25,7 +20,12 @@ import androidx.work.PeriodicWorkRequest;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
-import static com.myapps.ron.family_recipes.dal.Constants.MIN_FOLDER_SIZE_TO_START_DELETING_CONTENT;
+import static com.myapps.ron.family_recipes.dal.Constants.MIN_FOOD_FOLDER_SIZE_TO_START_DELETING_CONTENT;
+import static com.myapps.ron.family_recipes.dal.Constants.MIN_RECIPE_FOLDER_SIZE_TO_START_DELETING_CONTENT;
+import static com.myapps.ron.family_recipes.dal.Constants.MIN_THUMB_FOLDER_SIZE_TO_START_DELETING_CONTENT;
+import static com.myapps.ron.family_recipes.dal.Constants.TARGET_FOOD_FOLDER_SIZE_AFTER_DELETING_CONTENT;
+import static com.myapps.ron.family_recipes.dal.Constants.TARGET_RECIPE_FOLDER_SIZE_AFTER_DELETING_CONTENT;
+import static com.myapps.ron.family_recipes.dal.Constants.TARGET_THUMB_FOLDER_SIZE_AFTER_DELETING_CONTENT;
 
 /**
  * Created by ronginat on 31/03/2019.
@@ -33,28 +33,87 @@ import static com.myapps.ron.family_recipes.dal.Constants.MIN_FOLDER_SIZE_TO_STA
 public class DeleteOldFilesWorker extends Worker {
 
     private final String TAG = getClass().getSimpleName();
+    private final RecipeRepository repository;
+
     public DeleteOldFilesWorker(
             @NonNull Context context,
             @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
+        this.repository = Injection.provideRecipeRepository(getApplicationContext());
     }
 
     @NonNull
     @Override
     public Result doWork() {
         Log.e(TAG, "doWork");
-        File imagesFolder = getApplicationContext().getExternalFilesDir(Constants.FOOD_DIR);
-        if (imagesFolder != null && folderSize(imagesFolder) > MIN_FOLDER_SIZE_TO_START_DELETING_CONTENT) {
-            deleteFilesByAccessTime(imagesFolder);
+        File dir = getApplicationContext().getExternalFilesDir(Constants.FOOD_DIR);
+        if (dir != null) {
+            long dirSize = folderSize(dir);
+            if (dirSize > MIN_FOOD_FOLDER_SIZE_TO_START_DELETING_CONTENT) {
+                deleteFilesByDb(dir, AccessEntity.KEY_ACCESSED_IMAGES, dirSize, TARGET_FOOD_FOLDER_SIZE_AFTER_DELETING_CONTENT);
+            }
+        }
+        dir = getApplicationContext().getExternalFilesDir(Constants.RECIPES_DIR);
+        if (dir != null) {
+            long dirSize = folderSize(dir);
+            if (dirSize > MIN_RECIPE_FOLDER_SIZE_TO_START_DELETING_CONTENT) {
+                deleteFilesByDb(dir, AccessEntity.KEY_ACCESSED_RECIPE, dirSize, TARGET_RECIPE_FOLDER_SIZE_AFTER_DELETING_CONTENT);
+            }
+        }
+        dir = getApplicationContext().getExternalFilesDir(Constants.THUMB_DIR);
+        if (dir != null) {
+            long dirSize = folderSize(dir);
+            if (dirSize > MIN_THUMB_FOLDER_SIZE_TO_START_DELETING_CONTENT) {
+                deleteFilesByDb(dir, AccessEntity.KEY_ACCESSED_RECIPE, dirSize, TARGET_THUMB_FOLDER_SIZE_AFTER_DELETING_CONTENT);
+            }
         }
         return Result.success();
     }
 
-    private void deleteFilesByDb() {
-        
+    private void deleteFilesByDb(@NonNull File dir, @NonNull String accessKey, long originalSize, long targetSize) {
+        List<RecipeAccess> recipeAccesses = repository.getRecipeAccessOrderBy(accessKey);
+        int deleteCount = 0;
+        for (RecipeAccess access: recipeAccesses) {
+            Object object = access.getFileNameByAccessKey(accessKey);
+            if (object.getClass().equals(String.class)) {
+                String fileName = (String) object;
+                File file = new File(dir, fileName);
+                long currentFileSize = file.length();
+                if (file.delete()) {
+                    originalSize -= currentFileSize;
+                    deleteCount++;
+                    repository.upsertRecipeAccess(access.id, accessKey, null);
+                }
+
+            } else if (object instanceof List<?>) {
+                List<String> files = (List<String>) object;
+                for (String fileName: files) {
+                    File file = new File(dir, fileName);
+                    long currentFileSize = file.length();
+                    if (file.delete()) {
+                        originalSize -= currentFileSize;
+                        deleteCount++;
+                        repository.upsertRecipeAccess(access.id, accessKey, null);
+                    }
+                }
+            }
+            if (originalSize <= targetSize)
+                break;
+        }
+
+        Log.e(TAG, accessKey + ", deleted " + deleteCount + " files");
     }
 
-    private void deleteFilesByAccessTime(@NonNull File imagesFolder) {
+    private long folderSize(File directory) {
+        long length = 0;
+        for (File file : directory.listFiles()) {
+            if (file.isFile())
+                length += file.length();
+        }
+        return length;
+    }
+
+    /*private void deleteFilesByAccessTime(@NonNull File imagesFolder) {
         Log.e(TAG, "images name = " + imagesFolder.getName() + ", size = " + imagesFolder.length());
         File[] files = imagesFolder.listFiles();
         Log.e(TAG, Arrays.asList(files).toString());
@@ -86,12 +145,12 @@ public class DeleteOldFilesWorker extends Worker {
                 Log.e(getClass().getSimpleName(), "deleting " + file.getName()
                         + ", " + file.delete());
         }
-    }
+    }*/
 
-    /**
+    /*
      * @param files sorted
      * @return median time
-     */
+     *
     private long getMedianTime(@NonNull File[] files) {
         if (files.length % 2 == 0)
             return (files[files.length / 2].lastModified() + files[files.length / 2 - 1].lastModified()) / 2;
@@ -118,10 +177,10 @@ public class DeleteOldFilesWorker extends Worker {
         }
     }
 
-    /*private long getLastModifiedTime(@NonNull File file) {
+    //private long getLastModifiedTime(@NonNull File file) {
         //Log.e(getClass().getSimpleName(), "getLastModifiedTime, name = " + file.getName() + ", date = " + new Date(file.lastModified()).toString());
-        return file.lastModified();
-    }*/
+      //  return file.lastModified();
+    //}
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private long getLastAccessedTimeLegacy(@NonNull String path) {
@@ -131,11 +190,11 @@ public class DeleteOldFilesWorker extends Worker {
             e.printStackTrace();
         }
         return 0L;
-        /*Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(t2);
+        //Calendar calendar = Calendar.getInstance();
+        //calendar.setTimeInMillis(t2);
 
-        SimpleDateFormat formatter =  new SimpleDateFormat("dd-MM-yyyy hh-MM-ss");
-        String formattedDate = formatter.format(calendar.getTime());*/
+        //SimpleDateFormat formatter =  new SimpleDateFormat("dd-MM-yyyy hh-MM-ss");
+        //String formattedDate = formatter.format(calendar.getTime());
     }
 
     @TargetApi(Build.VERSION_CODES.O)
@@ -148,7 +207,7 @@ public class DeleteOldFilesWorker extends Worker {
             e.printStackTrace();
         }
         return 0L;
-    }
+    }*/
 
    /* public static OneTimeWorkRequest createPostRecipesWorker() {
         // Create a Constraints object that defines when the task should run

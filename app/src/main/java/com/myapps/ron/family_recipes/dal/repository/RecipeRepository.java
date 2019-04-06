@@ -11,6 +11,7 @@ import com.myapps.ron.family_recipes.dal.persistence.AppDatabases;
 import com.myapps.ron.family_recipes.dal.persistence.Converters;
 import com.myapps.ron.family_recipes.dal.persistence.RecipeDao;
 import com.myapps.ron.family_recipes.dal.storage.ExternalStorageHelper;
+import com.myapps.ron.family_recipes.model.AccessEntity;
 import com.myapps.ron.family_recipes.model.QueryModel;
 import com.myapps.ron.family_recipes.model.RecipeEntity;
 import com.myapps.ron.family_recipes.model.RecipeMinimal;
@@ -22,6 +23,7 @@ import com.myapps.ron.family_recipes.network.modelTO.RecipeTO;
 import com.myapps.ron.family_recipes.utils.logic.DateUtil;
 
 import java.io.File;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -34,8 +36,6 @@ import androidx.paging.PagedList;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
-import io.reactivex.SingleEmitter;
-import io.reactivex.SingleOnSubscribe;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableMaybeObserver;
@@ -113,20 +113,6 @@ public class RecipeRepository {
     public Flowable<RecipeEntity> getObservableRecipe(String id) {
         return recipeDao.getObservableRecipe(id);
     }
-
-
-    /*public DataSource.Factory<Integer, RecipeMinimal> getRecipesDataMinimalOrdered(String order) {
-        switch (order) {
-            case RecipeEntity.KEY_CREATED:
-                return recipeDao.getRecipesDataMinimalOrderByCreation();
-            case  RecipeEntity.KEY_MODIFIED:
-                return recipeDao.getRecipesDataMinimalOrderByModified();
-            case RecipeEntity.KEY_LIKES:
-                return recipeDao.getRecipesDataMinimalOrderByLikes();
-            default:
-                return recipeDao.getRecipesDataMinimalOrderByCreation();
-        }
-    }*/
 
     /**
      * Query the repository
@@ -379,29 +365,7 @@ public class RecipeRepository {
                 DELAYED_DISPATCH);*/
     }
 
-    /*public void fetchRecipesReactive1(final Context context) {
-        if(MiddleWareForNetwork.checkInternetConnection(context)) {
-            final String time = DateUtil.getUTCTime();
 
-            Observable<Response<List<RecipeTO>>> recipeObservable = APICallsHandler
-                    .getAllRecipesObservable(DateUtil.getLastUpdateTime(context), AppHelper.getAccessToken());
-            Disposable disposable = recipeObservable
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(next -> {
-                        if (next.code() == 200) {
-                            //updateFromServer(context, next.body());
-                        } else if (next.code() == 304) {
-                            dispatchInfo.onNext(context.getString(R.string.message_from_fetch_recipes_not_modified));
-                        }
-                        Log.e(TAG, "response code, " + next.code());
-
-                        DateUtil.updateServerTime(context, time);
-                    }, error -> Toast.makeText(context, R.string.load_error_message, Toast.LENGTH_SHORT).show());
-
-            compositeDisposable.add(disposable);
-        }
-    }*/
 
     //for case of server not sending the updated recipe in the response,
     //need to fetch it to update lastModifiedDate attribute
@@ -436,9 +400,7 @@ public class RecipeRepository {
                                 if (!update.identical(recipeEntity)) {
                                     update.setMeLike(recipeEntity.getMeLike());
                                     recipeDao.updateRecipe(update);
-                                    dispose();
                                 }
-
                                 dispose();
                             }
 
@@ -466,6 +428,82 @@ public class RecipeRepository {
         executor.execute(recipeDao::deleteAllRecipes);
     }
 
+    // region Recipe Access
+
+      // region Update/Insert Access
+
+    /**
+     *
+     * @param id specified recipe
+     * @param accessKey One String of {@link AccessEntity#KEY_ACCESSED_THUMBNAIL},
+     * {@link AccessEntity#KEY_ACCESSED_RECIPE} or {@link AccessEntity#KEY_ACCESSED_IMAGES}
+     * @param value new Date().getTime() or null
+     */
+    public void upsertRecipeAccess(String id, String accessKey, Long value) {
+        executor.execute(() -> recipeDao.getMaybeAccessById(id)
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.from(executor))
+                .subscribe(new DisposableMaybeObserver<AccessEntity>() {
+                    @Override
+                    public void onSuccess(AccessEntity accessEntity) {
+                        recipeDao.updateRecipeAccess(
+                                updatePOJOAccessEntityByKey(accessEntity, accessKey, value));
+                        dispose();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.e(TAG, e.getMessage());
+                        dispatchInfo.onNext(e.toString());
+                        dispose();
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        AccessEntity accessEntity = new AccessEntity();
+                        accessEntity.setRecipeId(id);
+                        recipeDao.insertRecipeAccess(
+                                updatePOJOAccessEntityByKey(accessEntity, accessKey, value));
+                        dispose();
+                    }
+                }));
+    }
+
+    private AccessEntity updatePOJOAccessEntityByKey(@NonNull AccessEntity access, String accessKey, Long value) {
+        switch (accessKey) {
+            case AccessEntity.KEY_ACCESSED_THUMBNAIL:
+                access.setLastAccessedThumbnail(value);
+                break;
+            case AccessEntity.KEY_ACCESSED_RECIPE:
+                access.setLastAccessedRecipe(value);
+                break;
+            case AccessEntity.KEY_ACCESSED_IMAGES:
+                access.setLastAccessedImages(value);
+                break;
+        }
+        return access;
+    }
+
+      // endregion
+
+      // region Fetch Access
+
+    public List<AccessEntity.RecipeAccess> getRecipeAccessOrderBy(String accessKey) {
+        switch (accessKey) {
+            case AccessEntity.KEY_ACCESSED_THUMBNAIL:
+                return recipeDao.getAccessTimeOrderByThumb();
+            case AccessEntity.KEY_ACCESSED_RECIPE:
+                return recipeDao.getAccessTimeOrderByRecipe();
+            case AccessEntity.KEY_ACCESSED_IMAGES:
+                return recipeDao.getAccessTimeOrderByImages();
+            default:
+                return null;
+        }
+    }
+
+      // endregion
+
+    // endregion
 
     class AddedModifiedSize {
         private int added, modified, size;
