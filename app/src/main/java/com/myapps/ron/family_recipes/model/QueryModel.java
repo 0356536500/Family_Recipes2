@@ -1,5 +1,6 @@
 package com.myapps.ron.family_recipes.model;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -13,7 +14,7 @@ import java.util.List;
  * {@link #filters} filters a complex LIKE search that searching for array containing this array
  * {@link #favorites} is querying for favorites
  */
-public class QueryModel {
+public class QueryModel implements Serializable {
 
     private boolean favorites = false;
     private String search, orderBy;

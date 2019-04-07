@@ -34,6 +34,7 @@ import androidx.paging.DataSource;
 import androidx.paging.LivePagedListBuilder;
 import androidx.paging.PagedList;
 import io.reactivex.Flowable;
+import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.disposables.CompositeDisposable;
@@ -95,14 +96,37 @@ public class RecipeRepository {
      * @return {@link Single} list of images file names to
      * {@link com.myapps.ron.family_recipes.viewmodels.DataViewModel} used by {@link com.myapps.ron.family_recipes.ui.fragments.RecyclerWithFiltersAbstractFragment}
      */
-    public Single<List<String>> getRecipeImages(String id) {
-        return Single.create(emitter ->
-                compositeDisposable.add(recipeDao.getRecipeImages(id)
+    public Maybe<List<String>> getRecipeImages(String id) {
+        return Maybe.create(emitter ->
+                recipeDao.getMaybeRecipeImages(id)
                         .subscribeOn(Schedulers.io())
                         .observeOn(Schedulers.from(executor))
-                        .subscribe(string -> emitter.onSuccess(Converters.fromString(string)),
-                                emitter::onError)
-                ));
+                        .subscribe(new DisposableMaybeObserver<String>() {
+                                       @Override
+                                       public void onSuccess(String s) {
+                                           Log.e(TAG, "onSuccess, " + s);
+                                           if (s != null && s.length() > 0 && !s.equals("null")) // !s.startsWith("[") && s.endsWith("]"))
+                                               emitter.onSuccess(Converters.fromString(s));
+                                           else
+                                               emitter.onComplete();
+                                           dispose();
+                                       }
+
+                                       @Override
+                                       public void onError(Throwable t) {
+                                           Log.e(TAG, "onError, " + t.getMessage());
+                                           emitter.onComplete();
+                                           dispose();
+                                       }
+
+                                       @Override
+                                       public void onComplete() {
+                                           Log.e(TAG, "onComplete");
+                                           emitter.onComplete();
+                                           dispose();
+                                       }
+                                   })
+                );
     }
 
     /**

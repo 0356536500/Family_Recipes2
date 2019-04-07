@@ -1,17 +1,15 @@
 package com.myapps.ron.family_recipes.ui.baseclasses;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 
 import com.myapps.ron.family_recipes.MyApplication;
 import com.myapps.ron.family_recipes.R;
-import com.myapps.ron.family_recipes.utils.logic.LocaleHelper;
 import com.myapps.ron.family_recipes.utils.logic.SharedPreferencesHandler;
 import com.myapps.ron.localehelper.LocaleAwareCompatActivity;
+
+import androidx.annotation.Nullable;
 
 /**
  * Created by ronginat on 13/12/2018.

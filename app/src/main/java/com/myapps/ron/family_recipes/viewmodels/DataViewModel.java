@@ -20,7 +20,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 import androidx.paging.PagedList;
-import io.reactivex.Single;
+import io.reactivex.Maybe;
 import io.reactivex.disposables.CompositeDisposable;
 
 /**
@@ -81,7 +81,7 @@ public class DataViewModel extends ViewModel {
         categoryRepository.fetchCategoriesReactive(context);
     }
 
-    public Single<List<String>> getRecipeImages(String id) {
+    public Maybe<List<String>> getRecipeImages(String id) {
         return recipeRepository.getRecipeImages(id);
     }
 

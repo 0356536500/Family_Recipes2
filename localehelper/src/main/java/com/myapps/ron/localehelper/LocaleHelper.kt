@@ -30,7 +30,7 @@ object LocaleHelper {
     fun setLocale(context: Context, locale: Locale): Context {
         //persist(context, locale)
         Locale.setDefault(locale)
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P + 20) updateResources(context, locale)
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N/*P + 20*/) updateResources(context, locale)
                 else updateResourcesLegacy(context, locale)
     }
 

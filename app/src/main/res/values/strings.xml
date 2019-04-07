@@ -21,6 +21,11 @@
     <string name="sort_action_popular">Popular</string>
     <string name="sort_action_recent_modified">Last Modified</string>
 
+    <!--#region RecyclerWithFiltersFragment -->
+    <string name="recipe_has_no_images_message">Recipe has no images</string>
+
+    <!--#endregion RecyclerWithFiltersFragment -->
+
 
     <!-- Item in recycler -->
     <string name="recycler_item_name">A recipe</string>

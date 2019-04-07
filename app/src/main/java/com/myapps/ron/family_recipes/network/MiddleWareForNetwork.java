@@ -16,25 +16,6 @@ public final class MiddleWareForNetwork {
         return InternetConnection;
     }
 
-    //region APICallHandler
-
-
-
-    //endregion
-
-
-
-    //region S3
-
-
-    //endregion
-
-
-    //region Cognito
-
-
-    //endregion
-
 
     //check internet connection
     public static boolean checkInternetConnection(Context context){
@@ -43,7 +24,8 @@ public final class MiddleWareForNetwork {
             //we are connected to a network
             NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
             InternetConnection = activeNetwork != null && activeNetwork.isConnected();
-            return InternetConnection;
+            //return InternetConnection;
+            return false;
             /*return connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
                     connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED;*/
         }

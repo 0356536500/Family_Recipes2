@@ -758,7 +758,7 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
         sendIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.recipe_share_pre_url) + "\n\n"
                 + getString(R.string.share_url, recipeId));
         /*sendIntent.putExtra(Intent.EXTRA_STREAM, ExternalStorageHelper.getFileUri(this,
-                com.myapps.ron.family_recipes.network.Constants.RECIPES_DIR, viewModel.getRecipeImages().getRecipeFile()));*/
+                com.myapps.ron.family_recipes.network.Constants.RECIPES_DIR, viewModel.getMaybeRecipeImages().getRecipeFile()));*/
         sendIntent.setType(getString(R.string.share_mime_type));
         /*sendIntent.addFlags(
                 Intent.FLAG_GRANT_READ_URI_PERMISSION);*/

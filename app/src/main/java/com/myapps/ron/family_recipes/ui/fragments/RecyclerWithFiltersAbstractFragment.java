@@ -52,7 +52,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
+import io.reactivex.observers.DisposableMaybeObserver;
 import io.reactivex.schedulers.Schedulers;
 
 import static android.app.Activity.RESULT_OK;
@@ -91,23 +91,41 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
     QueryModel queryModel;
 
+    //private int verticalScrollPosition;
+
     // region Fragment Override Methods
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        queryModel = new QueryModel.Builder()
-                .order(RecipeEntity.KEY_CREATED)
-                .build();
+        //verticalScrollPosition = -1;
+
+        if (savedInstanceState != null) {
+            //verticalScrollPosition = savedInstanceState.getInt("position");
+            queryModel = (QueryModel) savedInstanceState.getSerializable("query");
+        }
+        if (queryModel == null)
+            queryModel = new QueryModel.Builder()
+                    .order(RecipeEntity.KEY_CREATED)
+                    .build();
+
         activity = (MainActivity)getActivity();
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt("position", recyclerView.getVerticalScrollbarPosition());
+        outState.putSerializable("query", queryModel);
     }
 
     @Override
     public void onStop() {
         super.onStop();
+        Log.e(TAG, "onStop");
         if (compositeDisposable != null && !compositeDisposable.isDisposed()) {
-            compositeDisposable.dispose();
+            compositeDisposable.clear();
         }
     }
 
@@ -151,6 +169,7 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
             swipeRefreshLayout = view.findViewById(R.id.content_main_refresh);
             recyclerView = view.findViewById(R.id.recycler_view);
             mFilter = view.findViewById(R.id.content_main_filters);
+            filtersViewHider = ViewHider.of(mFilter).setDirection(ViewHider.TOP).setDuration(300L).build();
             firstLoadingProgressBar = view.findViewById(R.id.content_main_fist_loading_animation);
 
             orderBy = com.myapps.ron.family_recipes.dal.Constants.SORT_RECENT;
@@ -165,7 +184,6 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
             
             initAfterViewCreated();
         }
-
     }
 
     protected abstract void initAfterViewCreated();
@@ -173,7 +191,6 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
     protected abstract void optionRefresh();
 
     void initCategories() {
-        filtersViewHider = ViewHider.of(mFilter).setDirection(ViewHider.TOP).build();
         mFilter.setAdapter(new RecyclerWithFiltersAbstractFragment.Adapter(tags));
         mFilter.setListener(this);
 
@@ -386,7 +403,7 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
         Intent intent = new Intent(activity, RecipeActivity.class);
         intent.putExtra(Constants.RECIPE_ID, recipeMinimal.getId());
         startActivityForResult(intent, Constants.RECIPE_ACTIVITY_CODE);
-        /*onItemSelectedDisposable = viewModel.getRecipeImages(recipeMinimal.getId())
+        /*onItemSelectedDisposable = viewModel.getMaybeRecipeImages(recipeMinimal.getId())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(recipeEntity -> {
@@ -410,21 +427,36 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
         ft.addToBackStack(null);
 
         // Create and show the dialog.
-        Disposable disposable = viewModel.getRecipeImages(recipeMinimal.getId())
+        viewModel.getRecipeImages(recipeMinimal.getId())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(foodFiles -> {
-                    if (foodFiles != null) {
-                        viewModel.updateAccessToRecipeImages(recipeMinimal.getId());
-                        DialogFragment newFragment = new PagerDialogFragment();
-                        Bundle bundle = new Bundle();
-                        bundle.putSerializable(PagerDialogFragment.PAGER_TYPE_KEY, PagerDialogFragment.PAGER_TYPE.IMAGES);
-                        bundle.putStringArrayList(Constants.PAGER_FOOD_IMAGES, new ArrayList<>(foodFiles));
-                        newFragment.setArguments(bundle);
-                        newFragment.show(ft, "dialog");
+                .subscribe(new DisposableMaybeObserver<List<String>>() {
+                    @Override
+                    public void onSuccess(List<String> foodFiles) {
+                        if (foodFiles != null) {
+                            viewModel.updateAccessToRecipeImages(recipeMinimal.getId());
+                            DialogFragment newFragment = new PagerDialogFragment();
+                            Bundle bundle = new Bundle();
+                            bundle.putSerializable(PagerDialogFragment.PAGER_TYPE_KEY, PagerDialogFragment.PAGER_TYPE.IMAGES);
+                            bundle.putStringArrayList(Constants.PAGER_FOOD_IMAGES, new ArrayList<>(foodFiles));
+                            newFragment.setArguments(bundle);
+                            newFragment.show(ft, "dialog");
+                        }
+                        dispose();
                     }
-                }, error -> Log.e(TAG, error.getMessage()));
-        compositeDisposable.add(disposable);
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Toast.makeText(activity, e.getMessage(), Toast.LENGTH_SHORT).show();
+                        dispose();
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        Toast.makeText(activity, R.string.recipe_has_no_images_message, Toast.LENGTH_SHORT).show();
+                        dispose();
+                    }
+                });
     }
 
     @Override

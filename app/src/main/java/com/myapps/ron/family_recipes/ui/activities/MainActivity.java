@@ -33,15 +33,19 @@ import com.myapps.ron.family_recipes.ui.baseclasses.MyBaseActivity;
 import com.myapps.ron.family_recipes.ui.baseclasses.MyFragment;
 import com.myapps.ron.family_recipes.ui.fragments.AllRecipesFragment;
 import com.myapps.ron.family_recipes.ui.fragments.FavoritesRecipesFragment;
+import com.myapps.ron.family_recipes.utils.BackStack;
 import com.myapps.ron.family_recipes.utils.Constants;
 import com.myapps.ron.family_recipes.utils.logic.SharedPreferencesHandler;
 import com.myapps.ron.family_recipes.viewmodels.DataViewModel;
+import com.myapps.ron.localehelper.LocaleHelper;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
@@ -51,7 +55,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProviders;
 
-public class MainActivity extends MyBaseActivity {
+public class MainActivity extends MyBaseActivity implements BackStack.BackStackHelper {
     private static final String TAG = MainActivity.class.getSimpleName();
 
     private NavigationView navDrawer;
@@ -67,8 +71,8 @@ public class MainActivity extends MyBaseActivity {
     public MenuItem searchMenuItem;
     //public MenuItem sortMenuItem;
 
-    private List<MyFragment> myFragments;
-    private List<MyFragment> backStack;
+    //private List<MyFragment> myFragments;
+    private BackStack backStack;
     private MyFragment currentFragment;//, allRecipesFragment, favoritesRecipesFragment;
 
     private IntentFilter customFilter;
@@ -76,17 +80,23 @@ public class MainActivity extends MyBaseActivity {
 
     private int toolbarColorPrimary, toolbarColorSecond;
 
+    private List<Integer> getListOfTags() {
+        return  Arrays.asList(R.string.nav_main_all_recipes, R.string.nav_main_favorites);
+    }
+
     private final FragmentManager.FragmentLifecycleCallbacks fragmentLifecycleCallbacks = new FragmentManager.FragmentLifecycleCallbacks() {
         @Override
         public void onFragmentResumed(@NonNull FragmentManager fm, @NonNull Fragment f) {
             super.onFragmentResumed(fm, f);
+
             if (f instanceof MyFragment) {
                 currentFragment = (MyFragment) f;
 
-                if (getSupportActionBar() != null)
+                if (getSupportActionBar() != null) {
                     getSupportActionBar().setTitle(currentFragment.getMyTag());
+                }
 
-                int index = myFragments.indexOf(currentFragment);
+                int index = getListOfTags().indexOf(currentFragment.getMyTag());
                 if (index >= 0)
                     navDrawer.getMenu().getItem(index).setChecked(true);
             }
@@ -94,7 +104,7 @@ public class MainActivity extends MyBaseActivity {
     };
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -105,23 +115,70 @@ public class MainActivity extends MyBaseActivity {
         configureNavigationDrawer();
 
         init();
-        initFragments();
+        //initFragments();
         isRTL = isRTL();
 
         viewModel = ViewModelProviders.of(this, Injection.provideViewModelFactory(this)).get(DataViewModel.class);
-        //viewModel = ViewModelProviders.of(this).get(DataViewModel.class);
-
-        // create fragments only when first created, not after change language
-        if (savedInstanceState == null) {
-            handleDataFromIntentAndStart();
-            getFirebaseToken();
-        } else {
-            currentFragment = (MyFragment) getSupportFragmentManager()
-                    .findFragmentById(R.id.main_frame);
-        }
 
         // white background notification bar
         //whiteNotificationBar(recyclerView);
+    }
+
+    @Override
+    protected void onPostCreate(@Nullable Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        // create fragments only when first created, not after change language
+        if (savedInstanceState == null) {
+            initFragments();
+            handleDataFromIntentAndStart();
+            getFirebaseToken();
+        } else {
+            // restore after shutdown
+            if (backStack == null)
+                backStack = BackStack.restoreBackStackFromList(savedInstanceState, this, getSupportFragmentManager().getFragments());
+            currentFragment = backStack.peekTopFragment();
+            /*currentFragment = (MyFragment) getSupportFragmentManager()
+                    .findFragmentById(R.id.main_frame);*/
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        backStack.onSaveInstanceState(outState);
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public MyFragment generateFragmentFromTag(@StringRes int tag) {
+        MyFragment fragment = null;
+        switch (tag) {
+            case R.string.nav_main_all_recipes:
+                fragment = new AllRecipesFragment();
+                fragment.setMyTag(tag);
+                break;
+            case R.string.nav_main_favorites:
+                fragment = new FavoritesRecipesFragment();
+                fragment.setMyTag(tag);
+                break;
+        }
+        return fragment;
+    }
+
+    private MyFragment getOrCreateFragment(@StringRes int tag) {
+        MyFragment fragment = backStack.findFragmentByTag(tag);
+        if (fragment == null) {
+            switch (tag) {
+                case R.string.nav_main_all_recipes:
+                    fragment = new AllRecipesFragment();
+                    fragment.setMyTag(tag);
+                    break;
+                case R.string.nav_main_favorites:
+                    fragment = new FavoritesRecipesFragment();
+                    fragment.setMyTag(tag);
+                    break;
+            }
+        }
+        return fragment;
     }
 
     private void handleDataFromIntentAndStart() {
@@ -131,11 +188,11 @@ public class MainActivity extends MyBaseActivity {
             Log.e(TAG, "firstFragment = " + firstFragment);
 
             if (firstFragment.equals(Constants.MAIN_ACTIVITY_FRAGMENT_ALL))
-                new Handler().postDelayed(() -> startWithDefaultFragment(myFragments.get(0)), 100);
+                new Handler().postDelayed(() -> startWithDefaultFragment(getOrCreateFragment(R.string.nav_main_all_recipes)), 100);
             else if (firstFragment.equals(Constants.MAIN_ACTIVITY_FRAGMENT_FAVORITES))
-                new Handler().postDelayed(() -> startWithDefaultFragment(myFragments.get(1)), 100);
+                new Handler().postDelayed(() -> startWithDefaultFragment(getOrCreateFragment(R.string.nav_main_favorites)), 100);
         } else
-            new Handler().postDelayed(() -> startWithDefaultFragment(myFragments.get(0)), 100);
+            new Handler().postDelayed(() -> startWithDefaultFragment(getOrCreateFragment(R.string.nav_main_all_recipes)), 100);
 
         //check if got here from login activity
         if (getIntent() != null) {
@@ -318,8 +375,9 @@ public class MainActivity extends MyBaseActivity {
     }
 
     private boolean isRTL() {
-        return getResources().getConfiguration()
-                .getLayoutDirection() == View.LAYOUT_DIRECTION_RTL;
+        return LocaleHelper.INSTANCE.isRTL(Locale.getDefault());
+        /*return getResources().getConfiguration()
+                .getLayoutDirection() == View.LAYOUT_DIRECTION_RTL;*/
     }
 
     private void bindUI() {
@@ -403,11 +461,11 @@ public class MainActivity extends MyBaseActivity {
         switch(item.getItemId()) {
             case R.id.nav_main_all_recipes:
                 // Add a new attribute
-                fragment = myFragments.get(0);//allRecipesFragment;
+                fragment = getOrCreateFragment(R.string.nav_main_all_recipes);//allRecipesFragment;
                 break;
             case R.id.nav_main_favorites:
                 // Add a new attribute
-                fragment = myFragments.get(1);//favoritesRecipesFragment;
+                fragment = getOrCreateFragment(R.string.nav_main_favorites);//favoritesRecipesFragment;
                 break;
             case R.id.nav_main_settings:
                 // Show user settings
@@ -430,14 +488,9 @@ public class MainActivity extends MyBaseActivity {
         if(fragment != null && fragment != currentFragment) {
             // set item as selected to persist highlight
             //item.setChecked(true);
-            int index = backStack.indexOf(fragment);
-            if (index > 0) {
-                // remove fragment from old index
-                backStack.remove(index);
 
-            }
             // add the fragment to backStack at index 0
-            backStack.add(0, fragment);
+            backStack.addToBackStack(fragment);
 
             //currentFragment = fragment;  // Redundant - lifecycleCallback onFragmentResumed will do it
             getSupportFragmentManager()
@@ -447,7 +500,7 @@ public class MainActivity extends MyBaseActivity {
                             R.anim.slide_right_to_exit,
                             R.anim.slide_enter_from_right,
                             R.anim.slide_left_to_exit)
-                    .replace(R.id.main_frame, fragment)
+                    .replace(R.id.main_frame, fragment, String.valueOf(fragment.getMyTag()))
                     .commit();
         }
     }
@@ -455,12 +508,12 @@ public class MainActivity extends MyBaseActivity {
     // endregion
 
     private void initFragments() {
-        backStack = new ArrayList<>();
-        myFragments = new ArrayList<>();
+        backStack = new BackStack(this);
+        /*myFragments = new ArrayList<>();
         myFragments.add(new AllRecipesFragment());
-        myFragments.get(0).setMyTag(navDrawer.getMenu().getItem(0).getTitle().toString());
+        myFragments.get(0).setMyTag(R.string.nav_main_all_recipes);
         myFragments.add(new FavoritesRecipesFragment());
-        myFragments.get(1).setMyTag(navDrawer.getMenu().getItem(1).getTitle().toString());
+        myFragments.get(1).setMyTag(R.string.nav_main_favorites);*/
         /*allRecipesFragment = new AllRecipesFragment();
         favoritesRecipesFragment = new FavoritesRecipesFragment();*/
     }
@@ -471,17 +524,16 @@ public class MainActivity extends MyBaseActivity {
         getSupportFragmentManager()
                 .beginTransaction()
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                .add(R.id.main_frame, currentFragment)
+                .add(R.id.main_frame, currentFragment, String.valueOf(currentFragment.getMyTag()))
                 //.addToBackStack(null)
                 .commit();
-        backStack.add(currentFragment); // index 0 is the currently displayed fragment
+        backStack.addToBackStack(currentFragment); // index 0 is the currently displayed fragment
     }
 
     private boolean popFragmentFromBackStack() {
-        if (backStack.size() > 1) {
-            backStack.remove(0); // pop the current fragment out of the stack
-            MyFragment nextFragment = backStack.get(0); // new displaying fragment
+        MyFragment nextFragment = backStack.popFromBackStack(); // new displaying fragment
 
+        if (nextFragment != null) {
             getSupportFragmentManager()
                     .beginTransaction()
                     .setCustomAnimations(
@@ -489,7 +541,7 @@ public class MainActivity extends MyBaseActivity {
                             R.anim.slide_left_to_exit,
                             R.anim.slide_enter_from_left,
                             R.anim.slide_right_to_exit)
-                    .replace(R.id.main_frame, nextFragment)
+                    .replace(R.id.main_frame, nextFragment, String.valueOf(nextFragment.getMyTag()))
                     .commit();
             return true;
         }

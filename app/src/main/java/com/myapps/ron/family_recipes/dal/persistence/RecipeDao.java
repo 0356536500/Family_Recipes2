@@ -138,7 +138,7 @@ public interface RecipeDao {
     // endregion
 
     @Query("SELECT " + RecipeEntity.KEY_FOOD_FILES + " FROM " + AppDatabases.TABLE_RECIPES + " where " + RecipeEntity.KEY_ID + " = :id")
-    Single<String> getRecipeImages(String id);
+    Maybe<String> getMaybeRecipeImages(String id);
 
     // region Get Accessed Time
 

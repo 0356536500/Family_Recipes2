@@ -11,11 +11,14 @@ import com.myapps.ron.family_recipes.utils.logic.DateUtil;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.Executors;
 
+import androidx.annotation.NonNull;
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
+import androidx.sqlite.db.SupportSQLiteDatabase;
 
 /**
  * Created by ronginat on 31/12/2018.
@@ -60,19 +63,19 @@ public abstract class AppDatabases extends RoomDatabase {
                                                 ));
                                 }
                             })*/
-                            /*.addCallback(new Callback() {
+                            .addCallback(new Callback() {
                                 @Override
                                 public void onOpen(@NonNull SupportSQLiteDatabase db) {
                                     super.onOpen(db);
                                     Executors.newSingleThreadScheduledExecutor().execute(() -> {
                                         RecipeDao recipeDao = getInstance(context).recipeDao();
                                         recipeDao.deleteAllRecipes();
-                                        recipeDao.insertAll(generate3Recipe());
+                                        recipeDao.insertAll(generate5Recipes());
                                         //recipeDao.insertAll(generateData("recipe", 15));
                                         //recipeDao.insertAll(generateData("tirass", 15));
                                     });
                                 }
-                            })*/
+                            })
                             .build();
                 }
             }
@@ -80,7 +83,7 @@ public abstract class AppDatabases extends RoomDatabase {
         return INSTANCE;
     }
 
-    private static List<RecipeEntity> generate3Recipe() {
+    private static List<RecipeEntity> generate5Recipes() {
         List<RecipeEntity> recipeEntities = new ArrayList<>();
         recipeEntities.add(new RecipeEntity.RecipeBuilder()
                 .id("1")
@@ -96,6 +99,16 @@ public abstract class AppDatabases extends RoomDatabase {
                 .id("3")
                 .name("bet")
                 .meLike(false)
+                .build());
+        recipeEntities.add(new RecipeEntity.RecipeBuilder()
+                .id("4")
+                .name("פסטה פרמזן")
+                .meLike(true)
+                .build());
+        recipeEntities.add(new RecipeEntity.RecipeBuilder()
+                .id("5")
+                .name("עוף בגריל")
+                .meLike(true)
                 .build());
 
         return recipeEntities;
