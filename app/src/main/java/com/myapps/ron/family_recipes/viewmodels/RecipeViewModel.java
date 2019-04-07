@@ -7,6 +7,7 @@ import android.util.Log;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.dal.repository.RecipeRepository;
 import com.myapps.ron.family_recipes.dal.storage.StorageWrapper;
+import com.myapps.ron.family_recipes.model.AccessEntity;
 import com.myapps.ron.family_recipes.model.CommentEntity;
 import com.myapps.ron.family_recipes.model.RecipeEntity;
 import com.myapps.ron.family_recipes.network.APICallsHandler;
@@ -16,6 +17,7 @@ import com.myapps.ron.family_recipes.network.cognito.AppHelper;
 import com.myapps.ron.family_recipes.network.modelTO.CommentTO;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +28,6 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 import static com.myapps.ron.family_recipes.utils.Constants.FALSE;
@@ -194,6 +195,7 @@ public class RecipeViewModel extends ViewModel {
             StorageWrapper.getRecipeFile(context, recipeFile, path -> {
                 //Log.e(getClass().getSimpleName(), "return from getRecipeFile");
                 if(path != null) {
+                    updateAccessToRecipeContent(recipeId);
                     setRecipePath(Constants.FILE_PREFIX + path.getPath());
                 }
                 else {
@@ -218,6 +220,22 @@ public class RecipeViewModel extends ViewModel {
             setImagePath(null);
         }
     }
+
+    // region Recipe Access
+
+    private void updateAccessToRecipe(String id, String accessKey) {
+        recipeRepository.upsertRecipeAccess(id, accessKey, new Date().getTime());
+    }
+
+    private void updateAccessToRecipeContent(String id) {
+        updateAccessToRecipe(id, AccessEntity.KEY_ACCESSED_RECIPE);
+    }
+
+    public void updateAccessToRecipeImages(String id) {
+        updateAccessToRecipe(id, AccessEntity.KEY_ACCESSED_IMAGES);
+    }
+
+    // endregion
 
     @Override
     protected void onCleared() {

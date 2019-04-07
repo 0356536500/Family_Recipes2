@@ -23,12 +23,12 @@ import com.myapps.ron.family_recipes.network.modelTO.RecipeTO;
 import com.myapps.ron.family_recipes.utils.logic.DateUtil;
 
 import java.io.File;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.paging.DataSource;
 import androidx.paging.LivePagedListBuilder;
@@ -100,8 +100,8 @@ public class RecipeRepository {
                 compositeDisposable.add(recipeDao.getRecipeImages(id)
                         .subscribeOn(Schedulers.io())
                         .observeOn(Schedulers.from(executor))
-                        .subscribe(string -> {emitter.onSuccess(Converters.fromString(string));
-                        }, emitter::onError)
+                        .subscribe(string -> emitter.onSuccess(Converters.fromString(string)),
+                                emitter::onError)
                 ));
     }
 
@@ -439,7 +439,7 @@ public class RecipeRepository {
      * {@link AccessEntity#KEY_ACCESSED_RECIPE} or {@link AccessEntity#KEY_ACCESSED_IMAGES}
      * @param value new Date().getTime() or null
      */
-    public void upsertRecipeAccess(String id, String accessKey, Long value) {
+    public void upsertRecipeAccess(@NonNull String id, @NonNull String accessKey, @Nullable Long value) {
         executor.execute(() -> recipeDao.getMaybeAccessById(id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.from(executor))
@@ -469,7 +469,7 @@ public class RecipeRepository {
                 }));
     }
 
-    private AccessEntity updatePOJOAccessEntityByKey(@NonNull AccessEntity access, String accessKey, Long value) {
+    private AccessEntity updatePOJOAccessEntityByKey(@NonNull AccessEntity access, @NonNull String accessKey, @Nullable Long value) {
         switch (accessKey) {
             case AccessEntity.KEY_ACCESSED_THUMBNAIL:
                 access.setLastAccessedThumbnail(value);
@@ -488,6 +488,7 @@ public class RecipeRepository {
 
       // region Fetch Access
 
+    @Nullable
     public List<AccessEntity.RecipeAccess> getRecipeAccessOrderBy(String accessKey) {
         switch (accessKey) {
             case AccessEntity.KEY_ACCESSED_THUMBNAIL:

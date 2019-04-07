@@ -218,10 +218,12 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
             }
             ft.addToBackStack(null);
 
+            if (viewModel.getFoodFiles() != null && !viewModel.getFoodFiles().isEmpty())
+                viewModel.updateAccessToRecipeImages(recipeId);
+
             // Create and show the dialog.
             DialogFragment newFragment = new PagerDialogFragment();
             Bundle bundle = new Bundle();
-            //TODO: fix this
             bundle.putSerializable(PagerDialogFragment.PAGER_TYPE_KEY, PagerDialogFragment.PAGER_TYPE.IMAGES);
             bundle.putStringArrayList(Constants.PAGER_FOOD_IMAGES, viewModel.getFoodFiles());
             newFragment.setArguments(bundle);
@@ -299,7 +301,6 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
                         .error(android.R.drawable.stat_notify_error)
                         .into(imageViewCollapsingImage);
             } else {
-                //TODO: load default picture
                 Glide.with(getApplicationContext())
                         .asDrawable()
                         .load(RecipeEntity.image)
@@ -498,7 +499,7 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
                 return true;
             case R.id.action_share:
                 handleShareRecipe();
-                //TODO: https://developer.android.com/training/sharing/send
+                // https://developer.android.com/training/sharing/send
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -771,7 +772,6 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
         } else
             startActivity(Intent.createChooser(shareIntent, "Share"));
     }
-
 
     // endregion
 }

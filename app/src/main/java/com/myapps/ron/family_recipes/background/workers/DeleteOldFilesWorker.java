@@ -72,36 +72,42 @@ public class DeleteOldFilesWorker extends Worker {
 
     private void deleteFilesByDb(@NonNull File dir, @NonNull String accessKey, long originalSize, long targetSize) {
         List<RecipeAccess> recipeAccesses = repository.getRecipeAccessOrderBy(accessKey);
-        int deleteCount = 0;
-        for (RecipeAccess access: recipeAccesses) {
-            Object object = access.getFileNameByAccessKey(accessKey);
-            if (object.getClass().equals(String.class)) {
-                String fileName = (String) object;
-                File file = new File(dir, fileName);
-                long currentFileSize = file.length();
-                if (file.delete()) {
-                    originalSize -= currentFileSize;
-                    deleteCount++;
-                    repository.upsertRecipeAccess(access.id, accessKey, null);
-                }
-
-            } else if (object instanceof List<?>) {
-                List<String> files = (List<String>) object;
-                for (String fileName: files) {
+        if (recipeAccesses != null) {
+            int deleteCount = 0;
+            for (RecipeAccess access : recipeAccesses) {
+                Object object = access.getFileNameByAccessKey(accessKey);
+                if (object.getClass().equals(String.class)) {
+                    String fileName = (String) object;
                     File file = new File(dir, fileName);
-                    long currentFileSize = file.length();
-                    if (file.delete()) {
-                        originalSize -= currentFileSize;
-                        deleteCount++;
-                        repository.upsertRecipeAccess(access.id, accessKey, null);
+                    if (file.exists()) {
+                        long currentFileSize = file.length();
+                        if (file.delete()) {
+                            originalSize -= currentFileSize;
+                            deleteCount++;
+                            repository.upsertRecipeAccess(access.id, accessKey, null);
+                        }
+                    }
+
+                } else if (object instanceof List<?>) {
+                    List<String> files = (List<String>) object;
+                    for (String fileName : files) {
+                        File file = new File(dir, fileName);
+                        if (file.exists()) {
+                            long currentFileSize = file.length();
+                            if (file.delete()) {
+                                originalSize -= currentFileSize;
+                                deleteCount++;
+                                repository.upsertRecipeAccess(access.id, accessKey, null);
+                            }
+                        }
                     }
                 }
+                if (originalSize <= targetSize)
+                    break;
             }
-            if (originalSize <= targetSize)
-                break;
-        }
 
-        Log.e(TAG, accessKey + ", deleted " + deleteCount + " files");
+            Log.e(TAG, accessKey + ", deleted " + deleteCount + " files");
+        }
     }
 
     private long folderSize(File directory) {

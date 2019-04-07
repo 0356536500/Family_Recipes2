@@ -376,6 +376,11 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
     }
 
     @Override
+    public void onThumbnailAccessed(String id) {
+        viewModel.updateAccessToRecipeThumbnail(id);
+    }
+
+    @Override
     public void onItemSelected(RecipeMinimal recipeMinimal) {
         Log.e(TAG, "onItemSelected, " + recipeMinimal);
         Intent intent = new Intent(activity, RecipeActivity.class);
@@ -410,6 +415,7 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(foodFiles -> {
                     if (foodFiles != null) {
+                        viewModel.updateAccessToRecipeImages(recipeMinimal.getId());
                         DialogFragment newFragment = new PagerDialogFragment();
                         Bundle bundle = new Bundle();
                         bundle.putSerializable(PagerDialogFragment.PAGER_TYPE_KEY, PagerDialogFragment.PAGER_TYPE.IMAGES);

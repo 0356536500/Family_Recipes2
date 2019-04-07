@@ -253,7 +253,7 @@ public class RecipesAdapter extends PagedListAdapter<RecipeMinimal, RecipesAdapt
             //.apply(RequestOptions.circleCropTransform())
             StorageWrapper.getThumbFile(context, recipe.getThumbnail(), path -> {
                 if(path != null) {
-
+                    listener.onThumbnailAccessed(recipe.getId());
                     Glide.with(context)
                             .load(path)
                             .placeholder(circularProgressDrawable)
@@ -312,6 +312,7 @@ public class RecipesAdapter extends PagedListAdapter<RecipeMinimal, RecipesAdapt
         void onFavoriteClicked(RecipeMinimal recipe);
         void onItemSelected(RecipeMinimal recipe);
         void onImageClicked(RecipeMinimal recipe);
+        void onThumbnailAccessed(String id);
         void onCurrentSizeChanged(int size);
     }
 }
