@@ -66,7 +66,8 @@ public class DataViewModel extends ViewModel {
 
 
     public void applyQuery(@NonNull QueryModel queryModel) {
-        queryLiveData.postValue(queryModel);
+        if (!queryModel.equals(queryLiveData.getValue()))
+            queryLiveData.postValue(queryModel);
     }
 
 

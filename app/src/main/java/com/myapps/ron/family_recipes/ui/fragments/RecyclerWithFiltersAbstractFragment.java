@@ -71,7 +71,7 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
 
     private int filterBackgroundColor, filterTextColor;
 
-    private ViewHider filtersViewHider;
+    ViewHider filtersViewHider;
     private Filter<CategoryEntity> mFilter;
     List<CategoryEntity> tags;
     protected List<RecipeEntity> recipes;
@@ -169,7 +169,7 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
             swipeRefreshLayout = view.findViewById(R.id.content_main_refresh);
             recyclerView = view.findViewById(R.id.recycler_view);
             mFilter = view.findViewById(R.id.content_main_filters);
-            filtersViewHider = ViewHider.of(mFilter).setDirection(ViewHider.TOP).setDuration(300L).build();
+            filtersViewHider = ViewHider.of(mFilter).setDirection(ViewHider.TOP).setDuration(250L).build();
             firstLoadingProgressBar = view.findViewById(R.id.content_main_fist_loading_animation);
 
             orderBy = com.myapps.ron.family_recipes.dal.Constants.SORT_RECENT;
@@ -245,6 +245,7 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
         onRefreshListener = () -> {
             if(mayRefresh) {
                 Log.e(TAG, "in refresh listener, mayRefresh = true");
+                filtersViewHider.hide();
                 viewModel.fetchFromServer(getContext());
 
                 mayRefresh = false;

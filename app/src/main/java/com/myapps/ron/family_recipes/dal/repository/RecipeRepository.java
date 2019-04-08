@@ -7,6 +7,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.myapps.ron.family_recipes.R;
+import com.myapps.ron.family_recipes.background.workers.GetOneRecipeWorker;
 import com.myapps.ron.family_recipes.dal.persistence.AppDatabases;
 import com.myapps.ron.family_recipes.dal.persistence.Converters;
 import com.myapps.ron.family_recipes.dal.persistence.RecipeDao;
@@ -33,6 +34,9 @@ import androidx.lifecycle.LiveData;
 import androidx.paging.DataSource;
 import androidx.paging.LivePagedListBuilder;
 import androidx.paging.PagedList;
+import androidx.work.ExistingWorkPolicy;
+import androidx.work.WorkManager;
+import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
@@ -135,6 +139,33 @@ public class RecipeRepository {
      * {@link com.myapps.ron.family_recipes.viewmodels.RecipeViewModel} used by {@link com.myapps.ron.family_recipes.ui.activities.RecipeActivity}
      */
     public Flowable<RecipeEntity> getObservableRecipe(String id) {
+        // check whether the recipe is available locally with getMaybeRecipe
+        // return the Flowable anyways, it will do onNext when the recipe will be available
+        recipeDao.getMaybeRecipe(id)
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.from(executor))
+                .subscribe(new DisposableMaybeObserver<RecipeEntity>() {
+                    @Override
+                    public void onSuccess(RecipeEntity entity) {
+                        // will be available in Flowable#onNext
+                        Log.e(TAG, "getMaybeRecipe, onSuccess");
+                        dispose();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.e(TAG, e.getMessage());
+                        e.printStackTrace();
+                        dispose();
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        Log.e(TAG, "getMaybeRecipe, onComplete, enqueue worker");
+                        // no local recipe, fetch from server
+                        WorkManager.getInstance().enqueueUniqueWork(GetOneRecipeWorker.class.getSimpleName(), ExistingWorkPolicy.REPLACE, GetOneRecipeWorker.getOneRecipeWorker(id));
+                    }
+                });
         return recipeDao.getObservableRecipe(id);
     }
 
@@ -197,6 +228,34 @@ public class RecipeRepository {
     public void insertOrUpdateRecipe(RecipeEntity recipeEntity) {
         executor.execute(() ->
                 recipeDao.insertRecipe(recipeEntity));
+    }
+
+    /**
+     * Called from {@link GetOneRecipeWorker} background worker
+     * @param recipeEntity to insert
+     * @return {@link Completable} - deferred computation without any value but
+     * only indication for completion or exception.
+     */
+    public Completable insertRecipeCompletable(RecipeEntity recipeEntity) {
+        return recipeDao.insertRecipeCompletable(recipeEntity);
+        /*return Completable.create(emitter ->
+                executor.execute(() ->
+                        recipeDao.insertRecipeCompletable(recipeEntity)
+                                .subscribe(new DisposableCompletableObserver() {
+                                    @Override
+                                    public void onComplete() {
+                                        emitter.onComplete();
+                                        dispose();
+                                    }
+
+                                    @Override
+                                    public void onError(Throwable t) {
+                                        emitter.onError(t);
+                                        dispose();
+                                    }
+                                })
+                        )
+        );*/
     }
 
     public void updateRecipe(RecipeEntity recipeEntity) {

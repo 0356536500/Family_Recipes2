@@ -200,8 +200,8 @@ public interface RecipeDao {
     //Maybe<Integer> insertList(List<RecipeEntity> recipeEntities);
 
     // Makes sure that the operation finishes successfully.
-    @Insert
-    Completable insertRecipes(RecipeEntity... recipeEntities);
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    Completable insertRecipeCompletable(RecipeEntity recipeEntity);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertRecipe(RecipeEntity recipeEntity);

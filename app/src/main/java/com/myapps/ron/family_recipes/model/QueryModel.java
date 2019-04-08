@@ -2,6 +2,7 @@ package com.myapps.ron.family_recipes.model;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Created by ronginat on 05/01/2019.
@@ -73,6 +74,22 @@ public class QueryModel implements Serializable {
         if (query != null && !"".equals(query))
             return "%" + query + "%";
         return "%";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        QueryModel that = (QueryModel) o;
+        return favorites == that.favorites &&
+                Objects.equals(search, that.search) &&
+                Objects.equals(orderBy, that.orderBy) &&
+                Objects.equals(filters, that.filters);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(favorites, search, orderBy, filters);
     }
 
     public static class Builder {

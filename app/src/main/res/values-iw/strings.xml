@@ -16,7 +16,7 @@
     <string name="Menu">תפריט</string>
 
     <!-- Sort Menu in MainActivity -->
-    <string name="sort_action_recent">אחרונים</string>
+    <string name="sort_action_recent">חדשים</string>
     <string name="sort_action_popular">פופולריים</string>
     <string name="sort_action_recent_modified">השתנו לאחרונה</string>
 

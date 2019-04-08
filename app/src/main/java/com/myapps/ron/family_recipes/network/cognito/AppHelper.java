@@ -179,11 +179,11 @@ public class AppHelper {
     }
 
     public static String getAccessToken() {
-        if (getCurrSession() == null)
-            return null;
+        /*if (getCurrSession() == null)
+            return null;*/
         Date date = new Date();
         //date.setTime(date.getTime() + TimeUnit.MINUTES.toMillis(5));
-        if (getCurrSession().getAccessToken().getExpiration().before(date)) {
+        if (getCurrSession() == null || getCurrSession().getAccessToken().getExpiration().before(date)) {
             setUserSessionBackground(MyApplication.getContext());
             return null;
         }

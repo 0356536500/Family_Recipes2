@@ -47,7 +47,7 @@ public abstract class AppDatabases extends RoomDatabase {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
                             AppDatabases.class, DATABASE_NAME)
                             .fallbackToDestructiveMigration()
-                            .allowMainThreadQueries()
+                            //.allowMainThreadQueries()
                             /*.addCallback(new Callback() {
                                 @Override
                                 public void onCreate(@NonNull SupportSQLiteDatabase db) {
