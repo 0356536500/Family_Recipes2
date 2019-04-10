@@ -20,6 +20,8 @@
     <dimen name="recipe_content_margin_medium">20dp</dimen>
     <dimen name="recipe_content_margin_large">30dp</dimen>
 
+    <dimen name="corner_radius_medium">10dp</dimen>
+
     <!-- endregion Recipe Activity -->
 
     <!-- Item in recycler -->
@@ -28,6 +30,7 @@
     <dimen name="item_uploader_text_size">16sp</dimen>
     <dimen name="item_likes_text_size">16sp</dimen>
 
+    <dimen name="item_corner_radius">5dp</dimen>
     <dimen name="item_more_info_bottom_margin">4dp</dimen>
 
     <!-- Pager Adapter -->
@@ -42,6 +45,10 @@
     <dimen name="button_margin_top_small">10dp</dimen>
     <dimen name="material_corner_radius">18dp</dimen>
     <dimen name="button_text_size_large">20sp</dimen>
+
+    <dimen name="activity_text_large">22sp</dimen>
+    <dimen name="activity_text_medium">18sp</dimen>
+    <dimen name="activity_text_small">15sp</dimen>
 
         <!--#region PostRecipe Instructions -->
     <dimen name="instructions_fab_menu_size">70dp</dimen>

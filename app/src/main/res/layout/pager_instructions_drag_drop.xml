@@ -28,6 +28,7 @@
             android:layout_marginEnd="@dimen/instructions_medium_margins"
             android:layout_marginTop="@dimen/instructions_medium_margins"
             android:textSize="@dimen/instructions_text_medium"
+            android:textColor="?attr/textColorSecond"
             android:fontFamily="@font/open_sans_bold"
             android:elevation="@dimen/instructions_elevation_element"
             android:background="@drawable/background_pager_element" />
@@ -41,6 +42,7 @@
             android:layout_marginTop="@dimen/instructions_medium_margins"
             android:layout_marginBottom="@dimen/instructions_medium_margins"
             android:textSize="@dimen/instructions_text_medium"
+            android:textColor="?attr/textColorSecond"
             android:fontFamily="@font/open_sans_bold"
             android:elevation="@dimen/instructions_elevation_element"
             android:background="@drawable/background_pager_element" />

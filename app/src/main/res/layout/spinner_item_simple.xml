@@ -4,7 +4,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@android:id/text1"
     style="?android:attr/spinnerItemStyle"
-    android:textColor="?attr/colorPrimaryDark"
+    android:textColor="?attr/textColorMain"
     android:singleLine="true"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"

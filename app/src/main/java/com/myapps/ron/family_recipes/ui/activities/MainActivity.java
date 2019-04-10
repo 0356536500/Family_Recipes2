@@ -491,10 +491,16 @@ public class MainActivity extends MyBaseActivity implements BackStack.BackStackH
 
             // add the fragment to backStack at index 0
             backStack.addToBackStack(fragment);
-
+            FragmentTransaction ft = getSupportFragmentManager()
+                    .beginTransaction();
+            // Add to backStack each fragment one time for not creating new fragment after activity recreation
+            if (getSupportFragmentManager()
+                    .findFragmentByTag(String.valueOf(fragment.getMyTag())) == null)
+                ft.addToBackStack(null);
             //currentFragment = fragment;  // Redundant - lifecycleCallback onFragmentResumed will do it
-            getSupportFragmentManager()
-                    .beginTransaction()
+            /*getSupportFragmentManager()
+                    .beginTransaction()*/
+            ft
                     .setCustomAnimations(
                             R.anim.slide_enter_from_left,
                             R.anim.slide_right_to_exit,

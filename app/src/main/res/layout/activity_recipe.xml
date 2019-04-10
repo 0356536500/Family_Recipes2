@@ -59,7 +59,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/fab_margin"
-        app:backgroundTint="?attr/backgroundColor"
+        app:backgroundTint="?attr/tileBackgroundColor"
         app:layout_anchor="@id/activity_recipe_app_bar"
         app:layout_anchorGravity="bottom|end"
         app:srcCompat="@drawable/ic_favorite_border_red_36dp"

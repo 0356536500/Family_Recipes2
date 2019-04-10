@@ -238,7 +238,9 @@ public class HtmlInstructionsPagerAdapter extends PagerAdapter {
         view.findViewById(R.id.row_html_under_score_checkBox).setClickable(false);
         view.findViewById(R.id.row_html_horizontal_divider_checkBox).setClickable(false);
         view.findViewById(R.id.row_html_choose_type_spinner).setClickable(false);
+        view.findViewById(R.id.row_html_choose_type_spinner).setEnabled(false);
         view.findViewById(R.id.row_html_details_editText).setClickable(false);
+        view.findViewById(R.id.row_html_details_editText).setFocusable(false);
         //view.findViewById(R.id.pager_instructions_cardView_with_webView_html).setEnabled(false);
     }
 

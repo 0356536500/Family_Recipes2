@@ -4,7 +4,8 @@
     <attr name="searchFilterTextColor" format="reference" />
     <attr name="searchFilterCustomTextColor" format="reference" />
 
-    <attr name="backgroundColor" format="reference" />
+    <attr name="windowBackgroundColor" format="reference" />
+    <attr name="tileBackgroundColor" format="reference" />
     <attr name="textColorMain" format="reference" />
     <attr name="textColorSecond" format="reference" />
     <attr name="textColorThird" format="reference" />

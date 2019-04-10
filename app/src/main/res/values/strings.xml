@@ -95,6 +95,7 @@
     <string name="recipe_content_not_found">recipe content not found</string>
     <string name="recipe_not_in_server">recipe has no content in server</string>
     <string name="no_internet_message">Not connected to the internet</string>
+    <string name="post_comment">Send</string>
     <string name="post_comment_error">Can\'t send empty message</string>
     <string name="comments">Comments (%1$d)</string>
     <string name="no_comments">Comments (0)</string>

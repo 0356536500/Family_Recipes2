@@ -35,7 +35,8 @@ public class GetOneRecipeWorker extends RxWorker {
     private final RecipeRepository repository;
     /**
      * @param appContext   The application {@link Context}
-     * @param workerParams Parameters to setup the internal state of this worker
+     * @param workerParams Parameters to setup the internal state of this worker,
+     *                     which recipe to download
      */
     public GetOneRecipeWorker(@NonNull Context appContext, @NonNull WorkerParameters workerParams) {
         super(appContext, workerParams);

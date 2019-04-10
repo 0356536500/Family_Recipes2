@@ -73,6 +73,7 @@
     <string name="recipe_content_not_found">המתכון לא נמצא</string>
     <string name="recipe_not_in_server">המתכון לא קיים בשרת</string>
     <string name="no_internet_message">אין חיבור לרשת</string>
+    <string name="post_comment">שלח</string>
     <string name="post_comment_error">אי אפשר לשלוח הודעה ריקה</string>
     <string name="comments">תגובות (%1$d)</string>
     <string name="no_comments">תגובות (0)</string>
