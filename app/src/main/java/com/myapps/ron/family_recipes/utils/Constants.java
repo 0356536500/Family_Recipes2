@@ -41,6 +41,7 @@ public class Constants {
     public static final int POST_RECIPE_ACTIVITY_CODE = 1;
 
     public static final long FADE_ANIMATION_DURATION = 200;
+    public static final long SCALE_ANIMATION_DURATION = 500L;
 
     public static final long REFRESH_DELAY = 60000; // 60 seconds
 

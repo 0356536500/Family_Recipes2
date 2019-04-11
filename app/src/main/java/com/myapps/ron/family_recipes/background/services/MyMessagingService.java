@@ -178,7 +178,7 @@ public class MyMessagingService extends FirebaseMessagingService {
                         .setAutoCancel(true)
                         .setSound(defaultSoundUri)
                         .setColorized(true)
-                        .setColor(ContextCompat.getColor(this, R.color.logo_foreground1))
+                        .setColor(ContextCompat.getColor(this, R.color.logo_foreground))
                         .setGroup(DEFAULT_GROUP)
                         .setContentIntent(pendingIntent);
                         //.setDeleteIntent(deletionIntent);
@@ -193,7 +193,7 @@ public class MyMessagingService extends FirebaseMessagingService {
         return new NotificationCompat.Builder(this, "newRecipes")
                 .setSmallIcon(R.drawable.ic_status_logo)
                 .setColorized(true)
-                .setColor(ContextCompat.getColor(this, R.color.logo_foreground1))
+                .setColor(ContextCompat.getColor(this, R.color.logo_foreground))
                 //.setNumber(messageCount)
                 .setGroup(DEFAULT_GROUP)
                 .setGroupSummary(true);

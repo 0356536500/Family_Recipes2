@@ -1,8 +1,14 @@
 package com.myapps.ron.family_recipes.model;
 
+import android.util.Log;
+
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+
+import androidx.annotation.NonNull;
 
 /**
  * Created by ronginat on 05/01/2019.
@@ -22,6 +28,14 @@ public class QueryModel implements Serializable {
     private List<String> filters;// = new ArrayList<>();
 
     private QueryModel() {}
+
+    private QueryModel(@NonNull QueryModel queryModel) {
+        this.search = queryModel.search;
+        this.favorites = queryModel.favorites;
+        this.orderBy = queryModel.orderBy;
+        if (queryModel.filters != null)
+            this.filters = new ArrayList<>(queryModel.filters);
+    }
 
     public boolean isFavorites() {
         return favorites;
@@ -120,6 +134,10 @@ public class QueryModel implements Serializable {
         public QueryModel.Builder favorites(boolean favorites){
             this.builderFavorites = favorites;
             return this;
+        }
+
+        public QueryModel build(@NonNull QueryModel queryModel) {
+            return new QueryModel(queryModel);
         }
 
         public QueryModel build() {

@@ -71,7 +71,7 @@ public class DeleteOldFilesWorker extends Worker {
     }
 
     private void deleteFilesByDb(@NonNull File dir, @NonNull String accessKey, long originalSize, long targetSize) {
-        List<RecipeAccess> recipeAccesses = repository.getRecipeAccessOrderBy(accessKey);
+        List<RecipeAccess> recipeAccesses = repository.getRecipesAccessesOrderBy(accessKey);
         if (recipeAccesses != null) {
             int deleteCount = 0;
             for (RecipeAccess access : recipeAccesses) {

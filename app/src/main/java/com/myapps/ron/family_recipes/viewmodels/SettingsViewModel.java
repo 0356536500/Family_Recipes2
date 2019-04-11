@@ -17,9 +17,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
+import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
+import androidx.preference.Preference;
+import androidx.preference.TwoStatePreference;
 
 /**
  * Created by ronginat on 17/02/2019.
@@ -27,6 +30,7 @@ import androidx.lifecycle.ViewModel;
 public class SettingsViewModel extends ViewModel implements SharedPreferences.OnSharedPreferenceChangeListener {
     //private final String TAG = getClass().getSimpleName();
     private MutableLiveData<String> info = new MutableLiveData<>();
+    private MutableLiveData<String> bindListenerAgain = new MutableLiveData<>();
     public MutableLiveData<Map.Entry<String, Boolean>> changeKeyToValue = new MutableLiveData<>();
     private Context context;
 
@@ -36,6 +40,30 @@ public class SettingsViewModel extends ViewModel implements SharedPreferences.On
         this.context = MyApplication.getContext();
         SharedPreferencesHandler.getSharedPreferences(context).registerOnSharedPreferenceChangeListener(this);
     }
+
+    public void setSwitchListener(@Nullable TwoStatePreference statePreference) {
+        if (statePreference != null)
+            statePreference.setOnPreferenceChangeListener(mainPreferenceListener);
+    }
+
+    private Preference.OnPreferenceChangeListener mainPreferenceListener = (preference, newValue) -> {
+        if (MiddleWareForNetwork.checkInternetConnection(context)) {
+            if (AppHelper.getAccessToken() != null) {
+                // everything is valid
+                preference.setOnPreferenceChangeListener((preference1, newValue1) -> false);
+                return true;
+            }
+            // invalid access token
+            setInfo(context.getString(R.string.invalid_access_token));
+            return false;
+        } else {
+            // no internet
+            setInfo(context.getString(R.string.no_internet_message));
+            return false;
+        }
+    };
+
+    //private final Preference.OnPreferenceChangeListener blockingPreferenceListener = (preference1, newValue1) -> false;
 
     private void changeNotificationSetting(String key, boolean changeToValue) {
         if(MiddleWareForNetwork.checkInternetConnection(context)) {
@@ -47,15 +75,16 @@ public class SettingsViewModel extends ViewModel implements SharedPreferences.On
                     setInfo(message);
                     skipKey.set(key);
                     changeKeyToValue.setValue(new AbstractMap.SimpleEntry<>(key, !changeToValue));
-                    new Handler().postDelayed(() ->
-                            skipKey.set(""), 200);
+                    new Handler().postDelayed(() -> skipKey.set(""), 200);
                 }
+                setBindListenerAgain(key);
             });
-        } else { // no internet. reset the preference value
+        }
+        /*else { // no internet. reset the preference value
             setInfo(context.getString(R.string.no_internet_message));
             new Handler().postDelayed(() ->
                     SharedPreferencesHandler.writeBoolean(context, key, !changeToValue), 1500);
-        }
+        }*/
     }
 
     private void setInfo(String info) {
@@ -66,6 +95,14 @@ public class SettingsViewModel extends ViewModel implements SharedPreferences.On
         return info;
     }
 
+    public LiveData<String> getBindListenerAgain() {
+        return bindListenerAgain;
+    }
+
+    private void setBindListenerAgain(String key) {
+        this.bindListenerAgain.setValue(key);
+    }
+
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         // changing notification preferences
@@ -73,8 +110,9 @@ public class SettingsViewModel extends ViewModel implements SharedPreferences.On
                 || key.equals(context.getString(R.string.preference_key_notification_comment))
                 || key.equals(context.getString(R.string.preference_key_notification_likes))) {
 
-            if (!key.equals(skipKey.get()))
+            if (!key.equals(skipKey.get())) {
                 changeNotificationSetting(key, SharedPreferencesHandler.getBoolean(context, key));
+            }
         }
     }
 

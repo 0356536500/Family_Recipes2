@@ -4,9 +4,8 @@ import android.annotation.TargetApi;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.myapps.ron.family_recipes.R;
@@ -20,10 +19,10 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
-import androidx.preference.SwitchPreferenceCompat;
 import androidx.preference.TwoStatePreference;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.RecyclerView;
@@ -55,13 +54,13 @@ public class SettingsActivity extends MyBaseActivity
         fragmentCounter++;
     }
 
-    @Override
+    /*@Override
     protected void onResume() {
         super.onResume();
         Log.e(getClass().getSimpleName(), getResources().getConfiguration().locale.toLanguageTag());
         //Log.e(getClass().getSimpleName(), getResources().getConfiguration().getLocales().get(0).toLanguageTag());
         Log.e(getClass().getSimpleName(), Locale.getDefault().toLanguageTag());
-    }
+    }*/
 
     /**
      * Set up the {@link android.app.ActionBar}, if the API is available.
@@ -80,13 +79,11 @@ public class SettingsActivity extends MyBaseActivity
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
         if (id == android.R.id.home) {
-            Log.e(getClass().getSimpleName(), "return home");
             if (fragmentCounter > 1)
                 getSupportFragmentManager().popBackStack();
             else
                 finish();
             fragmentCounter--;
-            //startActivity(new Intent(getActivity(), SettingsActivity.class));
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -124,8 +121,7 @@ public class SettingsActivity extends MyBaseActivity
         final Bundle args = pref.getExtras();
         final Fragment fragment = getSupportFragmentManager().getFragmentFactory().instantiate(
                 getClassLoader(),
-                pref.getFragment(),
-                args);
+                pref.getFragment());
         fragment.setArguments(args);
         fragment.setTargetFragment(caller, 0);
         // Replace the existing Fragment with the new Fragment
@@ -193,17 +189,6 @@ public class SettingsActivity extends MyBaseActivity
             if (getActivity() != null)
                 getActivity().setTitle(getPreferenceScreen().getTitle());
         }
-
-        /*@Override
-        public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-            int id = item.getItemId();
-            if (id == android.R.id.home) {
-                Log.e(getClass().getSimpleName(), "return home");
-                startActivity(new Intent(getActivity(), SettingsActivity.class));
-                return true;
-            }
-            return super.onOptionsItemSelected(item);
-        }*/
     }
 
 
@@ -213,20 +198,25 @@ public class SettingsActivity extends MyBaseActivity
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public static class NotificationPreferenceFragment extends PreferenceFragmentCompat {
+        private FragmentActivity activity;
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
+            activity = getActivity();
 
-            SwitchPreferenceCompat switchNewRecipe = findPreference("notifications_new_message_vibrate");
-            if (switchNewRecipe != null) {
-                switchNewRecipe.setOnPreferenceChangeListener((preference, newValue) -> {
-                    new Handler().postDelayed(() -> Log.e(getClass().getSimpleName(), "delayed operation, value = " + newValue), 1500);
-                    return true;
-                });
-            }
+            //addPreferencesFromResource(R.xml.pref_notification);
+        }
 
-            if (getActivity() != null) {
-                SettingsViewModel viewModel = ViewModelProviders.of(getActivity()).get(SettingsViewModel.class);
+        @Override
+        public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+            super.onViewCreated(view, savedInstanceState);
+            if (activity != null) {
+                SettingsViewModel viewModel = ViewModelProviders.of(activity).get(SettingsViewModel.class);
+                viewModel.setSwitchListener(findPreference(getString(R.string.preference_key_notification_new_recipe)));
+                viewModel.setSwitchListener(findPreference(getString(R.string.preference_key_notification_comment)));
+                viewModel.setSwitchListener(findPreference(getString(R.string.preference_key_notification_likes)));
+
+                viewModel.getBindListenerAgain().observe(this, key -> viewModel.setSwitchListener(findPreference(key)));
                 viewModel.changeKeyToValue.observe(this, entry -> {
                     TwoStatePreference statePreference = findPreference(entry.getKey());
                     if (statePreference != null) {
@@ -234,22 +224,20 @@ public class SettingsActivity extends MyBaseActivity
                     }
                 });
             }
-            //addPreferencesFromResource(R.xml.pref_notification);
         }
 
         @Override
         public void onActivityCreated(@Nullable Bundle savedInstanceState) {
             super.onActivityCreated(savedInstanceState);
-            if (getActivity() != null) {
+            if (activity != null) {
                 RecyclerView recyclerView = getListView();
-                DividerItemDecoration itemDecoration = new DividerItemDecoration(getActivity(), RecyclerView.VERTICAL);
+                DividerItemDecoration itemDecoration = new DividerItemDecoration(activity, RecyclerView.VERTICAL);
                 recyclerView.addItemDecoration(itemDecoration);
             }
         }
 
         @Override
         public void onCreatePreferences(Bundle bundle, String rootKey) {
-            //Log.e(getClass().getSimpleName(), "onCreatePreferences, " + s);
             setPreferencesFromResource(R.xml.pref_notification, rootKey);
         }
 

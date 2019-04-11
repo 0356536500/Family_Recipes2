@@ -13,6 +13,7 @@ import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -42,9 +43,11 @@ import com.myapps.ron.localehelper.LocaleHelper;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.widget.Toolbar;
@@ -124,6 +127,7 @@ public class MainActivity extends MyBaseActivity implements BackStack.BackStackH
         //whiteNotificationBar(recyclerView);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onPostCreate(@Nullable Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
@@ -133,6 +137,13 @@ public class MainActivity extends MyBaseActivity implements BackStack.BackStackH
             handleDataFromIntentAndStart();
             getFirebaseToken();
         } else {
+            Log.e(TAG, "restore fragments!!!");
+            getSupportFragmentManager().getFragments()
+                    .stream()
+                    .filter(fragment -> fragment instanceof MyFragment)
+                    .map(fragment -> (MyFragment) fragment)
+                    .collect(Collectors.toList())
+                    .forEach(myFragment -> Log.e(TAG, myFragment.getTag()));
             // restore after shutdown
             if (backStack == null)
                 backStack = BackStack.restoreBackStackFromList(savedInstanceState, this, getSupportFragmentManager().getFragments());
@@ -491,16 +502,16 @@ public class MainActivity extends MyBaseActivity implements BackStack.BackStackH
 
             // add the fragment to backStack at index 0
             backStack.addToBackStack(fragment);
-            FragmentTransaction ft = getSupportFragmentManager()
+            /*FragmentTransaction ft = getSupportFragmentManager()
                     .beginTransaction();
             // Add to backStack each fragment one time for not creating new fragment after activity recreation
             if (getSupportFragmentManager()
                     .findFragmentByTag(String.valueOf(fragment.getMyTag())) == null)
-                ft.addToBackStack(null);
+                ft.addToBackStack(null);*/
             //currentFragment = fragment;  // Redundant - lifecycleCallback onFragmentResumed will do it
-            /*getSupportFragmentManager()
-                    .beginTransaction()*/
-            ft
+            getSupportFragmentManager()
+                    .beginTransaction()
+            //ft
                     .setCustomAnimations(
                             R.anim.slide_enter_from_left,
                             R.anim.slide_right_to_exit,

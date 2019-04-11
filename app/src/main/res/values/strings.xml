@@ -182,6 +182,8 @@
     <!--#endregion PostRecipe Activity -->
 
     <!-- SettingsActivity -->
+    <string name="invalid_access_token">Please try again later</string>
+
     <string name="settings_category_display">Display</string>
     <string name="settings_category_notifications">Notifications</string>
     <string name="settings_category_general">General</string>

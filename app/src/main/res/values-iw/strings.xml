@@ -147,6 +147,8 @@
     <!--#endregion PostRecipe Activity -->
 
     <!-- SettingsActivity -->
+    <string name="invalid_access_token">נסה/י מאוחר יותר</string>
+
     <string name="settings_category_display">תצוגה</string>
     <string name="settings_category_notifications">התראות</string>
     <string name="settings_category_general">כללי</string>

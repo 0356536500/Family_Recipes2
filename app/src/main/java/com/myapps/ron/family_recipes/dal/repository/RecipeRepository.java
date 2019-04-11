@@ -25,6 +25,7 @@ import com.myapps.ron.family_recipes.utils.logic.DateUtil;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -91,9 +92,11 @@ public class RecipeRepository {
         this.mayRefresh = new AtomicBoolean(true);
     }
 
-    /*public Single<RecipeEntity> getRecipe(String id) {
-        return recipeDao.getRecipe(id);
+    /*public Single<RecipeEntity> getSingleRecipe(String id) {
+        return recipeDao.getSingleRecipe(id);
     }*/
+
+    // region Local
 
     /**
      * @param id recipe id
@@ -131,6 +134,10 @@ public class RecipeRepository {
                                        }
                                    })
                 );
+    }
+
+    public Single<RecipeEntity> getSingleRecipe(@NonNull String id) {
+        return recipeDao.getSingleRecipe(id);
     }
 
     /**
@@ -267,6 +274,47 @@ public class RecipeRepository {
         executor.execute(() -> recipeDao.insertAll(AppDatabases.generateData(name, size)));
     }
 
+    // endregion
+
+    // region Helpers
+
+    //@SuppressWarnings("ResultOfMethodCallIgnored")
+    private void deleteOldRecipeContent(Context context, String path) {
+        Uri uri = ExternalStorageHelper.getFileAbsolutePath(context,
+                Constants.RECIPES_DIR, path);
+        if (uri != null) {
+            // local file exists
+            Log.e(TAG, "deleting " + path + ", " + new File(uri.getPath()).delete());
+        }
+    }
+
+    private void delayedDispatch(final Context context, final AddedModifiedSize addedModifiedSize) {
+        executor.execute(() -> {
+            try {
+                Thread.sleep(DELAYED_DISPATCH);
+                dispatchInfo.onNext(
+                        context.getString(
+                                R.string.message_from_fetch_recipes,
+                                addedModifiedSize.added,
+                                addedModifiedSize.modified));
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
+
+        /*new Handler().postDelayed(() ->
+                        dispatchInfo.onNext(
+                                context.getString(
+                                        R.string.message_from_fetch_recipes,
+                                        addedModifiedSize.added,
+                                        addedModifiedSize.modified)),
+                DELAYED_DISPATCH);*/
+    }
+
+    // endregion
+
+    // region Server
+
     public void updateFromServer(Context context, List<RecipeTO> list, AddedModifiedSize addedModifiedSize) {
         if (list != null) {
             if (list.isEmpty()) {
@@ -329,16 +377,6 @@ public class RecipeRepository {
                 });
             }
         });
-    }
-
-    //@SuppressWarnings("ResultOfMethodCallIgnored")
-    private void deleteOldRecipeContent(Context context, String path) {
-        Uri uri = ExternalStorageHelper.getFileAbsolutePath(context,
-                Constants.RECIPES_DIR, path);
-        if (uri != null) {
-            // local file exists
-            Log.e(TAG, "deleting " + path + ", " + new File(uri.getPath()).delete());
-        }
     }
 
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
@@ -425,31 +463,6 @@ public class RecipeRepository {
         }
     }
 
-    private void delayedDispatch(final Context context, final AddedModifiedSize addedModifiedSize) {
-        executor.execute(() -> {
-            try {
-                Thread.sleep(DELAYED_DISPATCH);
-                dispatchInfo.onNext(
-                        context.getString(
-                                R.string.message_from_fetch_recipes,
-                                addedModifiedSize.added,
-                                addedModifiedSize.modified));
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        });
-
-        /*new Handler().postDelayed(() ->
-                        dispatchInfo.onNext(
-                                context.getString(
-                                        R.string.message_from_fetch_recipes,
-                                        addedModifiedSize.added,
-                                        addedModifiedSize.modified)),
-                DELAYED_DISPATCH);*/
-    }
-
-
-
     //for case of server not sending the updated recipe in the response,
     //need to fetch it to update lastModifiedDate attribute
     public void changeLike(String id, boolean like) {
@@ -472,7 +485,7 @@ public class RecipeRepository {
             return;
         }
         executor.execute(() ->
-                recipeDao.getRecipe(updatedFromServer.getId())
+                recipeDao.getSingleRecipe(updatedFromServer.getId())
                         .subscribe(new DisposableSingleObserver<RecipeEntity>() {
                             RecipeEntity update = updatedFromServer.toEntity();
                             @Override
@@ -497,6 +510,8 @@ public class RecipeRepository {
         );
     }
 
+    // endregion
+
     public void updateFavoritesFromUserRecord(List<String> favorites) {
         if (favorites != null) {
             executor.execute(() -> {
@@ -506,6 +521,31 @@ public class RecipeRepository {
             });
         }
     }
+
+    public Single<Integer> changeLike(final Context context, @NonNull RecipeEntity recipe, Map<String, Object> attrs) {
+        return Single.create(emitter -> {
+            if (MiddleWareForNetwork.checkInternetConnection(context)) {
+                if (AppHelper.getAccessToken() != null) {
+                    APICallsHandler.patchRecipe(attrs, recipe.getId(), recipe.getLastModifiedDate(), AppHelper.getAccessToken(), result -> {
+                        if (result != null && recipe.getId().equals(result.getId())) { // status 200
+                            RecipeEntity update = result.toEntity();
+                            update.setMeLike(!recipe.isUserLiked() ? TRUE : FALSE);
+                            updateRecipe(update);
+                            emitter.onSuccess(-1);
+                        }
+                        else // status <> 200
+                            emitter.onSuccess(R.string.load_error_message);
+                    });
+
+                } else {
+                    emitter.onSuccess(R.string.invalid_access_token);
+                }
+            } else {
+                emitter.onSuccess(R.string.no_internet_message);
+            }
+        });
+    }
+
 
     public void deleteAllRecipes() {
         executor.execute(recipeDao::deleteAllRecipes);
@@ -572,7 +612,7 @@ public class RecipeRepository {
       // region Fetch Access
 
     @Nullable
-    public List<AccessEntity.RecipeAccess> getRecipeAccessOrderBy(String accessKey) {
+    public List<AccessEntity.RecipeAccess> getRecipesAccessesOrderBy(String accessKey) {
         switch (accessKey) {
             case AccessEntity.KEY_ACCESSED_THUMBNAIL:
                 return recipeDao.getAccessTimeOrderByThumb();

@@ -405,15 +405,10 @@ public class APICallsHandler {
                 else {
                     try {
                         if (response.errorBody() != null) {
-                            Gson gson = new Gson();
-                            Type type = new TypeToken<Map<String, Object>>() {}.getType();
-                            Map<String, Object> errorBody = gson.fromJson(response.errorBody().string(), type);
-                            if (errorBody != null && errorBody.get("message") != null) {
-                                Log.e(TAG, "error errorBody: " + errorBody.get("message"));
-                                callback.onFinished((String) errorBody.get("message"));
-                            }
-                            else
-                                callback.onFinished("error");
+                            String err = response.errorBody().string();
+                            Log.e(TAG, "error manageSubscriptions, code = " + response.code() + "\n errorBody: " + err
+                                    + "\n message: " + response.message());
+                            callback.onFinished(err);
                         }
                     } catch (IOException e) {
                         e.printStackTrace();

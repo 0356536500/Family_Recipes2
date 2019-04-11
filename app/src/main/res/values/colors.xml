@@ -11,8 +11,9 @@
     <color name="ic_logo_background">#F7F7EC</color>
     <color name="logo_background">#FFFFF4</color>
     <color name="logo_background_darker">#e5e5dc</color>
-    <color name="logo_foreground1">#3b3b3b</color>
-    <color name="logo_foreground">#7c7c7c</color>
+    <color name="logo_foreground">#3b3b3b</color>
+    <color name="logo_foreground_light">#555555</color>
+    <!--<color name="logo_foreground">#7c7c7c</color>-->
     <color name="logo_circle_border">#e78200</color>
 
     <color name="search_filter_text_light">#827f93</color>

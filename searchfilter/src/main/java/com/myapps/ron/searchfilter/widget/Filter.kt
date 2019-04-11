@@ -118,25 +118,29 @@ class Filter<T : FilterModel> : FrameLayout, FilterItemListener, CollapseListene
 
             if (isCollapsed == null) {
                 collapse(1)
-                val animation = AlphaAnimation(0f, 1f)
-                animation.duration = Constant.ANIMATION_DURATION
-                animation.setAnimationListener(object : Animation.AnimationListener {
-                    override fun onAnimationRepeat(animation: Animation?) {
-                        // actually, I don't need this method but I have to implement this.
-                    }
-
-                    override fun onAnimationEnd(animation: Animation?) {
-                        visibility = View.VISIBLE
-                    }
-
-                    override fun onAnimationStart(animation: Animation?) {
-                        // actually, I don't need this method but I have to implement this.
-                    }
-                })
-                startAnimation(animation)
+                animateFadeInAfterCollapse()
             }
         }
         expandedFilter.margin = margin
+    }
+
+    private fun animateFadeInAfterCollapse(duration : Long = Constant.ANIMATION_DURATION) {
+        val animation = AlphaAnimation(0f, 1f)
+        animation.duration = duration
+        animation.setAnimationListener(object : Animation.AnimationListener {
+            override fun onAnimationRepeat(animation: Animation?) {
+                // actually, I don't need this method but I have to implement this.
+            }
+
+            override fun onAnimationEnd(animation: Animation?) {
+                visibility = View.VISIBLE
+            }
+
+            override fun onAnimationStart(animation: Animation?) {
+                // actually, I don't need this method but I have to implement this.
+            }
+        })
+        startAnimation(animation)
     }
 
     private fun buildItem(item: FilterModel, parent: FilterModel?, isVisible: Boolean) : FilterItem{
@@ -191,7 +195,6 @@ class Filter<T : FilterModel> : FrameLayout, FilterItemListener, CollapseListene
         if (mIsBusy) return
         mIsBusy = true
         //mRemovedFilters.clear()
-
         isCollapsed = true
 
         //removeItemsFromParent()
@@ -371,11 +374,11 @@ class Filter<T : FilterModel> : FrameLayout, FilterItemListener, CollapseListene
         val superState = super.onSaveInstanceState()
         return Bundle().apply {
             putParcelable(STATE_SUPER, superState)
-            var collapsed: Boolean? = isCollapsed
+            /*var collapsed: Boolean? = isCollapsed
             if(collapsed == null)
                 collapsed = true
-            putBoolean(STATE_COLLAPSED, collapsed)
-            //putBoolean(STATE_COLLAPSED, isCollapsed!!)
+            putBoolean(STATE_COLLAPSED, collapsed)*/
+            putBoolean(STATE_COLLAPSED, isCollapsed!!)
             val selectedItems = mSelectedItems
             putSerializable(STATE_SELECTED_ITEMS, selectedItems)
         }
@@ -426,7 +429,8 @@ class Filter<T : FilterModel> : FrameLayout, FilterItemListener, CollapseListene
             }
 
             if (isCollapsed == null || isCollapsed as Boolean) {
-                collapse(1)
+                collapse(Constant.ANIMATION_RESTORE_DURATION)
+                animateFadeInAfterCollapse(Constant.ANIMATION_DURATION)
             } else {
                 expand()
             }

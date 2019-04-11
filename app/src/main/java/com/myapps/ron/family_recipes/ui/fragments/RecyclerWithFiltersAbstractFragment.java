@@ -29,6 +29,7 @@ import com.myapps.ron.family_recipes.ui.baseclasses.MyFragment;
 import com.myapps.ron.family_recipes.utils.Constants;
 import com.myapps.ron.family_recipes.utils.ui.ViewHider;
 import com.myapps.ron.family_recipes.viewmodels.DataViewModel;
+import com.myapps.ron.searchfilter.Constant;
 import com.myapps.ron.searchfilter.adapter.FilterAdapter;
 import com.myapps.ron.searchfilter.animator.FiltersListItemAnimator;
 import com.myapps.ron.searchfilter.listener.FilterListener;
@@ -389,8 +390,10 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
     // region Recycler Listener
 
     @Override
-    public void onFavoriteClicked(RecipeMinimal recipe) {
+    public void onFavoriteClicked(RecipeMinimal recipe, Runnable onError) {
         // change recipe on server
+        Log.e(TAG, "onFavoriteClicked, id = " + recipe.getId());
+        viewModel.changeLike(activity, recipe.getId(), onError);
     }
 
     @Override
@@ -533,15 +536,19 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
         new Handler().postDelayed(() -> {
             queryModel.setFilters(newTags);
             viewModel.applyQuery(queryModel);
-        }, 500);
+        }, Constant.ANIMATION_DURATION + 100L);
 
         //calculateDiff(oldList, mAdapter.getCurrentList());
     }
 
     @Override
     public void onNothingSelected() {
-        queryModel.setFilters(null);
-        viewModel.applyQuery(queryModel);
+        new Handler().postDelayed(() -> {
+            queryModel.setFilters(null);
+            viewModel.applyQuery(queryModel);
+        }, Constant.ANIMATION_DURATION + 100L);
+        /*queryModel.setFilters(null);
+        viewModel.applyQuery(queryModel);*/
     }
 
     // endregion

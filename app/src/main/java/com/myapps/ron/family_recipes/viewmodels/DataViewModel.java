@@ -1,6 +1,7 @@
 package com.myapps.ron.family_recipes.viewmodels;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.myapps.ron.family_recipes.background.services.GetUserDetailsService;
 import com.myapps.ron.family_recipes.dal.repository.CategoryRepository;
@@ -9,10 +10,14 @@ import com.myapps.ron.family_recipes.dal.repository.RepoSearchResults;
 import com.myapps.ron.family_recipes.model.AccessEntity;
 import com.myapps.ron.family_recipes.model.CategoryEntity;
 import com.myapps.ron.family_recipes.model.QueryModel;
+import com.myapps.ron.family_recipes.model.RecipeEntity;
 import com.myapps.ron.family_recipes.model.RecipeMinimal;
+import com.myapps.ron.family_recipes.network.Constants;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
@@ -21,7 +26,10 @@ import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 import androidx.paging.PagedList;
 import io.reactivex.Maybe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.observers.DisposableSingleObserver;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * class for use by MainActivity.
@@ -66,8 +74,66 @@ public class DataViewModel extends ViewModel {
 
 
     public void applyQuery(@NonNull QueryModel queryModel) {
-        if (!queryModel.equals(queryLiveData.getValue()))
-            queryLiveData.postValue(queryModel);
+        QueryModel newModel = new QueryModel.Builder().build(queryModel);
+        if (!newModel.equals(queryLiveData.getValue())) {
+            queryLiveData.setValue(newModel);
+        }
+    }
+
+    /**
+     * Retrieve the recipe before updating it
+     * @param context context
+     * @param id recipe identifier
+     */
+    public void changeLike(final Context context, @NonNull String id, Runnable onErrorUpdateUI) {
+        recipeRepository.getSingleRecipe(id)
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .subscribe(new DisposableSingleObserver<RecipeEntity>() {
+                    @Override
+                    public void onSuccess(RecipeEntity recipeEntity) {
+                        updateLike(context, recipeEntity, onErrorUpdateUI);
+                        dispose();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        infoFromLastFetch.postValue(e.getMessage());
+                        onErrorUpdateUI.run();
+                        dispose();
+                    }
+                });
+
+    }
+
+    /**
+     * the actual update
+     */
+    private void updateLike(final Context context, @NonNull RecipeEntity recipe, Runnable onErrorUpdateUI) {
+        Log.e(getClass().getSimpleName(), "updateLike");
+        Map<String, Object> attrs = new HashMap<>();
+        String likeStr = recipe.isUserLiked() ? "unlike" : "like";
+        attrs.put(Constants.LIKES, likeStr);
+        recipeRepository.changeLike(context, recipe, attrs)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new DisposableSingleObserver<Integer>() {
+                    @Override
+                    public void onSuccess(Integer status) {
+                        if (status != -1) {
+                            infoFromLastFetch.setValue(context.getString(status));
+                            onErrorUpdateUI.run();
+                        }
+                        dispose();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        infoFromLastFetch.setValue(e.getMessage());
+                        onErrorUpdateUI.run();
+                        dispose();
+                    }
+                });
     }
 
 

@@ -5,10 +5,11 @@
         <!-- toolbar colors and themes -->
         <item name="material_theme">@style/Material.Light</item>
         <item name="toolbar_theme">@style/ActionBarTheme.Light</item>
+        <item name="dialog_preference_theme">@style/PreferenceDialog.Light</item>
         <item name="toolbarBackgroundPrimary">@color/white</item>
         <item name="toolbarBackgroundSecondary">@color/logo_background_darker</item>
 
-        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimary">@color/logo_foreground</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="windowActionBar">false</item>
@@ -53,10 +54,11 @@
         <!-- toolbar colors and themes -->
         <item name="material_theme">@style/Material.Dark</item>
         <item name="toolbar_theme">@style/ActionBarTheme.Dark</item>
+        <item name="dialog_preference_theme">@style/PreferenceDialog.Dark</item>
         <item name="toolbarBackgroundPrimary">@color/grey_700</item>
         <item name="toolbarBackgroundSecondary">@color/md_grey_800</item>
 
-        <item name="colorPrimary">@color/grey_400</item>
+        <item name="colorPrimary">@color/logo_foreground</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="windowActionBar">false</item>
@@ -236,6 +238,28 @@
         <item name="android:textColorSecondary">@color/grey_100</item>
 
         <item name="android:buttonTint">@color/grey_300</item>
+    </style>
+    
+    <style name="PreferenceDialog.Light" parent="Base.Theme.AppCompat.Light.Dialog">
+        <item name="colorPrimary">@color/white</item>
+        <item name="colorPrimaryDark">@color/black</item>
+        <item name="colorAccent">@color/md_red_700</item>
+
+        <item name="android:background">?attr/windowBackgroundColor</item>
+        <item name="android:textColorPrimary">@color/black</item>
+        <item name="android:textColorSecondary">@color/grey_700</item>
+        <item name="textColorAlertDialogListItem">@color/md_blue_500</item>
+    </style>
+
+    <style name="PreferenceDialog.Dark" parent="Base.Theme.AppCompat.Dialog">
+        <item name="colorPrimary">@color/grey_700</item>
+        <item name="colorPrimaryDark">@color/white</item>
+        <item name="colorAccent">@color/md_pink_400</item>
+
+        <item name="android:background">?attr/windowBackgroundColor</item>
+        <item name="android:textColorPrimary">@color/grey_100</item>
+        <item name="android:textColorSecondary">@color/grey_300</item>
+        <item name="textColorAlertDialogListItem">@color/md_green_500</item>
     </style>
 
     <!--<style name="CustomDialogAnimation">

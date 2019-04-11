@@ -18,4 +18,5 @@
 
     <attr name="toolbar_theme" format="reference" />
     <attr name="material_theme" format="reference" />
+    <attr name="dialog_preference_theme" format="reference" />
 </resources>

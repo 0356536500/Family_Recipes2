@@ -3,6 +3,7 @@ package com.myapps.ron.family_recipes.viewmodels;
 import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.dal.repository.RecipeRepository;
@@ -28,6 +29,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
 
 import static com.myapps.ron.family_recipes.utils.Constants.FALSE;
@@ -148,7 +150,30 @@ public class RecipeViewModel extends ViewModel {
     }
 
     public void changeLike(final Context context) {
-        if(MiddleWareForNetwork.checkInternetConnection(context) && recipe.getValue() != null) {
+        if (recipe.getValue() != null) {
+            Map<String, Object> attrs = new HashMap<>();
+            String likeStr = recipe.getValue().isUserLiked() ? "unlike" : "like";
+            attrs.put(Constants.LIKES, likeStr);
+            recipeRepository.changeLike(context, recipe.getValue(), attrs)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new DisposableSingleObserver<Integer>() {
+                        @Override
+                        public void onSuccess(Integer status) {
+                            if (status != -1) {
+                                setInfo(status);
+                            }
+                            dispose();
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
+                            dispose();
+                        }
+                    });
+        }
+        /*if(MiddleWareForNetwork.checkInternetConnection(context) && recipe.getValue() != null) {
             Map<String, Object> attrs = new HashMap<>();
             String likeStr = recipe.getValue().isUserLiked() ? "unlike" : "like";
             attrs.put(Constants.LIKES, likeStr);
@@ -164,7 +189,7 @@ public class RecipeViewModel extends ViewModel {
         }
         else {
             setInfo(R.string.no_internet_message);
-        }
+        }*/
     }
 
     public void postComment(final Context context, String text) {

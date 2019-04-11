@@ -22,6 +22,7 @@
             app:negativeButtonText="@null"
             app:positiveButtonText="@null"
             app:title="@string/pref_title_dark_theme"
+            android:theme="?attr/dialog_preference_theme"
             app:summary="%s"
             app:iconSpaceReserved="false" />
 

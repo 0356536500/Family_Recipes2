@@ -127,7 +127,7 @@ public interface RecipeDao {
 
     // region Get Rx RecipeEntity by id
     @Query("SELECT * FROM " + AppDatabases.TABLE_RECIPES + " where " + RecipeEntity.KEY_ID + " = :id")
-    Single<RecipeEntity> getRecipe(String id);
+    Single<RecipeEntity> getSingleRecipe(String id);
 
     @Query("SELECT * FROM " + AppDatabases.TABLE_RECIPES + " where " + RecipeEntity.KEY_ID + " = :id")
     Flowable<RecipeEntity> getObservableRecipe(String id);

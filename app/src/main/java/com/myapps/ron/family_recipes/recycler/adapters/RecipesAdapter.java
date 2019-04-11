@@ -1,10 +1,12 @@
 package com.myapps.ron.family_recipes.recycler.adapters;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
-import android.util.Log;
+import android.text.Spannable;
+import android.text.style.ForegroundColorSpan;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -122,15 +124,13 @@ public class RecipesAdapter extends PagedListAdapter<RecipeMinimal, RecipesAdapt
                 compoundButton.setBackground(circularProgressDrawable);
                 compoundButton.setEnabled(false);
 
-                listener.onFavoriteClicked(getItem(getAdapterPosition()));
-                new Handler().postDelayed(() -> {
-                    compoundButton.setBackgroundResource(R.drawable.favorite_selector);
-                    compoundButton.startAnimation(scaleAnimation);
-                    compoundButton.setEnabled(true);
-
-                }, 1500);
-
-                Log.e(getClass().getSimpleName(), "checked changed, " + Boolean.toString(b));
+                listener.onFavoriteClicked(getItem(getAdapterPosition()), () ->
+                        new Handler().postDelayed(() -> {
+                            compoundButton.setChecked(!b);
+                            compoundButton.setBackgroundResource(R.drawable.favorite_selector);
+                            compoundButton.startAnimation(scaleAnimation);
+                            compoundButton.setEnabled(true);
+                        }, Constants.SCALE_ANIMATION_DURATION));
             }
         }
 
@@ -170,7 +170,7 @@ public class RecipesAdapter extends PagedListAdapter<RecipeMinimal, RecipesAdapt
 
         this.scaleAnimation = new ScaleAnimation(0.7f, 1f, 0.7f, 1f,
                 Animation.RELATIVE_TO_SELF, 0.7f, Animation.RELATIVE_TO_SELF, 0.7f);
-        scaleAnimation.setDuration(500);
+        scaleAnimation.setDuration(Constants.SCALE_ANIMATION_DURATION);
 
         TypedValue typedValue = new TypedValue();
         context.getTheme().resolveAttribute(R.attr.textColorMain, typedValue, true);
@@ -200,7 +200,10 @@ public class RecipesAdapter extends PagedListAdapter<RecipeMinimal, RecipesAdapt
             // Null defines a placeholder item - PagedListAdapter automatically
             // invalidates this row when the actual object is loaded from the
             // database.
-            Log.e(getClass().getSimpleName(), "bind with null object");
+            //Log.e(getClass().getSimpleName(), "bind with null object");
+            Spannable spannable = Spannable.Factory.getInstance().newSpannable("Not exists!");
+            spannable.setSpan(new ForegroundColorSpan(Color.RED), 0, spannable.length(), 0);
+            holder.name.setText(spannable , TextView.BufferType.SPANNABLE);
             //holder.clear();
         }
     }
@@ -309,7 +312,7 @@ public class RecipesAdapter extends PagedListAdapter<RecipeMinimal, RecipesAdapt
 
 
     public interface RecipesAdapterListener {
-        void onFavoriteClicked(RecipeMinimal recipe);
+        void onFavoriteClicked(RecipeMinimal recipe, Runnable onError);
         void onItemSelected(RecipeMinimal recipe);
         void onImageClicked(RecipeMinimal recipe);
         void onThumbnailAccessed(String id);
