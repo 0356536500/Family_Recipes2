@@ -1,14 +1,18 @@
 package com.myapps.ron.family_recipes.ui.activities;
 
 import android.annotation.TargetApi;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.myapps.ron.family_recipes.BuildConfig;
 import com.myapps.ron.family_recipes.R;
+import com.myapps.ron.family_recipes.network.cognito.AppHelper;
 import com.myapps.ron.family_recipes.ui.baseclasses.MyBaseActivity;
 import com.myapps.ron.family_recipes.viewmodels.SettingsViewModel;
 
@@ -165,14 +169,19 @@ public class SettingsActivity extends MyBaseActivity
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
 
-            /*PreferenceManager preferenceManager = getPreferenceManager();
-            preferenceManager.setSharedPreferencesName(getString(R.string.sharedPreferences));
-            preferenceManager.setSharedPreferencesMode(MODE_PRIVATE);*/
-
             //bindPreferenceSummaryToValue(findPreference(getString(R.string.preference_key_dark_theme)));
             //bindPreferenceSummaryToValue(findPreference(getString(R.string.preference_key_language)));
             //bindPreferenceSummaryToValue(findPreference("example_text"));
             //addPreferencesFromResource(R.xml.pref_general);
+        }
+
+        @Override
+        public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+            super.onViewCreated(view, savedInstanceState);
+            Preference bugPreference = findPreference(getString(R.string.preference_key_report_bug));
+            if (bugPreference != null) {
+                bugPreference.setOnPreferenceClickListener(preference -> sendEmail());
+            }
         }
 
         @Override
@@ -181,6 +190,46 @@ public class SettingsActivity extends MyBaseActivity
             preferenceManager.setSharedPreferencesName(getString(R.string.sharedPreferences));
             preferenceManager.setSharedPreferencesMode(MODE_PRIVATE);*/
             setPreferencesFromResource(R.xml.pref_general, rootKey);
+        }
+
+        @SuppressWarnings("StringBufferReplaceableByString")
+        private boolean sendEmail() {
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder
+                    .append(getString(R.string.settings_report_bug_mail_list_problem_here))
+                    .append("\n\n----------------------------\n")
+                    .append("Application and System information:\n")
+                    .append("Device Model: ")
+                    .append(Build.BRAND.toUpperCase().concat(" "))
+                    .append(Build.BRAND.concat(" "))
+                    .append(Build.MODEL.concat("\n"))
+                    .append("Android OS Version: ")
+                    .append(Build.VERSION.RELEASE.concat("\n"))
+                    .append(getString(R.string.app_name).concat(" App Version: "))
+                    .append(BuildConfig.VERSION_NAME.concat("\n"));
+
+            String emailSubject = AppHelper.getCurrUser() +
+                    " -- I've got an issue with " +
+                    getString(R.string.app_name) + " App";
+
+
+            Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
+            emailIntent.setData(Uri.parse("mailto:"));
+            //emailIntent.setType("message/rfc822");
+            emailIntent.putExtra(Intent.EXTRA_EMAIL  , new String[]{getString(R.string.support_email)});
+            emailIntent.putExtra(Intent.EXTRA_SUBJECT, emailSubject);
+            emailIntent.putExtra(Intent.EXTRA_TEXT   , stringBuilder.toString());
+            if (getActivity() != null && emailIntent.resolveActivity(getActivity().getPackageManager()) == null) {
+                return false;
+            }
+            try {
+                startActivity(Intent.createChooser(emailIntent, "Send using"));
+                return true;
+            } catch (android.content.ActivityNotFoundException ex) {
+                Toast.makeText(getActivity(), "There are no email clients installed.", Toast.LENGTH_SHORT).show();
+                return false;
+            }
+
         }
 
         @Override
