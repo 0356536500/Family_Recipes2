@@ -63,7 +63,7 @@
     <string name="main_activity_app_up_to_date">אין עדכונים</string>
     <string name="main_activity_update_available_title">יש גרסא חדשה לאפליקציה!</string>
     <string name="main_activity_update_available_message">להתחיל הורדה?</string>
-    <string name="main_activity_permission_to_install_updates_title">ההשאות הכרחיות</string>
+    <string name="main_activity_permission_to_install_updates_title">ההרשאות הכרחיות</string>
     <string name="main_activity_permission_to_install_updates_message">מבקש רשות להתקין אפליקציות ממקור לא ידוע, לצורך עדכון האפליקציה מחוץ לחנות הרשמית</string>
     <!--#endregion MainActivity -->
 
@@ -175,6 +175,8 @@
     <string name="pref_description_dark_theme">מצב כהה של אפליקציות מומלץ מאוד וחוסך בחיי הסוללה
     </string>
     <string name="preference_title_report_bug">דיווח על בעיה</string>
+    <string name="preference_title_system_notification">הגדרות המערכת</string>
+    <string name="preference_title_check_for_updates">בדוק עבור עדכונים</string>
 
     <string-array name="pref_dark_theme_list_titles">
         <item>תמיד</item>

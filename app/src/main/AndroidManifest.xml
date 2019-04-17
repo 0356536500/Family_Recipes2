@@ -20,25 +20,25 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme.Light">
         <activity android:name=".TestActivity">
-            <intent-filter>
+            <!--<intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
-               <!-- <action android:name="android.intent.action.INSTALL_PACKAGE" />
+                <action android:name="android.intent.action.INSTALL_PACKAGE" />
                 <data android:scheme="file" />
                 <data android:scheme="content" />
-                <data android:mimeType="application/vnd.android.package-archive" />-->
-            </intent-filter>
+                <data android:mimeType="application/vnd.android.package-archive" />
+            </intent-filter>-->
         </activity>
         <activity
             android:name=".ui.activities.SplashActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Launcher">
-            <!--<intent-filter>
+            <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>-->
+            </intent-filter>
 
             <meta-data android:name="android.app.shortcuts"
                 android:resource="@xml/shortcuts" />

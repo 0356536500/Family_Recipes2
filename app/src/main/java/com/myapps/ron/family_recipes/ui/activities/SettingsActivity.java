@@ -1,27 +1,27 @@
 package com.myapps.ron.family_recipes.ui.activities;
 
+import android.Manifest;
 import android.annotation.TargetApi;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import com.myapps.ron.family_recipes.BuildConfig;
-import com.myapps.ron.family_recipes.R;
-import com.myapps.ron.family_recipes.network.cognito.AppHelper;
-import com.myapps.ron.family_recipes.ui.baseclasses.MyBaseActivity;
-import com.myapps.ron.family_recipes.viewmodels.SettingsViewModel;
-
-import java.util.Locale;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProviders;
@@ -30,6 +30,22 @@ import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.TwoStatePreference;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.myapps.ron.family_recipes.BuildConfig;
+import com.myapps.ron.family_recipes.R;
+import com.myapps.ron.family_recipes.dal.storage.StorageWrapper;
+import com.myapps.ron.family_recipes.network.MiddleWareForNetwork;
+import com.myapps.ron.family_recipes.network.cognito.AppHelper;
+import com.myapps.ron.family_recipes.ui.baseclasses.MyBaseActivity;
+import com.myapps.ron.family_recipes.viewmodels.SettingsViewModel;
+
+import java.io.File;
+import java.util.Locale;
+import java.util.Map;
+
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.observers.DisposableSingleObserver;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created by ronginat on 12/12/2018.
@@ -165,10 +181,12 @@ public class SettingsActivity extends MyBaseActivity
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public static class GeneralPreferenceFragment extends PreferenceFragmentCompat {
+        private FragmentActivity activity;
+        private SettingsViewModel viewModel;
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
-
+            activity = getActivity();
             //bindPreferenceSummaryToValue(findPreference(getString(R.string.preference_key_dark_theme)));
             //bindPreferenceSummaryToValue(findPreference(getString(R.string.preference_key_language)));
             //bindPreferenceSummaryToValue(findPreference("example_text"));
@@ -178,9 +196,15 @@ public class SettingsActivity extends MyBaseActivity
         @Override
         public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
             super.onViewCreated(view, savedInstanceState);
+            viewModel = ViewModelProviders.of(activity).get(SettingsViewModel.class);
             Preference bugPreference = findPreference(getString(R.string.preference_key_report_bug));
             if (bugPreference != null) {
                 bugPreference.setOnPreferenceClickListener(preference -> sendEmail());
+            }
+
+            Preference updatePreference = findPreference(getString(R.string.preference_key_check_for_updates));
+            if (updatePreference != null) {
+                updatePreference.setOnPreferenceClickListener(preference -> checkForUpdates());
             }
         }
 
@@ -229,8 +253,96 @@ public class SettingsActivity extends MyBaseActivity
                 Toast.makeText(getActivity(), "There are no email clients installed.", Toast.LENGTH_SHORT).show();
                 return false;
             }
-
         }
+
+        // region App Updates
+
+        private static final int REQUEST_WRITE_PERMISSION = 186;
+        private File appUpdateFile;
+        private Uri uri;
+
+        private boolean checkForUpdates() {
+            if (!MiddleWareForNetwork.checkInternetConnection(activity))
+                return false;
+
+            viewModel.getDataToDownloadUpdate(activity)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new DisposableSingleObserver<Map<String, String>>() {
+                        @Override
+                        public void onSuccess(Map<String, String> map) {
+                            appUpdateFile = StorageWrapper.getFileToDownloadUpdateInto(activity,
+                                    map.get(com.myapps.ron.family_recipes.network.Constants.RESPONSE_KEY_APP_NAME));
+                            uri = Uri.parse(map.get(com.myapps.ron.family_recipes.network.Constants.RESPONSE_KEY_APP_URL));
+                            new AlertDialog.Builder(activity)
+                                    .setCancelable(true)
+                                    .setTitle(R.string.main_activity_update_available_title)
+                                    .setMessage(R.string.main_activity_update_available_message)
+                                    .setPositiveButton(android.R.string.yes, (dialog, which) ->
+                                            updateApp())
+                                    .create()
+                                    .show();
+
+                            dispose();
+                        }
+
+                        @Override
+                        public void onError(Throwable t) {
+                            Toast.makeText(activity, t.getMessage(), Toast.LENGTH_LONG).show();
+                            dispose();
+                        }
+                    });
+            return true;
+        }
+
+        private void updateApp() {
+            if (canReadWriteExternalAndInstallPackages()) {
+                viewModel.downloadNewAppVersion(activity, onComplete, uri, appUpdateFile);
+            } else {
+                if (ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                    new AlertDialog.Builder(activity)
+                            .setCancelable(true)
+                            .setTitle(R.string.main_activity_permission_to_install_updates_title)
+                            .setMessage(R.string.main_activity_permission_to_install_updates_message)
+                            .setPositiveButton(android.R.string.yes, (dialog, which) ->
+                                    requestPermission())
+                            .create()
+                            .show();
+                } else
+                    requestPermission();
+            }
+        }
+
+        BroadcastReceiver onComplete=new BroadcastReceiver() {
+            public void onReceive(Context context, Intent intent) {
+                Toast.makeText(context, "Finished", Toast.LENGTH_LONG).show();
+                viewModel.installApp(activity, appUpdateFile);
+                activity.unregisterReceiver(this);
+            }
+        };
+
+        @Override
+        public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+            if (requestCode == REQUEST_WRITE_PERMISSION && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                viewModel.downloadNewAppVersion(activity, onComplete, uri, appUpdateFile);
+            else
+                Toast.makeText(activity, "Permission denied", Toast.LENGTH_LONG).show();
+        }
+
+        private void requestPermission() {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+                requestPermissions(new String[]{
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE
+                }, REQUEST_WRITE_PERMISSION);
+        }
+
+        private boolean canReadWriteExternalAndInstallPackages() {
+            return Build.VERSION.SDK_INT < Build.VERSION_CODES.M ||
+                    ContextCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                            != PackageManager.PERMISSION_GRANTED;
+        }
+
+        // endregion
 
         @Override
         public void onResume() {
@@ -272,6 +384,11 @@ public class SettingsActivity extends MyBaseActivity
                         statePreference.setChecked(entry.getValue());
                     }
                 });
+
+                Preference sysNotificationPreference = findPreference(getString(R.string.preference_key_system_notification));
+                if (sysNotificationPreference != null) {
+                    sysNotificationPreference.setOnPreferenceClickListener(preference -> openSystemNotificationSettings());
+                }
             }
         }
 
@@ -288,6 +405,20 @@ public class SettingsActivity extends MyBaseActivity
         @Override
         public void onCreatePreferences(Bundle bundle, String rootKey) {
             setPreferencesFromResource(R.xml.pref_notification, rootKey);
+        }
+
+        private boolean openSystemNotificationSettings() {
+            Intent intent;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                intent = new Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+                            .putExtra(Settings.EXTRA_APP_PACKAGE, activity.getPackageName());
+            } else {
+                intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                intent.setData(new Uri.Builder().scheme("package").opaquePart(activity.getPackageName()).build());
+                //intent.setData(Uri.parse("package:" + activity.getPackageName()));
+            }
+            startActivity(intent);
+            return true;
         }
 
         @Override

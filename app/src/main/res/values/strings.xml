@@ -202,6 +202,8 @@
     <string name="preference_key_dark_theme" translatable="false">dark_theme</string>
     <string name="preference_key_language" translatable="false">Locale.Helper.Selected.Language</string>
     <string name="preference_key_report_bug" translatable="false">report_bug</string>
+    <string name="preference_key_system_notification" translatable="false">system_notification</string>
+    <string name="preference_key_check_for_updates" translatable="false">app_updates</string>
     <!--<string name="preference_key_language" translatable="false">system_language</string>-->
     <string name="preference_key_notification_new_recipe" translatable="false">@string/notification_new_recipe_channel_id</string>
     <string name="preference_key_notification_comment" translatable="false">@string/notification_comment_channel_id</string>
@@ -217,6 +219,8 @@
     <string name="pref_title_notification_like">@string/notification_like_channel_name</string>
 
     <string name="preference_title_report_bug">Report a Bug</string>
+    <string name="preference_title_system_notification">Open System Setting</string>
+    <string name="preference_title_check_for_updates">Check for updates</string>
     <string name="pref_title_dark_theme">Dark Theme</string>
     <string name="pref_description_dark_theme">Switching to dark theme is recommended by google
         for saving battery life

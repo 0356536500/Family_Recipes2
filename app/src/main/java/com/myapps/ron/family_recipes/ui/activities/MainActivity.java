@@ -715,8 +715,7 @@ public class MainActivity extends MyBaseActivity implements BackStack.BackStackH
         if (canReadWriteExternalAndInstallPackages()) {
             viewModel.downloadNewAppVersion(this, onComplete, uri, appUpdateFile);
         } else {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) ||
-                    ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.REQUEST_INSTALL_PACKAGES)) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
                 new AlertDialog.Builder(this)
                         .setCancelable(true)
                         .setTitle(R.string.main_activity_permission_to_install_updates_title)
@@ -730,31 +729,6 @@ public class MainActivity extends MyBaseActivity implements BackStack.BackStackH
         }
     }
 
-    /*private void downloadApp() {
-        registerReceiver(onComplete,
-                new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
-
-        ((DownloadManager)getSystemService(DOWNLOAD_SERVICE)).enqueue(new DownloadManager.Request(uri)
-                .setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI |
-                        DownloadManager.Request.NETWORK_MOBILE)
-                .setAllowedOverRoaming(false)
-                .setTitle(appUpdateFile.getName())
-                .setDescription("Downloading app update")
-                .setDestinationUri(Uri.fromFile(appUpdateFile))
-                .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)
-        );
-    }
-
-    public void installApp() {
-        Intent installIntent = new Intent(Intent.ACTION_VIEW);
-        installIntent.addCategory("android.intent.category.DEFAULT");
-        installIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-        installIntent.setDataAndType(FileProvider.getUriForFile(this, getPackageName(), appUpdateFile), "application/vnd.android.package-archive");
-        //installIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        installIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        startActivity(installIntent);
-    }*/
-
     BroadcastReceiver onComplete=new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
             Toast.makeText(context, "Finished", Toast.LENGTH_LONG).show();
@@ -765,8 +739,7 @@ public class MainActivity extends MyBaseActivity implements BackStack.BackStackH
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == REQUEST_WRITE_PERMISSION && grantResults[0] == PackageManager.PERMISSION_GRANTED &&
-                grantResults[1] == PackageManager.PERMISSION_GRANTED)
+        if (requestCode == REQUEST_WRITE_PERMISSION && grantResults[0] == PackageManager.PERMISSION_GRANTED)
             viewModel.downloadNewAppVersion(this, onComplete, uri, appUpdateFile);
         else
             Toast.makeText(this, "Permission denied", Toast.LENGTH_LONG).show();
@@ -775,15 +748,13 @@ public class MainActivity extends MyBaseActivity implements BackStack.BackStackH
     private void requestPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
             requestPermissions(new String[]{
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.REQUEST_INSTALL_PACKAGES
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
             }, REQUEST_WRITE_PERMISSION);
     }
 
     private boolean canReadWriteExternalAndInstallPackages() {
         return Build.VERSION.SDK_INT < Build.VERSION_CODES.M ||
                 ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                        != PackageManager.PERMISSION_GRANTED ||
-                ContextCompat.checkSelfPermission(this, Manifest.permission.REQUEST_INSTALL_PACKAGES)
                         != PackageManager.PERMISSION_GRANTED;
     }
 

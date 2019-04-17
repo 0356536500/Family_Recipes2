@@ -1,28 +1,44 @@
 package com.myapps.ron.family_recipes.viewmodels;
 
+import android.app.DownloadManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.ContextWrapper;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Handler;
 
 import com.myapps.ron.family_recipes.MyApplication;
 import com.myapps.ron.family_recipes.R;
+import com.myapps.ron.family_recipes.dal.repository.AppRepository;
 import com.myapps.ron.family_recipes.network.APICallsHandler;
 import com.myapps.ron.family_recipes.network.Constants;
 import com.myapps.ron.family_recipes.network.MiddleWareForNetwork;
 import com.myapps.ron.family_recipes.network.cognito.AppHelper;
 import com.myapps.ron.family_recipes.utils.logic.SharedPreferencesHandler;
 
+import java.io.File;
 import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 import androidx.annotation.Nullable;
+import androidx.core.content.FileProvider;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 import androidx.preference.Preference;
 import androidx.preference.TwoStatePreference;
+
+import io.reactivex.Single;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.observers.DisposableMaybeObserver;
+import io.reactivex.schedulers.Schedulers;
+
+import static android.content.Context.DOWNLOAD_SERVICE;
 
 /**
  * Created by ronginat on 17/02/2019.
@@ -115,6 +131,64 @@ public class SettingsViewModel extends ViewModel implements SharedPreferences.On
             }
         }
     }
+
+    // App update
+
+    public Single<Map<String, String>> getDataToDownloadUpdate(ContextWrapper context) {
+        return Single.create(emitter ->
+                AppRepository.getInstance().getDataToDownloadUpdate(context)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new DisposableMaybeObserver<Map<String, String>>() {
+                            @Override
+                            public void onSuccess(Map<String, String> map) {
+                                if (map != null) // always true
+                                    emitter.onSuccess(map);
+                                dispose();
+                            }
+
+                            @Override
+                            public void onError(Throwable t) {
+                                emitter.onError(t);
+                                dispose();
+                            }
+
+                            @Override
+                            public void onComplete() {
+                                // notify up to-date
+                                emitter.onError(new Throwable(context.getString(R.string.main_activity_app_up_to_date)));
+                                dispose();
+                            }
+                        })
+        );
+    }
+
+    public void downloadNewAppVersion(ContextWrapper context, BroadcastReceiver onComplete, Uri uri, File appUpdateFile) {
+        context.registerReceiver(onComplete,
+                new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+
+        ((DownloadManager)context.getSystemService(DOWNLOAD_SERVICE)).enqueue(new DownloadManager.Request(uri)
+                .setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI |
+                        DownloadManager.Request.NETWORK_MOBILE)
+                .setAllowedOverRoaming(false)
+                .setTitle(appUpdateFile.getName())
+                .setDescription("Downloading app update")
+                .setDestinationUri(Uri.fromFile(appUpdateFile))
+                .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)
+        );
+    }
+
+    public void installApp(Context context, File appUpdateFile) {
+        Intent installIntent = new Intent(Intent.ACTION_VIEW);
+        installIntent.addCategory("android.intent.category.DEFAULT");
+        installIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        installIntent.setDataAndType(FileProvider.getUriForFile(context, context.getPackageName(), appUpdateFile), "application/vnd.android.package-archive");
+        //installIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        installIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        context.startActivity(installIntent);
+    }
+
+    // endregion
 
     @Override
     protected void onCleared() {
