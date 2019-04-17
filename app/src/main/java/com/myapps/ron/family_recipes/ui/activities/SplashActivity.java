@@ -48,7 +48,7 @@ public class SplashActivity extends AppCompatActivity {
 
         AppHelper.init(getApplicationContext());
 
-        if (!MiddleWareForNetwork.checkInternetConnection(this))
+        if (MiddleWareForNetwork.checkInternetConnection(this))
             findCurrent();
         else if (SharedPreferencesHandler.getString(this, USERNAME) != null &&
                 SharedPreferencesHandler.getString(this, PASSWORD) != null) {

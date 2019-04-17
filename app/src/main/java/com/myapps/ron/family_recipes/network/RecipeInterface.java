@@ -34,6 +34,7 @@ public interface RecipeInterface {
     String subscriptions = Constants.URL_SUBSCRIPTIONS + "/{" + Constants.PATH_DEVICE_ID + "}";
     String register_token = Constants.URL_TOKENS + "/{" + Constants.PATH_DEVICE_ID + "}" + "/{" + Constants.PATH_TOKEN + "}";
     String userWithID = Constants.URL_USERS + "/{" + Constants.PATH_DEVICE_ID + "}";
+    String update = "app";
 
 
     @GET(recipeWithID)
@@ -149,6 +150,17 @@ public interface RecipeInterface {
     );
 
     //endregion
+
+    // region App
+
+    @GET(update)
+    Observable<Response<Map<String, String>>> getDetailsForUpdateObservable(
+            @Header(Constants.AUTHORIZATION) String auth,
+            @Query(Constants.QUERY_PLATFORM) String platform,
+            @Query(Constants.QUERY_PLATFORM) int androidVersion
+    );
+
+    // endregion
 
 
     /*@GET("/repos/{owner}/{repo}/contributors")

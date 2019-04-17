@@ -1,9 +1,11 @@
 package com.myapps.ron.family_recipes.ui.activities;
 
+import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.graphics.Canvas;
 import android.graphics.ColorFilter;
 import android.graphics.Paint;
@@ -13,6 +15,7 @@ import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -28,6 +31,7 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.dal.Injection;
+import com.myapps.ron.family_recipes.dal.storage.StorageWrapper;
 import com.myapps.ron.family_recipes.network.MiddleWareForNetwork;
 import com.myapps.ron.family_recipes.network.cognito.AppHelper;
 import com.myapps.ron.family_recipes.ui.baseclasses.MyBaseActivity;
@@ -40,9 +44,11 @@ import com.myapps.ron.family_recipes.utils.logic.SharedPreferencesHandler;
 import com.myapps.ron.family_recipes.viewmodels.DataViewModel;
 import com.myapps.ron.localehelper.LocaleHelper;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import androidx.annotation.NonNull;
@@ -50,13 +56,19 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProviders;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.observers.DisposableSingleObserver;
+import io.reactivex.schedulers.Schedulers;
 
 public class MainActivity extends MyBaseActivity implements BackStack.BackStackHelper {
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -153,6 +165,8 @@ public class MainActivity extends MyBaseActivity implements BackStack.BackStackH
         }
     }
 
+    // region BackStack
+
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         backStack.onSaveInstanceState(outState);
@@ -191,6 +205,8 @@ public class MainActivity extends MyBaseActivity implements BackStack.BackStackH
         }
         return fragment;
     }
+
+    // endregion
 
     private void handleDataFromIntentAndStart() {
         //handle data from intent
@@ -648,6 +664,130 @@ public class MainActivity extends MyBaseActivity implements BackStack.BackStackH
         unregisterReceiver(mReceiver);
         getSupportFragmentManager().unregisterFragmentLifecycleCallbacks(fragmentLifecycleCallbacks);
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        try {
+            unregisterReceiver(onComplete);
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // region App Updates
+
+    private static final int REQUEST_WRITE_PERMISSION = 786;
+    private File appUpdateFile;
+    private Uri uri;
+
+    private void checkIfUpdateAvailable() {
+        viewModel.getDataToDownloadUpdate(this)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new DisposableSingleObserver<Map<String, String>>() {
+                    @Override
+                    public void onSuccess(Map<String, String> map) {
+                        appUpdateFile = StorageWrapper.getFileToDownloadUpdateInto(getApplicationContext(),
+                                map.get(com.myapps.ron.family_recipes.network.Constants.RESPONSE_KEY_APP_NAME));
+                        uri = Uri.parse(map.get(com.myapps.ron.family_recipes.network.Constants.RESPONSE_KEY_APP_URL));
+                        new AlertDialog.Builder(getApplicationContext())
+                                .setCancelable(true)
+                                .setTitle(R.string.main_activity_update_available_title)
+                                .setMessage(R.string.main_activity_update_available_message)
+                                .setPositiveButton(android.R.string.yes, (dialog, which) ->
+                                        updateApp())
+                                .create()
+                                .show();
+
+                        dispose();
+                    }
+
+                    @Override
+                    public void onError(Throwable t) {
+                        Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_LONG).show();
+                        dispose();
+                    }
+                });
+    }
+
+    private void updateApp() {
+        if (canReadWriteExternalAndInstallPackages()) {
+            viewModel.downloadNewAppVersion(this, onComplete, uri, appUpdateFile);
+        } else {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) ||
+                    ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.REQUEST_INSTALL_PACKAGES)) {
+                new AlertDialog.Builder(this)
+                        .setCancelable(true)
+                        .setTitle(R.string.main_activity_permission_to_install_updates_title)
+                        .setMessage(R.string.main_activity_permission_to_install_updates_message)
+                        .setPositiveButton(android.R.string.yes, (dialog, which) ->
+                                requestPermission())
+                        .create()
+                        .show();
+            } else
+                requestPermission();
+        }
+    }
+
+    /*private void downloadApp() {
+        registerReceiver(onComplete,
+                new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+
+        ((DownloadManager)getSystemService(DOWNLOAD_SERVICE)).enqueue(new DownloadManager.Request(uri)
+                .setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI |
+                        DownloadManager.Request.NETWORK_MOBILE)
+                .setAllowedOverRoaming(false)
+                .setTitle(appUpdateFile.getName())
+                .setDescription("Downloading app update")
+                .setDestinationUri(Uri.fromFile(appUpdateFile))
+                .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)
+        );
+    }
+
+    public void installApp() {
+        Intent installIntent = new Intent(Intent.ACTION_VIEW);
+        installIntent.addCategory("android.intent.category.DEFAULT");
+        installIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        installIntent.setDataAndType(FileProvider.getUriForFile(this, getPackageName(), appUpdateFile), "application/vnd.android.package-archive");
+        //installIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        installIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        startActivity(installIntent);
+    }*/
+
+    BroadcastReceiver onComplete=new BroadcastReceiver() {
+        public void onReceive(Context context, Intent intent) {
+            Toast.makeText(context, "Finished", Toast.LENGTH_LONG).show();
+            viewModel.installApp(getApplicationContext(), appUpdateFile);
+            unregisterReceiver(this);
+        }
+    };
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == REQUEST_WRITE_PERMISSION && grantResults[0] == PackageManager.PERMISSION_GRANTED &&
+                grantResults[1] == PackageManager.PERMISSION_GRANTED)
+            viewModel.downloadNewAppVersion(this, onComplete, uri, appUpdateFile);
+        else
+            Toast.makeText(this, "Permission denied", Toast.LENGTH_LONG).show();
+    }
+
+    private void requestPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+            requestPermissions(new String[]{
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.REQUEST_INSTALL_PACKAGES
+            }, REQUEST_WRITE_PERMISSION);
+    }
+
+    private boolean canReadWriteExternalAndInstallPackages() {
+        return Build.VERSION.SDK_INT < Build.VERSION_CODES.M ||
+                ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        != PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(this, Manifest.permission.REQUEST_INSTALL_PACKAGES)
+                        != PackageManager.PERMISSION_GRANTED;
+    }
+
+    // endregion
 
     /**
      * The BroadcastReceiver that listens for discovered devices and changes the title when

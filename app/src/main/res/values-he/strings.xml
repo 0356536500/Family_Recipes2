@@ -59,6 +59,14 @@
     <string name="Username">שם משתמש</string>
     <string name="Password">סיסמה</string>
 
+    <!--#region MainActivity -->
+    <string name="main_activity_app_up_to_date">אין עדכונים</string>
+    <string name="main_activity_update_available_title">יש גרסא חדשה לאפליקציה!</string>
+    <string name="main_activity_update_available_message">להתחיל הורדה?</string>
+    <string name="main_activity_permission_to_install_updates_title">ההשאות הכרחיות</string>
+    <string name="main_activity_permission_to_install_updates_message">מבקש רשות להתקין אפליקציות ממקור לא ידוע, לצורך עדכון האפליקציה מחוץ לחנות הרשמית</string>
+    <!--#endregion MainActivity -->
+
     <!-- AllRecipes Fragment -->
     <string name="str_all_selected">כל הקטגוריות</string>
     <string name="load_error_message">קרתה תקלה בשרת</string>

@@ -9,7 +9,13 @@ import com.myapps.ron.family_recipes.network.cognito.AppHelper;
 import androidx.test.InstrumentationRegistry;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
+import io.reactivex.Maybe;
+import io.reactivex.Single;
+import io.reactivex.disposables.CompositeDisposable;
 
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -53,5 +59,23 @@ public class ExampleInstrumentedTest {
 
         Log.e("mailMessageTest", stringBuilder.toString());
         assertTrue(true);
+    }
+
+    private CompositeDisposable compositeDisposable;
+
+    @Before
+    public void initCompositeDisposable() {
+        compositeDisposable = new CompositeDisposable();
+    }
+
+    @After
+    public void clearCompositeDisposable() {
+        compositeDisposable.clear();
+    }
+
+    @Test
+    public void catchEmptyValueFromMaybeTest() {
+        compositeDisposable.add(Maybe.empty()
+                .subscribe(Assert::assertNull));
     }
 }

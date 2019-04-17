@@ -32,6 +32,7 @@ public class APICallsHandler {
     private static Retrofit retrofit, rxRetrofit;
 
     public static final int STATUS_OK = 200;
+    public static final int STATUS_OK_NO_CONTENT = 204;
     private static final int STATUS_NOT_MODIFIED = 304;
     //private static final String BASE_URL = "https://jsonplaceholder.typicode.com";
 
@@ -429,6 +430,15 @@ public class APICallsHandler {
     public static Observable<Response<Map<String, Object>>> getUserDetailsObservable(String token, String deviceId) {
         RecipeInterface service = getReactiveRetrofitInstance().create(RecipeInterface.class);
         return service.getUserDetailsObservable(token, deviceId);
+    }
+
+    // endregion
+
+    // region APP UPDATES
+
+    public static Observable<Response<Map<String, String>>> getDetailsForUpdate(String token, int androidVersion) {
+        RecipeInterface service = getReactiveRetrofitInstance().create(RecipeInterface.class);
+        return service.getDetailsForUpdateObservable(token, "android", androidVersion);
     }
 
     // endregion

@@ -143,6 +143,17 @@ public class StorageWrapper {
         //return image;
     }
 
+    /**
+     * Supply a file in local dedicated folder of the new update to be downloaded
+     * @param context application
+     * @param fileName the name of the new update file
+     * @return file from {@link Context#getExternalFilesDir(String)} to store the app download
+     */
+    public static File getFileToDownloadUpdateInto(Context context, String fileName) {
+        File dir = context.getExternalFilesDir(Constants.APK_DIR);
+        return new File(dir, fileName);
+    }
+
     public static File createImageFile(Context context) throws IOException {
         /*StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
         StrictMode.setVmPolicy(builder.build());*/

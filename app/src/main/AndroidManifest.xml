@@ -8,6 +8,7 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
     <application
         android:name=".MyApplication"
@@ -19,21 +20,25 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme.Light">
         <activity android:name=".TestActivity">
-            <!--<intent-filter>
+            <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>-->
+               <!-- <action android:name="android.intent.action.INSTALL_PACKAGE" />
+                <data android:scheme="file" />
+                <data android:scheme="content" />
+                <data android:mimeType="application/vnd.android.package-archive" />-->
+            </intent-filter>
         </activity>
         <activity
             android:name=".ui.activities.SplashActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Launcher">
-            <intent-filter>
+            <!--<intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+            </intent-filter>-->
 
             <meta-data android:name="android.app.shortcuts"
                 android:resource="@xml/shortcuts" />
@@ -122,7 +127,7 @@
 
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="com.myapps.ron.family_recipes"
+            android:authorities="${applicationId}"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data

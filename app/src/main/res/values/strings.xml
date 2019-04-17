@@ -81,6 +81,14 @@
 
     <!--#endregion UNUSED MainActivity -->
 
+    <!--#region MainActivity -->
+    <string name="main_activity_app_up_to_date">Up to date!</string>
+    <string name="main_activity_update_available_title">New version is available</string>
+    <string name="main_activity_update_available_message">Start download?</string>
+    <string name="main_activity_permission_to_install_updates_title">Permissions are necessary</string>
+    <string name="main_activity_permission_to_install_updates_message">Install from unknown source is the only way to install the app outside of google play</string>
+    <!--#endregion MainActivity -->
+
     <!-- AllRecipes Fragment -->
     <string name="str_all_selected">All categories</string>
     <string name="refresh_error_message">can refresh once every minute</string>
