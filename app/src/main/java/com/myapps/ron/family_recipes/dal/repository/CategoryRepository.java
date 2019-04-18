@@ -3,6 +3,8 @@ package com.myapps.ron.family_recipes.dal.repository;
 import android.content.Context;
 import android.util.Log;
 
+import androidx.lifecycle.LiveData;
+
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.dal.persistence.CategoryDao;
 import com.myapps.ron.family_recipes.dal.persistence.Converters;
@@ -13,14 +15,12 @@ import com.myapps.ron.family_recipes.network.cognito.AppHelper;
 import com.myapps.ron.family_recipes.network.modelTO.CategoryTO;
 import com.myapps.ron.family_recipes.utils.logic.DateUtil;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.Executor;
 
-import androidx.lifecycle.LiveData;
-import io.reactivex.Observable;
-import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableCompletableObserver;
+import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
 import retrofit2.Response;
@@ -72,47 +72,53 @@ public class CategoryRepository {
         executor.execute(() -> categoryDao.insertAll(AppDatabases.generateData(name, size)));
     }*/
 
-    public void deleteAllRecipes() {
+    public void deleteAllCategories() {
         executor.execute(categoryDao::deleteAllCategories);
     }
 
     // region Remote Server
 
-    public void fetchCategories(final Context context) {
-        if(MiddleWareForNetwork.checkInternetConnection(context)
-                && DateUtil.shouldUpdateCategories(context)) {
-            final String time = DateUtil.getUTCTime();
-            APICallsHandler.getAllCategories(DateUtil.getLastUpdateTime(context), AppHelper.getAccessToken(), categories -> {
-                if(categories != null) {
-                    DateUtil.updateServerTime(context, time);
-                    updateFromServer(categories);
-                } else {
-                    dispatchInfo.onNext(context.getString(R.string.error_message_from_fetch_categories));
-                }
-            });
-        }
-    }
-
-    private CompositeDisposable compositeDisposable = new CompositeDisposable();
-
     public void fetchCategoriesReactive(final Context context) {
         if(MiddleWareForNetwork.checkInternetConnection(context)
+                && AppHelper.getAccessToken() != null
                 && DateUtil.shouldUpdateCategories(context)) {
             final String time = DateUtil.getUTCTime();
 
-            Observable<Response<List<CategoryTO>>> categoryObservable = APICallsHandler
-                    .getAllCategoriesObservable(DateUtil.getLastCategoriesUpdateTime(context), AppHelper.getAccessToken());
-            Disposable disposable = categoryObservable
+            APICallsHandler.getAllCategoriesObservable(DateUtil.getLastCategoriesUpdateTime(context), AppHelper.getAccessToken())
                     .subscribeOn(Schedulers.io())
                     .observeOn(Schedulers.from(executor))
-                    //.observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(next -> {
-                        if (next.code() == 200)
-                            updateFromServer(next.body());
-                        DateUtil.updateCategoriesServerTime(context, time);
-                    }, error -> dispatchInfo.onNext(context.getString(R.string.error_message_from_fetch_categories)));
+                    .subscribe(new DisposableObserver<Response<List<CategoryTO>>>() {
+                        @Override
+                        public void onNext(Response<List<CategoryTO>> response) {
+                            if (response.code() == APICallsHandler.STATUS_OK && response.body() != null) {
+                                updateFromServer(response.body());
+                                DateUtil.updateCategoriesServerTime(context, time);
+                            } else if (response.code() != APICallsHandler.STATUS_NOT_MODIFIED) {
+                                int code = response.code();
+                                try {
+                                    if (response.errorBody() != null)
+                                        dispatchInfo.onNext(String.format("status %d" + response.errorBody().string(), code));
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                    dispatchInfo.onNext(e.getMessage());
+                                }
+                            }
+                            dispose();
+                        }
 
-            compositeDisposable.add(disposable);
+                        @Override
+                        public void onError(Throwable t) {
+                            dispatchInfo.onNext(context.getString(R.string.error_message_from_fetch_categories));
+                            dispatchInfo.onError(t);
+                            dispose();
+                        }
+
+                        @Override
+                        public void onComplete() {
+                            if (!isDisposed())
+                                dispose();
+                        }
+                    });
         }
     }
 

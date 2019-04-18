@@ -33,6 +33,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.myapps.ron.family_recipes.BuildConfig;
 import com.myapps.ron.family_recipes.R;
+import com.myapps.ron.family_recipes.dal.Injection;
 import com.myapps.ron.family_recipes.dal.storage.StorageWrapper;
 import com.myapps.ron.family_recipes.network.MiddleWareForNetwork;
 import com.myapps.ron.family_recipes.network.cognito.AppHelper;
@@ -61,7 +62,7 @@ public class SettingsActivity extends MyBaseActivity
         setContentView(R.layout.activity_settings);
 
         setupActionBar();
-        ViewModelProviders.of(this).get(SettingsViewModel.class)
+        ViewModelProviders.of(this, Injection.provideViewModelFactory(this)).get(SettingsViewModel.class)
                 .getInfo().observe(this, info ->
                 Toast.makeText(this, info, Toast.LENGTH_SHORT).show());
 

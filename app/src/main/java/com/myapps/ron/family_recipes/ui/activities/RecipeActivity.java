@@ -252,7 +252,7 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
     private void initViewModel() {
         viewModel = ViewModelProviders.of(this, Injection.provideViewModelFactory(this)).get(RecipeViewModel.class);
         //viewModel = ViewModelProviders.of(this).get(RecipeViewModel.class);
-        viewModel.setInitialRecipe(recipeId);
+        viewModel.setInitialRecipe(this, recipeId);
 
         viewModel.getRecipe().observe(this, recipe -> {
             if (recipe != null) {

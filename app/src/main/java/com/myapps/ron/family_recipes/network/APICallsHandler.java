@@ -33,7 +33,7 @@ public class APICallsHandler {
 
     public static final int STATUS_OK = 200;
     public static final int STATUS_OK_NO_CONTENT = 204;
-    private static final int STATUS_NOT_MODIFIED = 304;
+    public static final int STATUS_NOT_MODIFIED = 304;
     //private static final String BASE_URL = "https://jsonplaceholder.typicode.com";
 
     private static Retrofit getRetrofitInstance() {
@@ -57,7 +57,12 @@ public class APICallsHandler {
         return rxRetrofit;
     }
 
-    public static void getRecipeComments(String id, String token, MyCallback<List<CommentTO>> callback) {
+    public static Observable<Response<List<CommentTO>>> getRecipeCommentsObervable(String id, String token) {
+        RecipeInterface service = getReactiveRetrofitInstance().create(RecipeInterface.class);
+        return service.getRecipeComments(token, id);
+    }
+
+    /*public static void getRecipeComments(String id, String token, MyCallback<List<CommentTO>> callback) {
         RecipeInterface service = getRetrofitInstance().create(RecipeInterface.class);
         Call<List<CommentTO>> call = service.getRecipeComments(token, id);
 
@@ -79,7 +84,7 @@ public class APICallsHandler {
                 Log.e(TAG, "error getting recipe comments", t);
             }
         });
-    }
+    }*/
 
     public static void postRecipe(final PostRecipe recipe, final String token, final MyCallback<Map<String, String>> callback) {
         Log.e(TAG, "start post recipe");
@@ -175,41 +180,13 @@ public class APICallsHandler {
         });
     }
 
-    public static void postComment(Map<String, Object> attributes, String id, String lastModifiedDate, String token, final MyCallback<Boolean> callback) {
+    public static Observable<Response<Void>> postCommentObservable(Map<String, Object> attributes, String id, String lastModifiedDate, String token) {
         Map<String, String> headers = new HashMap<>();
         headers.put(Constants.CONTENT_TYPE, "application/json");
         headers.put(Constants.AUTHORIZATION, token);
 
-        RecipeInterface service = getRetrofitInstance().create(RecipeInterface.class);
-        Call<Void> call = service.postComment(headers, id, lastModifiedDate, attributes);
-
-        call.enqueue(new Callback<Void>() {
-            @Override
-            public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
-                //String body = response.body() != null ? response.body().toString() : "null";
-                Log.i(TAG, "postComment code, " + response.code());
-
-                if (response.code() == STATUS_OK) {
-                    //RecipeTO recipe = response.body();
-                    callback.onFinished(true);
-                }
-                else {
-                    try {
-                        if (response.errorBody() != null)
-                            Log.e(TAG, "error postComment, code = " + response.code() + "\n errorBody: " + response.errorBody().string());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    callback.onFinished(false);
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
-                Log.e(TAG, "error patching recipe. message: " + t.getMessage());
-                //Toast.makeText(MainActivity.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
-            }
-        });
+        RecipeInterface service = getReactiveRetrofitInstance().create(RecipeInterface.class);
+        return service.postComment(headers, id, lastModifiedDate, attributes);
     }
 
     public static void getAllCategories(String date, String token, final MyCallback<List<CategoryTO>> callback) {
@@ -331,7 +308,6 @@ public class APICallsHandler {
 
     public static Observable<Response<List<CategoryTO>>> getAllCategoriesObservable(String date, String token) {
         RecipeInterface service = getReactiveRetrofitInstance().create(RecipeInterface.class);
-
         return service.getAllCategoriesObservable(token, date);
     }
 
@@ -387,10 +363,18 @@ public class APICallsHandler {
         });
     }
 
-    public static void manageSubscriptions(String authToken, String deviceId,
-                     Map<String, String> queries, Map<String, String> policy, MyCallback<String> callback) {
+    public static Observable<Response<Void>> manageSubscriptionsObservable(String authToken, String deviceId,
+                                           Map<String, String> queries, Map<String, String> policy) {
         /*if (policy == null)
             policy = new HashMap<>();*/
+        RecipeInterface service = getReactiveRetrofitInstance().create(RecipeInterface.class);
+        return service.manageSubscriptions(authToken, deviceId, queries, policy);
+    }
+
+    /*public static void manageSubscriptions(String authToken, String deviceId,
+                     Map<String, String> queries, Map<String, String> policy, MyCallback<String> callback) {
+        *//*if (policy == null)
+            policy = new HashMap<>();*//*
         RecipeInterface service = getRetrofitInstance().create(RecipeInterface.class);
         Call<Void> call = service.manageSubscriptions(authToken, deviceId, queries, policy);
 
@@ -425,7 +409,7 @@ public class APICallsHandler {
                 //Toast.makeText(MainActivity.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
             }
         });
-    }
+    }*/
 
     public static Observable<Response<Map<String, Object>>> getUserDetailsObservable(String token, String deviceId) {
         RecipeInterface service = getReactiveRetrofitInstance().create(RecipeInterface.class);

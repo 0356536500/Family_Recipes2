@@ -100,24 +100,14 @@ public class DataViewModel extends ViewModel {
      * @param id recipe identifier
      */
     public void changeLike(final Context context, @NonNull String id, Runnable onErrorUpdateUI) {
-        recipeRepository.getSingleRecipe(id)
+        compositeDisposable.add(recipeRepository.getSingleRecipe(id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
-                .subscribe(new DisposableSingleObserver<RecipeEntity>() {
-                    @Override
-                    public void onSuccess(RecipeEntity recipeEntity) {
-                        updateLike(context, recipeEntity, onErrorUpdateUI);
-                        dispose();
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        infoFromLastFetch.postValue(e.getMessage());
-                        onErrorUpdateUI.run();
-                        dispose();
-                    }
-                });
-
+                .subscribe(recipeEntity -> updateLike(context, recipeEntity, onErrorUpdateUI), throwable -> {
+                    infoFromLastFetch.postValue(throwable.getMessage());
+                    onErrorUpdateUI.run();
+                })
+        );
     }
 
     /**
@@ -128,26 +118,14 @@ public class DataViewModel extends ViewModel {
         Map<String, Object> attrs = new HashMap<>();
         String likeStr = recipe.isUserLiked() ? "unlike" : "like";
         attrs.put(Constants.LIKES, likeStr);
-        recipeRepository.changeLike(context, recipe, attrs)
+        compositeDisposable.add(recipeRepository.changeLike(context, recipe, attrs)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new DisposableSingleObserver<Integer>() {
-                    @Override
-                    public void onSuccess(Integer status) {
-                        if (status != -1) {
-                            infoFromLastFetch.setValue(context.getString(status));
-                            onErrorUpdateUI.run();
-                        }
-                        dispose();
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        infoFromLastFetch.setValue(e.getMessage());
-                        onErrorUpdateUI.run();
-                        dispose();
-                    }
-                });
+                .subscribe(aBoolean -> {}, throwable -> {
+                    infoFromLastFetch.setValue(throwable.getMessage());
+                    onErrorUpdateUI.run();
+                })
+        );
     }
 
 

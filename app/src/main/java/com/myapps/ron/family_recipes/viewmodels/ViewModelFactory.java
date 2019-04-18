@@ -1,5 +1,6 @@
 package com.myapps.ron.family_recipes.viewmodels;
 
+import com.myapps.ron.family_recipes.dal.repository.AppRepository;
 import com.myapps.ron.family_recipes.dal.repository.CategoryRepository;
 import com.myapps.ron.family_recipes.dal.repository.PendingRecipeRepository;
 import com.myapps.ron.family_recipes.dal.repository.RecipeRepository;
@@ -43,6 +44,12 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
         } else if (modelClass.isAssignableFrom(DataViewModel.class)) {
             try {
                 return modelClass.getConstructor(RecipeRepository.class, CategoryRepository.class).newInstance(mDataSource1, mDataSource2);
+            } catch (ClassCastException | IllegalAccessException | NoSuchMethodException | InstantiationException | InvocationTargetException e) {
+                throw new RuntimeException("Cannot create an instance of " + modelClass, e);
+            }
+        } else if (modelClass.isAssignableFrom(SettingsViewModel.class)) {
+            try {
+                return modelClass.getConstructor(AppRepository.class).newInstance(AppRepository.getInstance());
             } catch (ClassCastException | IllegalAccessException | NoSuchMethodException | InstantiationException | InvocationTargetException e) {
                 throw new RuntimeException("Cannot create an instance of " + modelClass, e);
             }

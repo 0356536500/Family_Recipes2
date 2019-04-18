@@ -44,7 +44,7 @@ public interface RecipeInterface {
     );
 
     @GET(recipeWithID + "/" + Constants.COMMENTS)
-    Call<List<CommentTO>> getRecipeComments(
+    Observable<Response<List<CommentTO>>> getRecipeComments(
             @Header(Constants.AUTHORIZATION) String token,
             @Path(Constants.ID_QUERY) String id
     );
@@ -86,7 +86,7 @@ public interface RecipeInterface {
     );
 
     @POST(recipeWithID + "/" + Constants.COMMENTS)
-    Call<Void> postComment(
+    Observable<Response<Void>> postComment(
             @HeaderMap Map<String, String> headers,
             @Path(Constants.ID_QUERY) String id,
             @Query(Constants.LAST_MODIFIED_QUERY) String lastModifiedDate,
@@ -124,7 +124,7 @@ public interface RecipeInterface {
 
     //region users
     @PUT(subscriptions)
-    Call<Void> manageSubscriptions(
+    Observable<Response<Void>> manageSubscriptions(
             @Header(Constants.AUTHORIZATION) String auth,
             @Path(Constants.PATH_DEVICE_ID) String deviceId,
             @QueryMap Map<String, String> queries,

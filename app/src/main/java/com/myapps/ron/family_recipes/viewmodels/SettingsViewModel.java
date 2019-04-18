@@ -10,10 +10,17 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Handler;
 
+import androidx.annotation.Nullable;
+import androidx.core.content.FileProvider;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModel;
+import androidx.preference.Preference;
+import androidx.preference.TwoStatePreference;
+
 import com.myapps.ron.family_recipes.MyApplication;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.dal.repository.AppRepository;
-import com.myapps.ron.family_recipes.network.APICallsHandler;
 import com.myapps.ron.family_recipes.network.Constants;
 import com.myapps.ron.family_recipes.network.MiddleWareForNetwork;
 import com.myapps.ron.family_recipes.network.cognito.AppHelper;
@@ -25,16 +32,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
-import androidx.annotation.Nullable;
-import androidx.core.content.FileProvider;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
-import androidx.preference.Preference;
-import androidx.preference.TwoStatePreference;
-
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.observers.DisposableMaybeObserver;
 import io.reactivex.schedulers.Schedulers;
 
@@ -50,10 +50,15 @@ public class SettingsViewModel extends ViewModel implements SharedPreferences.On
     public MutableLiveData<Map.Entry<String, Boolean>> changeKeyToValue = new MutableLiveData<>();
     private Context context;
 
+    private CompositeDisposable compositeDisposable;
+    private final AppRepository appRepository;
+
     private AtomicReference<String> skipKey = new AtomicReference<>("");
 
-    public SettingsViewModel() {
+    public SettingsViewModel(AppRepository appRepository) {
         this.context = MyApplication.getContext();
+        this.appRepository = appRepository;
+        this.compositeDisposable = new CompositeDisposable();
         SharedPreferencesHandler.getSharedPreferences(context).registerOnSharedPreferenceChangeListener(this);
     }
 
@@ -86,21 +91,23 @@ public class SettingsViewModel extends ViewModel implements SharedPreferences.On
             // call to server
             Map<String, String> queries = new HashMap<>();
             queries.put(key, changeToValue ? Constants.SUBSCRIPTION_SUBSCRIBE : Constants.SUBSCRIPTION_UNSUBSCRIBE);
-            APICallsHandler.manageSubscriptions(AppHelper.getAccessToken(), MyApplication.getDeviceId(), queries, new HashMap<>(), message -> {
-                if (message != null) {
-                    setInfo(message);
-                    skipKey.set(key);
-                    changeKeyToValue.setValue(new AbstractMap.SimpleEntry<>(key, !changeToValue));
-                    new Handler().postDelayed(() -> skipKey.set(""), 200);
-                }
-                setBindListenerAgain(key);
-            });
+            compositeDisposable.add(appRepository.manageSubscriptions(context, queries, new HashMap<>())
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(message -> {
+                        // 200 ok will return empty string ""
+                        // local errors will return message string
+                        // server errors will return throwable
+                        if (message != null && !message.equals("")) {
+                            setInfo(message);
+                            skipKey.set(key);
+                            changeKeyToValue.setValue(new AbstractMap.SimpleEntry<>(key, !changeToValue));
+                            new Handler().postDelayed(() -> skipKey.set(""), 200);
+                        }
+                        setBindListenerAgain(key);
+                    }, throwable -> setInfo(throwable.getMessage()))
+            );
         }
-        /*else { // no internet. reset the preference value
-            setInfo(context.getString(R.string.no_internet_message));
-            new Handler().postDelayed(() ->
-                    SharedPreferencesHandler.writeBoolean(context, key, !changeToValue), 1500);
-        }*/
     }
 
     private void setInfo(String info) {
@@ -136,7 +143,7 @@ public class SettingsViewModel extends ViewModel implements SharedPreferences.On
 
     public Single<Map<String, String>> getDataToDownloadUpdate(ContextWrapper context) {
         return Single.create(emitter ->
-                AppRepository.getInstance().getDataToDownloadUpdate(context)
+                appRepository.getDataToDownloadUpdate(context)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(new DisposableMaybeObserver<Map<String, String>>() {
@@ -193,6 +200,7 @@ public class SettingsViewModel extends ViewModel implements SharedPreferences.On
     @Override
     protected void onCleared() {
         super.onCleared();
+        this.compositeDisposable.clear();
         SharedPreferencesHandler.getSharedPreferences(context).unregisterOnSharedPreferenceChangeListener(this);
     }
 }

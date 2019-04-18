@@ -13,6 +13,7 @@ import com.myapps.ron.family_recipes.dal.persistence.Converters;
 import com.myapps.ron.family_recipes.dal.persistence.RecipeDao;
 import com.myapps.ron.family_recipes.dal.storage.ExternalStorageHelper;
 import com.myapps.ron.family_recipes.model.AccessEntity;
+import com.myapps.ron.family_recipes.model.CommentEntity;
 import com.myapps.ron.family_recipes.model.QueryModel;
 import com.myapps.ron.family_recipes.model.RecipeEntity;
 import com.myapps.ron.family_recipes.model.RecipeMinimal;
@@ -20,10 +21,13 @@ import com.myapps.ron.family_recipes.network.APICallsHandler;
 import com.myapps.ron.family_recipes.network.Constants;
 import com.myapps.ron.family_recipes.network.MiddleWareForNetwork;
 import com.myapps.ron.family_recipes.network.cognito.AppHelper;
+import com.myapps.ron.family_recipes.network.modelTO.CommentTO;
 import com.myapps.ron.family_recipes.network.modelTO.RecipeTO;
 import com.myapps.ron.family_recipes.utils.logic.DateUtil;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
@@ -45,6 +49,7 @@ import io.reactivex.Single;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableMaybeObserver;
+import io.reactivex.observers.DisposableObserver;
 import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
@@ -265,7 +270,7 @@ public class RecipeRepository {
         );*/
     }
 
-    public void updateRecipe(RecipeEntity recipeEntity) {
+    private void updateRecipe(RecipeEntity recipeEntity) {
         executor.execute(() ->
                 recipeDao.updateRecipe(recipeEntity));
     }
@@ -384,6 +389,10 @@ public class RecipeRepository {
     public void fetchRecipesReactive(final Context context) {
         if (!MiddleWareForNetwork.checkInternetConnection(context)) {
             dispatchInfo.onNext(context.getString(R.string.no_internet_message));
+            return;
+        }
+        if (AppHelper.getAccessToken() == null) {
+            dispatchInfo.onNext(context.getString(R.string.invalid_access_token));
             return;
         }
         if (!mayRefresh.get()){
@@ -514,6 +523,58 @@ public class RecipeRepository {
         );
     }
 
+    public Single<List<CommentEntity>> fetchRecipeComments(Context context, String recipeId) {
+        if (!MiddleWareForNetwork.checkInternetConnection(context))
+            return Single.error(new Throwable(context.getString(R.string.no_internet_message)));
+        if (AppHelper.getAccessToken() == null)
+            return Single.error(new Throwable(context.getString(R.string.invalid_access_token)));
+        return Single.create(emitter -> APICallsHandler.getRecipeCommentsObervable(recipeId, AppHelper.getAccessToken())
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.from(executor))
+                .subscribe(new DisposableObserver<Response<List<CommentTO>>>() {
+                    @Override
+                    public void onNext(Response<List<CommentTO>> response) {
+                        if (response.code() == APICallsHandler.STATUS_OK) {
+                            // status 200 OK
+                         if (response.body() != null) {
+                             // there are comments
+                             List<CommentEntity> rv = new ArrayList<>();
+                             for (CommentTO to : response.body()) {
+                                 rv.add(to.toEntity());
+                             }
+                             emitter.onSuccess(rv);
+                         } else {
+                             // body is null somehow
+                             emitter.onError(new Throwable(context.getString(R.string.load_error_message)));
+                         }
+                        } else {
+                            String message = response.message();
+                            try {
+                                if (response.errorBody() != null)
+                                    message = response.errorBody().string();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                                emitter.onError(e);
+                            }
+                            emitter.onError(new Throwable(String.format("status %d, " + message, response.code())));
+                        }
+                        dispose();
+                    }
+
+                    @Override
+                    public void onError(Throwable t) {
+                        emitter.onError(t);
+                        dispose();
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        if (!isDisposed())
+                            dispose();
+                    }
+                }));
+    }
+
     // endregion
 
     public void updateFavoritesFromUserRecord(List<String> favorites) {
@@ -526,27 +587,64 @@ public class RecipeRepository {
         }
     }
 
-    public Single<Integer> changeLike(final Context context, @NonNull RecipeEntity recipe, Map<String, Object> attrs) {
-        return Single.create(emitter -> {
-            if (MiddleWareForNetwork.checkInternetConnection(context)) {
-                if (AppHelper.getAccessToken() != null) {
-                    APICallsHandler.patchRecipe(attrs, recipe.getId(), recipe.getLastModifiedDate(), AppHelper.getAccessToken(), result -> {
-                        if (result != null && recipe.getId().equals(result.getId())) { // status 200
-                            RecipeEntity update = result.toEntity();
-                            update.setMeLike(!recipe.isUserLiked() ? TRUE : FALSE);
-                            updateRecipe(update);
-                            emitter.onSuccess(-1);
-                        }
-                        else // status <> 200
-                            emitter.onSuccess(R.string.load_error_message);
-                    });
+    public Single<Boolean> changeLike(final Context context, @NonNull RecipeEntity recipe, Map<String, Object> attrs) {
+        if (!MiddleWareForNetwork.checkInternetConnection(context))
+            return Single.error(new Throwable(context.getString(R.string.no_internet_message)));
+        if (AppHelper.getAccessToken() == null)
+            return Single.error(new Throwable(context.getString(R.string.invalid_access_token)));
+        return Single.create(emitter ->
+                APICallsHandler.patchRecipe(attrs, recipe.getId(), recipe.getLastModifiedDate(), AppHelper.getAccessToken(), result -> {
+                    if (result != null && recipe.getId().equals(result.getId())) { // status 200
+                        RecipeEntity update = result.toEntity();
+                        update.setMeLike(!recipe.isUserLiked() ? TRUE : FALSE);
+                        updateRecipe(update);
+                        emitter.onSuccess(true);
+                    } else // status <> 200
+                        emitter.onError(new Throwable(context.getString(R.string.load_error_message)));
+                })
+        );
+    }
 
-                } else {
-                    emitter.onSuccess(R.string.invalid_access_token);
-                }
-            } else {
-                emitter.onSuccess(R.string.no_internet_message);
-            }
+    public Single<Boolean> postComment(final Context context, Map<String, Object> patchAttrs, String recipeId, String lastModifiedDate) {
+        if (!MiddleWareForNetwork.checkInternetConnection(context))
+            return Single.error(new Throwable(context.getString(R.string.no_internet_message)));
+        if (AppHelper.getAccessToken() == null)
+            return Single.error(new Throwable(context.getString(R.string.invalid_access_token)));
+        return Single.create(emitter -> {
+            APICallsHandler.postCommentObservable(patchAttrs, recipeId, lastModifiedDate, AppHelper.getAccessToken())
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(Schedulers.from(executor))
+                    .subscribe(new DisposableObserver<Response<Void>>() {
+                        @Override
+                        public void onNext(Response<Void> response) {
+                            if (response.code() == STATUS_OK) {
+                                emitter.onSuccess(true);
+                            } else {
+                                String message = response.message();
+                                try {
+                                    if (response.errorBody() != null)
+                                        message = response.errorBody().string();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                    emitter.onError(e);
+                                }
+                                emitter.onError(new Throwable(String.format("status %d, " + message, response.code())));
+                            }
+                            dispose();
+                        }
+
+                        @Override
+                        public void onError(Throwable t) {
+                            emitter.onError(t);
+                            dispose();
+                        }
+
+                        @Override
+                        public void onComplete() {
+                            if (!isDisposed())
+                                dispose();
+                        }
+                    });
         });
     }
 

@@ -3,6 +3,7 @@ package com.myapps.ron.family_recipes.dal.repository;
 import android.content.Context;
 import android.os.Build;
 
+import com.myapps.ron.family_recipes.MyApplication;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.network.APICallsHandler;
 import com.myapps.ron.family_recipes.network.Constants;
@@ -13,6 +14,7 @@ import java.io.IOException;
 import java.util.Map;
 
 import io.reactivex.Maybe;
+import io.reactivex.Single;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 import retrofit2.Response;
@@ -30,6 +32,52 @@ public class AppRepository {
         }
         return INSTANCE;
     }
+
+    // region notifications
+
+    public Single<String> manageSubscriptions(Context context, Map<String, String> queries, Map<String, String> policy) {
+        if (!MiddleWareForNetwork.checkInternetConnection(context))
+            return Single.just(context.getString(R.string.no_internet_message));
+        if (AppHelper.getAccessToken() == null)
+            return Single.just(context.getString(R.string.invalid_access_token));
+        return Single.create(emitter ->
+                APICallsHandler.manageSubscriptionsObservable(AppHelper.getAccessToken(), MyApplication.getDeviceId(), queries, policy)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(Schedulers.io())
+                        .subscribe(new DisposableObserver<Response<Void>>() {
+                            @Override
+                            public void onNext(Response<Void> response) {
+                                if (response.code() == APICallsHandler.STATUS_OK) {
+                                    emitter.onSuccess("");
+                                } else {
+                                    int code = response.code();
+                                    try {
+                                        if (response.errorBody() != null)
+                                            emitter.onError(new Throwable(String.format("status %d" + response.errorBody().string(), code)));
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                        emitter.onError(e);
+                                    }
+                                }
+                                dispose();
+                            }
+
+                            @Override
+                            public void onError(Throwable t) {
+                                emitter.onError(t);
+                                dispose();
+                            }
+
+                            @Override
+                            public void onComplete() {
+                                if (!isDisposed())
+                                    dispose();
+                            }
+                        })
+        );
+    }
+
+    // endregion
 
     /**
      *
