@@ -84,7 +84,6 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
 
     protected DataViewModel viewModel;
     String orderBy;
-    private boolean mayRefresh;
     private String lastQuery = "";
 
     ProgressBar firstLoadingProgressBar;
@@ -174,7 +173,6 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
             firstLoadingProgressBar = view.findViewById(R.id.content_main_fist_loading_animation);
 
             orderBy = com.myapps.ron.family_recipes.dal.Constants.SORT_RECENT;
-            mayRefresh = true;
 
             initViewModel();
             //initCategories();
@@ -244,20 +242,11 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
         ((FrameLayout)view.findViewById(R.id.main_container)).addView(progressBar, params);
         progressBar.setVisibility(View.VISIBLE);*/
         onRefreshListener = () -> {
-            if(mayRefresh) {
-                Log.e(TAG, "in refresh listener, mayRefresh = true");
-                filtersViewHider.hide();
-                viewModel.fetchFromServer(getContext());
-
-                mayRefresh = false;
-                new Handler().postDelayed(() -> mayRefresh = true, Constants.REFRESH_DELAY);
-            } else {
-                Toast.makeText(activity, R.string.refresh_error_message, Toast.LENGTH_SHORT).show();
-                swipeRefreshLayout.setRefreshing(false);
-            }
+            viewModel.fetchFromServer(activity);
         };
         swipeRefreshLayout.setOnRefreshListener(onRefreshListener);
         swipeRefreshLayout.setColorSchemeColors(getResources().getIntArray(R.array.colors));
+        //swipeRefreshLayout.setProgressViewOffset(false, swipeRefreshLayout.getProgressViewStartOffset(), swipeRefreshLayout.getProgressViewEndOffset());
     }
 
     private void setSearchView(Menu menu) {

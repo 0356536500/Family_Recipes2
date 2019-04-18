@@ -5,8 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?attr/windowBackgroundColor"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:showIn="@layout/activity_main">
+    app:layout_behavior="@string/appbar_scrolling_view_behavior">
+    <!--tools:showIn="@layout/activity_main">-->
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/content_main_refresh"
@@ -14,25 +14,30 @@
         android:layout_height="wrap_content">
         <!--android:layout_marginTop="@dimen/container_height">-->
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycler_view"
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            android:nestedScrollingEnabled="true"
-            android:scrollbars="vertical"
-            android:paddingTop="@dimen/container_height"
-            android:clipToPadding="false"/>
+            android:layout_height="match_parent">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                android:nestedScrollingEnabled="true"
+                android:scrollbars="vertical"
+                android:paddingTop="@dimen/container_height"
+                android:clipToPadding="false"/>
+
+            <com.myapps.ron.searchfilter.widget.Filter
+                android:id="@+id/content_main_filters"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:collapsedBackground="?attr/toolbarBackgroundPrimary"
+                app:expandedBackground="?attr/toolbarBackgroundPrimary"/>
+
+        </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-
-
-    <com.myapps.ron.searchfilter.widget.Filter
-        android:id="@+id/content_main_filters"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:collapsedBackground="?attr/toolbarBackgroundPrimary"
-        app:expandedBackground="?attr/toolbarBackgroundPrimary"/>
 
     <!--app:customTextViewColor="?android:textColorPrimary"-->
 

@@ -382,53 +382,57 @@ public class RecipeRepository {
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     public void fetchRecipesReactive(final Context context) {
+        if (!MiddleWareForNetwork.checkInternetConnection(context)) {
+            dispatchInfo.onNext(context.getString(R.string.no_internet_message));
+            return;
+        }
         if (!mayRefresh.get()){
             dispatchInfo.onNext(context.getString(R.string.refresh_error_message));
             return;
         }
         mayRefresh.getAndSet(false);
         new Handler().postDelayed(() -> mayRefresh.getAndSet(true), com.myapps.ron.family_recipes.utils.Constants.REFRESH_DELAY);
-        if(MiddleWareForNetwork.checkInternetConnection(context)) {
-            final String time = DateUtil.getUTCTime();
+        //if(MiddleWareForNetwork.checkInternetConnection(context)) {
+        final String time = DateUtil.getUTCTime();
 
-            String lastUpdate = DateUtil.getLastUpdateTime(context);
+        String lastUpdate = DateUtil.getLastUpdateTime(context);
 
-            Observable<Response<List<RecipeTO>>> recipeObservable = APICallsHandler
-                    .getAllRecipesObservable(lastUpdate, LIMIT, null, AppHelper.getAccessToken());
-            Disposable disposable = recipeObservable
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(Schedulers.from(executor))
-                    //.observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(next -> {
-                        if (next.code() == 200) {
-                            Log.e(TAG, "fetch recipes, " + next.body());
-                            final AddedModifiedSize addedModifiedSize = new AddedModifiedSize();
-                            updateFromServer(context, next.body(), addedModifiedSize);
-                            String lastKey = next.headers().get(Constants.HEADER_LAST_EVAL_KEY);
-                            if (lastKey != null && !lastKey.isEmpty())
-                                // there are more updated recipes
-                                fetchMoreRecipesReactive(context, lastKey, lastUpdate, addedModifiedSize, time);
-                            else {
-                                //there are no more recipes
-                                delayedDispatch(context, addedModifiedSize);
-                                DateUtil.updateServerTime(context, time);
-                                compositeDisposable.clear();
-                            }
-                        } else if (next.code() == 304) {
+        Observable<Response<List<RecipeTO>>> recipeObservable = APICallsHandler
+                .getAllRecipesObservable(lastUpdate, LIMIT, null, AppHelper.getAccessToken());
+        Disposable disposable = recipeObservable
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.from(executor))
+                //.observeOn(AndroidSchedulers.mainThread())
+                .subscribe(next -> {
+                    if (next.code() == 200) {
+                        Log.e(TAG, "fetch recipes, " + next.body());
+                        final AddedModifiedSize addedModifiedSize = new AddedModifiedSize();
+                        updateFromServer(context, next.body(), addedModifiedSize);
+                        String lastKey = next.headers().get(Constants.HEADER_LAST_EVAL_KEY);
+                        if (lastKey != null && !lastKey.isEmpty())
+                            // there are more updated recipes
+                            fetchMoreRecipesReactive(context, lastKey, lastUpdate, addedModifiedSize, time);
+                        else {
+                            //there are no more recipes
+                            delayedDispatch(context, addedModifiedSize);
                             DateUtil.updateServerTime(context, time);
-                            dispatchInfo.onNext(context.getString(R.string.message_from_fetch_recipes_not_modified));
-                            compositeDisposable.clear();
-                        } else {
-                            dispatchInfo.onNext(context.getString(R.string.load_error_message) + next.message());
                             compositeDisposable.clear();
                         }
-                        Log.e(TAG, "response code, " + next.code());
+                    } else if (next.code() == 304) {
+                        DateUtil.updateServerTime(context, time);
+                        dispatchInfo.onNext(context.getString(R.string.message_from_fetch_recipes_not_modified));
+                        compositeDisposable.clear();
+                    } else {
+                        dispatchInfo.onNext(context.getString(R.string.load_error_message) + next.message());
+                        compositeDisposable.clear();
+                    }
+                    Log.e(TAG, "response code, " + next.code());
 
-                        //DateUtil.updateServerTime(context, time);
-                    }, error -> Toast.makeText(context, context.getString(R.string.load_error_message) + "\n" + error.getMessage(), Toast.LENGTH_SHORT).show());
+                    //DateUtil.updateServerTime(context, time);
+                }, error -> Toast.makeText(context, context.getString(R.string.load_error_message) + "\n" + error.getMessage(), Toast.LENGTH_SHORT).show());
 
-            compositeDisposable.add(disposable);
-        }
+        compositeDisposable.add(disposable);
+        //}
     }
 
     // make more api calls with pagination if necessary, using lastEvaluatedKey header from api response
