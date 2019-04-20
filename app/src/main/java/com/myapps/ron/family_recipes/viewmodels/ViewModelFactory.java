@@ -1,9 +1,9 @@
 package com.myapps.ron.family_recipes.viewmodels;
 
-import com.myapps.ron.family_recipes.dal.repository.AppRepository;
-import com.myapps.ron.family_recipes.dal.repository.CategoryRepository;
-import com.myapps.ron.family_recipes.dal.repository.PendingRecipeRepository;
-import com.myapps.ron.family_recipes.dal.repository.RecipeRepository;
+import com.myapps.ron.family_recipes.logic.repository.AppRepository;
+import com.myapps.ron.family_recipes.logic.repository.CategoryRepository;
+import com.myapps.ron.family_recipes.logic.repository.PendingRecipeRepository;
+import com.myapps.ron.family_recipes.logic.repository.RecipeRepository;
 
 import java.lang.reflect.InvocationTargetException;
 

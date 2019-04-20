@@ -172,7 +172,7 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
             filtersViewHider = ViewHider.of(mFilter).setDirection(ViewHider.TOP).setDuration(250L).build();
             firstLoadingProgressBar = view.findViewById(R.id.content_main_fist_loading_animation);
 
-            orderBy = com.myapps.ron.family_recipes.dal.Constants.SORT_RECENT;
+            orderBy = com.myapps.ron.family_recipes.logic.Constants.SORT_RECENT;
 
             initViewModel();
             //initCategories();
@@ -333,13 +333,13 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
             orderBy = "";
             switch (item.getItemId()) {
                 case R.id.sort_action_recent:
-                    orderBy = com.myapps.ron.family_recipes.dal.Constants.SORT_RECENT;
+                    orderBy = com.myapps.ron.family_recipes.logic.Constants.SORT_RECENT;
                     break;
                 case R.id.sort_action_popular:
-                    orderBy = com.myapps.ron.family_recipes.dal.Constants.SORT_POPULAR;
+                    orderBy = com.myapps.ron.family_recipes.logic.Constants.SORT_POPULAR;
                     break;
                 case R.id.sort_action_last_modified:
-                    orderBy = com.myapps.ron.family_recipes.dal.Constants.SORT_MODIFIED;
+                    orderBy = com.myapps.ron.family_recipes.logic.Constants.SORT_MODIFIED;
                     break;
             }
             if (orderBy != null) {
@@ -358,13 +358,13 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
     private void setSortItemChecked(Menu menu) {
         boolean[] sorts = new boolean[3];
         switch (orderBy) {
-            case com.myapps.ron.family_recipes.dal.Constants.SORT_RECENT:
+            case com.myapps.ron.family_recipes.logic.Constants.SORT_RECENT:
                 sorts[0] = true;
                 break;
-            case com.myapps.ron.family_recipes.dal.Constants.SORT_POPULAR:
+            case com.myapps.ron.family_recipes.logic.Constants.SORT_POPULAR:
                 sorts[1] = true;
                 break;
-            case com.myapps.ron.family_recipes.dal.Constants.SORT_MODIFIED:
+            case com.myapps.ron.family_recipes.logic.Constants.SORT_MODIFIED:
                 sorts[2] = true;
                 break;
         }

@@ -4,13 +4,12 @@ import android.content.Context;
 import android.os.Build;
 import android.util.Log;
 
-import com.myapps.ron.family_recipes.network.cognito.AppHelper;
+import com.myapps.ron.family_recipes.layout.cognito.AppHelper;
 
 import androidx.test.InstrumentationRegistry;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import io.reactivex.Maybe;
-import io.reactivex.Single;
 import io.reactivex.disposables.CompositeDisposable;
 
 import org.junit.After;

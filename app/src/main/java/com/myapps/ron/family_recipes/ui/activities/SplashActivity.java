@@ -15,8 +15,8 @@ import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.Chal
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.MultiFactorAuthenticationContinuation;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.AuthenticationHandler;
 import com.myapps.ron.family_recipes.R;
-import com.myapps.ron.family_recipes.network.MiddleWareForNetwork;
-import com.myapps.ron.family_recipes.network.cognito.AppHelper;
+import com.myapps.ron.family_recipes.layout.MiddleWareForNetwork;
+import com.myapps.ron.family_recipes.layout.cognito.AppHelper;
 import com.myapps.ron.family_recipes.utils.Constants;
 import com.myapps.ron.family_recipes.utils.logic.SharedPreferencesHandler;
 
@@ -25,8 +25,8 @@ import java.util.Locale;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.TaskStackBuilder;
 
-import static com.myapps.ron.family_recipes.network.Constants.PASSWORD;
-import static com.myapps.ron.family_recipes.network.Constants.USERNAME;
+import static com.myapps.ron.family_recipes.layout.Constants.PASSWORD;
+import static com.myapps.ron.family_recipes.layout.Constants.USERNAME;
 
 
 public class SplashActivity extends AppCompatActivity {
@@ -48,7 +48,7 @@ public class SplashActivity extends AppCompatActivity {
 
         AppHelper.init(getApplicationContext());
 
-        if (MiddleWareForNetwork.checkInternetConnection(this))
+        if (!MiddleWareForNetwork.checkInternetConnection(this))
             findCurrent();
         else if (SharedPreferencesHandler.getString(this, USERNAME) != null &&
                 SharedPreferencesHandler.getString(this, PASSWORD) != null) {
@@ -79,13 +79,25 @@ public class SplashActivity extends AppCompatActivity {
             Log.d(TAG, " -- Auth Success");
             AppHelper.setCurrSession(cognitoUserSession);
             AppHelper.newDevice(device);
-            //Log.e(TAG, "IDToken: " + cognitoUserSession.getIdToken().getJWTToken());
+            Log.e(TAG, "IDToken: " + cognitoUserSession.getIdToken().getJWTToken());
             Log.e(TAG, "AccessToken: " + cognitoUserSession.getAccessToken().getJWTToken());
 
             AppHelper.setIdentityProvider(getApplicationContext(), cognitoUserSession);
 
             closeWaitDialog();
 
+            com.myapps.ron.family_recipes.layout.firebase.AppHelper.getFirebaseToken(getApplicationContext());
+            /*FirebaseAuth.getInstance()
+                    .signInWithCustomToken(cognitoUserSession.getIdToken().getJWTToken())
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            Log.e(TAG, "signInWithCustomToken:success");
+                            Log.e(TAG, task.getResult().getUser().getDisplayName());
+                        } else {
+                            // If sign in fails, display a message to the user.
+                            Log.e(TAG, "signInWithCustomToken:failure", task.getException());
+                        }
+                    });*/
             launchMain();
         }
 

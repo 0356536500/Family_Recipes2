@@ -12,9 +12,9 @@ import android.content.Context;
 import android.util.Log;
 
 import com.myapps.ron.family_recipes.background.workers.PostRecipeScheduledWorker;
-import com.myapps.ron.family_recipes.dal.repository.CategoryRepository;
-import com.myapps.ron.family_recipes.dal.repository.PendingRecipeRepository;
-import com.myapps.ron.family_recipes.dal.storage.StorageWrapper;
+import com.myapps.ron.family_recipes.logic.repository.CategoryRepository;
+import com.myapps.ron.family_recipes.logic.repository.PendingRecipeRepository;
+import com.myapps.ron.family_recipes.logic.storage.StorageWrapper;
 import com.myapps.ron.family_recipes.model.CategoryEntity;
 import com.myapps.ron.family_recipes.model.PendingRecipeEntity;
 import com.myapps.ron.family_recipes.model.RecipeEntity;

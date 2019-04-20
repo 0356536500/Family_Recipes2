@@ -33,10 +33,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.myapps.ron.family_recipes.BuildConfig;
 import com.myapps.ron.family_recipes.R;
-import com.myapps.ron.family_recipes.dal.Injection;
-import com.myapps.ron.family_recipes.dal.storage.StorageWrapper;
-import com.myapps.ron.family_recipes.network.MiddleWareForNetwork;
-import com.myapps.ron.family_recipes.network.cognito.AppHelper;
+import com.myapps.ron.family_recipes.logic.Injection;
+import com.myapps.ron.family_recipes.logic.storage.StorageWrapper;
+import com.myapps.ron.family_recipes.layout.MiddleWareForNetwork;
+import com.myapps.ron.family_recipes.layout.cognito.AppHelper;
 import com.myapps.ron.family_recipes.ui.baseclasses.MyBaseActivity;
 import com.myapps.ron.family_recipes.viewmodels.SettingsViewModel;
 
@@ -273,8 +273,8 @@ public class SettingsActivity extends MyBaseActivity
                         @Override
                         public void onSuccess(Map<String, String> map) {
                             appUpdateFile = StorageWrapper.getFileToDownloadUpdateInto(activity,
-                                    map.get(com.myapps.ron.family_recipes.network.Constants.RESPONSE_KEY_APP_NAME));
-                            uri = Uri.parse(map.get(com.myapps.ron.family_recipes.network.Constants.RESPONSE_KEY_APP_URL));
+                                    map.get(com.myapps.ron.family_recipes.layout.Constants.RESPONSE_KEY_APP_NAME));
+                            uri = Uri.parse(map.get(com.myapps.ron.family_recipes.layout.Constants.RESPONSE_KEY_APP_URL));
                             new AlertDialog.Builder(activity)
                                     .setCancelable(true)
                                     .setTitle(R.string.main_activity_update_available_title)

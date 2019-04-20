@@ -25,8 +25,8 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.myapps.ron.family_recipes.R;
-import com.myapps.ron.family_recipes.network.cognito.AppHelper;
-import com.myapps.ron.family_recipes.network.cognito.ItemToDisplay;
+import com.myapps.ron.family_recipes.layout.cognito.AppHelper;
+import com.myapps.ron.family_recipes.layout.cognito.ItemToDisplay;
 
 public class FirstTimeLoginAttributesDisplayAdapter extends BaseAdapter {
     //private String TAG = "FirstTimeLoginDetails";

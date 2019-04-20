@@ -53,7 +53,7 @@ public class Constants {
     public static final int TRUE = 1;
 
     //RecipeActivity
-    public static final int MAX_FILES_TO_UPLOAD = com.myapps.ron.family_recipes.network.Constants.MAX_FILES_TO_UPLOAD;
+    public static final int MAX_FILES_TO_UPLOAD = com.myapps.ron.family_recipes.layout.Constants.MAX_FILES_TO_UPLOAD;
     public static final String PAGER_FOOD_IMAGES = RecipeEntity.KEY_FOOD_FILES;
 
     //PostRecipeActivity

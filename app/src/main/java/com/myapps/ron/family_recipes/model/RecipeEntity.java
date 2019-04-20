@@ -2,7 +2,7 @@ package com.myapps.ron.family_recipes.model;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.myapps.ron.family_recipes.dal.persistence.AppDatabases;
+import com.myapps.ron.family_recipes.logic.persistence.AppDatabases;
 import com.myapps.ron.family_recipes.utils.Constants;
 
 import java.io.Serializable;
@@ -181,7 +181,7 @@ public class RecipeEntity implements Serializable {
     public String getCreationDate() {
         if(creationDate != null)
             return creationDate;
-        return com.myapps.ron.family_recipes.network.Constants.DEFAULT_UPDATED_TIME;
+        return com.myapps.ron.family_recipes.layout.Constants.DEFAULT_UPDATED_TIME;
     }
 
     public void setCreationDate(String creationDate) {

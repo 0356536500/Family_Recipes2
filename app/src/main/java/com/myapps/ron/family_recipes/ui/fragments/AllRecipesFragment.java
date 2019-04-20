@@ -8,7 +8,7 @@ import android.widget.Toast;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.background.services.GetUserDetailsService;
 import com.myapps.ron.family_recipes.recycler.adapters.RecipesAdapter;
-import com.myapps.ron.family_recipes.dal.Injection;
+import com.myapps.ron.family_recipes.logic.Injection;
 import com.myapps.ron.family_recipes.model.CategoryEntity;
 import com.myapps.ron.family_recipes.viewmodels.DataViewModel;
 import com.myapps.ron.searchfilter.listener.FilterListener;

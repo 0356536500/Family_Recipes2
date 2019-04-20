@@ -8,16 +8,16 @@ import android.os.StrictMode;
 import android.util.Log;
 
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserSession;
-import com.myapps.ron.family_recipes.dal.Injection;
-import com.myapps.ron.family_recipes.dal.repository.PendingRecipeRepository;
-import com.myapps.ron.family_recipes.dal.storage.StorageWrapper;
+import com.myapps.ron.family_recipes.logic.Injection;
+import com.myapps.ron.family_recipes.logic.repository.PendingRecipeRepository;
+import com.myapps.ron.family_recipes.logic.storage.StorageWrapper;
 import com.myapps.ron.family_recipes.model.PendingRecipeEntity;
 import com.myapps.ron.family_recipes.model.RecipeEntity;
-import com.myapps.ron.family_recipes.network.APICallsHandler;
-import com.myapps.ron.family_recipes.network.S3.OnlineStorageWrapper;
-import com.myapps.ron.family_recipes.network.cognito.AppHelper;
-import com.myapps.ron.family_recipes.network.modelTO.PendingRecipeTO;
-import com.myapps.ron.family_recipes.network.modelTO.RecipeTO;
+import com.myapps.ron.family_recipes.layout.APICallsHandler;
+import com.myapps.ron.family_recipes.layout.S3.OnlineStorageWrapper;
+import com.myapps.ron.family_recipes.layout.cognito.AppHelper;
+import com.myapps.ron.family_recipes.layout.modelTO.PendingRecipeTO;
+import com.myapps.ron.family_recipes.layout.modelTO.RecipeTO;
 import com.myapps.ron.family_recipes.utils.Constants;
 
 import java.io.File;
@@ -26,8 +26,8 @@ import java.util.List;
 
 import io.reactivex.observers.DisposableObserver;
 
-import static com.myapps.ron.family_recipes.network.Constants.RESPONSE_KEY_RECIPE_ID;
-import static com.myapps.ron.family_recipes.network.Constants.RESPONSE_KEY_URL;
+import static com.myapps.ron.family_recipes.layout.Constants.RESPONSE_KEY_RECIPE_ID;
+import static com.myapps.ron.family_recipes.layout.Constants.RESPONSE_KEY_URL;
 
 
 /**

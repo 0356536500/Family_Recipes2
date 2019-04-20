@@ -4,11 +4,11 @@ import android.content.Context;
 import android.os.Build;
 import android.util.Log;
 
-import com.myapps.ron.family_recipes.dal.Injection;
-import com.myapps.ron.family_recipes.dal.repository.RecipeRepository;
+import com.myapps.ron.family_recipes.logic.Injection;
+import com.myapps.ron.family_recipes.logic.repository.RecipeRepository;
 import com.myapps.ron.family_recipes.model.AccessEntity;
 import com.myapps.ron.family_recipes.model.AccessEntity.RecipeAccess;
-import com.myapps.ron.family_recipes.network.Constants;
+import com.myapps.ron.family_recipes.layout.Constants;
 
 import java.io.File;
 import java.util.List;
@@ -20,12 +20,12 @@ import androidx.work.PeriodicWorkRequest;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
-import static com.myapps.ron.family_recipes.dal.Constants.MIN_FOOD_FOLDER_SIZE_TO_START_DELETING_CONTENT;
-import static com.myapps.ron.family_recipes.dal.Constants.MIN_RECIPE_FOLDER_SIZE_TO_START_DELETING_CONTENT;
-import static com.myapps.ron.family_recipes.dal.Constants.MIN_THUMB_FOLDER_SIZE_TO_START_DELETING_CONTENT;
-import static com.myapps.ron.family_recipes.dal.Constants.TARGET_FOOD_FOLDER_SIZE_AFTER_DELETING_CONTENT;
-import static com.myapps.ron.family_recipes.dal.Constants.TARGET_RECIPE_FOLDER_SIZE_AFTER_DELETING_CONTENT;
-import static com.myapps.ron.family_recipes.dal.Constants.TARGET_THUMB_FOLDER_SIZE_AFTER_DELETING_CONTENT;
+import static com.myapps.ron.family_recipes.logic.Constants.MIN_FOOD_FOLDER_SIZE_TO_START_DELETING_CONTENT;
+import static com.myapps.ron.family_recipes.logic.Constants.MIN_RECIPE_FOLDER_SIZE_TO_START_DELETING_CONTENT;
+import static com.myapps.ron.family_recipes.logic.Constants.MIN_THUMB_FOLDER_SIZE_TO_START_DELETING_CONTENT;
+import static com.myapps.ron.family_recipes.logic.Constants.TARGET_FOOD_FOLDER_SIZE_AFTER_DELETING_CONTENT;
+import static com.myapps.ron.family_recipes.logic.Constants.TARGET_RECIPE_FOLDER_SIZE_AFTER_DELETING_CONTENT;
+import static com.myapps.ron.family_recipes.logic.Constants.TARGET_THUMB_FOLDER_SIZE_AFTER_DELETING_CONTENT;
 
 /**
  * Created by ronginat on 31/03/2019.

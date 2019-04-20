@@ -4,7 +4,7 @@ import android.graphics.Color;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.myapps.ron.family_recipes.dal.persistence.AppDatabases;
+import com.myapps.ron.family_recipes.logic.persistence.AppDatabases;
 import com.myapps.ron.family_recipes.utils.Constants;
 import com.myapps.ron.searchfilter.model.FilterModel;
 

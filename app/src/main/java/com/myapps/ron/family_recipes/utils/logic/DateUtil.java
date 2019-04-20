@@ -4,7 +4,7 @@ import android.content.Context;
 import android.os.Build;
 import android.text.format.DateUtils;
 
-import com.myapps.ron.family_recipes.network.Constants;
+import com.myapps.ron.family_recipes.layout.Constants;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

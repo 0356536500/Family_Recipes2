@@ -30,10 +30,10 @@ import android.widget.Toast;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.myapps.ron.family_recipes.R;
-import com.myapps.ron.family_recipes.dal.Injection;
-import com.myapps.ron.family_recipes.dal.storage.StorageWrapper;
-import com.myapps.ron.family_recipes.network.MiddleWareForNetwork;
-import com.myapps.ron.family_recipes.network.cognito.AppHelper;
+import com.myapps.ron.family_recipes.logic.Injection;
+import com.myapps.ron.family_recipes.logic.storage.StorageWrapper;
+import com.myapps.ron.family_recipes.layout.MiddleWareForNetwork;
+import com.myapps.ron.family_recipes.layout.cognito.AppHelper;
 import com.myapps.ron.family_recipes.ui.baseclasses.MyBaseActivity;
 import com.myapps.ron.family_recipes.ui.baseclasses.MyFragment;
 import com.myapps.ron.family_recipes.ui.fragments.AllRecipesFragment;
@@ -584,8 +584,9 @@ public class MainActivity extends MyBaseActivity implements BackStack.BackStackH
     // Sign out user
     private void signOut() {
         AppHelper.signOutUser();
-        SharedPreferencesHandler.removeString(this, com.myapps.ron.family_recipes.network.Constants.USERNAME);
-        SharedPreferencesHandler.removeString(this, com.myapps.ron.family_recipes.network.Constants.PASSWORD);
+        com.myapps.ron.family_recipes.layout.firebase.AppHelper.signOutUser();
+        SharedPreferencesHandler.removeString(this, com.myapps.ron.family_recipes.layout.Constants.USERNAME);
+        SharedPreferencesHandler.removeString(this, com.myapps.ron.family_recipes.layout.Constants.PASSWORD);
         exit();
     }
 
@@ -689,8 +690,8 @@ public class MainActivity extends MyBaseActivity implements BackStack.BackStackH
                     @Override
                     public void onSuccess(Map<String, String> map) {
                         appUpdateFile = StorageWrapper.getFileToDownloadUpdateInto(getApplicationContext(),
-                                map.get(com.myapps.ron.family_recipes.network.Constants.RESPONSE_KEY_APP_NAME));
-                        uri = Uri.parse(map.get(com.myapps.ron.family_recipes.network.Constants.RESPONSE_KEY_APP_URL));
+                                map.get(com.myapps.ron.family_recipes.layout.Constants.RESPONSE_KEY_APP_NAME));
+                        uri = Uri.parse(map.get(com.myapps.ron.family_recipes.layout.Constants.RESPONSE_KEY_APP_URL));
                         new AlertDialog.Builder(getApplicationContext())
                                 .setCancelable(true)
                                 .setTitle(R.string.main_activity_update_available_title)

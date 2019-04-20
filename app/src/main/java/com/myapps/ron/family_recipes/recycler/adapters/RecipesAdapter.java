@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Handler;
 import android.text.Spannable;
 import android.text.style.ForegroundColorSpan;
@@ -23,7 +24,7 @@ import android.widget.ToggleButton;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.myapps.ron.family_recipes.R;
-import com.myapps.ron.family_recipes.dal.storage.StorageWrapper;
+import com.myapps.ron.family_recipes.logic.storage.StorageWrapper;
 import com.myapps.ron.family_recipes.model.CategoryEntity;
 import com.myapps.ron.family_recipes.model.RecipeEntity;
 import com.myapps.ron.family_recipes.model.RecipeMinimal;
@@ -42,6 +43,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.observers.DisposableSingleObserver;
+import io.reactivex.schedulers.Schedulers;
 
 
 public class RecipesAdapter extends PagedListAdapter<RecipeMinimal, RecipesAdapter.MyViewHolder> {
@@ -254,22 +258,32 @@ public class RecipesAdapter extends PagedListAdapter<RecipeMinimal, RecipesAdapt
 
         if(recipe.getThumbnail() != null) {
             //.apply(RequestOptions.circleCropTransform())
-            StorageWrapper.getThumbFile(context, recipe.getThumbnail(), path -> {
-                if(path != null) {
-                    listener.onThumbnailAccessed(recipe.getId());
-                    Glide.with(context)
-                            .load(path)
-                            .placeholder(circularProgressDrawable)
-                            .transform(new RoundedCorners(50))// TODO: change to constant
-                            //.optionalCircleCrop()
-                            .into(holder.thumbnail);
-                }
-                else
-                    loadDefaultImage(holder, circularProgressDrawable);
-            });
-        }
-        else {
-            loadDefaultImage(holder, circularProgressDrawable);
+            StorageWrapper.getThumbFile(context, recipe.getThumbnail())
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new DisposableSingleObserver<Uri>() {
+                        @Override
+                        public void onSuccess(Uri path) {
+                            listener.onThumbnailAccessed(recipe.getId());
+                            if(path != null) {
+                                Glide.with(context)
+                                        .load(path)
+                                        .placeholder(circularProgressDrawable)
+                                        .transform(new RoundedCorners(50))// TODO: change to constant
+                                        //.optionalCircleCrop()
+                                        .into(holder.thumbnail);
+                            }
+                            else
+                                loadDefaultImage(holder, circularProgressDrawable);
+                            dispose();
+                        }
+
+                        @Override
+                        public void onError(Throwable throwable) {
+                            loadDefaultImage(holder, circularProgressDrawable);
+                            dispose();
+                        }
+                    });
         }
     }
 

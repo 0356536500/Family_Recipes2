@@ -13,7 +13,7 @@ import android.widget.Toast;
 
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.model.CategoryEntity;
-import com.myapps.ron.family_recipes.network.Constants;
+import com.myapps.ron.family_recipes.layout.Constants;
 import com.myapps.ron.family_recipes.ui.baseclasses.PostRecipeBaseFragment;
 import com.myapps.ron.family_recipes.viewmodels.PostRecipeViewModel;
 import com.myapps.ron.searchfilter.adapter.FilterAdapter;

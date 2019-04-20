@@ -3,8 +3,8 @@ package com.myapps.ron.family_recipes;
 import android.content.Context;
 import android.util.Log;
 
-import com.myapps.ron.family_recipes.dal.persistence.AppDatabases;
-import com.myapps.ron.family_recipes.dal.persistence.RecipeDao;
+import com.myapps.ron.family_recipes.logic.persistence.AppDatabases;
+import com.myapps.ron.family_recipes.logic.persistence.RecipeDao;
 import com.myapps.ron.family_recipes.model.AccessEntity;
 import com.myapps.ron.family_recipes.model.AccessEntity.RecipeAccess;
 import com.myapps.ron.family_recipes.model.RecipeEntity;

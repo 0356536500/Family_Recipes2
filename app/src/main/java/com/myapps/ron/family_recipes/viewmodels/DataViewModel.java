@@ -11,16 +11,16 @@ import android.util.Log;
 
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.background.services.GetUserDetailsService;
-import com.myapps.ron.family_recipes.dal.repository.AppRepository;
-import com.myapps.ron.family_recipes.dal.repository.CategoryRepository;
-import com.myapps.ron.family_recipes.dal.repository.RecipeRepository;
-import com.myapps.ron.family_recipes.dal.repository.RepoSearchResults;
+import com.myapps.ron.family_recipes.logic.repository.AppRepository;
+import com.myapps.ron.family_recipes.logic.repository.CategoryRepository;
+import com.myapps.ron.family_recipes.logic.repository.RecipeRepository;
+import com.myapps.ron.family_recipes.logic.repository.RepoSearchResults;
 import com.myapps.ron.family_recipes.model.AccessEntity;
 import com.myapps.ron.family_recipes.model.CategoryEntity;
 import com.myapps.ron.family_recipes.model.QueryModel;
 import com.myapps.ron.family_recipes.model.RecipeEntity;
 import com.myapps.ron.family_recipes.model.RecipeMinimal;
-import com.myapps.ron.family_recipes.network.Constants;
+import com.myapps.ron.family_recipes.layout.Constants;
 
 import java.io.File;
 import java.util.Date;
@@ -40,7 +40,6 @@ import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.observers.DisposableMaybeObserver;
-import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
 
 import static android.content.Context.DOWNLOAD_SERVICE;

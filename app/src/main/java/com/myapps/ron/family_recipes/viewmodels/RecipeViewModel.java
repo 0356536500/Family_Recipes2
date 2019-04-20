@@ -10,12 +10,12 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.myapps.ron.family_recipes.R;
-import com.myapps.ron.family_recipes.dal.repository.RecipeRepository;
-import com.myapps.ron.family_recipes.dal.storage.StorageWrapper;
+import com.myapps.ron.family_recipes.logic.repository.RecipeRepository;
+import com.myapps.ron.family_recipes.logic.storage.StorageWrapper;
 import com.myapps.ron.family_recipes.model.AccessEntity;
 import com.myapps.ron.family_recipes.model.CommentEntity;
 import com.myapps.ron.family_recipes.model.RecipeEntity;
-import com.myapps.ron.family_recipes.network.Constants;
+import com.myapps.ron.family_recipes.layout.Constants;
 
 import java.util.ArrayList;
 import java.util.Date;

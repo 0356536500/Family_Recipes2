@@ -20,10 +20,10 @@ import androidx.preference.TwoStatePreference;
 
 import com.myapps.ron.family_recipes.MyApplication;
 import com.myapps.ron.family_recipes.R;
-import com.myapps.ron.family_recipes.dal.repository.AppRepository;
-import com.myapps.ron.family_recipes.network.Constants;
-import com.myapps.ron.family_recipes.network.MiddleWareForNetwork;
-import com.myapps.ron.family_recipes.network.cognito.AppHelper;
+import com.myapps.ron.family_recipes.logic.repository.AppRepository;
+import com.myapps.ron.family_recipes.layout.Constants;
+import com.myapps.ron.family_recipes.layout.MiddleWareForNetwork;
+import com.myapps.ron.family_recipes.layout.cognito.AppHelper;
 import com.myapps.ron.family_recipes.utils.logic.SharedPreferencesHandler;
 
 import java.io.File;

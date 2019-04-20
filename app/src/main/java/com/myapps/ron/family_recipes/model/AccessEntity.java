@@ -1,6 +1,6 @@
 package com.myapps.ron.family_recipes.model;
 
-import com.myapps.ron.family_recipes.dal.persistence.AppDatabases;
+import com.myapps.ron.family_recipes.logic.persistence.AppDatabases;
 
 import java.util.List;
 

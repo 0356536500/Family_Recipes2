@@ -5,11 +5,11 @@ import android.util.Log;
 
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserSession;
 import com.myapps.ron.family_recipes.R;
-import com.myapps.ron.family_recipes.dal.Injection;
-import com.myapps.ron.family_recipes.dal.repository.RecipeRepository;
-import com.myapps.ron.family_recipes.network.APICallsHandler;
-import com.myapps.ron.family_recipes.network.cognito.AppHelper;
-import com.myapps.ron.family_recipes.network.modelTO.RecipeTO;
+import com.myapps.ron.family_recipes.logic.Injection;
+import com.myapps.ron.family_recipes.logic.repository.RecipeRepository;
+import com.myapps.ron.family_recipes.layout.APICallsHandler;
+import com.myapps.ron.family_recipes.layout.cognito.AppHelper;
+import com.myapps.ron.family_recipes.layout.modelTO.RecipeTO;
 import com.myapps.ron.family_recipes.utils.Constants;
 
 import androidx.annotation.NonNull;
