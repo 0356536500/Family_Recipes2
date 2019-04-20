@@ -147,7 +147,6 @@ public class MainActivity extends MyBaseActivity implements BackStack.BackStackH
         if (savedInstanceState == null) {
             initFragments();
             handleDataFromIntentAndStart();
-            getFirebaseToken();
         } else {
             Log.e(TAG, "restore fragments!!!");
             getSupportFragmentManager().getFragments()
@@ -226,26 +225,6 @@ public class MainActivity extends MyBaseActivity implements BackStack.BackStackH
             if (getIntent().getBooleanExtra("from_login", false))
                 new Handler().postDelayed(() -> viewModel.fetchFromServerJustLoggedIn(this), 10000);
         }
-    }
-
-    private void getFirebaseToken() {
-        FirebaseInstanceId.getInstance().getInstanceId()
-                .addOnCompleteListener(task -> {
-                    if (!task.isSuccessful()) {
-                        Log.w(TAG, "getInstanceId failed", task.getException());
-                        return;
-                    }
-
-                    // Get new Instance ID token
-                    if (task.getResult() != null) {
-                        String token = task.getResult().getToken();
-
-                        // Log and toast
-                        //String msg = getString(R.string.msg_token_fmt, token);
-                        Log.e(TAG, "firebase token: " + token);
-                        //Toast.makeText(MainActivity.this, "firebase token: " + token, Toast.LENGTH_SHORT).show();
-                    }
-                });
     }
 
     private void loadColorsFromTheme() {

@@ -273,8 +273,6 @@ public class RecipesAdapter extends PagedListAdapter<RecipeMinimal, RecipesAdapt
                                         //.optionalCircleCrop()
                                         .into(holder.thumbnail);
                             }
-                            else
-                                loadDefaultImage(holder, circularProgressDrawable);
                             dispose();
                         }
 
@@ -284,7 +282,8 @@ public class RecipesAdapter extends PagedListAdapter<RecipeMinimal, RecipesAdapt
                             dispose();
                         }
                     });
-        }
+        } else
+            loadDefaultImage(holder, circularProgressDrawable);
     }
 
     private void loadDefaultImage(@NonNull final MyViewHolder holder, @NonNull Drawable placeholder) {

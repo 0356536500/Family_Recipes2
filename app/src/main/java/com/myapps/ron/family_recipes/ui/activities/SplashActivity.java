@@ -48,7 +48,7 @@ public class SplashActivity extends AppCompatActivity {
 
         AppHelper.init(getApplicationContext());
 
-        if (!MiddleWareForNetwork.checkInternetConnection(this))
+        if (MiddleWareForNetwork.checkInternetConnection(this))
             findCurrent();
         else if (SharedPreferencesHandler.getString(this, USERNAME) != null &&
                 SharedPreferencesHandler.getString(this, PASSWORD) != null) {
@@ -86,7 +86,6 @@ public class SplashActivity extends AppCompatActivity {
 
             closeWaitDialog();
 
-            com.myapps.ron.family_recipes.layout.firebase.AppHelper.getFirebaseToken(getApplicationContext());
             /*FirebaseAuth.getInstance()
                     .signInWithCustomToken(cognitoUserSession.getIdToken().getJWTToken())
                     .addOnCompleteListener(task -> {

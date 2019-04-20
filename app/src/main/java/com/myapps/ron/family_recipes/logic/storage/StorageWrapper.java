@@ -9,6 +9,7 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 
+import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.layout.Constants;
 import com.myapps.ron.family_recipes.layout.MiddleWareForNetwork;
 import com.myapps.ron.family_recipes.layout.S3.OnlineStorageWrapper;
@@ -56,7 +57,7 @@ public class StorageWrapper {
             return OnlineStorageWrapper.downloadThumbFile(context, fileName);
         }
         else
-            return Single.error(new Throwable(""));
+            return Single.error(new Throwable(context.getString(R.string.no_internet_message)));
     }
 
     public static void getFoodFile(Context context, String fileName, MyCallback<Uri> callback) {

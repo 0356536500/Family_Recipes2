@@ -5,6 +5,8 @@ import android.net.Uri;
 import android.util.Log;
 
 import com.google.firebase.storage.FirebaseStorage;
+import com.myapps.ron.family_recipes.R;
+import com.myapps.ron.family_recipes.layout.firebase.AppHelper;
 import com.myapps.ron.family_recipes.logic.storage.ExternalStorageHelper;
 
 import java.io.File;
@@ -18,6 +20,9 @@ public class FirebaseStorageHelper {
     private static final String TAG = FirebaseStorageHelper.class.getSimpleName();
 
     public static Single<Uri> downloadFile(Context context, String key, String dir) {
+        if (AppHelper.getFirebaseToken(context) == null) {
+            return Single.error(new Throwable(context.getString(R.string.invalid_access_token)));
+        }
         final File file = ExternalStorageHelper.getFileForOnlineDownload(context, dir, key);
         if (file == null) {
             return Single.error(new Throwable("can\'t create local file"));

@@ -6,14 +6,14 @@ import android.net.NetworkInfo;
 
 public final class MiddleWareForNetwork {
 
-    private static boolean InternetConnection = false;
+    private static boolean internetConnection = false;
 
     public static void setConnection(boolean connection) {
-        InternetConnection = connection;
+        internetConnection = connection;
     }
 
     public static boolean getConnection() {
-        return InternetConnection;
+        return internetConnection;
     }
 
 
@@ -23,13 +23,12 @@ public final class MiddleWareForNetwork {
         if (connectivityManager != null) {
             //we are connected to a network
             NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
-            InternetConnection = activeNetwork != null && activeNetwork.isConnected();
-            //return InternetConnection;
-            return false;
+            internetConnection = activeNetwork != null && activeNetwork.isConnected();
+            return internetConnection;
+            //return false;
             /*return connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
                     connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED;*/
         }
-        InternetConnection = false;
-        return InternetConnection;
+        return internetConnection;
     }
 }

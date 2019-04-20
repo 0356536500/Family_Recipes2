@@ -8,6 +8,7 @@ import android.os.PowerManager;
 import android.provider.Settings;
 
 import com.myapps.ron.family_recipes.background.workers.DeleteOldFilesWorker;
+import com.myapps.ron.family_recipes.layout.firebase.AppHelper;
 import com.myapps.ron.family_recipes.utils.Constants;
 import com.myapps.ron.family_recipes.utils.logic.SharedPreferencesHandler;
 import com.myapps.ron.localehelper.LocaleAwareApplication;
@@ -30,6 +31,7 @@ public class MyApplication extends LocaleAwareApplication {
         mContext = this;
 
         enqueueFilesWorker();
+        AppHelper.initTokenObserver(getApplicationContext());
     }
 
     private void enqueueFilesWorker() {

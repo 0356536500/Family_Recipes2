@@ -12,6 +12,7 @@ import com.myapps.ron.family_recipes.logic.repository.AppRepository;
 
 import java.util.Date;
 
+import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
@@ -25,6 +26,7 @@ public class AppHelper {
     private static GetTokenResult authSession;
     private static FirebaseUser firebaseSession;
     public static PublishSubject<String> firebaseTokenObservable = PublishSubject.create();
+    private static Disposable disposable;
 
     private static GetTokenResult getAuthSession() {
         return authSession;
@@ -32,6 +34,18 @@ public class AppHelper {
 
     public static FirebaseUser getFirebaseUser() {
         return firebaseSession;
+    }
+
+    public static void initTokenObserver(Context context) {
+        disposable = com.myapps.ron.family_recipes.layout.cognito.AppHelper.currSessionObservable
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .subscribe(currSession -> {
+                    if (currSession != null) {
+                        getFirebaseToken(context);
+                    }
+                }, throwable -> firebaseTokenObservable.onError(throwable)
+                , () -> disposable.dispose());
     }
 
     public static String getFirebaseToken(Context context) {
