@@ -47,6 +47,7 @@ public class SplashActivity extends AppCompatActivity {
         //setContentView(R.layout.activity_splash);
 
         AppHelper.init(getApplicationContext());
+        com.myapps.ron.family_recipes.layout.firebase.AppHelper.initTokenObserver();
 
         if (MiddleWareForNetwork.checkInternetConnection(this))
             findCurrent();

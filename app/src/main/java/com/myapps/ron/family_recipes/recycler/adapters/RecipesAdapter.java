@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Handler;
 import android.text.Spannable;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +20,7 @@ import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.bumptech.glide.Glide;
@@ -267,6 +269,7 @@ public class RecipesAdapter extends PagedListAdapter<RecipeMinimal, RecipesAdapt
                             listener.onThumbnailAccessed(recipe.getId());
                             if(path != null) {
                                 Glide.with(context)
+                                        .asDrawable()
                                         .load(path)
                                         .placeholder(circularProgressDrawable)
                                         .transform(new RoundedCorners(50))// TODO: change to constant
@@ -278,6 +281,8 @@ public class RecipesAdapter extends PagedListAdapter<RecipeMinimal, RecipesAdapt
 
                         @Override
                         public void onError(Throwable throwable) {
+                            Toast.makeText(context, throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                            Log.e(getClass().getSimpleName(), "error from storage, ", throwable);
                             loadDefaultImage(holder, circularProgressDrawable);
                             dispose();
                         }

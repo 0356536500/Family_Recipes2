@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GetTokenResult;
+import com.myapps.ron.family_recipes.MyApplication;
 import com.myapps.ron.family_recipes.logic.repository.AppRepository;
 
 import java.util.Date;
@@ -27,29 +28,43 @@ public class AppHelper {
     private static FirebaseUser firebaseSession;
     public static PublishSubject<String> firebaseTokenObservable = PublishSubject.create();
     private static Disposable disposable;
+    private static boolean waitingForFirebaseToken = false;
 
     private static GetTokenResult getAuthSession() {
         return authSession;
+    }
+
+    private static void setAuthSession(GetTokenResult newAuthSession) {
+        authSession = newAuthSession;
     }
 
     public static FirebaseUser getFirebaseUser() {
         return firebaseSession;
     }
 
-    public static void initTokenObserver(Context context) {
+    public static void initTokenObserver() {
+        waitingForFirebaseToken = false;
+        if (disposable != null && !disposable.isDisposed())
+            disposable.dispose();
         disposable = com.myapps.ron.family_recipes.layout.cognito.AppHelper.currSessionObservable
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
                 .subscribe(currSession -> {
+                    Log.e(TAG, "firebase observer, got token new from aws");
                     if (currSession != null) {
-                        getFirebaseToken(context);
+                        getFirebaseToken(MyApplication.getContext());
                     }
                 }, throwable -> firebaseTokenObservable.onError(throwable)
                 , () -> disposable.dispose());
     }
 
     public static String getFirebaseToken(Context context) {
-        if (getAuthSession() == null || new Date(getAuthSession().getExpirationTimestamp()).before(new Date())) {
+        //Log.e(TAG, "request new token");
+        if (getAuthSession() != null && new Date(getAuthSession().getExpirationTimestamp()).after(new Date()))
+            return getAuthSession().getToken();
+        //Log.e(TAG, "null or expired firebase token");
+        if (!waitingForFirebaseToken) {
+            waitingForFirebaseToken = true;
             AppRepository.getInstance().getFirebaseToken(context)
                     .observeOn(Schedulers.io())
                     .observeOn(Schedulers.io())
@@ -57,6 +72,7 @@ public class AppHelper {
                         @Override
                         public void onSuccess(String token) {
                             // refresh token
+                            Log.e(TAG, "got response from server with firebase token");
                             signInCustomToken(token);
                             dispose();
                         }
@@ -67,9 +83,8 @@ public class AppHelper {
                             dispose();
                         }
                     });
-            return null;
         }
-        return getAuthSession().getToken();
+        return null;
     }
 
     private static void signInCustomToken(@NonNull String token) {
@@ -89,9 +104,11 @@ public class AppHelper {
     private static void updateAuthSession(@NonNull FirebaseUser firebaseUser) {
         firebaseUser.getIdToken(false)
                 .addOnCompleteListener(task -> {
-                    if (task.isSuccessful() && task.getResult() != null && task.getResult().getToken() != null) {
-                        authSession = task.getResult();
-                        firebaseTokenObservable.onNext(authSession.getToken());
+                    if (task.isSuccessful() && task.getResult() != null) {
+                        setAuthSession(task.getResult());
+                        waitingForFirebaseToken = false;
+                        if (task.getResult().getToken() != null)
+                            firebaseTokenObservable.onNext(task.getResult().getToken());
                         Log.e(TAG, "getIdToken:success");
                     } else {
                         Log.e(TAG, "getIdToken:failure", task.getException());

@@ -1,5 +1,6 @@
 package com.myapps.ron.family_recipes.layout;
 
+import com.google.gson.JsonObject;
 import com.myapps.ron.family_recipes.layout.modelTO.CategoryTO;
 import com.myapps.ron.family_recipes.layout.modelTO.CommentTO;
 import com.myapps.ron.family_recipes.layout.modelTO.RecipeTO;
@@ -34,7 +35,7 @@ public interface RecipeInterface {
     String subscriptions = Constants.URL_SUBSCRIPTIONS + "/{" + Constants.PATH_DEVICE_ID + "}";
     String register_token = Constants.URL_TOKENS + "/{" + Constants.PATH_DEVICE_ID + "}" + "/{" + Constants.PATH_TOKEN + "}";
     String userWithID = Constants.URL_USERS + "/{" + Constants.PATH_DEVICE_ID + "}";
-    String firebaseToken = Constants.URL_TOKENS;
+    String firebaseToken = Constants.URL_TOKENS + "/firebase";
     String update = "app";
 
 

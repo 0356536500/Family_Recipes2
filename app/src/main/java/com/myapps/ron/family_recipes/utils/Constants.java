@@ -4,6 +4,7 @@ import com.myapps.ron.family_recipes.model.RecipeEntity;
 
 public class Constants {
     public static final String FIRST_APP_LAUNCH = "first_app_launch";
+    public static final String NEW_FIREBASE_TOKEN = "new_firebase_token";
 
     // region Notifications
     public static final String BODY = "message";

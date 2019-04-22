@@ -35,6 +35,19 @@ public class AppRepository {
 
     // region notifications
 
+    public Single<String> registerNewFirebaseToken(Context context, String firebaseToken) {
+        if (!MiddleWareForNetwork.checkInternetConnection(context))
+            return Single.just(context.getString(R.string.no_internet_message));
+        if (AppHelper.getAccessToken() == null)
+            return Single.just(context.getString(R.string.invalid_access_token));
+        return Single.create(emitter -> APICallsHandler.registerNewToken(AppHelper.getAccessToken(), MyApplication.getDeviceId(), firebaseToken, message -> {
+            if (message != null)
+                emitter.onError(new Throwable(message));
+            else
+                emitter.onSuccess("");
+        }));
+    }
+
     public Single<String> manageSubscriptions(Context context, Map<String, String> queries, Map<String, String> policy) {
         if (!MiddleWareForNetwork.checkInternetConnection(context))
             return Single.just(context.getString(R.string.no_internet_message));

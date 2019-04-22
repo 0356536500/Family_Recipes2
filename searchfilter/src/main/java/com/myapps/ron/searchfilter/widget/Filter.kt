@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.os.Parcelable
 import android.util.AttributeSet
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.animation.AlphaAnimation
@@ -102,9 +103,12 @@ class Filter<T : FilterModel> : FrameLayout, FilterItemListener, CollapseListene
     }
 
     fun build() {
+        Log.e(javaClass.simpleName, "build")
         if (!validate()) {
             return
         }
+
+        val firstBuild = mainFilters.size > 0
 
         mItems.clear()
         mainFilters.clear()
@@ -112,12 +116,16 @@ class Filter<T : FilterModel> : FrameLayout, FilterItemListener, CollapseListene
         mSelectedFilters.clear()
 
         expandedFilter.post {
+            expandedFilter.removeAllViewsInLayout()
             adapter?.items?.forEach { item ->
                 mainFilters.add(buildItem(item, null, true))
             }
 
-            if (isCollapsed == null) {
-                collapse(1)
+            if (isCollapsed == null || isCollapsed == false) {
+                if (firstBuild)
+                    collapse(1)
+                else
+                    collapse(Constant.ANIMATION_RESTORE_DURATION)
                 animateFadeInAfterCollapse()
             }
         }

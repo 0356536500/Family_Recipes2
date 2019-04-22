@@ -63,19 +63,19 @@ public abstract class AppDatabases extends RoomDatabase {
                                                 ));
                                 }
                             })*/
-                            .addCallback(new Callback() {
+                            /*.addCallback(new Callback() {
                                 @Override
                                 public void onOpen(@NonNull SupportSQLiteDatabase db) {
                                     super.onOpen(db);
                                     Executors.newSingleThreadScheduledExecutor().execute(() -> {
                                         RecipeDao recipeDao = getInstance(context).recipeDao();
                                         recipeDao.deleteAllRecipes();
-                                        recipeDao.insertAll(generate5Recipes());
+                                        //recipeDao.insertAll(generate5Recipes());
                                         //recipeDao.insertAll(generateData("recipe", 15));
                                         //recipeDao.insertAll(generateData("tirass", 15));
                                     });
                                 }
-                            })
+                            })*/
                             .build();
                 }
             }

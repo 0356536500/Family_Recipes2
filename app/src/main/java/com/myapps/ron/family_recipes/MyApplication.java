@@ -31,7 +31,7 @@ public class MyApplication extends LocaleAwareApplication {
         mContext = this;
 
         enqueueFilesWorker();
-        AppHelper.initTokenObserver(getApplicationContext());
+        //AppHelper.initTokenObserver(getApplicationContext());
     }
 
     private void enqueueFilesWorker() {

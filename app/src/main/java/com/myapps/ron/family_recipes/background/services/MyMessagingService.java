@@ -21,6 +21,7 @@ import com.myapps.ron.family_recipes.layout.APICallsHandler;
 import com.myapps.ron.family_recipes.layout.cognito.AppHelper;
 import com.myapps.ron.family_recipes.ui.activities.SplashActivity;
 import com.myapps.ron.family_recipes.utils.Constants;
+import com.myapps.ron.family_recipes.utils.logic.SharedPreferencesHandler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -87,17 +88,23 @@ public class MyMessagingService extends FirebaseMessagingService {
     public void onNewToken(String token) {
         super.onNewToken(token);
         Log.e(TAG, "Refreshed token: " + token);
+        SharedPreferencesHandler.writeString(getApplicationContext(), Constants.NEW_FIREBASE_TOKEN, token);
         compositeDisposable.add(AppHelper.currSessionObservable
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
                 .subscribe(currSession -> {
                     if (currSession != null) {
-                        APICallsHandler.registerNewToken(currSession.getAccessToken().getJWTToken(), MyApplication.getDeviceId(), token, message -> {
-                            if (message != null)
-                                Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-                            else
-                                compositeDisposable.clear();
-                        });
+                        if (SharedPreferencesHandler.getString(getApplicationContext(), Constants.NEW_FIREBASE_TOKEN) != null) {
+                            APICallsHandler.registerNewToken(currSession.getAccessToken().getJWTToken(), MyApplication.getDeviceId(), token, message -> {
+                                if (message != null)
+                                    Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+                                else {
+                                    SharedPreferencesHandler.removeString(getApplicationContext(), Constants.NEW_FIREBASE_TOKEN);
+                                    compositeDisposable.clear();
+                                }
+                            });
+                        } else
+                            compositeDisposable.clear();
                     }
                 }, error -> {
                     Log.e(TAG, error.getMessage());

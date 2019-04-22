@@ -25,8 +25,8 @@ public class AllRecipesFragment extends RecyclerWithFiltersAbstractFragment impl
         setRefreshLayout();
 
         new Handler().postDelayed(() -> {
-            //firstLoadingProgressBar.setVisibility(View.VISIBLE);
-            //viewModel.fetchFromServer(getContext());
+            firstLoadingProgressBar.setVisibility(View.VISIBLE);
+            viewModel.fetchFromServer(getContext());
             viewModel.applyQuery(queryModel);
             /*activity.fetchCategories();
             activity.fetchRecipes(orderBy);*/
@@ -50,7 +50,7 @@ public class AllRecipesFragment extends RecyclerWithFiltersAbstractFragment impl
         //viewModel = ViewModelProviders.of(activity).get(DataViewModel.class);
         viewModel.getPagedRecipes().observe(this, recipesList -> {
 
-            Log.e(TAG, String.valueOf("in recipes observer."));
+            Log.e(TAG, "in recipes observer.");
 
             firstLoadingProgressBar.setVisibility(View.GONE);
             filtersViewHider.show();
@@ -58,7 +58,6 @@ public class AllRecipesFragment extends RecyclerWithFiltersAbstractFragment impl
 
             if (recipesList != null) {
                 mAdapter.submitList(recipesList);
-                scrollToTop();
             }
         });
 

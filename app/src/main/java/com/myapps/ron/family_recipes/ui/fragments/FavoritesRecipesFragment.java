@@ -39,9 +39,7 @@ public class FavoritesRecipesFragment extends RecyclerWithFiltersAbstractFragmen
         viewModel.getPagedRecipes().observe(this, recipes -> {
             Log.e(TAG, "in favorite recipes observer");
             if(recipes != null) {
-                //Log.e(TAG, recipes.toString());
                 mAdapter.submitList(recipes);
-                scrollToTop();
             }
         });
         // already have values from AllRecipesFragment
