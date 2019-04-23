@@ -1,5 +1,6 @@
 package com.myapps.ron.family_recipes.ui.fragments;
 
+import android.os.Build;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
@@ -50,8 +51,6 @@ public class AllRecipesFragment extends RecyclerWithFiltersAbstractFragment impl
         //viewModel = ViewModelProviders.of(activity).get(DataViewModel.class);
         viewModel.getPagedRecipes().observe(this, recipesList -> {
 
-            Log.e(TAG, "in recipes observer.");
-
             firstLoadingProgressBar.setVisibility(View.GONE);
             filtersViewHider.show();
             swipeRefreshLayout.setRefreshing(false);
@@ -62,7 +61,7 @@ public class AllRecipesFragment extends RecyclerWithFiltersAbstractFragment impl
         });
 
         viewModel.getCategories().observe(this, categories -> {
-            if (categories != null) {
+            if (categories != null && !categories.isEmpty()) {
                 tags = new ArrayList<>(categories);
                 tags.add(0, new CategoryEntity.CategoryBuilder()
                         .name(getString(R.string.str_all_selected))

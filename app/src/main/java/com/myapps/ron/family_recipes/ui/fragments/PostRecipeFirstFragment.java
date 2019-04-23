@@ -213,10 +213,7 @@ public class PostRecipeFirstFragment extends PostRecipeBaseFragment implements F
 
     @Override
     public void onFilterSelected(CategoryEntity item) {
-        /*if (item.getText().equals(allTags.get(0).getText())) {
-            mFilter.deselectAll();
-            mFilter.collapse();
-        }*/
+
     }
 
     @Override

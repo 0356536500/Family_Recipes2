@@ -77,8 +77,7 @@ class Filter<T : FilterModel> : FrameLayout, FilterItemListener, CollapseListene
     private val STATE_COLLAPSED = "state_collapsed"
 
     private var mNothingSelectedItem: FilterItem? = null
-    //private val mSelectedFilters: LinkedHashMap<FilterItem, Coord> = LinkedHashMap()
-    //private val mRemovedFilters: LinkedHashMap<FilterItem, Coord> = LinkedHashMap()
+
     private var mItems: LinkedHashMap<FilterItem, T> = LinkedHashMap()
     private var mainFilters: ArrayList<FilterItem> = ArrayList()
     private var mSelectedFilters: ArrayList<FilterItem> = ArrayList()
@@ -123,9 +122,9 @@ class Filter<T : FilterModel> : FrameLayout, FilterItemListener, CollapseListene
 
             if (isCollapsed == null || isCollapsed == false) {
                 if (firstBuild)
-                    collapse(1)
+                    collapse(1, false)
                 else
-                    collapse(Constant.ANIMATION_RESTORE_DURATION)
+                    collapse(Constant.ANIMATION_RESTORE_DURATION, false)
                 animateFadeInAfterCollapse()
             }
         }
@@ -192,14 +191,18 @@ class Filter<T : FilterModel> : FrameLayout, FilterItemListener, CollapseListene
     private fun validate(): Boolean = adapter != null && adapter?.items != null && !adapter?.items?.isEmpty()!!
 
     override fun collapse() {
-        collapse(Constant.ANIMATION_DURATION)
+        collapse(Constant.ANIMATION_DURATION, true)
+    }
+
+    private fun collapse(notify: Boolean) {
+        collapse(Constant.ANIMATION_DURATION, notify)
     }
 
     fun isCollapsed(): Boolean {
         return isCollapsed == null || isCollapsed!!
     }
 
-    private fun collapse(duration: Long) {
+    private fun collapse(duration: Long, notify: Boolean) {
         if (mIsBusy) return
         mIsBusy = true
         //mRemovedFilters.clear()
@@ -231,7 +234,8 @@ class Filter<T : FilterModel> : FrameLayout, FilterItemListener, CollapseListene
             }
         }.start()
 
-        notifyListener()
+        if (notify)
+            notifyListener()
     }
 
     override fun expand() {
@@ -262,6 +266,8 @@ class Filter<T : FilterModel> : FrameLayout, FilterItemListener, CollapseListene
                     expandedFilterScroll.bringToFront()
                     expandedFilterScroll.requestFocus()
                     collapsedText.visibility = View.GONE
+                    if (mSelectedItems.isEmpty())
+                        mNothingSelectedItem?.select(false)
                     mIsBusy = false
                 }
             }
@@ -271,6 +277,14 @@ class Filter<T : FilterModel> : FrameLayout, FilterItemListener, CollapseListene
     override fun onItemSelected(item: FilterItem) {
         val filter = mItems[item]!!
         if (mItems.contains(item)) {
+            if (item.isDeselectHead) {
+                // deselect all
+                deselectAll()
+                collapse(false)
+                return
+            }
+            mNothingSelectedItem?.deselect(false)
+
             mSelectedItems.add(filter)
             mSelectedFilters.add(item)
 
@@ -287,15 +301,22 @@ class Filter<T : FilterModel> : FrameLayout, FilterItemListener, CollapseListene
                 listener?.onFilterSelected(filter)
             }
         }
-
     }
 
     /**
      * item deselected in ExpandedFilterView
      */
     override fun onItemDeselected(item: FilterItem) {
-        val filter = mItems[item]!!
         if (mItems.contains(item)) {
+            if (item.isDeselectHead) {
+                // deselect all
+                deselectAll()
+                item.select(false)
+                collapse(false)
+                return
+            }
+
+            val filter = mItems[item]!!
 
             mSelectedItems.remove(filter)
             mSelectedFilters.remove(item)
@@ -308,6 +329,10 @@ class Filter<T : FilterModel> : FrameLayout, FilterItemListener, CollapseListene
             if(!item.isContainer) {
                 listener?.onFilterDeselected(filter)
             }
+
+            /*if (mSelectedItems.isEmpty()) {
+                mNothingSelectedItem?.select(false)
+            }*/
         }
     }
 
@@ -346,7 +371,7 @@ class Filter<T : FilterModel> : FrameLayout, FilterItemListener, CollapseListene
         if (mSelectedItems.isNotEmpty()) {
             mainFilters.forEach { filter ->
                 if (filter.isDeselectHead) {
-                    filter.deselect(false)
+                    filter.select(false)
                 } else {
                     filter.deselectAll()
                     filter.hideSubFilters()
@@ -355,7 +380,7 @@ class Filter<T : FilterModel> : FrameLayout, FilterItemListener, CollapseListene
         }
         mSelectedItems.clear()
         mSelectedFilters.clear()
-        //listener?.onNothingSelected()
+        listener?.onNothingSelected()
     }
 
     /**
@@ -437,7 +462,7 @@ class Filter<T : FilterModel> : FrameLayout, FilterItemListener, CollapseListene
             }
 
             if (isCollapsed == null || isCollapsed as Boolean) {
-                collapse(Constant.ANIMATION_RESTORE_DURATION)
+                collapse(Constant.ANIMATION_RESTORE_DURATION, false)
                 animateFadeInAfterCollapse(Constant.ANIMATION_DURATION)
             } else {
                 expand()

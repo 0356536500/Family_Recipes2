@@ -37,14 +37,12 @@ public class FavoritesRecipesFragment extends RecyclerWithFiltersAbstractFragmen
     protected void initViewModel() {
         viewModel =  ViewModelProviders.of(activity).get(DataViewModel.class);
         viewModel.getPagedRecipes().observe(this, recipes -> {
-            Log.e(TAG, "in favorite recipes observer");
             if(recipes != null) {
                 mAdapter.submitList(recipes);
             }
         });
         // already have values from AllRecipesFragment
         viewModel.getCategories().observe(this, categories -> {
-            Log.e(TAG, "in favorite categories observer");
             if (categories != null) {
                 tags = new ArrayList<>(categories);
                 tags.add(0, new CategoryEntity.CategoryBuilder()

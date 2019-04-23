@@ -5,7 +5,6 @@ import android.net.Uri;
 import android.util.Log;
 
 import com.google.firebase.storage.FirebaseStorage;
-import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.layout.firebase.AppHelper;
 import com.myapps.ron.family_recipes.logic.storage.ExternalStorageHelper;
 
@@ -22,10 +21,10 @@ public class FirebaseStorageHelper {
     private static final String TAG = FirebaseStorageHelper.class.getSimpleName();
 
     public static Single<Uri> downloadFile(Context context, String key, String dir) {
-        /*if (AppHelper.getFirebaseToken(context) == null) {
+        /*if (AppHelper.isFirebaseTokenValidElseRefresh(context) == null) {
             return Single.error(new Throwable(context.getString(R.string.invalid_access_token)));
         }*/
-        if (AppHelper.getFirebaseToken(context) == null) {
+        if (AppHelper.isFirebaseTokenValidElseRefresh(context) == null) {
             return Single.create(emitter -> AppHelper.firebaseTokenObservable
                     .subscribeOn(Schedulers.io())
                     .observeOn(Schedulers.io())
@@ -68,9 +67,8 @@ public class FirebaseStorageHelper {
                                 dispose();
                         }
                     }));
-        } else {
-            return downloadFileWithValidToken(context, key, dir);
         }
+        return downloadFileWithValidToken(context, key, dir);
     }
 
     private static Single<Uri> downloadFileWithValidToken(Context context, String key, String dir) {
@@ -80,7 +78,7 @@ public class FirebaseStorageHelper {
         }
 
         String storageKey = dir + "/" + key;
-        Log.e(TAG, "downloadFile, " + storageKey);
+        //Log.e(TAG, "downloadFile, " + storageKey);
 
         return Single.create(emitter ->
                 FirebaseStorage

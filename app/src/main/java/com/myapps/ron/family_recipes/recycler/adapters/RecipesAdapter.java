@@ -269,7 +269,6 @@ public class RecipesAdapter extends PagedListAdapter<RecipeMinimal, RecipesAdapt
                             listener.onThumbnailAccessed(recipe.getId());
                             if(path != null) {
                                 Glide.with(context)
-                                        .asDrawable()
                                         .load(path)
                                         .placeholder(circularProgressDrawable)
                                         .transform(new RoundedCorners(50))// TODO: change to constant

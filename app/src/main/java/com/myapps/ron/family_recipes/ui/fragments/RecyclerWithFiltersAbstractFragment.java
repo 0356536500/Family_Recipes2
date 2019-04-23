@@ -201,6 +201,7 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
         activity.getTheme().resolveAttribute(R.attr.searchFilterCustomTextColor, value, true);
         mFilter.setCustomTextViewColor(value.data);
 
+        Log.e(TAG, "build filterView");
         mFilter.build();
     }
 
@@ -510,12 +511,7 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
 
     @Override
     public void onFilterSelected(CategoryEntity item) {
-        if (item.getText().equals(tags.get(0).getText())) {
-            new Handler().postDelayed(() -> {
-                mFilter.deselectAll();
-                mFilter.collapse();
-            }, 200);
-        }
+
     }
 
     @Override

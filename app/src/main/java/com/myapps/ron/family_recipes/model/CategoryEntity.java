@@ -11,6 +11,7 @@ import com.myapps.ron.searchfilter.model.FilterModel;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
@@ -64,7 +65,7 @@ public class CategoryEntity implements FilterModel {
     }*/
 
     public int getIntColor() {
-        if (!color.equals(""))
+        if (color != null && !color.equals(""))
             return Color.parseColor(color);
         return Color.parseColor(Constants.DEFAULT_COLOR);
     }
@@ -99,7 +100,8 @@ public class CategoryEntity implements FilterModel {
 
         CategoryEntity tag = (CategoryEntity) o;
 
-        if (!getColor().equals(tag.getColor()))
+        if (!Objects.equals(getColor(), tag.getColor()))
+        //if (!getColor().equals(tag.getColor()))
             return false;
         return getText().equals(tag.getText());
     }

@@ -1,39 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:id="@+id/create_recipe_container"
     tools:context=".TestActivity">
 
-    <Button
-        android:id="@+id/start"
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/test_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:text="start download"
-        android:textSize="22sp"
-        android:onClick="installApp"/>
+        android:layout_gravity="center_horizontal"
+        android:layout_margin="15dp"/>
 
     <Button
-        android:id="@+id/query"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_below="@id/start"
-        android:enabled="false"
-        android:text="Query"
-        android:onClick="queryStatus"/>
+        android:layout_gravity="center_horizontal"
+        android:layout_margin="10dp"
+        android:text="download"
+        android:onClick="download"/>
 
-    <Button
-        android:id="@+id/log"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_below="@id/query"
-        android:text="View Log"
-        android:onClick="viewLog"/>
+     <Button
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_gravity="center_horizontal"
+         android:layout_margin="10dp"
+         android:text="delete"
+         android:onClick="delete"/>
 
-</RelativeLayout>
+</LinearLayout>
