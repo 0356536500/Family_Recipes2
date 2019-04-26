@@ -29,6 +29,8 @@ public class Constants {
     public static final String MAIN_ACTIVITY_FRAGMENT_ALL = "fragment_all";
     public static final String MAIN_ACTIVITY_FRAGMENT_FAVORITES = "fragment_favorites";
 
+    public static final String FIRST_LOAD_FRAGMENT = "first_load";
+
     // endregion
 
     public static final String RECIPE_ID = "recipe";

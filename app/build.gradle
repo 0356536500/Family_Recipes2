@@ -138,9 +138,9 @@ dependencies {
     // endregion
 
     // region AWS
-    implementation 'com.amazonaws:aws-android-sdk-s3:2.12.2'
-    implementation('com.amazonaws:aws-android-sdk-mobile-client:2.12.+@aar') { transitive = true }
-    implementation('com.amazonaws:aws-android-sdk-auth-userpools:2.12.+@aar') { transitive = true }
+    implementation 'com.amazonaws:aws-android-sdk-s3:2.13.2'
+    implementation('com.amazonaws:aws-android-sdk-mobile-client:2.13.+@aar') { transitive = true }
+    implementation('com.amazonaws:aws-android-sdk-auth-userpools:2.13.+@aar') { transitive = true }
     //implementation 'com.amazonaws:aws-android-sdk-sns:2.12.0'
 
     // endregion

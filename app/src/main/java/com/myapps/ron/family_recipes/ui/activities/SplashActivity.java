@@ -53,7 +53,7 @@ public class SplashActivity extends AppCompatActivity {
             findCurrent();
         else if (SharedPreferencesHandler.getString(this, USERNAME) != null &&
                 SharedPreferencesHandler.getString(this, PASSWORD) != null) {
-            Toast.makeText(this, "you are offline", Toast.LENGTH_LONG).show();
+            //Toast.makeText(this, "you are offline", Toast.LENGTH_LONG).show();
             launchMain();
         } else
             Toast.makeText(this, "Please connect to internet and then log in", Toast.LENGTH_LONG).show();
@@ -77,27 +77,16 @@ public class SplashActivity extends AppCompatActivity {
     AuthenticationHandler authenticationHandler = new AuthenticationHandler() {
         @Override
         public void onSuccess(CognitoUserSession cognitoUserSession, CognitoDevice device) {
-            Log.d(TAG, " -- Auth Success");
+            //Log.d(TAG, " -- Auth Success");
             AppHelper.setCurrSession(cognitoUserSession);
             AppHelper.newDevice(device);
-            Log.e(TAG, "IDToken: " + cognitoUserSession.getIdToken().getJWTToken());
+            //Log.e(TAG, "IDToken: " + cognitoUserSession.getIdToken().getJWTToken());
             Log.e(TAG, "AccessToken: " + cognitoUserSession.getAccessToken().getJWTToken());
 
             AppHelper.setIdentityProvider(getApplicationContext(), cognitoUserSession);
 
             closeWaitDialog();
 
-            /*FirebaseAuth.getInstance()
-                    .signInWithCustomToken(cognitoUserSession.getIdToken().getJWTToken())
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            Log.e(TAG, "signInWithCustomToken:success");
-                            Log.e(TAG, task.getResult().getUser().getDisplayName());
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Log.e(TAG, "signInWithCustomToken:failure", task.getException());
-                        }
-                    });*/
             launchMain();
         }
 

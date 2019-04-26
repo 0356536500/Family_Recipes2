@@ -1,41 +1,47 @@
 package com.myapps.ron.family_recipes.ui.fragments;
 
-import android.os.Build;
+import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.lifecycle.ViewModelProviders;
+
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.background.services.GetUserDetailsService;
-import com.myapps.ron.family_recipes.recycler.adapters.RecipesAdapter;
 import com.myapps.ron.family_recipes.logic.Injection;
 import com.myapps.ron.family_recipes.model.CategoryEntity;
+import com.myapps.ron.family_recipes.recycler.adapters.RecipesAdapter;
+import com.myapps.ron.family_recipes.utils.Constants;
 import com.myapps.ron.family_recipes.viewmodels.DataViewModel;
 import com.myapps.ron.searchfilter.listener.FilterListener;
 
 import java.util.ArrayList;
 
-import androidx.core.content.ContextCompat;
-import androidx.lifecycle.ViewModelProviders;
-
 public class AllRecipesFragment extends RecyclerWithFiltersAbstractFragment implements RecipesAdapter.RecipesAdapterListener, FilterListener<CategoryEntity> {
 
     @Override
-    protected void initAfterViewCreated() {
+    public void onViewCreated(@NonNull View itemView, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(itemView, savedInstanceState);
+
         setRefreshLayout();
 
-        new Handler().postDelayed(() -> {
-            firstLoadingProgressBar.setVisibility(View.VISIBLE);
-            viewModel.fetchFromServer(getContext());
-            viewModel.applyQuery(queryModel);
-            /*activity.fetchCategories();
-            activity.fetchRecipes(orderBy);*/
-        }, 500);
+        Bundle arguments = getArguments();
+        if (arguments != null && arguments.getBoolean(Constants.FIRST_LOAD_FRAGMENT, false)) {
+            new Handler().postDelayed(() -> {
+                firstLoadingProgressBar.setVisibility(View.VISIBLE);
+                viewModel.fetchFromServer(getContext());
+                viewModel.applyQuery(queryModel);
+            }, 500);
 
-        if(activity.getIntent().getBooleanExtra("login", false)) {
-            new Handler().postDelayed(() ->
-                    GetUserDetailsService.startActionFetchUserDetails(getContext()), 5000);
+            if (activity.getIntent().getBooleanExtra("login", false)) {
+                new Handler().postDelayed(() ->
+                        GetUserDetailsService.startActionFetchUserDetails(getContext()), 5000);
+            }
         }
     }
 
@@ -47,8 +53,8 @@ public class AllRecipesFragment extends RecyclerWithFiltersAbstractFragment impl
 
     @Override
     protected void initViewModel() {
-        viewModel =  ViewModelProviders.of(this, Injection.provideViewModelFactory(activity)).get(DataViewModel.class);
-        //viewModel = ViewModelProviders.of(activity).get(DataViewModel.class);
+        //viewModel =  ViewModelProviders.of(this, Injection.provideViewModelFactory(activity)).get(DataViewModel.class);
+        viewModel = ViewModelProviders.of(activity).get(DataViewModel.class);
         viewModel.getPagedRecipes().observe(this, recipesList -> {
 
             firstLoadingProgressBar.setVisibility(View.GONE);
@@ -74,7 +80,9 @@ public class AllRecipesFragment extends RecyclerWithFiltersAbstractFragment impl
         });
 
         viewModel.getInfoFromLastFetch().observe(this, message -> {
+            Log.e(TAG, message);
             swipeRefreshLayout.setRefreshing(false);
+            firstLoadingProgressBar.setVisibility(View.GONE);
             if (message != null && !message.equals(""))
                 Toast.makeText(activity, message, Toast.LENGTH_SHORT).show();
         });

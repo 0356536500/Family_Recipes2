@@ -27,13 +27,28 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.annotation.StringRes;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.ViewModelProviders;
+
 import com.google.android.material.navigation.NavigationView;
-import com.google.firebase.iid.FirebaseInstanceId;
 import com.myapps.ron.family_recipes.R;
-import com.myapps.ron.family_recipes.logic.Injection;
-import com.myapps.ron.family_recipes.logic.storage.StorageWrapper;
 import com.myapps.ron.family_recipes.layout.MiddleWareForNetwork;
 import com.myapps.ron.family_recipes.layout.cognito.AppHelper;
+import com.myapps.ron.family_recipes.logic.Injection;
+import com.myapps.ron.family_recipes.logic.storage.StorageWrapper;
 import com.myapps.ron.family_recipes.ui.baseclasses.MyBaseActivity;
 import com.myapps.ron.family_recipes.ui.baseclasses.MyFragment;
 import com.myapps.ron.family_recipes.ui.fragments.AllRecipesFragment;
@@ -51,21 +66,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
-import androidx.annotation.StringRes;
-import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.lifecycle.ViewModelProviders;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
@@ -95,9 +95,10 @@ public class MainActivity extends MyBaseActivity implements BackStack.BackStackH
 
     private int toolbarColorPrimary, toolbarColorSecond;
 
-    private List<Integer> getListOfTags() {
+    private List<Integer> listOfTags = Arrays.asList(R.string.nav_main_all_recipes, R.string.nav_main_favorites);
+    /*private List<Integer> getListOfTags() {
         return  Arrays.asList(R.string.nav_main_all_recipes, R.string.nav_main_favorites);
-    }
+    }*/
 
     private final FragmentManager.FragmentLifecycleCallbacks fragmentLifecycleCallbacks = new FragmentManager.FragmentLifecycleCallbacks() {
         @Override
@@ -111,7 +112,7 @@ public class MainActivity extends MyBaseActivity implements BackStack.BackStackH
                     getSupportActionBar().setTitle(currentFragment.getMyTag());
                 }
 
-                int index = getListOfTags().indexOf(currentFragment.getMyTag());
+                int index = listOfTags.indexOf(currentFragment.getMyTag());
                 if (index >= 0)
                     navDrawer.getMenu().getItem(index).setChecked(true);
             }
@@ -154,7 +155,7 @@ public class MainActivity extends MyBaseActivity implements BackStack.BackStackH
                     .filter(fragment -> fragment instanceof MyFragment)
                     .map(fragment -> (MyFragment) fragment)
                     .collect(Collectors.toList())
-                    .forEach(myFragment -> Log.e(TAG, myFragment.getTag()));
+                    .forEach(myFragment -> Log.e(TAG, getString(myFragment.getMyTag())));
             // restore after shutdown
             if (backStack == null)
                 backStack = BackStack.restoreBackStackFromList(savedInstanceState, this, getSupportFragmentManager().getFragments());
@@ -188,9 +189,15 @@ public class MainActivity extends MyBaseActivity implements BackStack.BackStackH
         return fragment;
     }
 
+    @Nullable
     private MyFragment getOrCreateFragment(@StringRes int tag) {
         MyFragment fragment = backStack.findFragmentByTag(tag);
+        Bundle bundle = new Bundle();
+        bundle.putBoolean(Constants.FIRST_LOAD_FRAGMENT, fragment == null);
+        /*if (fragment != null)
+            Log.e(TAG, "getOrCreateFragment, fragment tag = " + getString(fragment.getMyTag()));*/
         if (fragment == null) {
+            //Log.e(TAG, "getOrCreateFragment, fragment == null");
             switch (tag) {
                 case R.string.nav_main_all_recipes:
                     fragment = new AllRecipesFragment();
@@ -202,6 +209,8 @@ public class MainActivity extends MyBaseActivity implements BackStack.BackStackH
                     break;
             }
         }
+        if (fragment != null)
+            fragment.setArguments(bundle);
         return fragment;
     }
 
@@ -492,21 +501,13 @@ public class MainActivity extends MyBaseActivity implements BackStack.BackStackH
         }
 
         if(fragment != null && fragment != currentFragment) {
-            // set item as selected to persist highlight
-            //item.setChecked(true);
 
             // add the fragment to backStack at index 0
             backStack.addToBackStack(fragment);
-            /*FragmentTransaction ft = getSupportFragmentManager()
-                    .beginTransaction();
-            // Add to backStack each fragment one time for not creating new fragment after activity recreation
-            if (getSupportFragmentManager()
-                    .findFragmentByTag(String.valueOf(fragment.getMyTag())) == null)
-                ft.addToBackStack(null);*/
-            //currentFragment = fragment;  // Redundant - lifecycleCallback onFragmentResumed will do it
+            Log.e(TAG, backStack.toString());
+
             getSupportFragmentManager()
                     .beginTransaction()
-            //ft
                     .setCustomAnimations(
                             R.anim.slide_enter_from_left,
                             R.anim.slide_right_to_exit,
@@ -530,22 +531,27 @@ public class MainActivity extends MyBaseActivity implements BackStack.BackStackH
         favoritesRecipesFragment = new FavoritesRecipesFragment();*/
     }
 
-    private void startWithDefaultFragment(@NonNull MyFragment startingFragment) {
-        currentFragment = startingFragment;
+    private void startWithDefaultFragment(@Nullable MyFragment startingFragment) {
+        if (startingFragment != null) {
+            currentFragment = startingFragment;
 
-        getSupportFragmentManager()
-                .beginTransaction()
-                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                .add(R.id.main_frame, currentFragment, String.valueOf(currentFragment.getMyTag()))
-                //.addToBackStack(null)
-                .commit();
-        backStack.addToBackStack(currentFragment); // index 0 is the currently displayed fragment
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                    .add(R.id.main_frame, currentFragment, String.valueOf(currentFragment.getMyTag()))
+                    //.addToBackStack(null)
+                    .commit();
+            backStack.addToBackStack(currentFragment); // index 0 is the currently displayed fragment
+        }
     }
 
     private boolean popFragmentFromBackStack() {
         MyFragment nextFragment = backStack.popFromBackStack(); // new displaying fragment
+        Log.e(TAG, backStack.toString());
+        Log.e(TAG, "popFragmentFromBackStack, fragment == null ? " + (nextFragment == null));
 
         if (nextFragment != null) {
+            Log.e(TAG, "popFragmentFromBackStack, fragment tag = " + getString(nextFragment.getMyTag()));
             getSupportFragmentManager()
                     .beginTransaction()
                     .setCustomAnimations(

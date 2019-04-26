@@ -54,7 +54,7 @@ public class AppHelper {
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
                 .subscribe(currSession -> {
-                    Log.e(TAG, "firebase observer, got token new from aws");
+                    //Log.e(TAG, "firebase observer, got token new from aws");
                     if (currSession != null) {
                         isFirebaseTokenValidElseRefresh(MyApplication.getContext());
                     }
@@ -76,7 +76,7 @@ public class AppHelper {
                         @Override
                         public void onSuccess(String token) {
                             // refresh token
-                            Log.e(TAG, "got response from server with firebase token");
+                            //Log.e(TAG, "got response from server with firebase token");
                             signInCustomToken(context, token);
                             dispose();
                         }

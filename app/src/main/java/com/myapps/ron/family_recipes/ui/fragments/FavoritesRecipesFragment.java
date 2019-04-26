@@ -1,7 +1,9 @@
 package com.myapps.ron.family_recipes.ui.fragments;
 
+import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.View;
 
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.recycler.adapters.RecipesAdapter;
@@ -11,6 +13,8 @@ import com.myapps.ron.searchfilter.listener.FilterListener;
 
 import java.util.ArrayList;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProviders;
 
@@ -20,13 +24,14 @@ import androidx.lifecycle.ViewModelProviders;
 public class FavoritesRecipesFragment extends RecyclerWithFiltersAbstractFragment implements RecipesAdapter.RecipesAdapterListener, FilterListener<CategoryEntity> {
 
     @Override
-    protected void initAfterViewCreated() {
+    public void onViewCreated(@NonNull View itemView, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(itemView, savedInstanceState);
+
         swipeRefreshLayout.setEnabled(false);
         //queryModel.setOrderBy(RecipeEntity.KEY_CREATED);
         queryModel.setFavorites(true);
         new Handler().postDelayed(() ->
                 viewModel.applyQuery(queryModel), 500);
-                //viewModel.loadLocalFavoritesOrdered(activity, com.myapps.ron.family_recipes.dal.Constants.SORT_RECENT), 500);
     }
 
     @Override

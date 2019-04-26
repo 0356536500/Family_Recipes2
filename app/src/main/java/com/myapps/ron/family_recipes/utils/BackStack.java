@@ -3,6 +3,7 @@ package com.myapps.ron.family_recipes.utils;
 import android.os.Build;
 import android.os.Bundle;
 
+import com.myapps.ron.family_recipes.MyApplication;
 import com.myapps.ron.family_recipes.ui.baseclasses.MyFragment;
 
 import java.util.ArrayList;
@@ -52,11 +53,10 @@ public class BackStack {
     public void addToBackStack(MyFragment fragment) {
         // duplicate fragments not allowed!
         int index = backStack.indexOf(fragment);
-        if (index > 0) {
+        if (index >= 0) {
             // remove fragment from old index
             backStack.remove(index);
         }
-        else
         // add the fragment to backStack at index 0
         backStack.add(0, fragment);
     }
@@ -246,6 +246,22 @@ public class BackStack {
     // endregion
 
     // endregion
+
+
+    @NonNull
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder("BackStack[ ");
+        if (backStack != null) {
+            for (MyFragment fragment: backStack) {
+                builder.append(MyApplication.getContext().getString(fragment.getMyTag())).append(", ");
+            }
+            builder.delete(builder.length() - 3, builder.length() - 1);
+            builder.append("]");
+            return builder.toString();
+        }
+        return super.toString();
+    }
 
     public interface BackStackHelper {
         MyFragment generateFragmentFromTag(@StringRes int tag);

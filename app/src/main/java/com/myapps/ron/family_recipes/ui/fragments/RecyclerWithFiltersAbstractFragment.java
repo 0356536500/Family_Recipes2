@@ -16,6 +16,18 @@ import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.PopupMenu;
+import androidx.appcompat.widget.SearchView;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.model.CategoryEntity;
 import com.myapps.ron.family_recipes.model.QueryModel;
@@ -40,19 +52,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.widget.PopupMenu;
-import androidx.appcompat.widget.SearchView;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.observers.DisposableMaybeObserver;
 import io.reactivex.schedulers.Schedulers;
 
@@ -88,7 +88,6 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
 
     ProgressBar firstLoadingProgressBar;
 
-    private CompositeDisposable compositeDisposable = new CompositeDisposable();
     QueryModel queryModel;
 
     //private int verticalScrollPosition;
@@ -121,21 +120,13 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
     }
 
     @Override
-    public void onStop() {
-        super.onStop();
-        Log.e(TAG, "onStop");
-        if (compositeDisposable != null && !compositeDisposable.isDisposed()) {
-            compositeDisposable.clear();
-        }
-    }
-
-    @Override
     public void onDetach() {
         super.onDetach();
-        parent.removeAllViews();
+        //Log.e(TAG, "onDetach");
+        /*parent.removeAllViews();
         parent = null;
         view = null;
-        mFilter = null;
+        mFilter = null;*/
     }
 
     @Override
@@ -153,7 +144,7 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
                              @Nullable Bundle savedInstanceState) {
         //Log.e(TAG, "on createView");
         if (parent == null) {
-            //Log.e(TAG, "on createView parent was null");
+            Log.e(TAG, "on createView parent was null");
             view = inflater.inflate(R.layout.content_main_recipes, container, false);
             parent = (FrameLayout) view;
         } else
@@ -165,7 +156,7 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
     public void onViewCreated(@NonNull View itemView, @Nullable Bundle savedInstanceState) {
         //Log.e(TAG, "on viewCreated");
         if (mFilter == null) {
-            //Log.e(TAG, "on viewCreated mFilter was null");
+            Log.e(TAG, "on viewCreated mFilter was null");
             swipeRefreshLayout = view.findViewById(R.id.content_main_refresh);
             recyclerView = view.findViewById(R.id.recycler_view);
             mFilter = view.findViewById(R.id.content_main_filters);
@@ -180,12 +171,9 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
 
             // Associate searchable configuration with the SearchView
             setSearchView(activity.getMenu());
-            
-            initAfterViewCreated();
         }
     }
 
-    protected abstract void initAfterViewCreated();
     protected abstract void initViewModel();
     protected abstract void optionRefresh();
 
@@ -201,17 +189,11 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
         activity.getTheme().resolveAttribute(R.attr.searchFilterCustomTextColor, value, true);
         mFilter.setCustomTextViewColor(value.data);
 
-        Log.e(TAG, "build filterView");
         mFilter.build();
     }
 
     // region init Views
     private void initRecycler() {
-        //RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(activity.getApplicationContext());
-        //recyclerView.setLayoutManager(mLayoutManager);
-        //recyclerView.setItemAnimator(new DefaultItemAnimator());
-        //recyclerView.addItemDecoration(new MyDividerItemDecoration(activity, DividerItemDecoration.VERTICAL, 36));
-        //recyclerView.setAdapter(mAdapter);
         recyclerView.setItemAnimator(new FiltersListItemAnimator());
         recyclerView.addOnScrollListener(new MyRecyclerScroll() {
             @Override
@@ -242,9 +224,7 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
         params.gravity = Gravity.CENTER;
         ((FrameLayout)view.findViewById(R.id.main_container)).addView(progressBar, params);
         progressBar.setVisibility(View.VISIBLE);*/
-        onRefreshListener = () -> {
-            viewModel.fetchFromServer(activity);
-        };
+        onRefreshListener = () -> viewModel.fetchFromServer(activity);
         swipeRefreshLayout.setOnRefreshListener(onRefreshListener);
         swipeRefreshLayout.setColorSchemeColors(getResources().getIntArray(R.array.colors));
         //swipeRefreshLayout.setProgressViewOffset(false, swipeRefreshLayout.getProgressViewStartOffset(), swipeRefreshLayout.getProgressViewEndOffset());
@@ -382,7 +362,6 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
     @Override
     public void onFavoriteClicked(RecipeMinimal recipe, Runnable onError) {
         // change recipe on server
-        Log.e(TAG, "onFavoriteClicked, id = " + recipe.getId());
         viewModel.changeLike(activity, recipe.getId(), onError);
     }
 
@@ -393,7 +372,6 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
 
     @Override
     public void onItemSelected(RecipeMinimal recipeMinimal) {
-        Log.e(TAG, "onItemSelected, " + recipeMinimal);
         Intent intent = new Intent(activity, RecipeActivity.class);
         intent.putExtra(Constants.RECIPE_ID, recipeMinimal.getId());
         startActivityForResult(intent, Constants.RECIPE_ACTIVITY_CODE);
