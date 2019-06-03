@@ -166,10 +166,12 @@
     <string name="pref_title_notification_new_recipe">מתכונים חדשים</string>
     <string name="pref_title_notification_comment">תגובות</string>
     <string name="pref_title_notification_like">סימון \'אהבתי\'</string>
+    <string name="pref_title_notification_update">עדכוני גרסא</string>
 
     <string name="pref_summary_notification_new_recipe">קבלת עדכונים על מתכונים חדשים</string>
     <string name="pref_summary_notification_comment">הודע לי כאשר מישהו מגיב על המתכונים שלי</string>
     <string name="pref_summary_notification_like">הודע לי כאשר מישהו מסמן \'אהבתי\' על המתכונים שלי</string>
+    <string name="pref_summary_notification_update">הודע כשגרסא חדשה של האפליקציה זמינה להודרה</string>
 
     <string name="pref_title_dark_theme">מצב כהה</string>
     <string name="pref_description_dark_theme">מצב כהה של אפליקציות מומלץ מאוד וחוסך בחיי הסוללה

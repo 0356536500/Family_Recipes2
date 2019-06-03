@@ -630,8 +630,8 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void writeCredentialsToSharedPref() {
-        SharedPreferencesHandler.writeString(getApplicationContext(), "username", username);
-        SharedPreferencesHandler.writeString(getApplicationContext(), "password", password);
+        SharedPreferencesHandler.writeString(getApplicationContext(), com.myapps.ron.family_recipes.layout.Constants.USERNAME, username);
+        SharedPreferencesHandler.writeString(getApplicationContext(), com.myapps.ron.family_recipes.layout.Constants.PASSWORD, password);
         SharedPreferencesHandler.writeBoolean(getApplication(), "rememberMe", true);
     }
 }

@@ -17,35 +17,32 @@
 
 package com.myapps.ron.family_recipes.ui.activities;
 
-import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.View;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.layout.cognito.AppHelper;
 import com.myapps.ron.family_recipes.recycler.adapters.FirstTimeLoginAttributesDisplayAdapter;
 
 public class NewPassword extends AppCompatActivity {
-    private String TAG = "NewPassword";
+    //private String TAG = "NewPassword";
     private EditText newPassword;
 
     private Button continueSignIn;
     private AlertDialog userDialog;
-    private ProgressDialog waitDialog;
+    //private ProgressDialog waitDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,20 +54,16 @@ public class NewPassword extends AppCompatActivity {
         if (toolbar != null) {
             toolbar.setTitle("");
             setSupportActionBar(toolbar);
+            toolbar.setNavigationOnClickListener(v -> exit(false));
         }
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
 
         TextView main_title = findViewById(R.id.newpassword_toolbar_title);
         main_title.setText(getTitle());
-
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                exit(false);
-            }
-        });
 
         init();
     }
@@ -108,18 +101,17 @@ public class NewPassword extends AppCompatActivity {
         });
 
         continueSignIn = findViewById(R.id.buttonNewPass);
-        continueSignIn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String newUserPassword = newPassword.getText().toString();
-                if (newUserPassword != null) {
-                    AppHelper.setPasswordForFirstTimeLogin(newUserPassword);
-                    if (checkAttributes()) {
-                        exit(true);
-                    }
+        continueSignIn.setOnClickListener(v -> {
+            String newUserPassword = null;
+            if (newPassword.getText() != null)
+                newUserPassword = newPassword.getText().toString();
+            if (newUserPassword != null) {
+                AppHelper.setPasswordForFirstTimeLogin(newUserPassword);
+                if (checkAttributes()) {
+                    exit(true);
                 }
-                showDialogMessage("Error", "Enter all required attributed", false);
             }
+            showDialogMessage("Error", "Enter all required attributed", false);
         });
         refreshItemsDisplayed();
     }
@@ -130,14 +122,11 @@ public class NewPassword extends AppCompatActivity {
         final ListView displayListView;
         displayListView = findViewById(R.id.listViewCurrentUserDetails);
         displayListView.setAdapter(attributesAdapter);
-        displayListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                TextView data = view.findViewById(R.id.editTextUserDetailInput);
-                String attributeType = data.getHint().toString();
-                String attributeValue = data.getText().toString();
-                showAttributeDetail(attributeType, attributeValue);
-            }
+        displayListView.setOnItemClickListener((parent, view, position, id) -> {
+            TextView data = view.findViewById(R.id.editTextUserDetailInput);
+            String attributeType = data.getHint().toString();
+            String attributeValue = data.getText().toString();
+            showAttributeDetail(attributeType, attributeValue);
         });
     }
 
@@ -155,19 +144,16 @@ public class NewPassword extends AppCompatActivity {
         input.requestFocus();
         builder.setView(input);
 
-        builder.setNeutralButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                try {
-                    String newValue = input.getText().toString();
-                    if (!newValue.equals(attributeValue)) {
-                        AppHelper.setUserAttributeForFirstTimeLogin(attributeType, newValue);
-                        refreshItemsDisplayed();
-                    }
-                    userDialog.dismiss();
-                } catch (Exception e) {
-                    // Log failure
+        builder.setNeutralButton("OK", (dialog, which) -> {
+            try {
+                String newValue = input.getText().toString();
+                if (!newValue.equals(attributeValue)) {
+                    AppHelper.setUserAttributeForFirstTimeLogin(attributeType, newValue);
+                    refreshItemsDisplayed();
                 }
+                userDialog.dismiss();
+            } catch (Exception e) {
+                // Log failure
             }
         });
         userDialog = builder.create();
@@ -179,19 +165,17 @@ public class NewPassword extends AppCompatActivity {
         return true;
     }
 
+    @SuppressWarnings("SameParameterValue")
     private void showDialogMessage(String title, String body, final boolean exit) {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(title).setMessage(body).setNeutralButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                try {
-                    userDialog.dismiss();
-                    if (exit) {
-                        exit(false);
-                    }
-                } catch (Exception e) {
+        builder.setTitle(title).setMessage(body).setNeutralButton("OK", (dialog, which) -> {
+            try {
+                userDialog.dismiss();
+                if (exit) {
                     exit(false);
                 }
+            } catch (Exception e) {
+                exit(false);
             }
         });
         userDialog = builder.create();

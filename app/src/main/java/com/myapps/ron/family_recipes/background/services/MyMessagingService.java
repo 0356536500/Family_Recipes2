@@ -224,9 +224,9 @@ public class MyMessagingService extends FirebaseMessagingService {
                 getString(R.string.notification_like_channel_name),
                 NotificationManager.IMPORTANCE_DEFAULT));
 
-        channels.add(new NotificationChannel(getString(R.string.notification_system_update_channel_id),
-                getString(R.string.notification_system_update_channel_name),
-                NotificationManager.IMPORTANCE_DEFAULT));
+        channels.add(new NotificationChannel(getString(R.string.notification_app_updates_channel_id),
+                getString(R.string.notification_app_updates_channel_name),
+                NotificationManager.IMPORTANCE_HIGH));
 
         notificationManager.createNotificationChannels(channels);
     }
