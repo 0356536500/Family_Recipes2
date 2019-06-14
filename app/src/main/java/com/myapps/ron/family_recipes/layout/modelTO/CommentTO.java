@@ -31,6 +31,7 @@ public class CommentTO {
         }
     }*/
 
+    // TODO: switch from userId to username
     public CommentEntity toEntity() {
         CommentEntity entity = new CommentEntity();
         entity.setMessage(this.message);

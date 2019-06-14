@@ -3,19 +3,18 @@ package com.myapps.ron.family_recipes.layout;
 import android.os.StrictMode;
 import android.util.Log;
 
-import com.google.gson.JsonObject;
+import androidx.annotation.NonNull;
+
 import com.myapps.ron.family_recipes.layout.modelTO.CategoryTO;
 import com.myapps.ron.family_recipes.layout.modelTO.CommentTO;
 import com.myapps.ron.family_recipes.layout.modelTO.RecipeTO;
 import com.myapps.ron.family_recipes.utils.MyCallback;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import androidx.annotation.NonNull;
 import io.reactivex.Observable;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -55,7 +54,7 @@ public class APICallsHandler {
         return rxRetrofit;
     }
 
-    public static Observable<Response<List<CommentTO>>> getRecipeCommentsObervable(String id, String token) {
+    public static Observable<Response<List<CommentTO>>> getRecipeCommentsObservable(String id, String token) {
         RecipeInterface service = getReactiveRetrofitInstance().create(RecipeInterface.class);
         return service.getRecipeComments(token, id);
     }
@@ -187,7 +186,7 @@ public class APICallsHandler {
         return service.postComment(headers, id, lastModifiedDate, attributes);
     }
 
-    public static void getAllCategories(String date, String token, final MyCallback<List<CategoryTO>> callback) {
+    /*public static void getAllCategories(String date, String token, final MyCallback<List<CategoryTO>> callback) {
         RecipeInterface service = getRetrofitInstance().create(RecipeInterface.class);
         Call<List<CategoryTO>> call = service.getAllCategories(token, date);
 
@@ -218,7 +217,7 @@ public class APICallsHandler {
                 //Toast.makeText(MainActivity.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
             }
         });
-    }
+    }*/
 
     /*public static void requestUrlsForFoodPictures(String id, List<String> files, String token, final MyCallback<List<String>> callback) {
         Map<String, String> requestBody = new HashMap<>();
@@ -251,7 +250,7 @@ public class APICallsHandler {
 
     }*/
 
-    public static List<String> requestUrlsForFoodPicturesSync(String id, String lastModifiedDate, int numOfFiles, String token) {
+    /*public static List<String> requestUrlsForFoodPicturesSyncOld(String id, String lastModifiedDate, int numOfFiles, String token) {
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
                 .permitAll().build();
         StrictMode.setThreadPolicy(policy);
@@ -269,6 +268,32 @@ public class APICallsHandler {
             return response.body();
         } catch (IOException e) {
             Log.e(TAG, e.getMessage());
+            return null;
+        }
+    }*/
+
+    public static List<String> requestUrlsForFoodPicturesSync(String id, String lastModifiedDate, int numOfFiles, String token) {
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+                .permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+
+        RecipeInterface service = getRetrofitInstance().create(RecipeInterface.class);
+        Call<List<String>> call = service.requestFoodUrls(token, id, lastModifiedDate, numOfFiles, "jpg");
+        try {
+            Response<List<String>> response = call.execute();
+            Log.e(TAG, "response code for requesting urls, " + response.code());
+            if (response.isSuccessful()) {
+                Log.e(TAG, "response urls:\n" + response.body());
+                return response.body();
+            } else {
+                if (response.errorBody() != null) {
+                    Log.e(TAG, "errorBody: " +response.errorBody().string());
+                }
+                return null;
+            }
+        } catch (IOException e) {
+            Log.e(TAG, e.getMessage());
+            e.printStackTrace();
             return null;
         }
     }
@@ -429,4 +454,9 @@ public class APICallsHandler {
     }
 
     // endregion
+
+    public static Observable<Response<Object>> getTestObservable() {
+        RecipeInterface service = getReactiveRetrofitInstance().create(RecipeInterface.class);
+        return service.getTestObservable();
+    }
 }

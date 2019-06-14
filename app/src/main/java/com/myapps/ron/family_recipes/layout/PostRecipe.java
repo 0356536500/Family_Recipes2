@@ -9,7 +9,7 @@ public interface PostRecipe {
     String getName();
     String getDescription();
     String getLastModifiedDate();
-    String getRecipeFile();
+    String getRecipeContent();
     List<String> getFoodFiles();
     List<String> getCategories();
 }

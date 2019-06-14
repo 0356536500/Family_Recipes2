@@ -294,9 +294,9 @@ public class HtmlElementsAdapter extends RecyclerView.Adapter<HtmlElementsAdapte
         return numberOfValidElements >= Constants.MIN_NUMBER_OF_HTML_ELEMENTS;
     }
 
-    public String generateHtml(String...headers) {
+    public String generateHtml() {
         HtmlHelper helper = new HtmlHelper();
-        helper.openStaticElements(headers);
+        helper.openStaticElements();
 
         for (HtmlModel element : elements) {
             if (element.isElementHasContent())

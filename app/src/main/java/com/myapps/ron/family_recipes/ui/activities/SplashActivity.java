@@ -106,9 +106,10 @@ public class SplashActivity extends AppCompatActivity {
         @Override
         public void onFailure(Exception e) {
             closeWaitDialog();
-            //launchLogin();
-            signInUser();
+            //signInUser();
             Log.e(TAG, "Sign-in failed, " + AppHelper.formatException(e));
+            Toast.makeText(getApplicationContext(), AppHelper.formatException(e), Toast.LENGTH_SHORT).show();
+            launchLogin();
             //showDialogMessage("Sign-in failed", AppHelper.formatException(e));
         }
 

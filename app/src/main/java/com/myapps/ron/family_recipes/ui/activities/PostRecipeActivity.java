@@ -391,7 +391,7 @@ public class PostRecipeActivity extends MyBaseActivity {
         categories.add("פסטה");
         recipe.setCategories(categories);
 
-        recipe.setRecipeFile("/data/user/0/com.myapps.ron.family_recipes/files/פסטה פרמזן.html");
+        recipe.setRecipeContent("/data/user/0/com.myapps.ron.family_recipes/files/פסטה פרמזן.html");
         List<String> images = new ArrayList<>();
         images.add("/document/image:40876");
         images.add("/document/image:38906");

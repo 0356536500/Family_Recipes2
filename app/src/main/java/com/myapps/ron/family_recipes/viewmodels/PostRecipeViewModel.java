@@ -39,9 +39,8 @@ public class PostRecipeViewModel extends ViewModel {
         this.compositeDisposable = new CompositeDisposable();
     }
 
-    private File recipeFile;
     //private List<Uri> imagesUris = new ArrayList<>();
-    public RecipeEntity recipe = new RecipeEntity();
+    public PendingRecipeEntity recipe = new PendingRecipeEntity();
 
     private void setRecipePath(String item) {
         recipePath.setValue(item);
@@ -55,14 +54,10 @@ public class PostRecipeViewModel extends ViewModel {
         return categoryList;
     }
 
-    public File getRecipeFile() {
-        return recipeFile;
-    }
-
-    public void setRecipeFile(Context context, String html) {
-        recipeFile = StorageWrapper.createHtmlFile(context,recipe.getName().concat(".html"), html);
-        if (recipeFile != null)
-            recipe.setRecipeFile(recipeFile.getAbsolutePath());
+    public void setRecipeContent(String html) {
+        //recipeFile = StorageWrapper.createHtmlFile(context,recipe.getName().concat(".html"), html);
+        //if (recipeFile != null)
+        recipe.setRecipeContent(html);
     }
 
     public void setImagesUris(List<String> imagesUris) {
@@ -79,7 +74,7 @@ public class PostRecipeViewModel extends ViewModel {
     public void postRecipe() {
         this.compositeDisposable.add(
                 this.pendingRecipeRepository
-                        .insertOrUpdatePendingRecipe(new PendingRecipeEntity(this.recipe))
+                        .insertOrUpdatePendingRecipe(this.recipe)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(this::initWorker, error -> Log.e(getClass().getSimpleName(), error.getMessage()))

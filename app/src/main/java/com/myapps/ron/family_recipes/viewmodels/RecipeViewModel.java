@@ -167,7 +167,7 @@ public class RecipeViewModel extends ViewModel {
 
         if(recipeFile != null && !recipeFile.equals("\"\"")) {
             StorageWrapper.getRecipeFile(context, recipeFile, path -> {
-                //Log.e(getClass().getSimpleName(), "return from getRecipeFile");
+                //Log.e(getClass().getSimpleName(), "return from getRecipeContent");
                 if(path != null) {
                     updateAccessToRecipeContent(recipeId);
                     setRecipePath(Constants.FILE_PREFIX + path.getPath());

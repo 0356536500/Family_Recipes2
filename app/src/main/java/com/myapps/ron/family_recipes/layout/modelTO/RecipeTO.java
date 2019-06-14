@@ -2,7 +2,6 @@ package com.myapps.ron.family_recipes.layout.modelTO;
 
 import com.google.gson.annotations.SerializedName;
 import com.myapps.ron.family_recipes.model.RecipeEntity;
-import com.myapps.ron.family_recipes.layout.PostRecipe;
 import com.myapps.ron.family_recipes.utils.Constants;
 
 import java.util.List;
@@ -14,7 +13,7 @@ import androidx.annotation.NonNull;
 /**
  * Created by ronginat on 31/12/2018.
  */
-public class RecipeTO implements PostRecipe {
+public class RecipeTO {
 
     //public static String image = "https://api.androidhive.info/json/images/keanu.jpg";
 
@@ -28,8 +27,6 @@ public class RecipeTO implements PostRecipe {
     private String creationDate;
     @SerializedName("lastModifiedDate")
     private String lastModifiedDate;
-    @SerializedName("recipeFile")
-    private String recipeFile;
     @SerializedName("uploader")
     private String uploader;
     @SerializedName("thumbnail")
@@ -46,7 +43,7 @@ public class RecipeTO implements PostRecipe {
         super();
     }
 
-    public RecipeTO (RecipeEntity recipe) {
+    /*public RecipeTO (RecipeEntity recipe) {
         this();
         if (recipe != null) {
             this.id = recipe.getId();
@@ -54,15 +51,13 @@ public class RecipeTO implements PostRecipe {
             this.description = recipe.getDescription();
             this.creationDate = recipe.getCreationDate();
             this.lastModifiedDate = recipe.getLastModifiedDate();
-            this.recipeFile = recipe.getRecipeFile();
             this.uploader = recipe.getUploader();
             this.thumbnail = recipe.getThumbnail();
             this.categories = recipe.getCategories();
             this.foodFiles = recipe.getFoodFiles();
             this.likes = recipe.getLikes();
         }
-
-    }
+    }*/
 
     public RecipeEntity toEntity() {
         RecipeEntity rv = new RecipeEntity();
@@ -71,7 +66,6 @@ public class RecipeTO implements PostRecipe {
         rv.setDescription(this.description);
         rv.setCreationDate(this.creationDate);
         rv.setLastModifiedDate(this.lastModifiedDate);
-        rv.setRecipeFile(this.recipeFile);
         rv.setUploader(this.uploader);
         rv.setThumbnail(this.thumbnail);
         rv.setCategories(this.categories);
@@ -93,7 +87,7 @@ public class RecipeTO implements PostRecipe {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, creationDate, lastModifiedDate, recipeFile, uploader, thumbnail, categories, foodFiles, likes);
+        return Objects.hash(id, name, description, creationDate, lastModifiedDate, uploader, thumbnail, categories, foodFiles, likes);
     }
 
     public String getId() {
@@ -140,14 +134,6 @@ public class RecipeTO implements PostRecipe {
 
     public void setLastModifiedDate(String lastModifiedDate) {
         this.lastModifiedDate = lastModifiedDate;
-    }
-
-    public String getRecipeFile() {
-        return recipeFile;
-    }
-
-    public void setRecipeFile(String recipeFile) {
-        this.recipeFile = recipeFile;
     }
 
     public String getUploader() {
@@ -202,7 +188,6 @@ public class RecipeTO implements PostRecipe {
                 /*", description='" + description + '\'' +*/
                 ", creationDate='" + creationDate + '\'' +
                 ", lastModifiedDate='" + lastModifiedDate + '\'' +
-                ", recipeFile='" + recipeFile + '\'' +
                 /*", uploader='" + uploader + '\'' +*/
                 ", thumbnail='" + thumbnail + '\'' +
                 ", categories=" + categories +

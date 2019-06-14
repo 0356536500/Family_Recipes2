@@ -7,7 +7,7 @@ public class Constants {
     static final String AUTHORIZATION = "Authorization";
 
     //retrofit request queries
-    static final String DATE_QUERY = "lastModified";
+    //static final String DATE_QUERY = "lastModified";
     static final String ID_QUERY = "id";
     static final String LAST_MODIFIED_QUERY = "lastModifiedDate";
     static final String EXCLUSIVE_START_KEY_QUERY = "Last-Evaluated-Key";
@@ -43,6 +43,10 @@ public class Constants {
     static final String POSTED_DESCRIPTION = "description";
     static final String POSTED_CATEGORIES = "categories";
     static final String RECIPE_ITEM = "recipe";
+
+    //GET request food urls queries
+    static final String NUM_OF_FILES_QUERY = "numOfFiles";
+    static final String EXTENSION_QUERY = "extension";
 
     static final String NUM_FILES_TO_UPLOAD = "numOfFiles";
     static final String PUT_FOOD_EXTENSION = "extension";

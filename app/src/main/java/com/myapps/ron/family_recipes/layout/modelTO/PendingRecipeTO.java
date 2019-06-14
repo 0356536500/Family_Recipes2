@@ -13,14 +13,14 @@ public class PendingRecipeTO implements PostRecipe {
 
     private String name;
     private String description;
-    private String recipeFile;
+    private String recipeContent;
     private List<String> categories;
     private List<String> foodFiles;
 
     public PendingRecipeTO(PendingRecipeEntity entity) {
         this.name = entity.getName();
         this.description = entity.getDescription();
-        this.recipeFile = entity.getRecipeFile();
+        this.recipeContent = entity.getRecipeContent();
         this.categories = new ArrayList<>(entity.getCategories());
         this.foodFiles = new ArrayList<>(entity.getFoodFiles());
     }
@@ -41,8 +41,8 @@ public class PendingRecipeTO implements PostRecipe {
     }
 
     @Override
-    public String getRecipeFile() {
-        return recipeFile;
+    public String getRecipeContent() {
+        return recipeContent;
     }
 
     @Override

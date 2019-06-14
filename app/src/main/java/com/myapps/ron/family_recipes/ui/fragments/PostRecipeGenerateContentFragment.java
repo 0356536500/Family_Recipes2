@@ -109,9 +109,9 @@ public class PostRecipeGenerateContentFragment extends PostRecipeBaseFragment {
     protected View.OnClickListener getFabClickListener() {
         return view -> {
             if(mAdapter.checkValidInput()) {
-                String html = mAdapter.generateHtml(viewModel.recipe.getName(), viewModel.recipe.getDescription());
+                String html = mAdapter.generateHtml();
                 Log.e(TAG, html);
-                viewModel.setRecipeFile(activity, html);
+                viewModel.setRecipeContent(html);
                 activity.nextFragmentDelayed();
             } else {
                 Toast.makeText(activity, getString(R.string.post_recipe_advanced_step_validation_message, Constants.MIN_NUMBER_OF_HTML_ELEMENTS), Toast.LENGTH_SHORT).show();
@@ -180,7 +180,7 @@ public class PostRecipeGenerateContentFragment extends PostRecipeBaseFragment {
                     mAdapter.addElementToScreen();
                     break;
                 case R.id.fab_preview_action:
-                    activity.showPreviewDialog(mAdapter.generateHtml("some name" , "long description"));
+                    activity.showPreviewDialog(mAdapter.generateHtml());
                     break;
                 case R.id.fab_template_action:
                     if (shouldDisplayDialog())

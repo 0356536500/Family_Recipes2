@@ -13,7 +13,7 @@ import androidx.annotation.NonNull;
  */
 public class HtmlHelper {
 
-    private static final String BODY_TEXT_STYLE = "style=\"font-family:sans;\"";
+    private static final String BODY_TEXT_STYLE = "style=font-family:sans-serif";
     private static final String LINE_BREAK = "br";
     public static final String HORIZONTAL_RULE = "hr";
     public static final String LIST_ROW = "li";
@@ -41,9 +41,9 @@ public class HtmlHelper {
     }
 
     @SuppressWarnings("SameParameterValue")
-    private String autoCloseTagWithAttributes(String tag, String attributes) {
+    /*private String autoCloseTagWithAttributes(String tag, String attributes) {
         return "<" + tag + " " + attributes + " />";
-    }
+    }*/
 
     private String closeContainer() {
         if (!containers.empty()) {
@@ -56,14 +56,22 @@ public class HtmlHelper {
         builder.append(addTag(tag));
     }
 
-    public void addTagWithAttributeToBuilder(String tag, String key, String value) {
+    /*public void addTagWithAttributeToBuilder(String tag, String key, String value) {
         builder.append(addTag(tag + " " + key + "=" + value));
+    }*/
+
+
+    public void openStaticElements() {
+        builder.append(addTag("div dir=rtl lang=he " + BODY_TEXT_STYLE));
     }
 
-    public void closeTagInBuilder(String tag) {
+    public void closeStaticElements() {
+        builder.append(closeTag("div"));
+    }
+
+    /*private void closeTagInBuilder(String tag) {
         builder.append(closeTag(tag));
     }
-
     public void openStaticElements(String...metaHeaders) {
         builder.append(addTag("!DOCTYPE html"));
         builder.append(addTag("html dir=rtl lang=he"));
@@ -77,12 +85,12 @@ public class HtmlHelper {
         }
         closeTagInBuilder("head");
         builder.append(addTag("body " + BODY_TEXT_STYLE));
-    }
+    }*/
 
-    public void closeStaticElements() {
+    /*public void closeStaticElements() {
         closeTagInBuilder("body");
         closeTagInBuilder("html");
-    }
+    }*/
 
     public void openElement(String element) {
         builder.append(openContainer(element));
@@ -94,7 +102,7 @@ public class HtmlHelper {
         builder.append(closeContainer());
     }
 
-    public void openElement(String element, boolean addToStack) {
+    /*public void openElement(String element, boolean addToStack) {
         if (addToStack)
             openElement(element);
         else
@@ -106,7 +114,7 @@ public class HtmlHelper {
             closeElement();
         else
             closeTagInBuilder(element);
-    }
+    }*/
 
     public void closeElement() {
         builder.append(closeContainer());

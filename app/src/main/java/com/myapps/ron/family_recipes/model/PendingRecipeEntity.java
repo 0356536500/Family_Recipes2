@@ -32,8 +32,8 @@ public class PendingRecipeEntity {
     private String name;
     @ColumnInfo(name = KEY_DESCRIPTION)
     private String description;
-    @ColumnInfo(name = "recipeFile")
-    private String recipeFile;
+    @ColumnInfo(name = "recipeContent")
+    private String recipeContent;
     @ColumnInfo(name = KEY_CATEGORIES)
     private List<String> categories;
     @ColumnInfo(name = KEY_FOOD_FILES)
@@ -49,7 +49,7 @@ public class PendingRecipeEntity {
         this.creationDate = entity.getCreationDate();
         this.name = entity.getName();
         this.description = entity.getDescription();
-        this.recipeFile = entity.getRecipeFile();
+        this.recipeContent = entity.getRecipeFile();
         this.categories = entity.getCategories();
         this.foodFiles = entity.getFoodFiles();
     }
@@ -79,12 +79,12 @@ public class PendingRecipeEntity {
         this.description = description;
     }
 
-    public String getRecipeFile() {
-        return recipeFile;
+    public String getRecipeContent() {
+        return recipeContent;
     }
 
-    public void setRecipeFile(String recipeFile) {
-        this.recipeFile = recipeFile;
+    public void setRecipeContent(String recipeContent) {
+        this.recipeContent = recipeContent;
     }
 
     public List<String> getCategories() {

@@ -4,7 +4,6 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Handler;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.background.workers.GetOneRecipeWorker;
@@ -438,7 +437,7 @@ public class RecipeRepository {
                     Log.e(TAG, "response code, " + next.code());
 
                     //DateUtil.updateServerTime(context, time);
-                }, error -> Toast.makeText(context, context.getString(R.string.load_error_message) + "\n" + error.getMessage(), Toast.LENGTH_SHORT).show());
+                }, error -> dispatchInfo.onNext(error.getMessage()));
 
         compositeDisposable.add(disposable);
         //}
@@ -470,7 +469,7 @@ public class RecipeRepository {
                         }
                         Log.e(TAG, "response code, " + next.code());
 
-                    }, error -> Toast.makeText(context, context.getString(R.string.load_error_message) + "\n" + error.getMessage(), Toast.LENGTH_SHORT).show());
+                    }, error -> dispatchInfo.onNext(error.getMessage()));
 
             compositeDisposable.add(disposable);
         }
@@ -528,7 +527,7 @@ public class RecipeRepository {
             return Single.error(new Throwable(context.getString(R.string.no_internet_message)));
         if (AppHelper.getAccessToken() == null)
             return Single.error(new Throwable(context.getString(R.string.invalid_access_token)));
-        return Single.create(emitter -> APICallsHandler.getRecipeCommentsObervable(recipeId, AppHelper.getAccessToken())
+        return Single.create(emitter -> APICallsHandler.getRecipeCommentsObservable(recipeId, AppHelper.getAccessToken())
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.from(executor))
                 .subscribe(new DisposableObserver<Response<List<CommentTO>>>() {

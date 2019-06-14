@@ -178,7 +178,7 @@ public class PostEnqueuedRecipesService extends Service {
         APICallsHandler.postRecipe(new PendingRecipeTO(recipe), AppHelper.getAccessToken(), results -> {
             if (results != null) {
                 Log.e(TAG, "finished post pend, " + results.toString());
-                boolean fileUploaded = OnlineStorageWrapper.uploadRecipeFileSync(results.get(RESPONSE_KEY_URL), recipe.getRecipeFile());
+                boolean fileUploaded = OnlineStorageWrapper.uploadRecipeFileSync(results.get(RESPONSE_KEY_URL), recipe.getRecipeContent());
                 if (fileUploaded) {
                     //sendIntentToUser(false, "recipe uploaded");
                     if (recipe.getFoodFiles() != null) {
@@ -203,7 +203,7 @@ public class PostEnqueuedRecipesService extends Service {
 
         deleteLocalFiles(recipe.getFoodFiles());
         List<String> recipeFile = new ArrayList<>();
-        recipeFile.add(recipe.getRecipeFile());
+        recipeFile.add(recipe.getRecipeContent());
         deleteLocalFiles(recipeFile);
     }
 
@@ -231,6 +231,6 @@ public class PostEnqueuedRecipesService extends Service {
                 new File(files.get(i)).delete();
             }
         }
-        //new File(recipe.getRecipeFile()).delete();
+        //new File(recipe.getRecipeContent()).delete();
     }
 }

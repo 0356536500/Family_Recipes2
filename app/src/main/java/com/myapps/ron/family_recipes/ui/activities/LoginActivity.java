@@ -424,7 +424,7 @@ public class LoginActivity extends AppCompatActivity {
             this.username = username;
             AppHelper.setUser(username);
         }
-        if(this.password == null) {
+        //if(this.password == null) {
             inUsername.setText(username);
             password = inPassword.getText().toString();
             if(inPassword.getText() == null || password.length() < 1) {
@@ -433,7 +433,7 @@ public class LoginActivity extends AppCompatActivity {
                 inPassword.setBackground(getDrawable(R.drawable.text_border_error));
                 return;
             }
-        }
+        //}
         AuthenticationDetails authenticationDetails = new AuthenticationDetails(this.username, password, null);
         continuation.setAuthenticationDetails(authenticationDetails);
         continuation.continueTask();

@@ -4,9 +4,11 @@ import android.content.Context;
 import android.util.Log;
 
 import com.myapps.ron.family_recipes.logic.persistence.AppDatabases;
+import com.myapps.ron.family_recipes.logic.persistence.PendingRecipeDao;
 import com.myapps.ron.family_recipes.logic.persistence.RecipeDao;
 import com.myapps.ron.family_recipes.model.AccessEntity;
 import com.myapps.ron.family_recipes.model.AccessEntity.RecipeAccess;
+import com.myapps.ron.family_recipes.model.PendingRecipeEntity;
 import com.myapps.ron.family_recipes.model.RecipeEntity;
 
 import org.junit.After;
@@ -22,6 +24,8 @@ import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.isIn;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -128,5 +132,40 @@ public class RoomJoinTest {
         assertEquals(recipeAccesses.size(), list.size() - 1);
         //assertNull(recipeAccesses.get(0).lastAccessedRecipe);
         assertNotNull(recipeAccesses.get(1).lastAccessedImages);
+    }
+
+    @Test
+    public void writeAndReadRecipeWithStringAsContentTest() {
+        TAG = "writeAndReadRecipeWithStringAsContentTest";
+        String html = "<div dir=rtl lang=he class=recipeStyle> \n" +
+                "    <h2>מרכיבים:</h2>\n" +
+                "    <ul>\n" +
+                "        <li>טחינה גולמית</li>\n" +
+                "        <li>חלב מרוכז</li>\n" +
+                "        <li>2 שמנת מתוקה</li>\n" +
+                "    </ul> \n" +
+                "    <hr>\n" +
+                "\n" +
+                "    <h2>אופן הכנה:</h2>\n" +
+                "\n" +
+                "    <ol>\n" +
+                "        <li>לשפוך הכל לקערה</li>\n" +
+                "        <li>לערבב טוב טוב</li>\n" +
+                "        <li>להכניס למקפיא ל4 שעות</li>\n" +
+                "    </ol>\n" +
+                "    <h5>שיהיה בתיאבון!</h5>\n" +
+                "</div>";
+
+        PendingRecipeEntity entity = new PendingRecipeEntity();
+        entity.setName("testName");
+        entity.setDescription("testDescription");
+        entity.setRecipeContent(html);
+        PendingRecipeDao dao = db.pendingRecipeDao();
+        dao.insertAll(entity);
+
+        List<PendingRecipeEntity> entities = dao.getAll();
+        assertNotNull(entities);
+        assertThat(entities, hasSize(1));
+        //assertThat(entity, isIn(entities));
     }
 }

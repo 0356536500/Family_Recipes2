@@ -17,7 +17,6 @@ import com.myapps.ron.family_recipes.layout.APICallsHandler;
 import com.myapps.ron.family_recipes.layout.S3.OnlineStorageWrapper;
 import com.myapps.ron.family_recipes.layout.cognito.AppHelper;
 import com.myapps.ron.family_recipes.layout.modelTO.PendingRecipeTO;
-import com.myapps.ron.family_recipes.layout.modelTO.RecipeTO;
 import com.myapps.ron.family_recipes.utils.Constants;
 
 import java.io.File;
@@ -128,7 +127,7 @@ public class PostRecipeToServerService extends IntentService {
 
         Log.e(TAG, "handle action post recipe");
         //maybe open a new thread
-        APICallsHandler.postRecipe(new RecipeTO(recipe), AppHelper.getAccessToken(), results -> {
+        APICallsHandler.postRecipe(null/*new RecipeTO(recipe)*/, AppHelper.getAccessToken(), results -> {
             if (results != null) {
                 Log.e(TAG, "finished post pend, " + results.toString());
                 boolean fileUploaded = OnlineStorageWrapper.uploadRecipeFileSync(results.get("url"), recipe.getRecipeFile());
@@ -194,7 +193,7 @@ public class PostRecipeToServerService extends IntentService {
                 new File(files.get(i)).delete();
             }
         }
-        //new File(recipe.getRecipeFile()).delete();
+        //new File(recipe.getRecipeContent()).delete();
     }
 
     private List<String> compressFiles(List<String> paths) {
@@ -298,7 +297,7 @@ public class PostRecipeToServerService extends IntentService {
         APICallsHandler.postRecipe(new PendingRecipeTO(recipe), AppHelper.getAccessToken(), results -> {
             if (results != null) {
                 Log.e(TAG, "finished post pend, " + results.toString());
-                boolean fileUploaded = OnlineStorageWrapper.uploadRecipeFileSync(results.get(RESPONSE_KEY_URL), recipe.getRecipeFile());
+                boolean fileUploaded = OnlineStorageWrapper.uploadRecipeFileSync(results.get(RESPONSE_KEY_URL), recipe.getRecipeContent());
                 if (fileUploaded) {
                     //sendIntentToUser(false, "recipe uploaded");
                     if (recipe.getFoodFiles() != null) {
@@ -323,7 +322,7 @@ public class PostRecipeToServerService extends IntentService {
 
         deleteLocalFiles(recipe.getFoodFiles());
         List<String> recipeFile = new ArrayList<>();
-        recipeFile.add(recipe.getRecipeFile());
+        recipeFile.add(recipe.getRecipeContent());
         deleteLocalFiles(recipeFile);
     }
 }
