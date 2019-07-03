@@ -5,15 +5,21 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.layout.APICallsHandler;
 import com.myapps.ron.family_recipes.layout.S3.OnlineStorageWrapper;
 import com.myapps.ron.family_recipes.layout.cognito.AppHelper;
+import com.myapps.ron.family_recipes.logic.Injection;
+import com.myapps.ron.family_recipes.logic.repository.RecipeRepository;
 import com.myapps.ron.family_recipes.logic.storage.StorageWrapper;
 import com.myapps.ron.family_recipes.utils.Constants;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import retrofit2.Response;
 
 
 /**
@@ -110,20 +116,40 @@ public class PostFoodImagesService extends IntentService {
         //uploadFoodFilesSync(id, localPaths);
         Log.e(TAG, "handle post images");
         Log.e(TAG, "id = " + id + "\n files: " + foodFiles);
+        RecipeRepository repository = Injection.provideRecipeRepository(getApplicationContext());
         //Synchronous request with retrofit 2.0
-        List<String> urlsForFood = APICallsHandler.requestUrlsForFoodPicturesSync(id, lastModifiedDate, foodFiles.size(), AppHelper.getAccessToken());
-        if (urlsForFood != null) {
-            //upload the images to s3
-            Log.e(TAG, "urls: " + urlsForFood);
-            for (int i = 0; i < urlsForFood.size() && i < foodFiles.size(); i++) {
-                Log.e(TAG, "uploading file #" + i);
-                OnlineStorageWrapper.uploadFoodFileSync(urlsForFood.get(i), foodFiles.get(i));
+        Response<List<String>> response = APICallsHandler.requestUrlsForFoodPicturesSync(id, lastModifiedDate, foodFiles.size(), AppHelper.getAccessToken());
+        if (response != null) {
+            if (response.isSuccessful() && response.body() != null) {
+                List<String> urlsForFood = response.body();
+
+                Log.e(TAG, "urls: " + urlsForFood);
+                for (int i = 0; i < urlsForFood.size() && i < foodFiles.size(); i++) {
+                    Log.e(TAG, "uploading file #" + i);
+                    OnlineStorageWrapper.uploadFoodFileSync(urlsForFood.get(i), foodFiles.get(i));
+                }
+                sendIntentUploadImagesFinishedToUser(true);
+
+            } else {
+                try {
+                    if (response.errorBody() != null) {
+                        String message = response.errorBody().string();
+                        repository.dispatchInfoForRecipe.onNext(message);
+                    } else
+                        repository.dispatchInfoForRecipe.onNext(getApplicationContext().getString(R.string.post_images_error));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    repository.dispatchInfoForRecipe.onNext(getApplicationContext().getString(R.string.post_images_error));
+                } finally {
+                    sendIntentUploadImagesFinishedToUser(false);
+                }
             }
-            sendIntentUploadImagesFinishedToUser(true);
+
         } else {
             Log.e(TAG, "urls are nulls");
             sendIntentUploadImagesFinishedToUser(false);
         }
+
         deleteLocalFiles(foodFiles);
     }
 }

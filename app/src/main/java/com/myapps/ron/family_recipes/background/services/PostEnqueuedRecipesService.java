@@ -153,6 +153,7 @@ public class PostEnqueuedRecipesService extends Service {
         RecipeRepository repository = Injection.provideRecipeRepository(getApplicationContext());
 
         Log.e(TAG, "handle action post recipe");
+        String errorMessage = getApplicationContext().getString(R.string.post_recipe_error) + recipe.getName();
         Response<Map<String, String>> response = APICallsHandler.postRecipeSync(new PendingRecipeTO(recipe), AppHelper.getAccessToken());
         if (response != null) {
             if (response.isSuccessful() && response.body() != null) {
@@ -177,15 +178,15 @@ public class PostEnqueuedRecipesService extends Service {
                         String message = response.errorBody().string();
                         repository.dispatchInfo.onNext(message);
                     } else
-                        repository.dispatchInfo.onNext(getApplicationContext().getString(R.string.load_error_message));
+                        repository.dispatchInfo.onNext(errorMessage);
                 } catch (IOException e) {
                     e.printStackTrace();
-                    repository.dispatchInfo.onNext(getApplicationContext().getString(R.string.load_error_message));
+                    repository.dispatchInfo.onNext(errorMessage);
                 }
             }
         } else {
             Log.e(TAG, "recipe wasn't uploaded");
-            repository.dispatchInfo.onNext(recipe.getName() + ", failed to upload");
+            repository.dispatchInfo.onNext(errorMessage);
         }
 
         //maybe open a new thread
@@ -207,27 +208,42 @@ public class PostEnqueuedRecipesService extends Service {
             }
             else
                 Log.e(TAG, "recipe wasn't uploaded");
-        });*/
-
-        deleteLocalFiles(recipe.getFoodFiles());
-        List<String> recipeFile = new ArrayList<>();
-        recipeFile.add(recipe.getRecipeContent());
-        deleteLocalFiles(recipeFile);
+        });
+        deleteLocalFiles(recipe.getFoodFiles());*/
     }
 
     private void uploadFoodFilesSync(String id, String lastModifiedDate, List<String> foodFiles) {
         Log.e(TAG, "uploading images");
         Log.e(TAG, "id = " + id + "\n files: " + foodFiles);
+        RecipeRepository repository = Injection.provideRecipeRepository(getApplicationContext());
+
         //Synchronous request with retrofit 2.0
-        List<String> urlsForFood = APICallsHandler.requestUrlsForFoodPicturesSync(id, lastModifiedDate, foodFiles.size(), AppHelper.getAccessToken());
-        if (urlsForFood != null) {
-            //upload the images to s3
-            Log.e(TAG, "urls: " + urlsForFood);
-            for (int i = 0; i < urlsForFood.size() && i < foodFiles.size(); i++) {
-                Log.e(TAG, "uploading file #" + i);
-                OnlineStorageWrapper.uploadFoodFileSync(urlsForFood.get(i), foodFiles.get(i));
+        Response<List<String>> response = APICallsHandler.requestUrlsForFoodPicturesSync(id, lastModifiedDate, foodFiles.size(), AppHelper.getAccessToken());
+        if (response != null) {
+            // check if successful
+            if (response.isSuccessful() && response.body() != null) {
+                List<String> urlsForFood = response.body();
+
+                //upload the images to s3
+                Log.e(TAG, "urls: " + urlsForFood);
+                for (int i = 0; i < urlsForFood.size() && i < foodFiles.size(); i++) {
+                    Log.e(TAG, "uploading file #" + i);
+                    OnlineStorageWrapper.uploadFoodFileSync(urlsForFood.get(i), foodFiles.get(i));
+                }
+                deleteLocalFiles(foodFiles);
+                new Handler().postDelayed(() -> Log.e(TAG, "images uploaded"), 2500);
+            } else {
+                try {
+                    if (response.errorBody() != null) {
+                        String message = response.errorBody().string();
+                        repository.dispatchInfo.onNext(message);
+                    } else
+                        repository.dispatchInfo.onNext(getApplicationContext().getString(R.string.post_images_error));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    repository.dispatchInfo.onNext(getApplicationContext().getString(R.string.post_images_error));
+                }
             }
-            new Handler().postDelayed(() -> Log.e(TAG, "images uploaded"), 2500);
         }
         Log.e(TAG, "urls are null");
     }

@@ -132,14 +132,12 @@ public class APICallsHandler {
         headers.put(Constants.CONTENT_TYPE, "application/json");
         headers.put(Constants.AUTHORIZATION, token);
 
-        Map<String, Object> body = new HashMap<>();
-        //body.put(Constants.RECIPE_ITEM, gson.toJson(recipe));
-        body.put(Constants.RECIPE_ITEM, generatePostRecipeFields(recipe));
-        //body.put(Constants.NUM_FILES_TO_UPLOAD, String.valueOf(numOfFiles));
+        //Map<String, Object> body = new HashMap<>();
+        //body.put(Constants.RECIPE_ITEM, generatePostRecipeFields(recipe));
+        //Log.e(TAG, "post body: \n" + body.toString());
 
-        Log.e(TAG, "post body: \n" + body.toString());
         RecipeInterface service = getRetrofitInstance().create(RecipeInterface.class);
-        Call<Map<String, String>> call = service.postRecipe(headers, body);
+        Call<Map<String, String>> call = service.postRecipe(headers, generatePostRecipeFields(recipe));
 
         try {
             return call.execute();
@@ -155,8 +153,6 @@ public class APICallsHandler {
         fields.put(Constants.POSTED_DESCRIPTION, recipe.getDescription());
         fields.put(Constants.POSTED_CONTENT, recipe.getRecipeContent());
         fields.put(Constants.POSTED_CATEGORIES, recipe.getCategories());
-
-        Log.e(TAG, "post body:\n" + fields.toString());
 
         return fields;
     }
@@ -284,29 +280,22 @@ public class APICallsHandler {
 
     }*/
 
-    /*public static List<String> requestUrlsForFoodPicturesSyncOld(String id, String lastModifiedDate, int numOfFiles, String token) {
+    public static Response<List<String>> requestUrlsForFoodPicturesSync(String id, String lastModifiedDate, int numOfFiles, String token) {
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
                 .permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
-        Map<String, String> requestBody = new HashMap<>();
-        requestBody.put(Constants.NUM_FILES_TO_UPLOAD, String.valueOf(numOfFiles));
-        requestBody.put(Constants.PUT_FOOD_EXTENSION, "jpg");
-
         RecipeInterface service = getRetrofitInstance().create(RecipeInterface.class);
-        Call<List<String>> call = service.requestFoodUrls(token, id, lastModifiedDate, requestBody);
+        Call<List<String>> call = service.requestFoodUrls(token, id, lastModifiedDate, numOfFiles, "jpg");
         try {
-            Response<List<String>> response = call.execute();
-            Log.e(TAG, "response code for requesting urls, " + response.code());
-            Log.e(TAG, "response urls:\n" + response.body());
-            return response.body();
+            return call.execute();
         } catch (IOException e) {
-            Log.e(TAG, e.getMessage());
+            e.printStackTrace();
             return null;
         }
-    }*/
+    }
 
-    public static List<String> requestUrlsForFoodPicturesSync(String id, String lastModifiedDate, int numOfFiles, String token) {
+    /*public static List<String> requestUrlsForFoodPicturesSyncOld(String id, String lastModifiedDate, int numOfFiles, String token) {
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
                 .permitAll().build();
         StrictMode.setThreadPolicy(policy);
@@ -331,29 +320,6 @@ public class APICallsHandler {
             e.printStackTrace();
             return null;
         }
-    }
-
-    /*public static APIResponse<List<RecipeTO>> getAllRecipesSync(String date, String startKey, int limit, String token) {
-        RecipeInterface service = getRetrofitInstance().create(RecipeInterface.class);
-        Call<List<RecipeTO>> call = service.getAllRecipesPagination(token, date, startKey, limit);
-
-        try {
-            Response<List<RecipeTO>> response = call.execute();
-            Log.e(TAG, "response code for getAllRecipesSync, " + response.code());
-            Log.e(TAG, "response getAllRecipesSync:\n" + response.body());
-            APIResponse<List<RecipeTO>> rv = null;
-            if (response.code() == STATUS_OK) {
-                rv = new APIResponse<>();
-                rv.setData(response.body());
-                rv.setLastKey(response.headers().get(Constants.HEADER_LAST_EVAL_KEY));
-            }
-            return rv;
-
-        } catch (IOException e) {
-            Log.e(TAG, e.getMessage());
-            return null;
-        }
-
     }*/
 
     // region Observable

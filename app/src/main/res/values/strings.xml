@@ -89,6 +89,11 @@
     <string name="main_activity_permission_to_install_updates_message">Install from unknown source is the only way to install the app outside of google play</string>
     <!--#endregion MainActivity -->
 
+    <!--#region ERRORS -->
+    <string name="post_images_error">error uploading images</string>
+    <string name="post_recipe_error">failed to upload </string>
+    <!--#endregion ERRORS -->
+
     <!-- AllRecipes Fragment -->
     <string name="str_all_selected">All categories</string>
     <string name="refresh_error_message">can refresh once every minute</string>
