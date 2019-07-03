@@ -97,7 +97,7 @@
     <string name="message_from_fetch_recipes_not_modified">no updates</string>
     <string name="message_from_fetch_categories">added %1$d, modified %2$d categories</string>
     <string name="number_of_recipes_indicator">%1$d recipes</string>
-    <string name="error_message_from_fetch_categories">error when fetching categories from server</string>
+    <string name="error_message_from_fetch_categories">error fetching new categories</string>
 
     <!-- Recipe Activity -->
     <string name="recipe_content_not_found">recipe content not found</string>

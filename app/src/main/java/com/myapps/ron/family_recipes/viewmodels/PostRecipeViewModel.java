@@ -1,7 +1,5 @@
 package com.myapps.ron.family_recipes.viewmodels;
 
-import android.util.Log;
-
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
 
@@ -10,6 +8,7 @@ import com.myapps.ron.family_recipes.logic.repository.CategoryRepository;
 import com.myapps.ron.family_recipes.logic.repository.PendingRecipeRepository;
 import com.myapps.ron.family_recipes.model.CategoryEntity;
 import com.myapps.ron.family_recipes.model.PendingRecipeEntity;
+import com.myapps.ron.family_recipes.utils.logic.CrashLogger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,10 +48,6 @@ public class PostRecipeViewModel extends ViewModel {
     public void setImagesUris(List<String> imagesUris) {
         if (imagesUris != null) {
             List<String> paths = new ArrayList<>(imagesUris);
-            /*if (!imagesUris.isEmpty()) {
-                for (Uri uri : imagesUris)
-                    paths.add(uri.getPath());
-            }*/
             recipe.setFoodFiles(paths);
         }
     }
@@ -63,13 +58,13 @@ public class PostRecipeViewModel extends ViewModel {
                         .insertOrUpdatePendingRecipe(this.recipe)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(this::initWorker, error -> Log.e(getClass().getSimpleName(), error.getMessage()))
+                        .subscribe(this::initWorker, CrashLogger::logException)
         );
     }
 
     private void initWorker() {
         this.compositeDisposable.clear();
-        BeginContinuationWorker.enqueueWorkContinuationWithValidSession(BeginContinuationWorker.WORKERS.POST_RECIPE, null);
+        BeginContinuationWorker.enqueueWorkContinuationWithValidSession(BeginContinuationWorker.WORKERS.POST_RECIPE);
     }
 
     @Override

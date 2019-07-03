@@ -12,17 +12,23 @@ import android.os.Process;
 import android.os.StrictMode;
 import android.util.Log;
 
+import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.layout.APICallsHandler;
 import com.myapps.ron.family_recipes.layout.S3.OnlineStorageWrapper;
 import com.myapps.ron.family_recipes.layout.cognito.AppHelper;
 import com.myapps.ron.family_recipes.layout.modelTO.PendingRecipeTO;
 import com.myapps.ron.family_recipes.logic.Injection;
 import com.myapps.ron.family_recipes.logic.repository.PendingRecipeRepository;
+import com.myapps.ron.family_recipes.logic.repository.RecipeRepository;
 import com.myapps.ron.family_recipes.model.PendingRecipeEntity;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
+import retrofit2.Response;
 
 import static com.myapps.ron.family_recipes.layout.Constants.RESPONSE_KEY_RECIPE_ID;
 import static com.myapps.ron.family_recipes.layout.Constants.RESPONSE_KEY_RECIPE_MODIFIED;
@@ -125,27 +131,65 @@ public class PostEnqueuedRecipesService extends Service {
         PendingRecipeRepository pendingRepository = Injection.providePendingRecipeRepository(getApplicationContext());
         List<PendingRecipeEntity> pendingRecipes = pendingRepository.getAll();
 
-        for (PendingRecipeEntity recipe: pendingRecipes) {
-            uploadRecipeSync(recipe);
+        if (pendingRecipes != null) {
+            for (PendingRecipeEntity recipe : pendingRecipes) {
+                uploadRecipeSync(recipe);
 
-            // delete from db when finish upload
-            pendingRepository.delete(recipe);
+                // delete from db when finish upload
+                pendingRepository.delete(recipe);
+            }
         }
         stopSelf(startId);
     }
 
     /**
-     * Handle action Foo in the provided background thread with the provided
+     * Handle action upload recipe in the provided background thread with the provided
      * parameters.
      */
     private void uploadRecipeSync(final PendingRecipeEntity recipe) {
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
                 .permitAll().build();
         StrictMode.setThreadPolicy(policy);
+        RecipeRepository repository = Injection.provideRecipeRepository(getApplicationContext());
 
         Log.e(TAG, "handle action post recipe");
+        Response<Map<String, String>> response = APICallsHandler.postRecipeSync(new PendingRecipeTO(recipe), AppHelper.getAccessToken());
+        if (response != null) {
+            if (response.isSuccessful() && response.body() != null) {
+                Map<String, String> results = response.body();
+                Log.e(TAG, "finished post pend, " + results.toString());
+                if (recipe.getFoodFiles() != null) {
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } finally {
+                        uploadFoodFilesSync(results.get(RESPONSE_KEY_RECIPE_ID), results.get(RESPONSE_KEY_RECIPE_MODIFIED), recipe.getFoodFiles());
+                    }
+                } else {
+                    //no images to upload
+                    new Handler().postDelayed(() -> Log.e(TAG, "recipe uploaded"), 2500);
+                }
+
+            } else {
+                try {
+                    if (response.errorBody() != null) {
+                        String message = response.errorBody().string();
+                        repository.dispatchInfo.onNext(message);
+                    } else
+                        repository.dispatchInfo.onNext(getApplicationContext().getString(R.string.load_error_message));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    repository.dispatchInfo.onNext(getApplicationContext().getString(R.string.load_error_message));
+                }
+            }
+        } else {
+            Log.e(TAG, "recipe wasn't uploaded");
+            repository.dispatchInfo.onNext(recipe.getName() + ", failed to upload");
+        }
+
         //maybe open a new thread
-        APICallsHandler.postRecipe(new PendingRecipeTO(recipe), AppHelper.getAccessToken(), results -> {
+        /*APICallsHandler.postRecipe(new PendingRecipeTO(recipe), AppHelper.getAccessToken(), results -> {
             if (results != null) {
                 Log.e(TAG, "finished post pend, " + results.toString());
                 if (recipe.getFoodFiles() != null) {
@@ -163,7 +207,7 @@ public class PostEnqueuedRecipesService extends Service {
             }
             else
                 Log.e(TAG, "recipe wasn't uploaded");
-        });
+        });*/
 
         deleteLocalFiles(recipe.getFoodFiles());
         List<String> recipeFile = new ArrayList<>();

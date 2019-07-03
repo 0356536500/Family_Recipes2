@@ -757,7 +757,7 @@ public class MainActivity extends MyBaseActivity implements BackStack.BackStackH
                     if (intent.getExtras() != null) {
                         final ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
                         if (connectivityManager != null) {
-                            boolean isConnected = false;
+                            boolean isConnected;
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                                 Network network = connectivityManager.getActiveNetwork();
                                 isConnected = network != null;

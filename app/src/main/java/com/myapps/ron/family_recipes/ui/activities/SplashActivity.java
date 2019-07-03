@@ -55,6 +55,7 @@ public class SplashActivity extends AppCompatActivity {
         else if (SharedPreferencesHandler.getString(this, USERNAME) != null &&
                 SharedPreferencesHandler.getString(this, PASSWORD) != null) {
             //Toast.makeText(this, "you are offline", Toast.LENGTH_LONG).show();
+            CrashLogger.setName(SharedPreferencesHandler.getString(this, USERNAME));
             launchMain();
         } else
             Toast.makeText(this, "Please connect to internet and then log in", Toast.LENGTH_LONG).show();

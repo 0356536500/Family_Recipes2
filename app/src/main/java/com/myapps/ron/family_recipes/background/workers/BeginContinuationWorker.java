@@ -65,29 +65,34 @@ public class BeginContinuationWorker extends RxWorker {
                 .build();
     }
 
-    public static void enqueueWorkContinuationWithValidSession(WORKERS nextWorker, String recipeId) {
+    public static void enqueueWorkContinuationWithValidSession(WORKERS nextWorker) {
         try {
             WorkManager.getInstance()
                     .beginWith(getSessionWaiterWorker(nextWorker))
-                    .then(getNextWorkerRequest(nextWorker, recipeId))
+                    .then(getNextWorkerRequest(nextWorker))
                     .enqueue();
         } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
 
-    private static OneTimeWorkRequest getNextWorkerRequest(WORKERS worker, String recipeId) {
-        switch (worker) {
-            /*case GET_RECIPE:
+    private static OneTimeWorkRequest getNextWorkerRequest(WORKERS worker) {
+        if (worker.equals(WORKERS.POST_RECIPE))
+            return PostRecipeScheduledWorker.createPostRecipesWorker();
+        else
+            throw new RuntimeException("Worker is not valid!");
+
+        /*switch (worker) {
+            case GET_RECIPE:
                 return GetOneRecipeWorker.getOneRecipeWorker(recipeId);
             case GET_CONTENT:
                 return GetRecipeContentWorker.getRecipeContentWorker(recipeId, null);
             case POST_RECIPE:
                 return PostRecipeScheduledWorker.createPostRecipesWorker();
             case GET_USER:
-                return GetUserDetailsWorker.getUserDetailsWorker();*/
+                return GetUserDetailsWorker.getUserDetailsWorker();
             default:
                 throw new RuntimeException("Worker is not valid!");
-        }
+        }*/
     }
 }

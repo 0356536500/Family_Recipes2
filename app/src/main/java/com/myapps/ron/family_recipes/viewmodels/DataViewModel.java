@@ -21,6 +21,7 @@ import com.myapps.ron.family_recipes.model.QueryModel;
 import com.myapps.ron.family_recipes.model.RecipeEntity;
 import com.myapps.ron.family_recipes.model.RecipeMinimal;
 import com.myapps.ron.family_recipes.layout.Constants;
+import com.myapps.ron.family_recipes.utils.logic.CrashLogger;
 
 import java.io.File;
 import java.util.Date;
@@ -64,7 +65,7 @@ public class DataViewModel extends ViewModel {
 
     private LiveData<List<CategoryEntity>> categoryList;// = new MutableLiveData<>(); // list of newCategories from api
 
-    private MutableLiveData<String> infoFromLastFetch = new MutableLiveData<>(); // info about new or modified pagedRecipes from last fetch from api
+    private MutableLiveData<String> infoForUser = new MutableLiveData<>(); // info about new or modified pagedRecipes from last fetch from api
     private CompositeDisposable compositeDisposable;
 
     //private Observer<List<CategoryEntity>> categoryObserver = categoryList::setValue;
@@ -74,8 +75,15 @@ public class DataViewModel extends ViewModel {
         this.categoryRepository = categoryRepository;
 
         this.compositeDisposable = new CompositeDisposable();
-        compositeDisposable.add(this.recipeRepository.dispatchInfo.subscribe(infoFromLastFetch::postValue));
-        compositeDisposable.add(this.categoryRepository.dispatchInfo.subscribe(infoFromLastFetch::postValue));
+        compositeDisposable.add(this.recipeRepository.dispatchInfo
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::setInfo));
+        compositeDisposable.add(this.categoryRepository.dispatchInfo
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::setInfo));
+        //compositeDisposable.add(this.categoryRepository.dispatchInfo.subscribe(infoForUser::postValue));
 
         categoryList = categoryRepository.getAllCategoriesLiveData();//.observeForever(categoryObserver);
     }
@@ -103,7 +111,8 @@ public class DataViewModel extends ViewModel {
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
                 .subscribe(recipeEntity -> updateLike(context, recipeEntity, onErrorUpdateUI), throwable -> {
-                    infoFromLastFetch.postValue(throwable.getMessage());
+                    CrashLogger.logException(throwable);
+                    infoForUser.postValue(context.getString(R.string.load_error_message));
                     onErrorUpdateUI.run();
                 })
         );
@@ -111,6 +120,7 @@ public class DataViewModel extends ViewModel {
 
     /**
      * the actual update
+     * Send request to server and then,
      */
     private void updateLike(final Context context, @NonNull RecipeEntity recipe, Runnable onErrorUpdateUI) {
         Log.e(getClass().getSimpleName(), "updateLike");
@@ -121,7 +131,7 @@ public class DataViewModel extends ViewModel {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(aBoolean -> {}, throwable -> {
-                    infoFromLastFetch.setValue(throwable.getMessage());
+                    infoForUser.setValue(throwable.getMessage());
                     onErrorUpdateUI.run();
                 })
         );
@@ -131,7 +141,6 @@ public class DataViewModel extends ViewModel {
     public void fetchFromServerJustLoggedIn(Context context) {
         GetUserDetailsService.startActionFetchUserDetails(context);
         //GetUserDetailsService.startActionGetAllRecipes(context);
-        //categoryRepository.fetchCategoriesReactive(context);
     }
 
     public void fetchFromServer(Context context) {
@@ -147,8 +156,12 @@ public class DataViewModel extends ViewModel {
         return categoryList;
     }
 
-    public LiveData<String> getInfoFromLastFetch() {
-        return infoFromLastFetch;
+    public LiveData<String> getInfo() {
+        return infoForUser;
+    }
+
+    private void setInfo(String message) {
+        infoForUser.setValue(message);
     }
 
     // region Recipe Access

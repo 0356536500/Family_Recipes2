@@ -10,6 +10,6 @@ public interface PostRecipe {
     String getDescription();
     String getLastModifiedDate();
     String getRecipeContent();
-    List<String> getFoodFiles();
+    //List<String> getFoodFiles();
     List<String> getCategories();
 }

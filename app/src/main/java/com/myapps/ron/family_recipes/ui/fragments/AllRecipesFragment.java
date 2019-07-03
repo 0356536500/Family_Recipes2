@@ -13,7 +13,6 @@ import androidx.lifecycle.ViewModelProviders;
 
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.background.services.GetUserDetailsService;
-import com.myapps.ron.family_recipes.logic.Injection;
 import com.myapps.ron.family_recipes.model.CategoryEntity;
 import com.myapps.ron.family_recipes.recycler.adapters.RecipesAdapter;
 import com.myapps.ron.family_recipes.utils.Constants;
@@ -79,11 +78,11 @@ public class AllRecipesFragment extends RecyclerWithFiltersAbstractFragment impl
             }
         });
 
-        viewModel.getInfoFromLastFetch().observe(this, message -> {
+        viewModel.getInfo().observe(this, message -> {
             Log.e(TAG, message);
             swipeRefreshLayout.setRefreshing(false);
             firstLoadingProgressBar.setVisibility(View.GONE);
-            if (message != null && !message.equals(""))
+            if (!message.equals(""))
                 Toast.makeText(activity, message, Toast.LENGTH_SHORT).show();
         });
     }

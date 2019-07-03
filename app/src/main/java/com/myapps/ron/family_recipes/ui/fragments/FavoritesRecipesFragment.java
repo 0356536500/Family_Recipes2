@@ -2,21 +2,20 @@ package com.myapps.ron.family_recipes.ui.fragments;
 
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.View;
-
-import com.myapps.ron.family_recipes.R;
-import com.myapps.ron.family_recipes.recycler.adapters.RecipesAdapter;
-import com.myapps.ron.family_recipes.model.CategoryEntity;
-import com.myapps.ron.family_recipes.viewmodels.DataViewModel;
-import com.myapps.ron.searchfilter.listener.FilterListener;
-
-import java.util.ArrayList;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProviders;
+
+import com.myapps.ron.family_recipes.R;
+import com.myapps.ron.family_recipes.model.CategoryEntity;
+import com.myapps.ron.family_recipes.recycler.adapters.RecipesAdapter;
+import com.myapps.ron.family_recipes.viewmodels.DataViewModel;
+import com.myapps.ron.searchfilter.listener.FilterListener;
+
+import java.util.ArrayList;
 
 /**
  * Created by ronginat on 07/11/2018.

@@ -1,5 +1,6 @@
 package com.myapps.ron.family_recipes.layout.modelTO;
 
+import com.google.gson.annotations.SerializedName;
 import com.myapps.ron.family_recipes.model.PendingRecipeEntity;
 import com.myapps.ron.family_recipes.layout.PostRecipe;
 
@@ -11,18 +12,23 @@ import java.util.List;
  */
 public class PendingRecipeTO implements PostRecipe {
 
+    @SerializedName("name")
     private String name;
+    @SerializedName("description")
     private String description;
-    private String recipeContent;
+    @SerializedName("html")
+    private String content;
+    @SerializedName("categories")
     private List<String> categories;
-    private List<String> foodFiles;
+    /*@SerializedName("foodFiles")
+    private List<String> foodFiles;*/
 
     public PendingRecipeTO(PendingRecipeEntity entity) {
         this.name = entity.getName();
         this.description = entity.getDescription();
-        this.recipeContent = entity.getRecipeContent();
+        this.content = entity.getRecipeContent();
         this.categories = new ArrayList<>(entity.getCategories());
-        this.foodFiles = new ArrayList<>(entity.getFoodFiles());
+        //this.foodFiles = new ArrayList<>(entity.getFoodFiles());
     }
 
     @Override
@@ -42,13 +48,13 @@ public class PendingRecipeTO implements PostRecipe {
 
     @Override
     public String getRecipeContent() {
-        return recipeContent;
+        return content;
     }
 
-    @Override
+    /*@Override
     public List<String> getFoodFiles() {
         return foodFiles;
-    }
+    }*/
 
     @Override
     public List<String> getCategories() {

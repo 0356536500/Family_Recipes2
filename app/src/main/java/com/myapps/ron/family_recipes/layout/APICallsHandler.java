@@ -82,7 +82,7 @@ public class APICallsHandler {
                 Log.e(TAG, "error getting recipe comments", t);
             }
         });
-    }*/
+    }
 
     public static void postRecipe(final PostRecipe recipe, final String token, final MyCallback<Map<String, String>> callback) {
         Log.e(TAG, "start post recipe");
@@ -104,8 +104,6 @@ public class APICallsHandler {
             @Override
             public void onResponse(@NonNull Call<Map<String, String>> call, @NonNull Response<Map<String, String>> response) {
                 String url = "null";
-                /*if (response.body() != null && response.body().get("url") != null)
-                    url = response.body().get("url").getAsString();*/
 
                 Log.i(TAG, "response code = " + response.code() + ",\t" + url);
 
@@ -125,6 +123,30 @@ public class APICallsHandler {
                 //Toast.makeText(MainActivity.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
             }
         });
+    }*/
+
+    public static Response<Map<String, String>> postRecipeSync(final PostRecipe recipe, final String token) {
+        Log.e(TAG, "start post recipe");
+
+        Map<String, String> headers = new HashMap<>();
+        headers.put(Constants.CONTENT_TYPE, "application/json");
+        headers.put(Constants.AUTHORIZATION, token);
+
+        Map<String, Object> body = new HashMap<>();
+        //body.put(Constants.RECIPE_ITEM, gson.toJson(recipe));
+        body.put(Constants.RECIPE_ITEM, generatePostRecipeFields(recipe));
+        //body.put(Constants.NUM_FILES_TO_UPLOAD, String.valueOf(numOfFiles));
+
+        Log.e(TAG, "post body: \n" + body.toString());
+        RecipeInterface service = getRetrofitInstance().create(RecipeInterface.class);
+        Call<Map<String, String>> call = service.postRecipe(headers, body);
+
+        try {
+            return call.execute();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     private static Map<String,Object> generatePostRecipeFields(PostRecipe recipe) {

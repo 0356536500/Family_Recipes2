@@ -411,7 +411,7 @@ public class RecipeRepository {
                             DateUtil.updateServerTime(context, time);
                             compositeDisposable.clear();
                         }
-                    } else if (next.code() == 304) {
+                    } else if (next.code() == APICallsHandler.STATUS_NOT_MODIFIED) {
                         DateUtil.updateServerTime(context, time);
                         dispatchInfo.onNext(context.getString(R.string.message_from_fetch_recipes_not_modified));
                         compositeDisposable.clear();
