@@ -19,7 +19,7 @@ import androidx.room.PrimaryKey;
 public class AccessEntity {
     public static final String KEY_ID = "id";
     public static final String KEY_ACCESSED_THUMBNAIL = "lastAccessedThumbnail";
-    public static final String KEY_ACCESSED_RECIPE = "lastAccessedRecipe";
+    public static final String KEY_ACCESSED_CONTENT = "lastAccessedContent";
     public static final String KEY_ACCESSED_IMAGES = "lastAccessedImages";
 
     @NonNull
@@ -31,8 +31,8 @@ public class AccessEntity {
     private Long lastAccessedThumbnail;
 
     // timestamp of last time accessed to recipe file
-    @ColumnInfo(name = KEY_ACCESSED_RECIPE)
-    private Long lastAccessedRecipe;
+    @ColumnInfo(name = KEY_ACCESSED_CONTENT)
+    private Long lastAccessedContent;
 
     // timestamp of last time accessed to food images
     @ColumnInfo(name = KEY_ACCESSED_IMAGES)
@@ -59,12 +59,12 @@ public class AccessEntity {
         this.lastAccessedThumbnail = lastAccessedThumbnail;
     }
 
-    public Long getLastAccessedRecipe() {
-        return lastAccessedRecipe;
+    public Long getLastAccessedContent() {
+        return lastAccessedContent;
     }
 
-    public void setLastAccessedRecipe(Long lastAccessedRecipe) {
-        this.lastAccessedRecipe = lastAccessedRecipe;
+    public void setLastAccessedContent(Long lastAccessedRecipe) {
+        this.lastAccessedContent = lastAccessedRecipe;
     }
 
     public Long getLastAccessedImages() {
@@ -80,12 +80,12 @@ public class AccessEntity {
      */
     public static class RecipeAccess {
         public String id;
-        public String recipeFile;
+        //public String recipeFile;
         public String thumbnail;
         public List<String> foodFiles;
 
         public Long lastAccessedThumbnail;
-        public Long lastAccessedRecipe;
+        public Long lastAccessedContent;
         public Long lastAccessedImages;
 
         @Ignore
@@ -93,8 +93,8 @@ public class AccessEntity {
             switch (accessKey) {
                 case KEY_ACCESSED_THUMBNAIL:
                     return thumbnail;
-                case KEY_ACCESSED_RECIPE:
-                    return recipeFile;
+                case KEY_ACCESSED_CONTENT:
+                    return id;
                 case KEY_ACCESSED_IMAGES:
                     return foodFiles;
                 default:
@@ -109,7 +109,7 @@ public class AccessEntity {
                     "id='" + id + '\'' +
                     ", thumbnail='" + thumbnail + '\'' +
                     ", lastAccessedThumbnail=" + lastAccessedThumbnail +
-                    ", lastAccessedRecipe=" + lastAccessedRecipe +
+                    ", lastAccessedContent=" + lastAccessedContent +
                     ", lastAccessedImages=" + lastAccessedImages +
                     '}';
         }

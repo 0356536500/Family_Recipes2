@@ -12,24 +12,20 @@ import android.os.Process;
 import android.os.StrictMode;
 import android.util.Log;
 
-import com.myapps.ron.family_recipes.logic.Injection;
-import com.myapps.ron.family_recipes.logic.repository.PendingRecipeRepository;
-import com.myapps.ron.family_recipes.model.PendingRecipeEntity;
 import com.myapps.ron.family_recipes.layout.APICallsHandler;
 import com.myapps.ron.family_recipes.layout.S3.OnlineStorageWrapper;
 import com.myapps.ron.family_recipes.layout.cognito.AppHelper;
 import com.myapps.ron.family_recipes.layout.modelTO.PendingRecipeTO;
+import com.myapps.ron.family_recipes.logic.Injection;
+import com.myapps.ron.family_recipes.logic.repository.PendingRecipeRepository;
+import com.myapps.ron.family_recipes.model.PendingRecipeEntity;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.reactivex.Scheduler;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.CompositeDisposable;
-
 import static com.myapps.ron.family_recipes.layout.Constants.RESPONSE_KEY_RECIPE_ID;
-import static com.myapps.ron.family_recipes.layout.Constants.RESPONSE_KEY_URL;
+import static com.myapps.ron.family_recipes.layout.Constants.RESPONSE_KEY_RECIPE_MODIFIED;
 
 public class PostEnqueuedRecipesService extends Service {
     private static final String TAG = PostEnqueuedRecipesService.class.getSimpleName();
@@ -39,11 +35,10 @@ public class PostEnqueuedRecipesService extends Service {
     private Looper serviceLooper;
     private ServiceHandler serviceHandler;
     private int startId;
-    private CompositeDisposable compositeDisposable;
 
     public static void startActionPostRecipeFromQueue(Context context) {
         Log.e(TAG, "handle action post recipe from queue");
-        Intent intent = new Intent(context, PostRecipeToServerService.class);
+        Intent intent = new Intent(context, PostEnqueuedRecipesService.class);
         intent.setAction(ACTION_POST_RECIPE_FROM_QUEUE);
         context.startService(intent);
     }
@@ -74,10 +69,8 @@ public class PostEnqueuedRecipesService extends Service {
         if (intent != null) {
             final String action = intent.getAction();
             if (action != null) {
-                switch (action) {
-                    case ACTION_POST_RECIPE_FROM_QUEUE:
-                        handleActionPostRecipeFromQueue();
-                        break;
+                if (ACTION_POST_RECIPE_FROM_QUEUE.equals(action)) {
+                    startPostPendingRecipesProcess();
                 }
             }
         }
@@ -87,7 +80,6 @@ public class PostEnqueuedRecipesService extends Service {
     public void onCreate() {
         Log.e(TAG, "onCreate");
         super.onCreate();
-        compositeDisposable = new CompositeDisposable();
         // Start up the thread running the service. Note that we create a
         // separate thread because the service normally runs in the process's
         // main thread, which we don't want to block. We also make it
@@ -125,29 +117,7 @@ public class PostEnqueuedRecipesService extends Service {
     @Override
     public void onDestroy() {
         Log.e(TAG, "onDestroy");
-        compositeDisposable.clear();
         serviceLooper.quit();
-    }
-
-    private void handleActionPostRecipeFromQueue() {
-        //assuming network connection. Called from Worker that initiates only when connected
-        if (AppHelper.getAccessToken() == null) {
-            // subscribe for token
-            Scheduler intentScheduler = AndroidSchedulers.from(serviceHandler.getLooper());
-            compositeDisposable.add(AppHelper.currSessionObservable
-                    .subscribeOn(intentScheduler)
-                    .observeOn(intentScheduler)
-                    .subscribe(next -> {
-                        Log.e(TAG, "got info, " + next);
-                        startPostPendingRecipesProcess();
-                    }, error ->
-                            Log.e(TAG, "got error, " + error.getMessage()), () ->
-                            Log.e(TAG, "onComplete")));
-        }
-        else {
-            // there is a valid token
-            startPostPendingRecipesProcess();
-        }
     }
 
     private void startPostPendingRecipesProcess() {
@@ -178,24 +148,18 @@ public class PostEnqueuedRecipesService extends Service {
         APICallsHandler.postRecipe(new PendingRecipeTO(recipe), AppHelper.getAccessToken(), results -> {
             if (results != null) {
                 Log.e(TAG, "finished post pend, " + results.toString());
-                boolean fileUploaded = OnlineStorageWrapper.uploadRecipeFileSync(results.get(RESPONSE_KEY_URL), recipe.getRecipeContent());
-                if (fileUploaded) {
-                    //sendIntentToUser(false, "recipe uploaded");
-                    if (recipe.getFoodFiles() != null) {
-                        try {
-                            Thread.sleep(100);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        } finally {
-                            uploadFoodFilesSync(results.get(RESPONSE_KEY_RECIPE_ID)/*recipe.getLastModifiedDate()*/, recipe.getFoodFiles());
-                        }
-                    } else {
-                        //no images to upload
-                        new Handler().postDelayed(() -> Log.e(TAG, "recipe uploaded"), 2500);
+                if (recipe.getFoodFiles() != null) {
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } finally {
+                        uploadFoodFilesSync(results.get(RESPONSE_KEY_RECIPE_ID), results.get(RESPONSE_KEY_RECIPE_MODIFIED), recipe.getFoodFiles());
                     }
+                } else {
+                    //no images to upload
+                    new Handler().postDelayed(() -> Log.e(TAG, "recipe uploaded"), 2500);
                 }
-                else
-                    Log.e(TAG, "recipe wasn't uploaded");
             }
             else
                 Log.e(TAG, "recipe wasn't uploaded");
@@ -207,11 +171,11 @@ public class PostEnqueuedRecipesService extends Service {
         deleteLocalFiles(recipeFile);
     }
 
-    private void uploadFoodFilesSync(String id, List<String> foodFiles) {
+    private void uploadFoodFilesSync(String id, String lastModifiedDate, List<String> foodFiles) {
         Log.e(TAG, "uploading images");
         Log.e(TAG, "id = " + id + "\n files: " + foodFiles);
         //Synchronous request with retrofit 2.0
-        List<String> urlsForFood = APICallsHandler.requestUrlsForFoodPicturesSync(id, null, foodFiles.size(), AppHelper.getAccessToken());
+        List<String> urlsForFood = APICallsHandler.requestUrlsForFoodPicturesSync(id, lastModifiedDate, foodFiles.size(), AppHelper.getAccessToken());
         if (urlsForFood != null) {
             //upload the images to s3
             Log.e(TAG, "urls: " + urlsForFood);

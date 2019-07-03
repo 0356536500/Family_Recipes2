@@ -1,9 +1,6 @@
 package com.myapps.ron.family_recipes.background.workers;
 
 import android.content.Context;
-import android.util.Log;
-
-import com.myapps.ron.family_recipes.background.services.PostEnqueuedRecipesService;
 
 import androidx.annotation.NonNull;
 import androidx.work.Constraints;
@@ -12,12 +9,12 @@ import androidx.work.OneTimeWorkRequest;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
+import com.myapps.ron.family_recipes.background.services.PostEnqueuedRecipesService;
+
 /**
  * Created by ronginat on 20/02/2019.
  */
 public class PostRecipeScheduledWorker extends Worker {
-
-    private final String TAG = getClass().getSimpleName();
 
     public PostRecipeScheduledWorker(
             @NonNull Context context,
@@ -25,27 +22,20 @@ public class PostRecipeScheduledWorker extends Worker {
         super(context, params);
     }
 
-    @Override
-    public void onStopped() {
-        super.onStopped();
-        Log.e(TAG, "onStopped");
-    }
-
     @NonNull
     @Override
     public Result doWork() {
-        Log.e(TAG, "doWork");
-        //PostRecipeToServerService.startActionPostRecipeFromQueue(getApplicationContext());
+        //Log.e(TAG, "doWork");
         PostEnqueuedRecipesService.startActionPostRecipeFromQueue(getApplicationContext());
-        Log.e(TAG, "finish work");
+        //Log.e(TAG, "finish work");
         // Indicate success or failure with your return value:
         return Result.success();
 
-        // (Returning Result.retry() tells WorkManager to try this task again
-        // later; Result.failure() says not to try again.)
+        // Returning Result.retry() tells WorkManager to try this task again later
+        // Result.failure() says not to try again
     }
 
-    public static OneTimeWorkRequest createPostRecipesWorker() {
+    static OneTimeWorkRequest createPostRecipesWorker() {
         // Create a Constraints object that defines when the task should run
         Constraints myConstraints = new Constraints.Builder()
                 .setRequiredNetworkType(NetworkType.CONNECTED)
@@ -53,7 +43,6 @@ public class PostRecipeScheduledWorker extends Worker {
                 .build();
 
         // then create a OneTimeWorkRequest that uses those constraints
-
         return new OneTimeWorkRequest.Builder(PostRecipeScheduledWorker.class)
                 .setConstraints(myConstraints)
                 .build();

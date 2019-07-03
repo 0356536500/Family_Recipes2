@@ -56,8 +56,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.observers.DisposableMaybeObserver;
 import io.reactivex.schedulers.Schedulers;
 
-import static android.app.Activity.RESULT_OK;
-
 /**
  * Created by ronginat on 18/12/2018.
  */
@@ -192,7 +190,7 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
         mFilter.build();
     }
 
-    // region init Views
+    // region setName Views
     private void initRecycler() {
         recyclerView.setItemAnimator(new FiltersListItemAnimator());
         recyclerView.addOnScrollListener(new MyRecyclerScroll() {
@@ -374,7 +372,7 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
     public void onItemSelected(RecipeMinimal recipeMinimal) {
         Intent intent = new Intent(activity, RecipeActivity.class);
         intent.putExtra(Constants.RECIPE_ID, recipeMinimal.getId());
-        startActivityForResult(intent, Constants.RECIPE_ACTIVITY_CODE);
+        startActivity(intent);
         /*onItemSelectedDisposable = viewModel.getMaybeRecipeImages(recipeMinimal.getId())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -446,18 +444,6 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
     }
 
     // endregion
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == Constants.RECIPE_ACTIVITY_CODE) {
-            if(resultCode == RESULT_OK) {
-                //mAdapter.updateRecipes(new RecipesDBHelper(this).getAllRecipes());
-                //RecipeEntity updatedRecipe = data.getParcelableExtra(Constants.RECIPE_ID);
-                //mAdapter.updateOneRecipe(updatedRecipe);
-            }
-        }
-    }
 
     void loadFiltersColor() {
         TypedValue backgroundValue = new TypedValue();

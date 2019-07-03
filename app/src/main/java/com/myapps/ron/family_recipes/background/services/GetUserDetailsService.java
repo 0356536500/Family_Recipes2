@@ -3,21 +3,16 @@ package com.myapps.ron.family_recipes.background.services;
 import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
-import android.os.StrictMode;
 import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.myapps.ron.family_recipes.MyApplication;
-import com.myapps.ron.family_recipes.logic.Injection;
-import com.myapps.ron.family_recipes.logic.repository.RecipeRepository;
 import com.myapps.ron.family_recipes.layout.APICallsHandler;
-import com.myapps.ron.family_recipes.layout.APIResponse;
 import com.myapps.ron.family_recipes.layout.Constants;
 import com.myapps.ron.family_recipes.layout.MiddleWareForNetwork;
 import com.myapps.ron.family_recipes.layout.cognito.AppHelper;
-import com.myapps.ron.family_recipes.layout.modelTO.RecipeTO;
-import com.myapps.ron.family_recipes.utils.logic.DateUtil;
+import com.myapps.ron.family_recipes.logic.Injection;
 import com.myapps.ron.family_recipes.utils.logic.SharedPreferencesHandler;
 
 import java.io.IOException;
@@ -39,30 +34,12 @@ public class GetUserDetailsService extends IntentService {
     private static final String TAG = GetUserDetailsService.class.getSimpleName();
 
     // IntentService can perform, e.g. ACTION_FETCH_NEW_ITEMS
-    private static final String ACTION_GET_ALL = "com.myapps.ron.family_recipes.background.services.action.GET_ALL";
     private static final String ACTION_FETCH_USER_DETAILS = "com.myapps.ron.family_recipes.background.services.action.GET_USER_DETAILS";
-
-    // TODO: Rename parameters
-    private static final String EXTRA_PARAM1 = "com.myapps.ron.family_recipes.background.services.extra.PARAM1";
-    private static final String EXTRA_PARAM2 = "com.myapps.ron.family_recipes.background.services.extra.PARAM2";
 
     public GetUserDetailsService() {
         super("GetUserDetailsService");
     }
 
-
-    /**
-     * Starts this service to perform action Foo with the given parameters. If
-     * the service is already performing a task this action will be queued.
-     *
-     * @see IntentService
-     */
-    public static void startActionGetAllRecipes(Context context) {
-        Log.e(TAG, "startActionGetAllRecipes");
-        Intent intent = new Intent(context, GetUserDetailsService.class);
-        intent.setAction(ACTION_GET_ALL);
-        context.startService(intent);
-    }
 
     /**
      * Starts this service to perform action Baz with the given parameters. If
@@ -80,52 +57,17 @@ public class GetUserDetailsService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         if (intent != null) {
             final String action = intent.getAction();
-            if (ACTION_GET_ALL.equals(action)) {
-                Log.e(TAG, "onHandleIntent");
-                setThreadPolicy();
-                handleActionGetAllRecipes();
-            } else if (ACTION_FETCH_USER_DETAILS.equals(action)) {
+            if (ACTION_FETCH_USER_DETAILS.equals(action)) {
                 handleActionFetchUserDetails();
             }
         }
     }
 
-    private void setThreadPolicy() {
+    /*private void setThreadPolicy() {
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
                 .permitAll().build();
         StrictMode.setThreadPolicy(policy);
-    }
-
-
-    /**
-     * Handle action GetAllRecipes in the provided background thread with the provided
-     * parameters.
-     */
-    private void handleActionGetAllRecipes() {
-        Log.e(TAG, "handleActionGetAllRecipes");
-        //asyncRecipeUpdateList = Collections.synchronizedList(new ArrayList<>());
-        final RecipeRepository  repository = Injection.provideRecipeRepository(getApplicationContext());
-        String lastKey = null;
-        if (!MiddleWareForNetwork.checkInternetConnection(getApplicationContext()))
-            return;
-        final String time = DateUtil.getUTCTime();
-        do {
-            APIResponse<List<RecipeTO>> response = APICallsHandler.getAllRecipesSync(
-                    DateUtil.getLastUpdateTime(getApplicationContext()), lastKey, 50, AppHelper.getAccessToken());
-
-            if (response != null) {
-                Log.e(TAG, "response: lastKey = " + response.getLastKey());
-                Log.e(TAG, "response data length: " + response.getData().size());
-                lastKey = response.getLastKey();
-
-                repository.updateFromServer(getApplicationContext(), response.getData(), null);
-            }
-        }
-        while (lastKey != null && !lastKey.isEmpty() && MiddleWareForNetwork.checkInternetConnection(getApplicationContext()));
-
-        DateUtil.updateServerTime(getApplicationContext(), time);
-    }
-
+    }*/
 
     /**
      * Handle action FetchUserDetails in the provided background thread

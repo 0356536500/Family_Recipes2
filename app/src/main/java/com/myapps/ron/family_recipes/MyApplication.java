@@ -7,16 +7,16 @@ import android.content.SharedPreferences;
 import android.os.PowerManager;
 import android.provider.Settings;
 
+import androidx.work.ExistingPeriodicWorkPolicy;
+import androidx.work.WorkManager;
+
 import com.myapps.ron.family_recipes.background.workers.DeleteOldFilesWorker;
-import com.myapps.ron.family_recipes.layout.firebase.AppHelper;
 import com.myapps.ron.family_recipes.utils.Constants;
+import com.myapps.ron.family_recipes.utils.logic.CrashLogger;
 import com.myapps.ron.family_recipes.utils.logic.SharedPreferencesHandler;
 import com.myapps.ron.localehelper.LocaleAwareApplication;
 
 import java.util.Calendar;
-
-import androidx.work.ExistingPeriodicWorkPolicy;
-import androidx.work.WorkManager;
 
 
 public class MyApplication extends LocaleAwareApplication {
@@ -30,6 +30,7 @@ public class MyApplication extends LocaleAwareApplication {
         super.onCreate();
         mContext = this;
 
+        CrashLogger.init(this);
         enqueueFilesWorker();
         //AppHelper.initTokenObserver(getApplicationContext());
     }

@@ -8,6 +8,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.graphics.BlendMode;
+import android.graphics.BlendModeColorFilter;
 import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Bundle;
@@ -24,30 +26,6 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.bumptech.glide.Glide;
-import com.google.android.material.appbar.AppBarLayout;
-import com.google.android.material.appbar.CollapsingToolbarLayout;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
-import com.myapps.ron.family_recipes.R;
-import com.myapps.ron.family_recipes.background.services.PostRecipeToServerService;
-import com.myapps.ron.family_recipes.logic.Injection;
-import com.myapps.ron.family_recipes.logic.storage.StorageWrapper;
-import com.myapps.ron.family_recipes.model.RecipeEntity;
-import com.myapps.ron.family_recipes.recycler.adapters.CommentsAdapter;
-import com.myapps.ron.family_recipes.ui.baseclasses.MyBaseActivity;
-import com.myapps.ron.family_recipes.ui.fragments.PagerDialogFragment;
-import com.myapps.ron.family_recipes.ui.fragments.PickImagesMethodDialog;
-import com.myapps.ron.family_recipes.utils.Constants;
-import com.myapps.ron.family_recipes.utils.ui.MyDividerItemDecoration;
-import com.myapps.ron.family_recipes.viewmodels.RecipeViewModel;
-import com.myapps.ron.searchfilter.animator.FiltersListItemAnimator;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -70,6 +48,30 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable;
+
+import com.bumptech.glide.Glide;
+import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.appbar.CollapsingToolbarLayout;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
+import com.myapps.ron.family_recipes.R;
+import com.myapps.ron.family_recipes.logic.Injection;
+import com.myapps.ron.family_recipes.logic.storage.StorageWrapper;
+import com.myapps.ron.family_recipes.model.RecipeEntity;
+import com.myapps.ron.family_recipes.recycler.adapters.CommentsAdapter;
+import com.myapps.ron.family_recipes.ui.baseclasses.MyBaseActivity;
+import com.myapps.ron.family_recipes.ui.fragments.PagerDialogFragment;
+import com.myapps.ron.family_recipes.ui.fragments.PickImagesMethodDialog;
+import com.myapps.ron.family_recipes.utils.Constants;
+import com.myapps.ron.family_recipes.utils.ui.MyDividerItemDecoration;
+import com.myapps.ron.family_recipes.viewmodels.RecipeViewModel;
+import com.myapps.ron.searchfilter.animator.FiltersListItemAnimator;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
@@ -278,9 +280,9 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
 
         viewModel.isUserLiked().observe(this, this::loadLikeDrawable);
 
-        viewModel.getRecipePath().observe(this, path -> {
-            if (path != null)
-                loadRecipeHtml(path);
+        viewModel.getRecipeContent().observe(this, content -> {
+            if (content != null)
+                loadRecipeHtml(content);
             progressBar.hide();
             new Handler().postDelayed(() ->
                     commentsLayout.setVisibility(View.VISIBLE), 1500);
@@ -309,9 +311,10 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
                         .into(imageViewCollapsingImage);
             }
         });
-        viewModel.getInfo().observe(this, messageId -> {
-            if (messageId != null)
-                Toast.makeText(RecipeActivity.this, messageId, Toast.LENGTH_LONG).show();
+        viewModel.getInfo().observe(this, message -> {
+            progressBar.hide();
+            if (message != null)
+                Toast.makeText(RecipeActivity.this, message, Toast.LENGTH_LONG).show();
         });
     }
 
@@ -356,10 +359,10 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
         commentsRecyclerView.setAdapter(commentsAdapter);
     }
 
-    private void loadRecipeHtml(String path) {
+    private void loadRecipeHtml(String content) {
         /*File file = new File(path);
         Log.e(TAG, file.getAbsolutePath());*/
-        myWebView.loadUrl(path);
+        myWebView.loadData(content, "text/html; charset=utf-8", "UTF-8");
     }
 
     /*private void loadImage() {
@@ -451,7 +454,8 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
                 // Collapsed
                 //menuItemShare.setIcon(R.drawable.ic_share_collapsed_24dp);
                 if (toolbar.getOverflowIcon() != null) {
-                    toolbar.getOverflowIcon().setColorFilter(navigationCollapsedColor, PorterDuff.Mode.SRC_ATOP);
+                    toolbar.getOverflowIcon().setColorFilter(new BlendModeColorFilter(navigationCollapsedColor, BlendMode.SRC_ATOP));
+                    //toolbar.getOverflowIcon().setColorFilter(navigationCollapsedColor, PorterDuff.Mode.SRC_ATOP);
                 }
                 if (toolbar.getNavigationIcon() != null) {
                     toolbar.getNavigationIcon().setColorFilter(navigationCollapsedColor, PorterDuff.Mode.SRC_ATOP);
@@ -489,7 +493,7 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int itemId = item.getItemId();
 
         switch (itemId) {
@@ -675,8 +679,7 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
                     IntentFilter intentFilter = new IntentFilter();
                     intentFilter.addAction(Constants.ACTION_UPLOAD_IMAGES_SERVICE);
                     registerReceiver(mReceiver, intentFilter);
-                    PostRecipeToServerService.startActionPostImages(this,
-                            viewModel.getRecipe().getValue().getId(), viewModel.getRecipe().getValue().getLastModifiedDate(), imagesPathsToUpload);
+                    viewModel.postImages(this, imagesPathsToUpload);
                     uploadImagesProgressBar.setVisibility(View.VISIBLE);
                     break;
 

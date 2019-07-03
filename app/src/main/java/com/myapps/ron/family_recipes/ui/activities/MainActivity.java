@@ -14,6 +14,7 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
+import android.net.Network;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
@@ -222,9 +223,9 @@ public class MainActivity extends MyBaseActivity implements BackStack.BackStackH
             String firstFragment = getIntent().getStringExtra(Constants.MAIN_ACTIVITY_FIRST_FRAGMENT);
             Log.e(TAG, "firstFragment = " + firstFragment);
 
-            if (firstFragment.equals(Constants.MAIN_ACTIVITY_FRAGMENT_ALL))
+            if (Constants.MAIN_ACTIVITY_FRAGMENT_ALL.equals(firstFragment))
                 new Handler().postDelayed(() -> startWithDefaultFragment(getOrCreateFragment(R.string.nav_main_all_recipes)), 100);
-            else if (firstFragment.equals(Constants.MAIN_ACTIVITY_FRAGMENT_FAVORITES))
+            else if (Constants.MAIN_ACTIVITY_FRAGMENT_FAVORITES.equals(firstFragment))
                 new Handler().postDelayed(() -> startWithDefaultFragment(getOrCreateFragment(R.string.nav_main_favorites)), 100);
         } else
             new Handler().postDelayed(() -> startWithDefaultFragment(getOrCreateFragment(R.string.nav_main_all_recipes)), 100);
@@ -428,7 +429,7 @@ public class MainActivity extends MyBaseActivity implements BackStack.BackStackH
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
@@ -504,7 +505,7 @@ public class MainActivity extends MyBaseActivity implements BackStack.BackStackH
 
             // add the fragment to backStack at index 0
             backStack.addToBackStack(fragment);
-            Log.e(TAG, backStack.toString());
+            //Log.e(TAG, backStack.toString());
 
             getSupportFragmentManager()
                     .beginTransaction()
@@ -547,11 +548,11 @@ public class MainActivity extends MyBaseActivity implements BackStack.BackStackH
 
     private boolean popFragmentFromBackStack() {
         MyFragment nextFragment = backStack.popFromBackStack(); // new displaying fragment
-        Log.e(TAG, backStack.toString());
-        Log.e(TAG, "popFragmentFromBackStack, fragment == null ? " + (nextFragment == null));
+        //Log.e(TAG, backStack.toString());
+        //Log.e(TAG, "popFragmentFromBackStack, fragment == null ? " + (nextFragment == null));
 
         if (nextFragment != null) {
-            Log.e(TAG, "popFragmentFromBackStack, fragment tag = " + getString(nextFragment.getMyTag()));
+            //Log.e(TAG, "popFragmentFromBackStack, fragment tag = " + getString(nextFragment.getMyTag()));
             getSupportFragmentManager()
                     .beginTransaction()
                     .setCustomAnimations(
@@ -572,7 +573,10 @@ public class MainActivity extends MyBaseActivity implements BackStack.BackStackH
         com.myapps.ron.family_recipes.layout.firebase.AppHelper.signOutUser();
         SharedPreferencesHandler.removeString(this, com.myapps.ron.family_recipes.layout.Constants.USERNAME);
         SharedPreferencesHandler.removeString(this, com.myapps.ron.family_recipes.layout.Constants.PASSWORD);
-        exit();
+        // start splash activity
+        Intent intent = new Intent(MainActivity.this, SplashActivity.class);
+        startActivity(intent);
+        finish();
     }
 
     private void showSettings() {
@@ -580,7 +584,7 @@ public class MainActivity extends MyBaseActivity implements BackStack.BackStackH
         startActivity(settingsIntent);
     }
 
-    private void exit () {
+    /*private void exit () {
         String username = AppHelper.getCurrSession().getUsername();
         Intent intent = new Intent();
         if(username == null)
@@ -588,7 +592,7 @@ public class MainActivity extends MyBaseActivity implements BackStack.BackStackH
         intent.putExtra("name", username);
         setResult(RESULT_OK, intent);
         finish();
-    }
+    }*/
 
     @Override
     public void onBackPressed() {
@@ -619,21 +623,11 @@ public class MainActivity extends MyBaseActivity implements BackStack.BackStackH
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode)  {
-            case Constants.RECIPE_ACTIVITY_CODE:
-                if(resultCode == RESULT_OK) {
-                    Log.d(TAG, "results from RecipeActivity...");
-                    //mAdapter.updateRecipes(new RecipesDBHelper(this).getAllRecipes());
-                    /*Recipe updatedRecipe = data.getParcelableExtra(Constants.RECIPE);
-                    mAdapter.updateOneRecipe(updatedRecipe);*/
-                }
-                break;
-            case Constants.POST_RECIPE_ACTIVITY_CODE:
-                if (resultCode != RESULT_OK) {
-                    //unregisterReceiver(mReceiver);
-                    //registerReceiver(mReceiver, regularFilter);
-                }
-                break;
+        if (requestCode == Constants.POST_RECIPE_ACTIVITY_CODE) {
+            if (resultCode != RESULT_OK) {
+                //unregisterReceiver(mReceiver);
+                //registerReceiver(mReceiver, regularFilter);
+            }
         }
     }
 
@@ -759,15 +753,22 @@ public class MainActivity extends MyBaseActivity implements BackStack.BackStackH
             switch(action) {
                 // When network state changes
                 case ConnectivityManager.CONNECTIVITY_ACTION:
-                    Log.d(TAG, "Network connectivity change");
+                    //Log.d(TAG, "Network connectivity change");
                     if (intent.getExtras() != null) {
                         final ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
                         if (connectivityManager != null) {
-                            NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
-                            MiddleWareForNetwork.setConnection(activeNetwork != null && activeNetwork.isConnected());
+                            boolean isConnected = false;
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                Network network = connectivityManager.getActiveNetwork();
+                                isConnected = network != null;
+                            } else {
+                                NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
+                                isConnected = activeNetwork != null && activeNetwork.isConnected();
+                            }
+                            MiddleWareForNetwork.setConnection(isConnected);
                             //NetworkInfo ni = connectivityManager.getActiveNetworkInfo();
-                            if (activeNetwork != null && activeNetwork.isConnected()) {
-                                Log.i(TAG, "Network " + activeNetwork.getTypeName() + " connected");
+                            if (isConnected) {
+                                Log.i(TAG, "Network " + connectivityManager.getActiveNetworkInfo().getTypeName() + " connected");
                             } else {// if (intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, Boolean.FALSE)) {
                                 Log.d(TAG, "There's no network connectivity");
                             }
@@ -777,7 +778,7 @@ public class MainActivity extends MyBaseActivity implements BackStack.BackStackH
                     }
                     break;
                 case Constants.ACTION_UPDATE_FROM_SERVICE:
-                    Log.d(TAG, "Got an update from service");
+                    //Log.d(TAG, "Got an update from service");
                     //unregisterReceiver(mReceiver);
                     //registerReceiver(mReceiver, regularFilter);
                     if (intent.getExtras() != null) {

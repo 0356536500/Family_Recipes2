@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 
 import com.myapps.ron.family_recipes.layout.modelTO.CategoryTO;
 import com.myapps.ron.family_recipes.layout.modelTO.CommentTO;
+import com.myapps.ron.family_recipes.layout.modelTO.ContentTO;
 import com.myapps.ron.family_recipes.layout.modelTO.RecipeTO;
 import com.myapps.ron.family_recipes.utils.MyCallback;
 
@@ -97,7 +98,7 @@ public class APICallsHandler {
 
         Log.e(TAG, "post body: \n" + body.toString());
         RecipeInterface service = getRetrofitInstance().create(RecipeInterface.class);
-        Call<Map<String, String>> call = service.postPendRecipe(headers, body);
+        Call<Map<String, String>> call = service.postRecipe(headers, body);
 
         call.enqueue(new Callback<Map<String, String>>() {
             @Override
@@ -130,6 +131,7 @@ public class APICallsHandler {
         Map<String, Object> fields = new HashMap<>();
         fields.put(Constants.POSTED_NAME, recipe.getName());
         fields.put(Constants.POSTED_DESCRIPTION, recipe.getDescription());
+        fields.put(Constants.POSTED_CONTENT, recipe.getRecipeContent());
         fields.put(Constants.POSTED_CATEGORIES, recipe.getCategories());
 
         Log.e(TAG, "post body:\n" + fields.toString());
@@ -137,7 +139,7 @@ public class APICallsHandler {
         return fields;
     }
 
-    public static void patchRecipe(Map<String, Object> attributes, String id, String lastModifiedDate, String token, final MyCallback<RecipeTO> callback) {
+    /*public static void patchRecipe(Map<String, Object> attributes, String id, String lastModifiedDate, String token, final MyCallback<RecipeTO> callback) {
         Map<String, String> headers = new HashMap<>();
         headers.put(Constants.CONTENT_TYPE, "application/json");
         headers.put(Constants.AUTHORIZATION, token);
@@ -146,7 +148,7 @@ public class APICallsHandler {
         //body.put(Constants.NUM_FILES_TO_UPLOAD, String.valueOf(numOfFiles));
 
         RecipeInterface service = getRetrofitInstance().create(RecipeInterface.class);
-        Call<RecipeTO> call = service.patchRecipe(headers, id, lastModifiedDate, attributes);
+        Call<RecipeTO> call = service.patchRecipe1(headers, id, lastModifiedDate, attributes);
 
         call.enqueue(new Callback<RecipeTO>() {
             @Override
@@ -175,6 +177,16 @@ public class APICallsHandler {
                 //Toast.makeText(MainActivity.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
             }
         });
+    }*/
+
+    public static Observable<Response<RecipeTO>> patchRecipeObservable(Map<String, Object> attributes, String id, String lastModifiedDate, String token) {
+        Map<String, String> headers = new HashMap<>();
+        headers.put(Constants.CONTENT_TYPE, "application/json");
+        headers.put(Constants.AUTHORIZATION, token);
+
+        RecipeInterface service = getReactiveRetrofitInstance().create(RecipeInterface.class);
+        return service.patchRecipe(headers, id, lastModifiedDate, attributes);
+
     }
 
     public static Observable<Response<Void>> postCommentObservable(Map<String, Object> attributes, String id, String lastModifiedDate, String token) {
@@ -292,13 +304,14 @@ public class APICallsHandler {
                 return null;
             }
         } catch (IOException e) {
-            Log.e(TAG, e.getMessage());
+            if (e.getMessage() != null)
+                Log.e(TAG, e.getMessage());
             e.printStackTrace();
             return null;
         }
     }
 
-    public static APIResponse<List<RecipeTO>> getAllRecipesSync(String date, String startKey, int limit, String token) {
+    /*public static APIResponse<List<RecipeTO>> getAllRecipesSync(String date, String startKey, int limit, String token) {
         RecipeInterface service = getRetrofitInstance().create(RecipeInterface.class);
         Call<List<RecipeTO>> call = service.getAllRecipesPagination(token, date, startKey, limit);
 
@@ -319,7 +332,7 @@ public class APICallsHandler {
             return null;
         }
 
-    }
+    }*/
 
     // region Observable
 
@@ -327,6 +340,12 @@ public class APICallsHandler {
         RecipeInterface service = getReactiveRetrofitInstance().create(RecipeInterface.class);
 
         return service.getRecipeObservable(token, id);
+    }
+
+    public static Observable<Response<ContentTO>> getRecipeContentObservable(String id, String lastModified, String token) {
+        RecipeInterface service = getReactiveRetrofitInstance().create(RecipeInterface.class);
+
+        return service.getRecipeContentObservable(token, lastModified, id);
     }
 
     public static Observable<Response<List<CategoryTO>>> getAllCategoriesObservable(String date, String token) {

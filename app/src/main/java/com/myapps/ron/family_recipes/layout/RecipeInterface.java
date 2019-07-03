@@ -2,6 +2,7 @@ package com.myapps.ron.family_recipes.layout;
 
 import com.myapps.ron.family_recipes.layout.modelTO.CategoryTO;
 import com.myapps.ron.family_recipes.layout.modelTO.CommentTO;
+import com.myapps.ron.family_recipes.layout.modelTO.ContentTO;
 import com.myapps.ron.family_recipes.layout.modelTO.RecipeTO;
 
 import java.util.List;
@@ -24,11 +25,9 @@ import retrofit2.http.QueryMap;
 
 public interface RecipeInterface {
 
-    /*String recipesGET = Constants.URL_RECIPES + "/{" + Constants.DATE_QUERY + "}";
-    String recipesPOST = Constants.URL_RECIPES;
-    String recipesUpdate = Constants.URL_RECIPES + "/{" + Constants.ID_QUERY + "}";*/
     String recipeWithID = Constants.URL_RECIPES + "/{" + Constants.ID_QUERY + "}";
     String recipes = Constants.URL_RECIPES;
+    String contents = recipeWithID + "/" + Constants.URL_CONTENT;
     String categories = Constants.URL_CATEGORIES;// + "/{" + Constants.DATE_QUERY + "}";
     String food = Constants.URL_FOOD + "/{" + Constants.ID_QUERY + "}";
     String subscriptions = Constants.URL_SUBSCRIPTIONS + "/{" + Constants.PATH_DEVICE_ID + "}";
@@ -44,6 +43,13 @@ public interface RecipeInterface {
     Observable<Response<RecipeTO>> getRecipeObservable(
             @Header(Constants.AUTHORIZATION) String token,
             @Path(Constants.ID_QUERY) String id
+    );
+
+    @GET(contents)
+    Observable<Response<ContentTO>> getRecipeContentObservable(
+            @Header(Constants.AUTHORIZATION) String token,
+            @Path(Constants.ID_QUERY) String id,
+            @Query(Constants.LAST_MODIFIED_QUERY) String date
     );
 
     @GET(recipeWithID + "/" + Constants.COMMENTS)
@@ -66,22 +72,37 @@ public interface RecipeInterface {
             @Query(Constants.LIMIT_QUERY) Integer limit
     );
 
-    @GET(recipes)
+    /*@GET(recipes)
     Call<List<RecipeTO>> getAllRecipesPagination(
             @Header(Constants.AUTHORIZATION) String auth,
             @Query(Constants.LAST_MODIFIED_QUERY) String date,
             @Query(Constants.EXCLUSIVE_START_KEY_QUERY) String startKey,
             @Query(Constants.LIMIT_QUERY) int limit
-    );
+    );*/
+
+    /*@POST(recipes)
+    Call<Map<String, String>> postPendRecipe(
+            @HeaderMap Map<String, String> headers,
+            @Body Map<String, Object> body
+    );*/
 
     @POST(recipes)
-    Call<Map<String, String>> postPendRecipe(
+    // response structure { id: "id", lastModifiedDate: "lastModifiedDate" }
+    Call<Map<String, String>> postRecipe(
             @HeaderMap Map<String, String> headers,
             @Body Map<String, Object> body
     );
 
+    /*@PATCH(recipeWithID)
+    Call<RecipeTO> patchRecipe1(
+            @HeaderMap Map<String, String> headers,
+            @Path(Constants.ID_QUERY) String id,
+            @Query(Constants.LAST_MODIFIED_QUERY) String lastModifiedDate,
+            @Body Map<String, Object> body
+    );*/
+
     @PATCH(recipeWithID)
-    Call<RecipeTO> patchRecipe(
+    Observable<Response<RecipeTO>> patchRecipe(
             @HeaderMap Map<String, String> headers,
             @Path(Constants.ID_QUERY) String id,
             @Query(Constants.LAST_MODIFIED_QUERY) String lastModifiedDate,
@@ -100,11 +121,11 @@ public interface RecipeInterface {
     //endregion
 
     //region categories
-    @GET(categories)
+    /*@GET(categories)
     Call<List<CategoryTO>> getAllCategories(
             @Header(Constants.AUTHORIZATION) String auth,
             @Query(Constants.LAST_MODIFIED_QUERY) String date
-    );
+    );*/
 
     @GET(categories)
     Observable<Response<List<CategoryTO>>> getAllCategoriesObservable(
@@ -115,13 +136,13 @@ public interface RecipeInterface {
     //endregion
 
     //region food
-    @PUT(food)
+    /*@PUT(food)
     Call<List<String>> requestFoodUrls(
             @Header(Constants.AUTHORIZATION) String auth,
             @Path(Constants.ID_QUERY) String id,
             @Query(Constants.LAST_MODIFIED_QUERY) String lastModifiedDate,
             @Body Map<String, String> body
-    );
+    );*/
 
     @GET(food)
     Call<List<String>> requestFoodUrls(

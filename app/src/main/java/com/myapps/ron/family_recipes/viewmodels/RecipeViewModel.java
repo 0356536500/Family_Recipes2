@@ -10,12 +10,13 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.myapps.ron.family_recipes.R;
+import com.myapps.ron.family_recipes.background.services.PostFoodImagesService;
+import com.myapps.ron.family_recipes.layout.Constants;
 import com.myapps.ron.family_recipes.logic.repository.RecipeRepository;
 import com.myapps.ron.family_recipes.logic.storage.StorageWrapper;
 import com.myapps.ron.family_recipes.model.AccessEntity;
 import com.myapps.ron.family_recipes.model.CommentEntity;
 import com.myapps.ron.family_recipes.model.RecipeEntity;
-import com.myapps.ron.family_recipes.layout.Constants;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -37,7 +38,7 @@ public class RecipeViewModel extends ViewModel {
     //private final MutableLiveData<RecipeEntity> recipe = new MutableLiveData<>(); // current recipe on the screen
     private final MutableLiveData<List<CommentEntity>> comments = new MutableLiveData<>(); // current recipe on the screen
     private final MutableLiveData<Boolean> isUserLiked = new MutableLiveData<>();
-    private MutableLiveData<String> recipePath = new MutableLiveData<>();
+    private MutableLiveData<String> recipeContent = new MutableLiveData<>();
     private MutableLiveData<Uri> imagePath = new MutableLiveData<>();
     private MutableLiveData<String> infoForUser = new MutableLiveData<>();
 
@@ -66,12 +67,12 @@ public class RecipeViewModel extends ViewModel {
         return comments;
     }
 
-    private void setRecipePath(String item) {
-        recipePath.setValue(item);
+    private void setRecipeContent(String item) {
+        recipeContent.setValue(item);
     }
 
-    public LiveData<String> getRecipePath() {
-        return recipePath;
+    public LiveData<String> getRecipeContent() {
+        return recipeContent;
     }
 
     private void setImagePath(Uri item) {
@@ -97,13 +98,17 @@ public class RecipeViewModel extends ViewModel {
 
     public RecipeViewModel(RecipeRepository recipeRepository) {
         this.recipeRepository = recipeRepository;
+        compositeDisposable.add(this.recipeRepository.dispatchInfoForRecipe
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::setInfo));
     }
 
     public void setInitialRecipe(Context context, String recipeId) {
         //this.recipe = initialRecipe;
         //isUserLiked.setValue(initialRecipe.isUserLiked());
         this.recipeId = recipeId;
-        compositeDisposable.add(this.recipeRepository.getObservableRecipe(recipeId)
+        compositeDisposable.add(this.recipeRepository.getObservableRecipe(context, recipeId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(recipeEntity -> {
@@ -114,7 +119,8 @@ public class RecipeViewModel extends ViewModel {
 
                     this.recipe.setValue(recipeEntity);
                 }, error -> {
-                    Log.e(getClass().getSimpleName(), error.getMessage());
+                    if (error.getMessage() != null)
+                        Log.e(getClass().getSimpleName(), error.getMessage());
                     setInfo(context.getString(R.string.recipe_content_not_found));
                 }));
     }
@@ -161,7 +167,15 @@ public class RecipeViewModel extends ViewModel {
     }
 
     public void loadRecipeContent(final Context context) {
-        String recipeFile = null;
+        compositeDisposable.add(recipeRepository.getRecipeContentById(context, recipeId)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(content -> {
+                    setRecipeContent(content);
+                    updateAccessToRecipeContent(recipeId);
+                }));
+
+        /*String recipeFile = null;
         if (recipe.getValue() != null)
             recipeFile = recipe.getValue().getRecipeFile();
 
@@ -181,7 +195,7 @@ public class RecipeViewModel extends ViewModel {
         else {
             setInfo(context.getString(R.string.recipe_not_in_server));
             setRecipePath(null);
-        }
+        }*/
     }
 
     public void loadRecipeFoodImage(final Context context) {
@@ -195,6 +209,13 @@ public class RecipeViewModel extends ViewModel {
         }
     }
 
+    public void postImages(Context context, List<String> imagesPathsToUpload) {
+        RecipeEntity recipe = getRecipe().getValue();
+        if (recipe != null)
+            PostFoodImagesService.startActionPostImages(context, recipe.getId(),
+                    recipe.getLastModifiedDate(), imagesPathsToUpload);
+    }
+
     // region Recipe Access
 
     private void updateAccessToRecipe(String id, String accessKey) {
@@ -202,7 +223,7 @@ public class RecipeViewModel extends ViewModel {
     }
 
     private void updateAccessToRecipeContent(String id) {
-        updateAccessToRecipe(id, AccessEntity.KEY_ACCESSED_RECIPE);
+        updateAccessToRecipe(id, AccessEntity.KEY_ACCESSED_CONTENT);
     }
 
     public void updateAccessToRecipeImages(String id) {

@@ -18,6 +18,7 @@ import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.layout.MiddleWareForNetwork;
 import com.myapps.ron.family_recipes.layout.cognito.AppHelper;
 import com.myapps.ron.family_recipes.utils.Constants;
+import com.myapps.ron.family_recipes.utils.logic.CrashLogger;
 import com.myapps.ron.family_recipes.utils.logic.SharedPreferencesHandler;
 
 import java.util.Locale;
@@ -63,7 +64,7 @@ public class SplashActivity extends AppCompatActivity {
         CognitoUser user = AppHelper.getPool().getCurrentUser();
         username = user.getUserId();
         //user saved in cache
-        if(username != null) {
+        if(username != null && SharedPreferencesHandler.getString(this, USERNAME) != null) {
             Log.e(TAG, "username = " + username);
             AppHelper.setUser(username);
             user.getSessionInBackground(authenticationHandler);
@@ -86,6 +87,8 @@ public class SplashActivity extends AppCompatActivity {
             AppHelper.setIdentityProvider(getApplicationContext(), cognitoUserSession);
 
             closeWaitDialog();
+
+            CrashLogger.setName(cognitoUserSession.getUsername());
 
             launchMain();
         }
@@ -218,12 +221,7 @@ public class SplashActivity extends AppCompatActivity {
         if(this.password == null) {
             password = SharedPreferencesHandler.getString(this, PASSWORD);
             if(password == null) {
-                Log.e(TAG, "enter password1");
-                return;
-            }
-
-            if(password.length() < 1) {
-                Log.e(TAG, "enter password2");
+                Log.e(TAG, "missing password");
                 return;
             }
         }

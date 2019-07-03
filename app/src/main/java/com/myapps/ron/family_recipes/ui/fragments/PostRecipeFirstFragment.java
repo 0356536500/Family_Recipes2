@@ -126,7 +126,7 @@ public class PostRecipeFirstFragment extends PostRecipeBaseFragment implements F
     }
 
     private void initCategories() {
-        //Log.e(getClass().getSimpleName(), "init categories");
+        //Log.e(getClass().getSimpleName(), "setName categories");
         mFilter.setAdapter(new PostRecipeFirstFragment.Adapter(allTags));
         mFilter.setListener(this);
 

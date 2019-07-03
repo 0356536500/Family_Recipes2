@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.myapps.ron.family_recipes.model.AccessEntity;
 import com.myapps.ron.family_recipes.model.CategoryEntity;
+import com.myapps.ron.family_recipes.model.ContentEntity;
 import com.myapps.ron.family_recipes.model.PendingRecipeEntity;
 import com.myapps.ron.family_recipes.model.RecipeEntity;
 import com.myapps.ron.family_recipes.utils.logic.DateUtil;
@@ -23,7 +24,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
 /**
  * Created by ronginat on 31/12/2018.
  */
-@Database(entities = {RecipeEntity.class, CategoryEntity.class, PendingRecipeEntity.class, AccessEntity.class}, version = 1, exportSchema = false)
+@Database(entities = {RecipeEntity.class, CategoryEntity.class, ContentEntity.class, PendingRecipeEntity.class, AccessEntity.class}, version = 1, exportSchema = false)
 @TypeConverters({Converters.class})
 public abstract class AppDatabases extends RoomDatabase {
 
@@ -33,6 +34,7 @@ public abstract class AppDatabases extends RoomDatabase {
 
     public static final String TABLE_RECIPES = "recipes";
     public static final String TABLE_CATEGORIES = "categories";
+    public static final String TABLE_CONTENTS = "contents";
     public static final String TABLE_PENDING_RECIPES = "pendingRecipes";
     public static final String TABLE_ACCESS = "access";
 

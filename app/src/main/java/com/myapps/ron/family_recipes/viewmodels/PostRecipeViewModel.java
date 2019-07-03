@@ -1,33 +1,27 @@
 package com.myapps.ron.family_recipes.viewmodels;
 
+import android.util.Log;
+
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
-import androidx.work.WorkManager;
+
+import com.myapps.ron.family_recipes.background.workers.BeginContinuationWorker;
+import com.myapps.ron.family_recipes.logic.repository.CategoryRepository;
+import com.myapps.ron.family_recipes.logic.repository.PendingRecipeRepository;
+import com.myapps.ron.family_recipes.model.CategoryEntity;
+import com.myapps.ron.family_recipes.model.PendingRecipeEntity;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
-
-import android.content.Context;
-import android.util.Log;
-
-import com.myapps.ron.family_recipes.background.workers.PostRecipeScheduledWorker;
-import com.myapps.ron.family_recipes.logic.repository.CategoryRepository;
-import com.myapps.ron.family_recipes.logic.repository.PendingRecipeRepository;
-import com.myapps.ron.family_recipes.logic.storage.StorageWrapper;
-import com.myapps.ron.family_recipes.model.CategoryEntity;
-import com.myapps.ron.family_recipes.model.PendingRecipeEntity;
-import com.myapps.ron.family_recipes.model.RecipeEntity;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by ronginat on 29/10/2018.
  */
 public class PostRecipeViewModel extends ViewModel {
-    private MutableLiveData<String> recipePath = new MutableLiveData<>();
     private LiveData<List<CategoryEntity>> categoryList; // list of categories from local db
 
     private CompositeDisposable compositeDisposable;
@@ -41,14 +35,6 @@ public class PostRecipeViewModel extends ViewModel {
 
     //private List<Uri> imagesUris = new ArrayList<>();
     public PendingRecipeEntity recipe = new PendingRecipeEntity();
-
-    private void setRecipePath(String item) {
-        recipePath.setValue(item);
-    }
-
-    public LiveData<String> getRecipePath() {
-        return recipePath;
-    }
 
     public LiveData<List<CategoryEntity>> getCategories() {
         return categoryList;
@@ -83,12 +69,12 @@ public class PostRecipeViewModel extends ViewModel {
 
     private void initWorker() {
         this.compositeDisposable.clear();
-        WorkManager.getInstance().enqueue(PostRecipeScheduledWorker.createPostRecipesWorker());
+        BeginContinuationWorker.enqueueWorkContinuationWithValidSession(BeginContinuationWorker.WORKERS.POST_RECIPE, null);
     }
 
     @Override
     protected void onCleared() {
-        this.compositeDisposable.clear();
         super.onCleared();
+        this.compositeDisposable.clear();
     }
 }

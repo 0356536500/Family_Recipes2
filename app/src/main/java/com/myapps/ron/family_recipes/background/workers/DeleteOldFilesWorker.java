@@ -21,10 +21,10 @@ import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
 import static com.myapps.ron.family_recipes.logic.Constants.MIN_FOOD_FOLDER_SIZE_TO_START_DELETING_CONTENT;
-import static com.myapps.ron.family_recipes.logic.Constants.MIN_RECIPE_FOLDER_SIZE_TO_START_DELETING_CONTENT;
+import static com.myapps.ron.family_recipes.logic.Constants.MIN_RECIPE_RECORDS_COUNT_TO_START_DELETING_CONTENT;
 import static com.myapps.ron.family_recipes.logic.Constants.MIN_THUMB_FOLDER_SIZE_TO_START_DELETING_CONTENT;
 import static com.myapps.ron.family_recipes.logic.Constants.TARGET_FOOD_FOLDER_SIZE_AFTER_DELETING_CONTENT;
-import static com.myapps.ron.family_recipes.logic.Constants.TARGET_RECIPE_FOLDER_SIZE_AFTER_DELETING_CONTENT;
+import static com.myapps.ron.family_recipes.logic.Constants.TARGET_RECIPE_REDORDS_COUNT_AFTER_DELETING_CONTENT;
 import static com.myapps.ron.family_recipes.logic.Constants.TARGET_THUMB_FOLDER_SIZE_AFTER_DELETING_CONTENT;
 
 /**
@@ -53,21 +53,47 @@ public class DeleteOldFilesWorker extends Worker {
                 deleteFilesByDb(dir, AccessEntity.KEY_ACCESSED_IMAGES, dirSize, TARGET_FOOD_FOLDER_SIZE_AFTER_DELETING_CONTENT);
             }
         }
-        dir = getApplicationContext().getExternalFilesDir(Constants.RECIPES_DIR);
+        int contentCount = repository.getRecipeContentDataCount();
+        if (contentCount > MIN_RECIPE_RECORDS_COUNT_TO_START_DELETING_CONTENT) {
+            deleteRecords(AccessEntity.KEY_ACCESSED_CONTENT, contentCount, TARGET_RECIPE_REDORDS_COUNT_AFTER_DELETING_CONTENT);
+        }
+        /*dir = getApplicationContext().getExternalFilesDir(Constants.RECIPES_DIR);
         if (dir != null) {
             long dirSize = folderSize(dir);
             if (dirSize > MIN_RECIPE_FOLDER_SIZE_TO_START_DELETING_CONTENT) {
-                deleteFilesByDb(dir, AccessEntity.KEY_ACCESSED_RECIPE, dirSize, TARGET_RECIPE_FOLDER_SIZE_AFTER_DELETING_CONTENT);
+                deleteFilesByDb(dir, AccessEntity.KEY_ACCESSED_CONTENT, dirSize, TARGET_RECIPE_FOLDER_SIZE_AFTER_DELETING_CONTENT);
             }
-        }
+        }*/
         dir = getApplicationContext().getExternalFilesDir(Constants.THUMB_DIR);
         if (dir != null) {
             long dirSize = folderSize(dir);
             if (dirSize > MIN_THUMB_FOLDER_SIZE_TO_START_DELETING_CONTENT) {
-                deleteFilesByDb(dir, AccessEntity.KEY_ACCESSED_RECIPE, dirSize, TARGET_THUMB_FOLDER_SIZE_AFTER_DELETING_CONTENT);
+                deleteFilesByDb(dir, AccessEntity.KEY_ACCESSED_THUMBNAIL, dirSize, TARGET_THUMB_FOLDER_SIZE_AFTER_DELETING_CONTENT);
             }
         }
         return Result.success();
+    }
+
+    @SuppressWarnings("SameParameterValue")
+    private void deleteRecords(@NonNull String accessKey, long originalRowCount, long targetRowCount) {
+        List<RecipeAccess> recipeAccesses = repository.getRecipesAccessesOrderBy(accessKey);
+        if (recipeAccesses != null) {
+            int deleteCount = 0;
+            for (RecipeAccess access : recipeAccesses) {
+                Object object = access.getFileNameByAccessKey(accessKey);
+                if (object.getClass().equals(String.class)) {
+                    String recipeId = (String) object;
+                    repository.deleteRecipeContentById(recipeId);
+                    deleteCount++;
+                    originalRowCount -= 1;
+                    repository.upsertRecipeAccess(access.id, accessKey, null);
+                }
+                if (originalRowCount <= targetRowCount)
+                    break;
+            }
+
+            Log.e(TAG, accessKey + ", deleted " + deleteCount + " files");
+        }
     }
 
     private void deleteFilesByDb(@NonNull File dir, @NonNull String accessKey, long originalSize, long targetSize) {

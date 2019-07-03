@@ -36,11 +36,13 @@ public class Constants {
     //POST pend recipe response keys
     public static final String RESPONSE_KEY_URL = "url";
     public static final String RESPONSE_KEY_RECIPE_ID = "id";
+    public static final String RESPONSE_KEY_RECIPE_MODIFIED = "lsatModifiedDate";
 
     //POST body elements
     public static final int MIN_TAGS = 2;
     static final String POSTED_NAME = "name";
     static final String POSTED_DESCRIPTION = "description";
+    static final String POSTED_CONTENT = "html";
     static final String POSTED_CATEGORIES = "categories";
     static final String RECIPE_ITEM = "recipe";
 
@@ -67,6 +69,7 @@ public class Constants {
     //urls
     static final String URL_RECIPES = "recipes";
     static final String URL_CATEGORIES = "recipes/categories";
+    static final String URL_CONTENT = "content";
     static final String URL_FOOD = "food";
     static final String URL_USERS = "users";
     static final String URL_SUBSCRIPTIONS = URL_USERS + "/subscriptions";
@@ -90,9 +93,9 @@ public class Constants {
     public static final String FILE_PREFIX = "file:///";
 
     //Cognito
-    public static final String COGNITO_POOL_ID = "eu-west-2_C6QCfzs5x";
-    public static final String COGNITO_CLIENT_ID = "2idnagpsie32k2vpis3km8edes";
-    public static final String COGNITO_CLIENT_SECRET = "t81ka034as5veuac6rtuliont0sdmhv8tf7ipa5utehai98nsmt";
+    public static final String COGNITO_POOL_ID = "eu-west-2_q4gQJK1TO";
+    public static final String COGNITO_CLIENT_ID = "g5a06641tr4f82fr5v366uvku";
+    public static final String COGNITO_CLIENT_SECRET = "ufjleb4rj3hofsub84aguoqlnap7p6kg8lr2qet4epipi34375d";
     public static final com.amazonaws.regions.Regions COGNITO_REGION = com.amazonaws.regions.Regions.EU_WEST_2;
 
     public static final String COGNITO_IDENTITY_POOL_ID = "eu-west-2:8b51a9b1-9fc6-46aa-aa8b-53bee06bfb91";

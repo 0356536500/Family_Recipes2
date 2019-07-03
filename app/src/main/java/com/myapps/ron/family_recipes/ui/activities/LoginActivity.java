@@ -93,7 +93,7 @@ public class LoginActivity extends AppCompatActivity {
         setNavDrawer();*/
 
         // Initialize application
-        //AppHelper.init(getApplicationContext());
+        //AppHelper.setName(getApplicationContext());
         initApp();
         findCurrent();
     }

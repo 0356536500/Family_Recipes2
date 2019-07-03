@@ -1,36 +1,7 @@
 package com.myapps.ron.family_recipes.logic.repository;
 
 import android.content.Context;
-import android.net.Uri;
 import android.os.Handler;
-import android.util.Log;
-
-import com.myapps.ron.family_recipes.R;
-import com.myapps.ron.family_recipes.background.workers.GetOneRecipeWorker;
-import com.myapps.ron.family_recipes.logic.persistence.AppDatabases;
-import com.myapps.ron.family_recipes.logic.persistence.Converters;
-import com.myapps.ron.family_recipes.logic.persistence.RecipeDao;
-import com.myapps.ron.family_recipes.logic.storage.ExternalStorageHelper;
-import com.myapps.ron.family_recipes.model.AccessEntity;
-import com.myapps.ron.family_recipes.model.CommentEntity;
-import com.myapps.ron.family_recipes.model.QueryModel;
-import com.myapps.ron.family_recipes.model.RecipeEntity;
-import com.myapps.ron.family_recipes.model.RecipeMinimal;
-import com.myapps.ron.family_recipes.layout.APICallsHandler;
-import com.myapps.ron.family_recipes.layout.Constants;
-import com.myapps.ron.family_recipes.layout.MiddleWareForNetwork;
-import com.myapps.ron.family_recipes.layout.cognito.AppHelper;
-import com.myapps.ron.family_recipes.layout.modelTO.CommentTO;
-import com.myapps.ron.family_recipes.layout.modelTO.RecipeTO;
-import com.myapps.ron.family_recipes.utils.logic.DateUtil;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Executor;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -38,9 +9,36 @@ import androidx.lifecycle.LiveData;
 import androidx.paging.DataSource;
 import androidx.paging.LivePagedListBuilder;
 import androidx.paging.PagedList;
-import androidx.work.ExistingWorkPolicy;
 import androidx.work.WorkManager;
-import io.reactivex.Completable;
+
+import com.myapps.ron.family_recipes.MyApplication;
+import com.myapps.ron.family_recipes.R;
+import com.myapps.ron.family_recipes.background.workers.GetOneRecipeWorker;
+import com.myapps.ron.family_recipes.background.workers.GetRecipeContentWorker;
+import com.myapps.ron.family_recipes.layout.APICallsHandler;
+import com.myapps.ron.family_recipes.layout.Constants;
+import com.myapps.ron.family_recipes.layout.MiddleWareForNetwork;
+import com.myapps.ron.family_recipes.layout.cognito.AppHelper;
+import com.myapps.ron.family_recipes.layout.modelTO.CommentTO;
+import com.myapps.ron.family_recipes.layout.modelTO.RecipeTO;
+import com.myapps.ron.family_recipes.logic.persistence.Converters;
+import com.myapps.ron.family_recipes.logic.persistence.RecipeDao;
+import com.myapps.ron.family_recipes.model.AccessEntity;
+import com.myapps.ron.family_recipes.model.CommentEntity;
+import com.myapps.ron.family_recipes.model.ContentEntity;
+import com.myapps.ron.family_recipes.model.QueryModel;
+import com.myapps.ron.family_recipes.model.RecipeEntity;
+import com.myapps.ron.family_recipes.model.RecipeMinimal;
+import com.myapps.ron.family_recipes.utils.logic.CrashLogger;
+import com.myapps.ron.family_recipes.utils.logic.DateUtil;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Executor;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
@@ -49,7 +47,6 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableMaybeObserver;
 import io.reactivex.observers.DisposableObserver;
-import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
 import retrofit2.Response;
@@ -62,7 +59,7 @@ import static com.myapps.ron.family_recipes.utils.Constants.TRUE;
  * Created by ronginat on 02/01/2019.
  */
 public class RecipeRepository {
-    private final String TAG = getClass().getSimpleName();
+    //private final String TAG = getClass().getSimpleName();
     @SuppressWarnings("FieldCanBeLocal")
     private final long DELAYED_DISPATCH = 2000;
     private final int LIMIT = 100;
@@ -73,7 +70,12 @@ public class RecipeRepository {
 
     private PagedList.Config pagedConfig;
 
+    // For use in MainActivity and DataViewModel
     public PublishSubject<String> dispatchInfo;
+    // For use in RecipeActivity and RecipeViewModel
+    public PublishSubject<String> dispatchInfoForRecipe;
+
+    private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     private static RecipeRepository INSTANCE;
 
@@ -88,11 +90,12 @@ public class RecipeRepository {
         this.recipeDao = recipeDao;
         this.executor = executor;
         this.pagedConfig = new PagedList.Config.Builder()
-                .setPageSize(15)
-                .setPrefetchDistance(50)
+                .setPageSize(10)
+                .setPrefetchDistance(30)
                 .setEnablePlaceholders(true)
                 .build();
         this.dispatchInfo = PublishSubject.create();
+        this.dispatchInfoForRecipe = PublishSubject.create();
         this.mayRefresh = new AtomicBoolean(true);
     }
 
@@ -100,7 +103,7 @@ public class RecipeRepository {
         return recipeDao.getSingleRecipe(id);
     }*/
 
-    // region Local
+    // region Single Recipe
 
     /**
      * @param id recipe id
@@ -115,7 +118,6 @@ public class RecipeRepository {
                         .subscribe(new DisposableMaybeObserver<String>() {
                                        @Override
                                        public void onSuccess(String s) {
-                                           Log.e(TAG, "onSuccess, " + s);
                                            if (s != null && s.length() > 0 && !s.equals("null")) // !s.startsWith("[") && s.endsWith("]"))
                                                emitter.onSuccess(Converters.fromString(s));
                                            else
@@ -125,14 +127,13 @@ public class RecipeRepository {
 
                                        @Override
                                        public void onError(Throwable t) {
-                                           Log.e(TAG, "onError, " + t.getMessage());
-                                           emitter.onComplete();
+                                           CrashLogger.logException(t);
+                                           emitter.onError(new Throwable(MyApplication.getContext().getString(R.string.load_error_message)));
                                            dispose();
                                        }
 
                                        @Override
                                        public void onComplete() {
-                                           Log.e(TAG, "onComplete");
                                            emitter.onComplete();
                                            dispose();
                                        }
@@ -146,10 +147,10 @@ public class RecipeRepository {
 
     /**
      * @param id recipe id
-     * @return {@link Flowable} {@link RecipeEntity} to
+     * @return {@link Flowable<RecipeEntity>} {@link RecipeEntity} to
      * {@link com.myapps.ron.family_recipes.viewmodels.RecipeViewModel} used by {@link com.myapps.ron.family_recipes.ui.activities.RecipeActivity}
      */
-    public Flowable<RecipeEntity> getObservableRecipe(String id) {
+    public Flowable<RecipeEntity> getObservableRecipe(Context context, String id) {
         // check whether the recipe is available locally with getMaybeRecipe
         // return the Flowable anyways, it will do onNext when the recipe will be available
         recipeDao.getMaybeRecipe(id)
@@ -159,26 +160,68 @@ public class RecipeRepository {
                     @Override
                     public void onSuccess(RecipeEntity entity) {
                         // will be available in Flowable#onNext
-                        Log.e(TAG, "getMaybeRecipe, onSuccess");
+                        //Log.e(TAG, "getMaybeRecipe, onSuccess");
                         dispose();
                     }
 
                     @Override
-                    public void onError(Throwable e) {
-                        Log.e(TAG, e.getMessage());
-                        e.printStackTrace();
+                    public void onError(Throwable t) {
+                        /*if (t.getMessage() != null)
+                            Log.e(TAG, t.getMessage());*/
+                        CrashLogger.logException(t);
+                        t.printStackTrace();
+                        dispatchInfoForRecipe.onNext(context.getString(R.string.load_error_message));
                         dispose();
                     }
 
                     @Override
                     public void onComplete() {
-                        Log.e(TAG, "getMaybeRecipe, onComplete, enqueue worker");
                         // no local recipe, fetch from server
-                        WorkManager.getInstance().enqueueUniqueWork(GetOneRecipeWorker.class.getSimpleName(), ExistingWorkPolicy.REPLACE, GetOneRecipeWorker.getOneRecipeWorker(id));
+                        if (!MiddleWareForNetwork.checkInternetConnection(context)) {
+                            dispatchInfoForRecipe.onNext(context.getString(R.string.no_internet_message));
+                            return;
+                        }
+                        if (AppHelper.getAccessToken() == null) {
+                            dispatchInfoForRecipe.onNext(context.getString(R.string.invalid_access_token));
+                            return;
+                        }
+                        //Log.e(TAG, "getMaybeRecipe, onComplete, enqueue worker");
+                        WorkManager.getInstance().enqueue(GetOneRecipeWorker.getOneRecipeWorker(id));
+                        //BeginContinuationWorker.enqueueWorkContinuationWithValidSession(BeginContinuationWorker.WORKERS.GET_RECIPE, id);
                     }
                 });
         return recipeDao.getObservableRecipe(id);
     }
+
+    /**
+     * @param recipeEntity to insert
+     */
+    public void insertRecipe(RecipeEntity recipeEntity) {
+        recipeDao.insertRecipe(recipeEntity);
+    }
+
+    /*
+     * Called from {@link GetOneRecipeWorker} background worker
+     * @param recipeEntity to insert
+     * @return {@link Completable} - deferred computation without any value but
+     * only indication for completion or exception.
+     */
+    /*public Completable insertRecipeCompletable(RecipeEntity recipeEntity) {
+        return recipeDao.insertRecipeCompletable(recipeEntity);
+    }*/
+
+    /*public void insertQuery(String name, int size) {
+        executor.execute(() -> recipeDao.insertAll(AppDatabases.generateData(name, size)));
+    }*/
+
+    private void updateRecipe(RecipeEntity recipeEntity) {
+        executor.execute(() ->
+                recipeDao.updateRecipe(recipeEntity));
+    }
+
+    // endregion
+
+    // region Query Recipes
 
     /**
      * Query the repository
@@ -194,9 +237,9 @@ public class RecipeRepository {
         String order = query.getOrderBy();
         String filters = query.getSQLFilters();
 
-        Log.e(getClass().getSimpleName(), order);
+        /*Log.e(getClass().getSimpleName(), order);
         Log.e(getClass().getSimpleName(), search);
-        Log.e(getClass().getSimpleName(), filters);
+        Log.e(getClass().getSimpleName(), filters);*/
 
         if (query.isFavorites()) {
             dataSource = switchCaseOrderFavorites(search, filters, order);
@@ -231,66 +274,9 @@ public class RecipeRepository {
         }
     }
 
-
-    /**
-     * update from local user
-     * @param recipeEntity to insert
-     */
-    public void insertOrUpdateRecipe(RecipeEntity recipeEntity) {
-        executor.execute(() ->
-                recipeDao.insertRecipe(recipeEntity));
-    }
-
-    /**
-     * Called from {@link GetOneRecipeWorker} background worker
-     * @param recipeEntity to insert
-     * @return {@link Completable} - deferred computation without any value but
-     * only indication for completion or exception.
-     */
-    public Completable insertRecipeCompletable(RecipeEntity recipeEntity) {
-        return recipeDao.insertRecipeCompletable(recipeEntity);
-        /*return Completable.create(emitter ->
-                executor.execute(() ->
-                        recipeDao.insertRecipeCompletable(recipeEntity)
-                                .subscribe(new DisposableCompletableObserver() {
-                                    @Override
-                                    public void onComplete() {
-                                        emitter.onComplete();
-                                        dispose();
-                                    }
-
-                                    @Override
-                                    public void onError(Throwable t) {
-                                        emitter.onError(t);
-                                        dispose();
-                                    }
-                                })
-                        )
-        );*/
-    }
-
-    private void updateRecipe(RecipeEntity recipeEntity) {
-        executor.execute(() ->
-                recipeDao.updateRecipe(recipeEntity));
-    }
-
-    public void insertQuery(String name, int size) {
-        executor.execute(() -> recipeDao.insertAll(AppDatabases.generateData(name, size)));
-    }
-
     // endregion
 
     // region Helpers
-
-    //@SuppressWarnings("ResultOfMethodCallIgnored")
-    private void deleteOldRecipeContent(Context context, String path) {
-        Uri uri = ExternalStorageHelper.getFileAbsolutePath(context,
-                Constants.RECIPES_DIR, path);
-        if (uri != null) {
-            // local file exists
-            Log.e(TAG, "deleting " + path + ", " + new File(uri.getPath()).delete());
-        }
-    }
 
     private void delayedDispatch(final Context context, final AddedModifiedSize addedModifiedSize) {
         executor.execute(() -> {
@@ -319,72 +305,72 @@ public class RecipeRepository {
 
     // region Server
 
-    public void updateFromServer(Context context, List<RecipeTO> list, AddedModifiedSize addedModifiedSize) {
-        if (list != null) {
-            if (list.isEmpty()) {
-                return;
-            }
-            Log.e(TAG, "recipes from server, " + list.toString());
-        } else {
-            Log.e(TAG, "recipes from server, null");
+    private void updateFromServer(@Nullable List<RecipeTO> list, AddedModifiedSize addedModifiedSize) {
+        if (list == null || list.isEmpty()) {
+            //Log.e(TAG, "recipes from server, null");
             return;
         }
+        //Log.e(TAG, "recipes from server, " + list.toString());
         executor.execute(() -> {
             // first cell is for added and second cell is for modified recipes
             for (RecipeTO fromServer: list) {
-                //Log.e(TAG, "updateFromServer, id = " + fromServer.getId());
-                recipeDao.getMaybeRecipe(fromServer.getId()).subscribe(new DisposableMaybeObserver<RecipeEntity>() {
-                    RecipeEntity update = fromServer.toEntity();
-                    @Override
-                    public void onSuccess(RecipeEntity recipeEntity) {
-                        // found a recipe
-                        // update it and save the current 'like' of the user
-                        Log.e(TAG, "updateFromServer, found, id " + fromServer.getId());
-                        if (!update.identical(recipeEntity)) {
-                            update.setMeLike(recipeEntity.getMeLike());
-                            // compare existing and new recipe html files
-                            if (recipeEntity.getRecipeFile() != null &&
-                                    !recipeEntity.getRecipeFile().equals(update.getRecipeFile())) {
-                                // delete old recipe html file
-                                Log.e(TAG, "different html");
-                                deleteOldRecipeContent(context, recipeEntity.getRecipeFile());
+                // Iterate through recipes list.
+                // For each item, if exists, save previous meLike flag
+                // if not exists, insert to db.
+                recipeDao.getMaybeRecipe(fromServer.getId())
+                        .subscribe(new DisposableMaybeObserver<RecipeEntity>() {
+                            RecipeEntity update = fromServer.toEntity();
+                            @Override
+                            public void onSuccess(RecipeEntity recipeEntity) {
+                                // found a recipe
+                                // update it and save the current 'like' of the user
+                                //Log.e(TAG, "updateFromServer, found, id " + fromServer.getId());
+                                if (!update.identical(recipeEntity)) {
+                                    update.setMeLike(recipeEntity.getMeLike());
 
+                                    recipeDao.updateRecipe(update);
+                                    addedModifiedSize.incrementModified();
+                                    dispose();
+                                }
+
+                                addedModifiedSize.incrementSize();
+
+                                dispose();
                             }
-                            recipeDao.updateRecipe(update);
-                            addedModifiedSize.incrementModified();
-                            dispose();
-                        }
 
-                        addedModifiedSize.incrementSize();
+                            @Override
+                            public void onError(Throwable t) {
+                                //Log.e("updateFromServer", t.getMessage(), t);
+                                dispatchInfo.onNext(MyApplication.getContext().getString(R.string.load_error_message));
+                                CrashLogger.logException(t);
+                                dispose();
+                            }
 
-                        dispose();
-                    }
+                            @Override
+                            public void onComplete() {
+                                // no recipe found. Insert a new recipe
+                                //Log.e(TAG, "updateFromServer, recipe not found, id " + fromServer.getId());
+                                recipeDao.insertRecipe(fromServer.toEntity());
+                                addedModifiedSize.incrementAdded();
+                                addedModifiedSize.incrementSize();
 
-                    @Override
-                    public void onError(Throwable e) {
-                        dispatchInfo.onNext(e.getMessage());
-                        Log.e("updateFromServer", e.getMessage(), e);
-                        dispose();
-                    }
-
-                    @Override
-                    public void onComplete() {
-                        // no recipe found
-                        // insert a new recipe
-                        Log.e(TAG, "updateFromServer, recipe not found, id " + fromServer.getId());
-                        recipeDao.insertRecipe(fromServer.toEntity());
-                        addedModifiedSize.incrementAdded();
-                        addedModifiedSize.incrementSize();
-
-                        dispose();
-                    }
-                });
+                                dispose();
+                            }
+                        });
             }
         });
     }
 
-    private CompositeDisposable compositeDisposable = new CompositeDisposable();
+    public void updateFavoritesFromUserRecord(List<String> favorites) {
+        if (favorites != null) {
+            executor.execute(() -> {
+                for (String id : favorites)
+                    recipeDao.updateLikeRecipe(id, TRUE);
+            });
+        }
+    }
 
+        // region Fetch
     public void fetchRecipesReactive(final Context context) {
         if (!MiddleWareForNetwork.checkInternetConnection(context)) {
             dispatchInfo.onNext(context.getString(R.string.no_internet_message));
@@ -400,7 +386,6 @@ public class RecipeRepository {
         }
         mayRefresh.getAndSet(false);
         new Handler().postDelayed(() -> mayRefresh.getAndSet(true), com.myapps.ron.family_recipes.utils.Constants.REFRESH_DELAY);
-        //if(MiddleWareForNetwork.checkInternetConnection(context)) {
         final String time = DateUtil.getUTCTime();
 
         String lastUpdate = DateUtil.getLastUpdateTime(context);
@@ -413,9 +398,9 @@ public class RecipeRepository {
                 //.observeOn(AndroidSchedulers.mainThread())
                 .subscribe(next -> {
                     if (next.code() == 200) {
-                        Log.e(TAG, "fetch recipes, " + next.body());
+                        //Log.e(TAG, "fetch recipes, " + next.body());
                         final AddedModifiedSize addedModifiedSize = new AddedModifiedSize();
-                        updateFromServer(context, next.body(), addedModifiedSize);
+                        updateFromServer(next.body(), addedModifiedSize);
                         String lastKey = next.headers().get(Constants.HEADER_LAST_EVAL_KEY);
                         if (lastKey != null && !lastKey.isEmpty())
                             // there are more updated recipes
@@ -434,13 +419,14 @@ public class RecipeRepository {
                         dispatchInfo.onNext(context.getString(R.string.load_error_message) + next.message());
                         compositeDisposable.clear();
                     }
-                    Log.e(TAG, "response code, " + next.code());
-
-                    //DateUtil.updateServerTime(context, time);
-                }, error -> dispatchInfo.onNext(error.getMessage()));
+                    //Log.e(TAG, "response code, " + next.code());
+                }, error -> {
+                    //dispatchInfo.onError(error);
+                    CrashLogger.logException(error);
+                    dispatchInfo.onNext(context.getString(R.string.load_error_message));
+                });
 
         compositeDisposable.add(disposable);
-        //}
     }
 
     // make more api calls with pagination if necessary, using lastEvaluatedKey header from api response
@@ -454,8 +440,8 @@ public class RecipeRepository {
                     //.observeOn(AndroidSchedulers.mainThread())
                     .subscribe(next -> {
                         if (next.code() == 200) {
-                            Log.e(TAG, "more recipes, status 200");
-                            updateFromServer(context, next.body(), addedModifiedSize);
+                            //Log.e(TAG, "more recipes, status 200");
+                            updateFromServer(next.body(), addedModifiedSize);
                             String lastEvalKey = next.headers().get(Constants.HEADER_LAST_EVAL_KEY);
                             if (lastEvalKey != null && !lastEvalKey.isEmpty())
                                 // there are more updated recipes
@@ -467,59 +453,12 @@ public class RecipeRepository {
                                 compositeDisposable.clear();
                             }
                         }
-                        Log.e(TAG, "response code, " + next.code());
+                        //Log.e(TAG, "response code, " + next.code());
 
-                    }, error -> dispatchInfo.onNext(error.getMessage()));
+                    }, CrashLogger::logException);
 
             compositeDisposable.add(disposable);
         }
-    }
-
-    //for case of server not sending the updated recipe in the response,
-    //need to fetch it to update lastModifiedDate attribute
-    public void changeLike(String id, boolean like) {
-        executor.execute(() -> {
-            recipeDao.updateLikeRecipe(id, like ? TRUE : FALSE);
-            compositeDisposable.add(APICallsHandler.getRecipeObservable(id, AppHelper.getAccessToken())
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(Schedulers.from(executor))
-                    .subscribe(response -> {
-                        Log.e(TAG, "get one recipe code = " + response.code());
-                        if (response.code() == STATUS_OK)
-                            updateFromServerAfterLike(response.body());
-                    }, throwable -> Log.e(TAG, "error when getting updated recipe after like\n" + throwable.getMessage())));
-        });
-    }
-
-    private void updateFromServerAfterLike(RecipeTO updatedFromServer) {
-        if (updatedFromServer == null) {
-            Log.e(TAG, "recipe from server, null");
-            return;
-        }
-        executor.execute(() ->
-                recipeDao.getSingleRecipe(updatedFromServer.getId())
-                        .subscribe(new DisposableSingleObserver<RecipeEntity>() {
-                            RecipeEntity update = updatedFromServer.toEntity();
-                            @Override
-                            public void onSuccess(RecipeEntity recipeEntity) {
-                                // found a recipe
-                                // update it and save the current 'like' of the user
-                                //Log.e(TAG, "updateFromServer, found, id " + updatedFromServer.getId());
-                                if (!update.identical(recipeEntity)) {
-                                    update.setMeLike(recipeEntity.getMeLike());
-                                    recipeDao.updateRecipe(update);
-                                }
-                                dispose();
-                            }
-
-                            @Override
-                            public void onError(Throwable e) {
-                                dispatchInfo.onNext(e.getMessage());
-                                Log.e("updateFromServer", e.getMessage(), e);
-                                dispose();
-                            }
-                        })
-        );
     }
 
     public Single<List<CommentEntity>> fetchRecipeComments(Context context, String recipeId) {
@@ -547,22 +486,24 @@ public class RecipeRepository {
                              emitter.onError(new Throwable(context.getString(R.string.load_error_message)));
                          }
                         } else {
-                            String message = response.message();
                             try {
-                                if (response.errorBody() != null)
-                                    message = response.errorBody().string();
+                                if (response.errorBody() != null) {
+                                    String message = response.errorBody().string();
+                                    emitter.onError(new Throwable(message));
+                                } else
+                                    emitter.onError(new Throwable(context.getString(R.string.load_error_message)));
                             } catch (IOException e) {
                                 e.printStackTrace();
-                                emitter.onError(e);
+                                emitter.onError(new Throwable(context.getString(R.string.load_error_message)));
                             }
-                            emitter.onError(new Throwable(String.format("status %d, " + message, response.code())));
                         }
                         dispose();
                     }
 
                     @Override
                     public void onError(Throwable t) {
-                        emitter.onError(t);
+                        CrashLogger.logException(t);
+                        emitter.onError(new Throwable(context.getString(R.string.load_error_message)));
                         dispose();
                     }
 
@@ -574,17 +515,9 @@ public class RecipeRepository {
                 }));
     }
 
-    // endregion
+        // endregion
 
-    public void updateFavoritesFromUserRecord(List<String> favorites) {
-        if (favorites != null) {
-            executor.execute(() -> {
-                for (String id : favorites)
-                    recipeDao.updateLikeRecipe(id, TRUE);
-                //recipeDao.updateLikesFromUserRecord(favorites, TRUE);
-            });
-        }
-    }
+        // region Post
 
     public Single<Boolean> changeLike(final Context context, @NonNull RecipeEntity recipe, Map<String, Object> attrs) {
         if (!MiddleWareForNetwork.checkInternetConnection(context))
@@ -592,15 +525,51 @@ public class RecipeRepository {
         if (AppHelper.getAccessToken() == null)
             return Single.error(new Throwable(context.getString(R.string.invalid_access_token)));
         return Single.create(emitter ->
-                APICallsHandler.patchRecipe(attrs, recipe.getId(), recipe.getLastModifiedDate(), AppHelper.getAccessToken(), result -> {
-                    if (result != null && recipe.getId().equals(result.getId())) { // status 200
-                        RecipeEntity update = result.toEntity();
-                        update.setMeLike(!recipe.isUserLiked() ? TRUE : FALSE);
-                        updateRecipe(update);
-                        emitter.onSuccess(true);
-                    } else // status <> 200
-                        emitter.onError(new Throwable(context.getString(R.string.load_error_message)));
-                })
+                APICallsHandler.patchRecipeObservable(attrs, recipe.getId(), recipe.getLastModifiedDate(), AppHelper.getAccessToken())
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(Schedulers.from(executor))
+                        .subscribe(new DisposableObserver<Response<RecipeTO>>() {
+                            @Override
+                            public void onNext(Response<RecipeTO> response) {
+                                if (response.code() == APICallsHandler.STATUS_OK) {
+                                    // status 200 OK
+                                    if (response.body() != null && recipe.getId().equals(response.body().getId())) {
+                                        RecipeEntity update = response.body().toEntity();
+                                        update.setMeLike(!recipe.isUserLiked() ? TRUE : FALSE);
+                                        updateRecipe(update);
+                                        emitter.onSuccess(true);
+                                    } else {
+                                        // body is null somehow
+                                        emitter.onError(new Throwable(context.getString(R.string.load_error_message)));
+                                    }
+                                } else {
+                                    try {
+                                        if (response.errorBody() != null) {
+                                            String message = response.errorBody().string();
+                                            emitter.onError(new Throwable(message));
+                                        } else
+                                            emitter.onError(new Throwable(context.getString(R.string.load_error_message)));
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                        emitter.onError(new Throwable(context.getString(R.string.load_error_message)));
+                                    }
+                                }
+                                dispose();
+                            }
+
+                            @Override
+                            public void onError(Throwable t) {
+                                CrashLogger.logException(t);
+                                emitter.onError(new Throwable(context.getString(R.string.load_error_message)));
+                                dispose();
+                            }
+
+                            @Override
+                            public void onComplete() {
+                                if (!isDisposed())
+                                    dispose();
+                            }
+                        })
         );
     }
 
@@ -609,7 +578,7 @@ public class RecipeRepository {
             return Single.error(new Throwable(context.getString(R.string.no_internet_message)));
         if (AppHelper.getAccessToken() == null)
             return Single.error(new Throwable(context.getString(R.string.invalid_access_token)));
-        return Single.create(emitter -> {
+        return Single.create(emitter ->
             APICallsHandler.postCommentObservable(patchAttrs, recipeId, lastModifiedDate, AppHelper.getAccessToken())
                     .subscribeOn(Schedulers.io())
                     .observeOn(Schedulers.from(executor))
@@ -619,22 +588,24 @@ public class RecipeRepository {
                             if (response.code() == STATUS_OK) {
                                 emitter.onSuccess(true);
                             } else {
-                                String message = response.message();
                                 try {
-                                    if (response.errorBody() != null)
-                                        message = response.errorBody().string();
+                                    if (response.errorBody() != null) {
+                                        String message = response.errorBody().string();
+                                        emitter.onError(new Throwable(message));
+                                    } else
+                                        emitter.onError(new Throwable(context.getString(R.string.load_error_message)));
                                 } catch (IOException e) {
                                     e.printStackTrace();
-                                    emitter.onError(e);
+                                    emitter.onError(new Throwable(context.getString(R.string.load_error_message)));
                                 }
-                                emitter.onError(new Throwable(String.format("status %d, " + message, response.code())));
                             }
                             dispose();
                         }
 
                         @Override
                         public void onError(Throwable t) {
-                            emitter.onError(t);
+                            CrashLogger.logException(t);
+                            emitter.onError(new Throwable(context.getString(R.string.load_error_message)));
                             dispose();
                         }
 
@@ -643,24 +614,28 @@ public class RecipeRepository {
                             if (!isDisposed())
                                 dispose();
                         }
-                    });
-        });
+                    })
+        );
     }
 
+        // endregion
 
-    public void deleteAllRecipes() {
+    // endregion
+
+    /*public void deleteAllRecipes() {
         executor.execute(recipeDao::deleteAllRecipes);
-    }
+    }*/
 
     // region Recipe Access
 
       // region Update/Insert Access
 
     /**
-     *
+     * Update 'touching' time of resources.
+     * Used later to decide which to delete if reached to some amount of used space.
      * @param id specified recipe
      * @param accessKey One String of {@link AccessEntity#KEY_ACCESSED_THUMBNAIL},
-     * {@link AccessEntity#KEY_ACCESSED_RECIPE} or {@link AccessEntity#KEY_ACCESSED_IMAGES}
+     * {@link AccessEntity#KEY_ACCESSED_CONTENT} or {@link AccessEntity#KEY_ACCESSED_IMAGES}
      * @param value new Date().getTime() or null
      */
     public void upsertRecipeAccess(@NonNull String id, @NonNull String accessKey, @Nullable Long value) {
@@ -676,9 +651,9 @@ public class RecipeRepository {
                     }
 
                     @Override
-                    public void onError(Throwable e) {
-                        Log.e(TAG, e.getMessage());
-                        dispatchInfo.onNext(e.toString());
+                    public void onError(Throwable t) {
+                        CrashLogger.logException(t);
+                        //dispatchInfo.onNext(t.toString());
                         dispose();
                     }
 
@@ -698,8 +673,8 @@ public class RecipeRepository {
             case AccessEntity.KEY_ACCESSED_THUMBNAIL:
                 access.setLastAccessedThumbnail(value);
                 break;
-            case AccessEntity.KEY_ACCESSED_RECIPE:
-                access.setLastAccessedRecipe(value);
+            case AccessEntity.KEY_ACCESSED_CONTENT:
+                access.setLastAccessedContent(value);
                 break;
             case AccessEntity.KEY_ACCESSED_IMAGES:
                 access.setLastAccessedImages(value);
@@ -717,8 +692,8 @@ public class RecipeRepository {
         switch (accessKey) {
             case AccessEntity.KEY_ACCESSED_THUMBNAIL:
                 return recipeDao.getAccessTimeOrderByThumb();
-            case AccessEntity.KEY_ACCESSED_RECIPE:
-                return recipeDao.getAccessTimeOrderByRecipe();
+            case AccessEntity.KEY_ACCESSED_CONTENT:
+                return recipeDao.getAccessTimeOrderByContent();
             case AccessEntity.KEY_ACCESSED_IMAGES:
                 return recipeDao.getAccessTimeOrderByImages();
             default:
@@ -727,6 +702,58 @@ public class RecipeRepository {
     }
 
       // endregion
+
+    // endregion
+
+
+    // region Recipe Content
+
+    public Flowable<String> getRecipeContentById(Context context, String recipeId) {
+        //BeginContinuationWorker.enqueueWorkContinuationWithValidSession(BeginContinuationWorker.WORKERS.GET_CONTENT, recipeId);
+        recipeDao.findMaybeContentById(recipeId)
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.from(executor))
+                .subscribe(new DisposableMaybeObserver<ContentEntity>() {
+                    @Override
+                    public void onSuccess(ContentEntity contentEntity) {
+                        // fetch recipe content if possible
+                        if (MiddleWareForNetwork.checkInternetConnection(context) && AppHelper.getAccessToken() != null)
+                            WorkManager.getInstance().enqueue(GetRecipeContentWorker.getRecipeContentWorker(recipeId, contentEntity.getLastModifiedDate()));
+                        dispose();
+                    }
+
+                    @Override
+                    public void onError(Throwable t) {
+                        CrashLogger.logException(t);
+                        dispatchInfoForRecipe.onNext(context.getString(R.string.load_error_message));
+                        //dispatchInfo.onError(t);
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        // no local content
+                        if (!MiddleWareForNetwork.checkInternetConnection(context) || AppHelper.getAccessToken() == null)
+                            dispatchInfoForRecipe.onNext(context.getString(R.string.recipe_content_not_found));
+                        else
+                            WorkManager.getInstance().enqueue(GetRecipeContentWorker.getRecipeContentWorker(recipeId, null));
+                    }
+                });
+
+        return recipeDao.findContentById(recipeId);
+    }
+
+    public void insertContentRecipe(ContentEntity contentEntity) {
+        this.executor.execute(() ->
+                recipeDao.upsertRecipeContent(contentEntity));
+    }
+
+    public int getRecipeContentDataCount() {
+        return recipeDao.getContentDataCount();
+    }
+
+    public void deleteRecipeContentById(String recipeId) {
+        recipeDao.deleteContentById(recipeId);
+    }
 
     // endregion
 

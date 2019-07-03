@@ -251,7 +251,7 @@ public class HtmlInstructionsPagerAdapter extends PagerAdapter {
     }
 
     private void setSpinnerAdapterAndSelection(@NonNull Spinner spinner, int selection) {
-        //init the spinner
+        //setName the spinner
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(context,
                 R.array.html_elements, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);

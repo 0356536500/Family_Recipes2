@@ -34,13 +34,14 @@ public class Constants {
     // endregion
 
     public static final String RECIPE_ID = "recipe";
+    public static final String CONTENT_MODIFIED = "lastModified";
     public static final String RECIPE_PATH = "recipe_file";
     public static final String DEFAULT_RECIPE_PATH = "/recipe/default.html";
 
     public static final String ACTION_UPDATE_FROM_SERVICE = "update_from_service";
     public static final String ACTION_UPLOAD_IMAGES_SERVICE = "upload_images_service";
 
-    public static final int RECIPE_ACTIVITY_CODE = 0;
+    //public static final int RECIPE_ACTIVITY_CODE = 0;
     public static final int POST_RECIPE_ACTIVITY_CODE = 1;
 
     public static final long FADE_ANIMATION_DURATION = 200;
