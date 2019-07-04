@@ -524,6 +524,7 @@ public class LoginActivity extends AppCompatActivity {
         public void onSuccess(CognitoUserSession cognitoUserSession, CognitoDevice device) {
             Log.d(TAG, " -- Auth Success");
             AppHelper.setCurrSession(cognitoUserSession);
+            AppHelper.setUserDetailsBackground(getApplicationContext());
             AppHelper.newDevice(device);
             Log.e(TAG, "IDToken: " + cognitoUserSession.getIdToken().getJWTToken());
             Log.e(TAG, "AccessToken: " + cognitoUserSession.getAccessToken().getJWTToken());

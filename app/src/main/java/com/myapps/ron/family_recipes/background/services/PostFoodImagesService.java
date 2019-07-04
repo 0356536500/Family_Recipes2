@@ -88,7 +88,7 @@ public class PostFoodImagesService extends IntentService {
                 new File(files.get(i)).delete();
             }
         }
-        //new File(recipe.getRecipeContent()).delete();
+        //new File(recipe.getContent()).delete();
     }
 
     private List<String> compressFiles(List<String> paths) {

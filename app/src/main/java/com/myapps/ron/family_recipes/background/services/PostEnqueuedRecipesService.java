@@ -255,6 +255,6 @@ public class PostEnqueuedRecipesService extends Service {
                 new File(files.get(i)).delete();
             }
         }
-        //new File(recipe.getRecipeContent()).delete();
+        //new File(recipe.getContent()).delete();
     }
 }

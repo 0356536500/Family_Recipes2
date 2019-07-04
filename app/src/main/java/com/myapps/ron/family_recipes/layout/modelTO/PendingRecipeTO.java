@@ -26,7 +26,7 @@ public class PendingRecipeTO implements PostRecipe {
     public PendingRecipeTO(PendingRecipeEntity entity) {
         this.name = entity.getName();
         this.description = entity.getDescription();
-        this.content = entity.getRecipeContent();
+        this.content = entity.getContent();
         this.categories = new ArrayList<>(entity.getCategories());
         //this.foodFiles = new ArrayList<>(entity.getFoodFiles());
     }

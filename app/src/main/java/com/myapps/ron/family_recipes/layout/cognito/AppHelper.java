@@ -8,6 +8,7 @@ import com.amazonaws.auth.CognitoCachingCredentialsProvider;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoDevice;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUser;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserAttributes;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserCodeDeliveryDetails;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserDetails;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserPool;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserSession;
@@ -16,10 +17,14 @@ import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.Auth
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.ChallengeContinuation;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.MultiFactorAuthenticationContinuation;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.AuthenticationHandler;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.GetDetailsHandler;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.UpdateAttributesHandler;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.cognitoidentityprovider.model.AttributeType;
 import com.myapps.ron.family_recipes.MyApplication;
+import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.layout.Constants;
+import com.myapps.ron.family_recipes.utils.logic.CrashLogger;
 import com.myapps.ron.family_recipes.utils.logic.SharedPreferencesHandler;
 
 import java.util.ArrayList;
@@ -30,7 +35,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
+import io.reactivex.Completable;
+import io.reactivex.observers.DisposableCompletableObserver;
+import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
 @SuppressWarnings("UnusedDeclaration")
 public class AppHelper {
@@ -209,6 +218,13 @@ public class AppHelper {
         }
     }
 
+    /**
+     * retrieve CognitoUser details (email, name, etc.)
+     */
+    public static void setUserDetailsBackground(Context context) {
+        AppHelper.getPool().getUser(AppHelper.getCurrUser()).getDetailsInBackground(getDetailsHandler(context));
+    }
+
     public static void signOutUser() {
         getPool().getUser(user).signOut();
     }
@@ -231,12 +247,12 @@ public class AppHelper {
             public void onSuccess(CognitoUserSession cognitoUserSession, CognitoDevice device) {
                 Log.d(TAG, " -- Auth Success");
                 AppHelper.setCurrSession(cognitoUserSession);
+                AppHelper.setUserDetailsBackground(context);
                 AppHelper.newDevice(device);
                 //Log.e(TAG, "IDToken: " + cognitoUserSession.getIdToken().getJWTToken());
                 Log.e(TAG, "AccessToken: " + cognitoUserSession.getAccessToken().getJWTToken());
 
                 AppHelper.setIdentityProvider(context, cognitoUserSession);
-
             }
 
             @Override
@@ -266,11 +282,26 @@ public class AppHelper {
              */
             @Override
             public void authenticationChallenge(ChallengeContinuation continuation) {
-                if ("NEW_PASSWORD_REQUIRED".equals(continuation.getChallengeName())) {
+                /*if ("NEW_PASSWORD_REQUIRED".equals(continuation.getChallengeName())) {
                     Log.i(TAG, "NEW PASSWORD REQUIRED");
                 } else if ("SELECT_MFA_TYPE".equals(continuation.getChallengeName())) {
                     Log.i(TAG, "SELECT MFA TYPE");
-                }
+                }*/
+            }
+        };
+    }
+
+    private static GetDetailsHandler getDetailsHandler(Context context) {
+        return new GetDetailsHandler() {
+            @Override
+            public void onSuccess(CognitoUserDetails cognitoUserDetails) {
+                AppHelper.setUserDetails(context, cognitoUserDetails);
+            }
+
+            @Override
+            public void onFailure(Exception exception) {
+                CrashLogger.logException(exception);
+                Log.e(TAG, exception.getMessage(), exception);
             }
         };
     }
@@ -290,9 +321,9 @@ public class AppHelper {
         continuation.continueTask();
     }
 
-    public static void setUserDetails(CognitoUserDetails details) {
+    private static void setUserDetails(Context context, CognitoUserDetails details) {
         userDetails = details;
-        refreshWithSync();
+        refreshWithSync(context);
     }
 
     public static CognitoUserDetails getUserDetails() {
@@ -591,7 +622,7 @@ public class AppHelper {
 
     }
 
-    private static void refreshWithSync() {
+    private static void refreshWithSync(Context context) {
         // This will refresh the current items to display list with the attributes fetched from service
         List<String> tempKeys = new ArrayList<>();
         List<String> tempValues = new ArrayList<>();
@@ -618,11 +649,17 @@ public class AppHelper {
                 phoneVerified = attr.getValue().contains("true");
             }
 
-            if(attr.getKey().equals("email")) {
-                emailAvailable = true;
-            }
-            else if(attr.getKey().equals("phone_number")) {
-                phoneAvailable = true;
+            switch (attr.getKey()) {
+                case "email":
+                    emailAvailable = true;
+                    SharedPreferencesHandler.writeString(context, attr.getKey(), attr.getValue());
+                    break;
+                case "preferred_username":
+                    SharedPreferencesHandler.writeString(context, context.getString(R.string.preference_key_preferred_name), attr.getValue());
+                    break;
+                case "phone_number":
+                    phoneAvailable = true;
+                    break;
             }
         }
 
@@ -667,13 +704,57 @@ public class AppHelper {
         }
     }
 
-    private static void modifyAttribute(String attributeName, String newValue) {
-        //
+    // Notify when cognito attribute had changed or got error while modifying it
+    public static PublishSubject<Boolean> updateAttributeSubject = PublishSubject.create();
 
+    public static void modifyAttribute(Context context, String attributeName, String attributeValue) {
+        if (attributeName == null || attributeValue == null)
+            return;
+        CognitoUserAttributes updatedUserAttributes = new CognitoUserAttributes();
+        updatedUserAttributes.addAttribute(attributeName, attributeValue);
+        AppHelper.getPool().getUser(AppHelper.getCurrUser()).updateAttributesInBackground(updatedUserAttributes, getUpdateHandler(context));
+    }
+
+    // Callback handler
+    private static UpdateAttributesHandler getUpdateHandler(Context context) {
+        return new UpdateAttributesHandler() {
+            @Override
+            public void onSuccess(List<CognitoUserCodeDeliveryDetails> attributesVerificationList) {
+                // Update successful
+                if (attributesVerificationList.size() > 0) {
+                    Log.e(TAG, "The updated attributes has to be verified");
+                    updateAttributeSubject.onNext(false);
+                } else {
+                    setUserDetailsBackground(context);
+                    Completable.timer(300, TimeUnit.MILLISECONDS, Schedulers.io())
+                            .observeOn(Schedulers.io())
+                            .observeOn(Schedulers.io())
+                            .subscribe(new DisposableCompletableObserver() {
+                                @Override
+                                public void onComplete() {
+                                    Log.e(TAG, "attribute updated");
+                                    updateAttributeSubject.onNext(true);
+                                    dispose();
+                                }
+
+                                @Override
+                                public void onError(Throwable e) {
+                                    Log.e(TAG, e.getMessage(), e);
+                                }
+                            });
+                }
+            }
+
+            @Override
+            public void onFailure(Exception exception) {
+                // Update failed
+                Log.e(TAG, "Update failed, " + AppHelper.formatException(exception));
+                updateAttributeSubject.onNext(false);
+            }
+        };
     }
 
     private static void deleteAttribute(String attributeName) {
 
     }
 }
-

@@ -82,7 +82,7 @@ public class RoomJoinTest {
 
         AccessEntity accessEntity = recipeDao.getAccessById(list.get(0).getId());
         assertThat(accessEntity.getLastAccessedThumbnail(), equalTo(firstAccess));
-        assertThat(accessEntity.getLastAccessedRecipe(), nullValue());
+        assertThat(accessEntity.getLastAccessedContent(), nullValue());
         assertEquals(recipeDao.getAllRecipeAccess().size(), recipeDao.findAllSync().size());
     }
 
@@ -159,7 +159,7 @@ public class RoomJoinTest {
         PendingRecipeEntity entity = new PendingRecipeEntity();
         entity.setName("testName");
         entity.setDescription("testDescription");
-        entity.setRecipeContent(html);
+        entity.setContent(html);
         PendingRecipeDao dao = db.pendingRecipeDao();
         dao.insertAll(entity);
 

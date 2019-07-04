@@ -25,6 +25,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.preference.EditTextPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.TwoStatePreference;
@@ -33,10 +34,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.myapps.ron.family_recipes.BuildConfig;
 import com.myapps.ron.family_recipes.R;
-import com.myapps.ron.family_recipes.logic.Injection;
-import com.myapps.ron.family_recipes.logic.storage.StorageWrapper;
 import com.myapps.ron.family_recipes.layout.MiddleWareForNetwork;
 import com.myapps.ron.family_recipes.layout.cognito.AppHelper;
+import com.myapps.ron.family_recipes.logic.Injection;
+import com.myapps.ron.family_recipes.logic.storage.StorageWrapper;
 import com.myapps.ron.family_recipes.ui.baseclasses.MyBaseActivity;
 import com.myapps.ron.family_recipes.viewmodels.SettingsViewModel;
 
@@ -420,6 +421,57 @@ public class SettingsActivity extends MyBaseActivity
             }
             startActivity(intent);
             return true;
+        }
+
+        @Override
+        public void onResume() {
+            super.onResume();
+            if (getActivity() != null)
+                getActivity().setTitle(getPreferenceScreen().getTitle());
+        }
+
+    }
+
+
+    /**
+     * This fragment shows account preferences only. It is used when the
+     * activity is showing a two-pane settings UI.
+     */
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    public static class AccountPreferenceFragment extends PreferenceFragmentCompat {
+        private FragmentActivity activity;
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            activity = getActivity();
+
+            //addPreferencesFromResource(R.xml.pref_notification);
+        }
+
+        @Override
+        public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+            super.onViewCreated(view, savedInstanceState);
+            if (activity != null) {
+                SettingsViewModel viewModel = ViewModelProviders.of(activity).get(SettingsViewModel.class);
+
+                EditTextPreference namePreference = findPreference(getString(R.string.preference_key_preferred_name));
+                viewModel.setPreferredNamePreference(activity, namePreference);
+            }
+        }
+
+        @Override
+        public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+            super.onActivityCreated(savedInstanceState);
+            if (activity != null) {
+                RecyclerView recyclerView = getListView();
+                DividerItemDecoration itemDecoration = new DividerItemDecoration(activity, RecyclerView.VERTICAL);
+                recyclerView.addItemDecoration(itemDecoration);
+            }
+        }
+
+        @Override
+        public void onCreatePreferences(Bundle bundle, String rootKey) {
+            setPreferencesFromResource(R.xml.pref_account, rootKey);
         }
 
         @Override

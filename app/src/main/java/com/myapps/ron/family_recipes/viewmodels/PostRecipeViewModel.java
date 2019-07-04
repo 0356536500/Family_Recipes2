@@ -42,7 +42,7 @@ public class PostRecipeViewModel extends ViewModel {
     public void setRecipeContent(String html) {
         //recipeFile = StorageWrapper.createHtmlFile(context,recipe.getName().concat(".html"), html);
         //if (recipeFile != null)
-        recipe.setRecipeContent(html);
+        recipe.setContent(html);
     }
 
     public void setImagesUris(List<String> imagesUris) {

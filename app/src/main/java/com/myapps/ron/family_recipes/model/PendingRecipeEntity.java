@@ -80,11 +80,11 @@ public class PendingRecipeEntity {
         this.description = description;
     }
 
-    public String getRecipeContent() {
+    public String getContent() {
         return content;
     }
 
-    public void setRecipeContent(String content) {
+    public void setContent(String content) {
         this.content = content;
     }
 

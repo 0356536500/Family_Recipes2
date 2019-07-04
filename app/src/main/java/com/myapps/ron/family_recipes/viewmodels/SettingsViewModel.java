@@ -9,12 +9,14 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Handler;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.core.content.FileProvider;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
+import androidx.preference.EditTextPreference;
 import androidx.preference.Preference;
 import androidx.preference.TwoStatePreference;
 
@@ -45,6 +47,7 @@ import static android.content.Context.DOWNLOAD_SERVICE;
 public class SettingsViewModel extends ViewModel implements SharedPreferences.OnSharedPreferenceChangeListener {
     //private final String TAG = getClass().getSimpleName();
     private MutableLiveData<String> info = new MutableLiveData<>();
+    // rebind preference after finishing its process
     private MutableLiveData<String> bindListenerAgain = new MutableLiveData<>();
     public MutableLiveData<Map.Entry<String, Boolean>> changeKeyToValue = new MutableLiveData<>();
     private Context context;
@@ -72,6 +75,7 @@ public class SettingsViewModel extends ViewModel implements SharedPreferences.On
         if (MiddleWareForNetwork.checkInternetConnection(context)) {
             if (AppHelper.getAccessToken() != null) {
                 // everything is valid
+                // disable listener for the meantime
                 preference.setOnPreferenceChangeListener((preference1, newValue1) -> false);
                 return true;
             }
@@ -84,6 +88,28 @@ public class SettingsViewModel extends ViewModel implements SharedPreferences.On
             return false;
         }
     };
+
+    public void setPreferredNamePreference(Context context, @Nullable EditTextPreference namePreference) {
+        if (namePreference != null) {
+            namePreference.setOnPreferenceChangeListener((preference, newValue) -> {
+                Log.e(getClass().getSimpleName(), "changing attribute, " + preference.getKey());
+                AppHelper.modifyAttribute(context, preference.getKey(), String.valueOf(newValue));
+                return false;
+            });
+        }
+
+        compositeDisposable.add(AppHelper.updateAttributeSubject
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(success -> {
+                    if (success && namePreference != null) {
+                        String nameFromPreferences = SharedPreferencesHandler.getString(context, context.getString(R.string.preference_key_preferred_name));
+                        if (nameFromPreferences != null)
+                            namePreference.setText(nameFromPreferences);
+                    } else
+                        setInfo("Couldn't update name");
+                }));
+    }
 
     //private final Preference.OnPreferenceChangeListener blockingPreferenceListener = (preference1, newValue1) -> false;
 

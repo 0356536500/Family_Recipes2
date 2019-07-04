@@ -58,6 +58,7 @@
     <string name="nav_drawer_close">Close navigation drawer</string>
     <string name="Username">שם משתמש</string>
     <string name="Password">סיסמה</string>
+    <string name="email">אימייל</string>
 
     <!--#region MainActivity -->
     <string name="main_activity_app_up_to_date">אין עדכונים</string>
@@ -164,6 +165,7 @@
 
     <string name="settings_category_display">תצוגה</string>
     <string name="settings_category_notifications">התראות</string>
+    <string name="settings_category_account">חשבון</string>
     <string name="settings_category_general">כללי</string>
 
     <string name="settings_report_bug_mail_list_problem_here">תיאור הבעיה כאן:</string>
@@ -182,6 +184,7 @@
     <string name="pref_description_dark_theme">מצב כהה של אפליקציות מומלץ מאוד וחוסך בחיי הסוללה
     </string>
     <string name="preference_title_report_bug">דיווח על בעיה</string>
+    <string name="preference_title_preferred_name">שינוי שם</string>
     <string name="preference_title_system_notification">הגדרות המערכת</string>
     <string name="preference_title_check_for_updates">בדוק עבור עדכונים</string>
 
