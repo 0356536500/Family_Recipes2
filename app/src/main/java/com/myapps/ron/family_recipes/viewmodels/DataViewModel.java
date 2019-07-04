@@ -9,6 +9,7 @@ import android.content.IntentFilter;
 import android.net.Uri;
 import android.util.Log;
 
+import com.myapps.ron.family_recipes.MyApplication;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.background.services.GetUserDetailsService;
 import com.myapps.ron.family_recipes.logic.repository.AppRepository;
@@ -22,6 +23,7 @@ import com.myapps.ron.family_recipes.model.RecipeEntity;
 import com.myapps.ron.family_recipes.model.RecipeMinimal;
 import com.myapps.ron.family_recipes.layout.Constants;
 import com.myapps.ron.family_recipes.utils.logic.CrashLogger;
+import com.myapps.ron.family_recipes.utils.logic.SharedPreferencesHandler;
 
 import java.io.File;
 import java.util.Date;
@@ -30,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.content.FileProvider;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -86,6 +89,22 @@ public class DataViewModel extends ViewModel {
         //compositeDisposable.add(this.categoryRepository.dispatchInfo.subscribe(infoForUser::postValue));
 
         categoryList = categoryRepository.getAllCategoriesLiveData();//.observeForever(categoryObserver);
+
+        // Check if new firebase token is available and needs to be registered
+        registerNewFirebaseToken(MyApplication.getContext(),
+                SharedPreferencesHandler.getString(MyApplication.getContext(), com.myapps.ron.family_recipes.utils.Constants.NEW_FIREBASE_TOKEN));
+    }
+
+    private void registerNewFirebaseToken(Context context, @Nullable String token) {
+        if (token != null) {
+            compositeDisposable.add(AppRepository.getInstance().registerNewFirebaseToken(context, token)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(Schedulers.io())
+                    .subscribe(success -> {
+                        if (success)
+                            SharedPreferencesHandler.removeString(context, com.myapps.ron.family_recipes.utils.Constants.NEW_FIREBASE_TOKEN);
+                    }, throwable -> setInfo(throwable.getMessage())));
+        }
     }
 
 

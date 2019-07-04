@@ -20,10 +20,10 @@ import androidx.preference.TwoStatePreference;
 
 import com.myapps.ron.family_recipes.MyApplication;
 import com.myapps.ron.family_recipes.R;
-import com.myapps.ron.family_recipes.logic.repository.AppRepository;
 import com.myapps.ron.family_recipes.layout.Constants;
 import com.myapps.ron.family_recipes.layout.MiddleWareForNetwork;
 import com.myapps.ron.family_recipes.layout.cognito.AppHelper;
+import com.myapps.ron.family_recipes.logic.repository.AppRepository;
 import com.myapps.ron.family_recipes.utils.logic.SharedPreferencesHandler;
 
 import java.io.File;
@@ -35,7 +35,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.observers.DisposableMaybeObserver;
 import io.reactivex.schedulers.Schedulers;
 
 import static android.content.Context.DOWNLOAD_SERVICE;
@@ -63,6 +62,8 @@ public class SettingsViewModel extends ViewModel implements SharedPreferences.On
     }
 
     public void setSwitchListener(@Nullable TwoStatePreference statePreference) {
+        // register switch listener
+        // called from every two state preference in SettingsActivity
         if (statePreference != null)
             statePreference.setOnPreferenceChangeListener(mainPreferenceListener);
     }
@@ -94,17 +95,17 @@ public class SettingsViewModel extends ViewModel implements SharedPreferences.On
             compositeDisposable.add(appRepository.manageSubscriptions(context, queries, new HashMap<>())
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(message -> {
-                        // 200 ok will return empty string ""
-                        // local errors will return message string
-                        // server errors will return throwable
-                        if (message != null && !message.equals("")) {
-                            setInfo(message);
+                    .subscribe(success -> {
+                        // 200 ok will return true
+                        if (success) {
                             skipKey.set(key);
                             changeKeyToValue.setValue(new AbstractMap.SimpleEntry<>(key, !changeToValue));
                             new Handler().postDelayed(() -> skipKey.set(""), 200);
                         }
                         setBindListenerAgain(key);
+
+                        // Local and server errors will be displayed as simplified like 'error has occurred'
+                        // Errors will be returned throwable
                     }, throwable -> setInfo(throwable.getMessage()))
             );
         }
@@ -143,30 +144,15 @@ public class SettingsViewModel extends ViewModel implements SharedPreferences.On
 
     public Single<Map<String, String>> getDataToDownloadUpdate(ContextWrapper context) {
         return Single.create(emitter ->
-                appRepository.getDataToDownloadUpdate(context)
+                compositeDisposable.add(appRepository.getDataToDownloadUpdate(context)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(new DisposableMaybeObserver<Map<String, String>>() {
-                            @Override
-                            public void onSuccess(Map<String, String> map) {
-                                if (map != null) // always true
-                                    emitter.onSuccess(map);
-                                dispose();
-                            }
-
-                            @Override
-                            public void onError(Throwable t) {
-                                emitter.onError(t);
-                                dispose();
-                            }
-
-                            @Override
-                            public void onComplete() {
-                                // notify up to-date
-                                emitter.onError(new Throwable(context.getString(R.string.main_activity_app_up_to_date)));
-                                dispose();
-                            }
-                        })
+                        .subscribe(map -> {
+                            if (map != null) // always true
+                                emitter.onSuccess(map);
+                        }, emitter::onError,
+                                () -> emitter.onError(new Throwable(context.getString(R.string.main_activity_app_up_to_date)))
+                        ))
         );
     }
 

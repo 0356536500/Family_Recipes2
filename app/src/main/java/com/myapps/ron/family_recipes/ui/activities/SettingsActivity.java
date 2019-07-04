@@ -84,7 +84,7 @@ public class SettingsActivity extends MyBaseActivity
     }*/
 
     /**
-     * Set up the {@link android.app.ActionBar}, if the API is available.
+     * Set up the {android.app.ActionBar}, if the API is available.
      */
     private void setupActionBar() {
         Toolbar toolbar = findViewById(R.id.main_toolbar);

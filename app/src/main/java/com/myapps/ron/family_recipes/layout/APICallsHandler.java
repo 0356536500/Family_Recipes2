@@ -363,7 +363,7 @@ public class APICallsHandler {
             @Override
             public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
                 //String body = response.body() != null ? response.body().toString() : "null";
-                Log.i(TAG, "registerNewToken code, " + response.code());
+                //Log.i(TAG, "registerNewToken code, " + response.code());
 
                 if (response.code() == STATUS_OK) {
                     callback.onFinished(null);
@@ -372,8 +372,8 @@ public class APICallsHandler {
                     try {
                         if (response.errorBody() != null) {
                             String err = response.errorBody().string();
-                            Log.e(TAG, "error registerNewToken, code = " + response.code() + "\n errorBody: " + err
-                                    + "\n message: " + response.message());
+                            /*Log.e(TAG, "error registerNewToken, code = " + response.code() + "\n errorBody: " + err
+                                    + "\n message: " + response.message());*/
                             callback.onFinished(err);
                         }
                     } catch (IOException e) {

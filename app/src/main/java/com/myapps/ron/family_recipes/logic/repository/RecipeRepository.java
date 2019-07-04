@@ -397,7 +397,7 @@ public class RecipeRepository {
                 .observeOn(Schedulers.from(executor))
                 //.observeOn(AndroidSchedulers.mainThread())
                 .subscribe(next -> {
-                    if (next.code() == 200) {
+                    if (next.code() == STATUS_OK) {
                         //Log.e(TAG, "fetch recipes, " + next.body());
                         final AddedModifiedSize addedModifiedSize = new AddedModifiedSize();
                         updateFromServer(next.body(), addedModifiedSize);
@@ -439,7 +439,7 @@ public class RecipeRepository {
                     .observeOn(Schedulers.from(executor))
                     //.observeOn(AndroidSchedulers.mainThread())
                     .subscribe(next -> {
-                        if (next.code() == 200) {
+                        if (next.code() == STATUS_OK) {
                             //Log.e(TAG, "more recipes, status 200");
                             updateFromServer(next.body(), addedModifiedSize);
                             String lastEvalKey = next.headers().get(Constants.HEADER_LAST_EVAL_KEY);

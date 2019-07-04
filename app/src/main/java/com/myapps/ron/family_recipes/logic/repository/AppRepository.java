@@ -9,6 +9,7 @@ import com.myapps.ron.family_recipes.layout.APICallsHandler;
 import com.myapps.ron.family_recipes.layout.Constants;
 import com.myapps.ron.family_recipes.layout.MiddleWareForNetwork;
 import com.myapps.ron.family_recipes.layout.cognito.AppHelper;
+import com.myapps.ron.family_recipes.utils.logic.CrashLogger;
 
 import java.io.IOException;
 import java.util.Map;
@@ -33,26 +34,35 @@ public class AppRepository {
         return INSTANCE;
     }
 
-    // region notifications
+    // region firebase and notifications
 
-    public Single<String> registerNewFirebaseToken(Context context, String firebaseToken) {
+    /**
+     * registers a new firebase token with the server.
+     * This tokens created when deleting app data
+     */
+    public Maybe<Boolean> registerNewFirebaseToken(Context context, String firebaseToken) {
         if (!MiddleWareForNetwork.checkInternetConnection(context))
-            return Single.just(context.getString(R.string.no_internet_message));
+            return Maybe.empty();
         if (AppHelper.getAccessToken() == null)
-            return Single.just(context.getString(R.string.invalid_access_token));
-        return Single.create(emitter -> APICallsHandler.registerNewToken(AppHelper.getAccessToken(), MyApplication.getDeviceId(), firebaseToken, message -> {
-            if (message != null)
-                emitter.onError(new Throwable(message));
+            return Maybe.empty();
+        return Maybe.create(emitter -> APICallsHandler.registerNewToken(AppHelper.getAccessToken(), MyApplication.getDeviceId(), firebaseToken, message -> {
+            if (message == null)
+                emitter.onSuccess(true);
             else
-                emitter.onSuccess("");
+                emitter.onError(new Throwable(message));
         }));
     }
 
-    public Single<String> manageSubscriptions(Context context, Map<String, String> queries, Map<String, String> policy) {
+    /**
+     * Change notification subscriptions of current user, according to {queries}
+     * @param queries map representing which topic to subscribe/unsubscribe from
+     * @param policy currently not used option
+     */
+    public Single<Boolean> manageSubscriptions(Context context, Map<String, String> queries, Map<String, String> policy) {
         if (!MiddleWareForNetwork.checkInternetConnection(context))
-            return Single.just(context.getString(R.string.no_internet_message));
+            return Single.error(new Throwable(context.getString(R.string.no_internet_message)));
         if (AppHelper.getAccessToken() == null)
-            return Single.just(context.getString(R.string.invalid_access_token));
+            return Single.error(new Throwable(context.getString(R.string.invalid_access_token)));
         return Single.create(emitter ->
                 APICallsHandler.manageSubscriptionsObservable(AppHelper.getAccessToken(), MyApplication.getDeviceId(), queries, policy)
                         .subscribeOn(Schedulers.io())
@@ -61,15 +71,17 @@ public class AppRepository {
                             @Override
                             public void onNext(Response<Void> response) {
                                 if (response.code() == APICallsHandler.STATUS_OK) {
-                                    emitter.onSuccess("");
+                                    emitter.onSuccess(true);
                                 } else {
-                                    int code = response.code();
                                     try {
-                                        if (response.errorBody() != null)
-                                            emitter.onError(new Throwable(String.format("status %d" + response.errorBody().string(), code)));
+                                        if (response.errorBody() != null) {
+                                            String message = response.errorBody().string();
+                                            emitter.onError(new Throwable(message));
+                                        } else
+                                            emitter.onError(new Throwable(context.getString(R.string.load_error_message)));
                                     } catch (IOException e) {
                                         e.printStackTrace();
-                                        emitter.onError(e);
+                                        emitter.onError(new Throwable(context.getString(R.string.load_error_message)));
                                     }
                                 }
                                 dispose();
@@ -77,7 +89,8 @@ public class AppRepository {
 
                             @Override
                             public void onError(Throwable t) {
-                                emitter.onError(t);
+                                CrashLogger.logException(t);
+                                emitter.onError(new Throwable(context.getString(R.string.load_error_message)));
                                 dispose();
                             }
 
@@ -114,17 +127,16 @@ public class AppRepository {
                                             if (body.containsKey(Constants.RESPONSE_KEY_APP_URL) && body.containsKey(Constants.RESPONSE_KEY_APP_NAME))
                                                 emitter.onSuccess(body);
                                             else
-                                                emitter.onError(new Throwable("error from server"));
+                                                emitter.onError(new Throwable(context.getString(R.string.load_error_message)));
                                         }
-                                    } else if (response.errorBody() != null){ // status <> 2xx
+                                    } else if (response.errorBody() != null) { // status <> 2xx
                                         try {
-                                            //
-                                            String err = response.errorBody().string();
-                                            emitter.onError(new Throwable(err));
+                                            String message = response.errorBody().string();
+                                            emitter.onError(new Throwable(message));
 
                                         } catch (IOException e) {
                                             e.printStackTrace();
-                                            emitter.onError(e);
+                                            emitter.onError(new Throwable(context.getString(R.string.load_error_message)));
                                         }
                                     } else {
                                         emitter.onError(new Throwable("error updating the app"));
@@ -135,7 +147,8 @@ public class AppRepository {
 
                                 @Override
                                 public void onError(Throwable t) {
-                                    emitter.onError(t);
+                                    CrashLogger.logException(t);
+                                    emitter.onError(new Throwable(context.getString(R.string.load_error_message)));
                                     dispose();
                                 }
 
@@ -170,16 +183,17 @@ public class AppRepository {
 
                             } catch (IOException e) {
                                 e.printStackTrace();
-                                emitter.onError(e);
+                                emitter.onError(new Throwable(context.getString(R.string.load_error_message)));
                             }
                         } else {
-                            emitter.onError(new Throwable("error response from server"));
+                            emitter.onError(new Throwable(context.getString(R.string.load_error_message)));
                         }
                         dispose();
                     }
 
                     @Override
                     public void onError(Throwable t) {
+                        CrashLogger.logException(t);
                         emitter.onError(t);
                         dispose();
                     }

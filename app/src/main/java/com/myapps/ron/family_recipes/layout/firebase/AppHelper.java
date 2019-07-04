@@ -1,7 +1,6 @@
 package com.myapps.ron.family_recipes.layout.firebase;
 
 import android.content.Context;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -10,6 +9,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GetTokenResult;
 import com.myapps.ron.family_recipes.MyApplication;
 import com.myapps.ron.family_recipes.logic.repository.AppRepository;
+import com.myapps.ron.family_recipes.utils.logic.CrashLogger;
 import com.myapps.ron.family_recipes.utils.logic.SharedPreferencesHandler;
 
 import java.util.Calendar;
@@ -24,15 +24,15 @@ import io.reactivex.subjects.PublishSubject;
  * Created by ronginat on 20/04/2019.
  */
 public class AppHelper {
-    private static final String TAG = AppHelper.class.getSimpleName() + "Firebase";
+    //private static final String TAG = AppHelper.class.getSimpleName() + "Firebase";
 
     private static GetTokenResult authSession;
-    private static FirebaseUser firebaseSession;
+    //private static FirebaseUser firebaseSession;
     public static PublishSubject<String> firebaseTokenObservable = PublishSubject.create();
     private static Disposable disposable;
     private static boolean waitingForFirebaseToken = false;
     private static final String FIREBASE_TOKEN_EXPIRATION = "firebase_token_expiration";
-    private static final long DEFULTE_VALUE = -1L;
+    private static final long DEFAULT_VALUE = -1L;
 
     private static GetTokenResult getAuthSession() {
         return authSession;
@@ -42,9 +42,9 @@ public class AppHelper {
         authSession = newAuthSession;
     }
 
-    public static FirebaseUser getFirebaseUser() {
+    /*public static FirebaseUser getFirebaseUser() {
         return firebaseSession;
-    }
+    }*/
 
     public static void initTokenObserver() {
         waitingForFirebaseToken = false;
@@ -63,8 +63,8 @@ public class AppHelper {
     }
 
     public static String isFirebaseTokenValidElseRefresh(Context context) {
-        long expiration = SharedPreferencesHandler.getLong(context, FIREBASE_TOKEN_EXPIRATION, DEFULTE_VALUE);
-        if (expiration != DEFULTE_VALUE && new Date(expiration).after(new Date()))
+        long expiration = SharedPreferencesHandler.getLong(context, FIREBASE_TOKEN_EXPIRATION, DEFAULT_VALUE);
+        if (expiration != DEFAULT_VALUE && new Date(expiration).after(new Date()))
             return Long.toString(expiration);
         //Log.e(TAG, "null or expired firebase token");
         if (!waitingForFirebaseToken) {
@@ -97,10 +97,13 @@ public class AppHelper {
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful() && task.getResult() != null) {
                         updateAuthSession(context, task.getResult().getUser());
-                        Log.e(TAG, "signInWithCustomToken:success");
+                        //Log.e(TAG, "signInWithCustomToken:success");
                     } else {
                         // If sign in fails, display a message to the user.
-                        Log.e(TAG, "signInWithCustomToken:failure", task.getException());
+                        CrashLogger.logException(task.getException());
+                        if (task.getException() != null)
+                            firebaseTokenObservable.onError(task.getException());
+                        //Log.e(TAG, "signInWithCustomToken:failure", task.getException());
                     }
                 });
     }
@@ -113,16 +116,17 @@ public class AppHelper {
         firebaseUser.getIdToken(false)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful() && task.getResult() != null) {
-                        Log.e(TAG, "update auth, expiration: " + calendar.getTime().toString());
+                        //Log.e(TAG, "update auth, expiration: " + calendar.getTime().toString());
                         SharedPreferencesHandler.writeLong(context, FIREBASE_TOKEN_EXPIRATION, calendar.getTimeInMillis());
                         setAuthSession(task.getResult());
                         waitingForFirebaseToken = false;
                         if (task.getResult().getToken() != null)
                             firebaseTokenObservable.onNext(task.getResult().getToken());
-                        Log.e(TAG, "getIdToken:success");
+                        //Log.e(TAG, "getIdToken:success");
                     } else {
-                        SharedPreferencesHandler.writeLong(context, FIREBASE_TOKEN_EXPIRATION, DEFULTE_VALUE);
-                        Log.e(TAG, "getIdToken:failure", task.getException());
+                        SharedPreferencesHandler.writeLong(context, FIREBASE_TOKEN_EXPIRATION, DEFAULT_VALUE);
+                        CrashLogger.logException(task.getException());
+                        //Log.e(TAG, "getIdToken:failure", task.getException());
                     }
                 });
     }

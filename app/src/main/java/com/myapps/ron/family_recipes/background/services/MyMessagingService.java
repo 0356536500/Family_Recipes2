@@ -11,14 +11,14 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
-import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
-import com.myapps.ron.family_recipes.MyApplication;
 import com.myapps.ron.family_recipes.R;
-import com.myapps.ron.family_recipes.layout.APICallsHandler;
-import com.myapps.ron.family_recipes.layout.cognito.AppHelper;
 import com.myapps.ron.family_recipes.ui.activities.SplashActivity;
 import com.myapps.ron.family_recipes.utils.Constants;
 import com.myapps.ron.family_recipes.utils.logic.SharedPreferencesHandler;
@@ -27,12 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-
-import androidx.annotation.NonNull;
-import androidx.core.app.NotificationCompat;
-import androidx.core.content.ContextCompat;
-import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created by ronginat on 10/02/2019.
@@ -43,7 +37,7 @@ public class MyMessagingService extends FirebaseMessagingService {
     @SuppressWarnings("FieldCanBeLocal")
     private final String DEFAULT_GROUP = "com.myapps.ron.family_recipes.DEFAULT";
 
-    private CompositeDisposable compositeDisposable;
+    //private CompositeDisposable compositeDisposable;
     @SuppressWarnings("FieldCanBeLocal")
     private final int SUMMARY_ID = 0;
 
@@ -51,14 +45,14 @@ public class MyMessagingService extends FirebaseMessagingService {
     public void onCreate() {
         super.onCreate();
         //registerReceiver(mReceiver, intentFilter);
-        compositeDisposable = new CompositeDisposable();
+        //compositeDisposable = new CompositeDisposable();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         //unregisterReceiver(mReceiver);
-        compositeDisposable.clear();
+        //compositeDisposable.clear();
     }
 
     @Override
@@ -73,7 +67,7 @@ public class MyMessagingService extends FirebaseMessagingService {
             remoteMessage.getNotification().getClickAction();
         }
 
-        if (remoteMessage.getNotification() == null && remoteMessage.getData() != null) {
+        if (/*remoteMessage.getNotification() == null && */remoteMessage.getData() != null) {
             /*
             Instead of sending a “notification” entry in the payload, change it for a “data” entry.
             In this way the notifications will ALWAYS be managed by the app through onMessageReceived
@@ -89,7 +83,7 @@ public class MyMessagingService extends FirebaseMessagingService {
         super.onNewToken(token);
         Log.e(TAG, "Refreshed token: " + token);
         SharedPreferencesHandler.writeString(getApplicationContext(), Constants.NEW_FIREBASE_TOKEN, token);
-        compositeDisposable.add(AppHelper.currSessionObservable
+        /*compositeDisposable.add(AppHelper.currSessionObservable
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
                 .subscribe(currSession -> {
@@ -107,10 +101,10 @@ public class MyMessagingService extends FirebaseMessagingService {
                             compositeDisposable.clear();
                     }
                 }, error -> {
-                    Log.e(TAG, error.getMessage());
+                    CrashLogger.logException(error);
                     compositeDisposable.clear();
                 })
-        );
+        );*/
     }
 
     /**
@@ -135,14 +129,17 @@ public class MyMessagingService extends FirebaseMessagingService {
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-        // Since android Oreo notification channel is needed.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            createNotificationChannels(notificationManager);
-        }
+        if (notificationManager != null) {
 
-        // send notification to the user
-        notificationManager.notify(notificationID /* ID of notification */, notificationBuilder.build());
-        notificationManager.notify(SUMMARY_ID, getSummaryBuilderUI().build());
+            // Since android Oreo notification channel is needed.
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                createNotificationChannels(notificationManager);
+            }
+
+            // send notification to the user
+            notificationManager.notify(notificationID /* ID of notification */, notificationBuilder.build());
+            notificationManager.notify(SUMMARY_ID, getSummaryBuilderUI().build());
+        }
     }
 
     private PendingIntent getIntentToStartActivity(Map<String, String> data, String channelId) {
