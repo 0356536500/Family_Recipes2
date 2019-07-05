@@ -7,7 +7,6 @@ import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +15,11 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.TaskStackBuilder;
 
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoDevice;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUser;
@@ -37,16 +41,10 @@ import com.myapps.ron.family_recipes.utils.logic.SharedPreferencesHandler;
 import java.util.Locale;
 import java.util.Map;
 
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.TaskStackBuilder;
-
 @SuppressLint("SetTextI18n")
 public class LoginActivity extends AppCompatActivity {
-    private final String TAG = getClass().getSimpleName();
+    //private final String TAG = getClass().getSimpleName();
 
-    //private NavigationView nDrawer;
-    //private DrawerLayout mDrawer;
     //private ActionBarDrawerToggle mDrawerToggle;
     //private Toolbar toolbar;
     //private AlertDialog userDialog;
@@ -66,6 +64,9 @@ public class LoginActivity extends AppCompatActivity {
     private String username;
     private String password;
 
+    // User attribute name
+    private String name;
+
     @Override
     protected void attachBaseContext(Context newBase) {
         super.attachBaseContext(LocaleHelper.onAttach(newBase));
@@ -77,34 +78,12 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-        /*// Set toolbar for this screen
-        toolbar = (Toolbar) findViewById(R.id.main_toolbar1);
-        toolbar.setTitle("");
-        TextView main_title = (TextView) findViewById(R.id.main_toolbar_title);
-        main_title.setMessage("Sign in");
-        setSupportActionBar(toolbar);
-
-        // Set navigation drawer for this screen
-        mDrawer = (DrawerLayout) findViewById(R.id.main_drawer_layout);
-        mDrawerToggle = new ActionBarDrawerToggle(this,mDrawer, toolbar, R.string.nav_drawer_open, R.string.nav_drawer_close);
-        mDrawer.addDrawerListener(mDrawerToggle);
-        mDrawerToggle.syncState();
-        nDrawer = (NavigationView) findViewById(R.id.nav_view);
-        setNavDrawer();*/
-
-        // Initialize application
-        //AppHelper.setName(getApplicationContext());
         initApp();
         findCurrent();
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Open/Close the navigation drawer when menu icon is selected
-        /*if (mDrawerToggle.onOptionsItemSelected(item)) {
-            return true;
-        }*/
-
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         return super.onOptionsItemSelected(item);
     }
 
@@ -121,16 +100,16 @@ public class LoginActivity extends AppCompatActivity {
                 // Register user
                 if(resultCode == RESULT_OK) {
                     String name = data.getStringExtra("name");
-                    if (!name.isEmpty()) {
+                    if (name != null && !name.isEmpty()) {
                         inUsername.setText(name);
                         inPassword.setText("");
                         inPassword.requestFocus();
                     }
                     String userPasswd = data.getStringExtra("password");
-                    if (!userPasswd.isEmpty()) {
+                    if (userPasswd != null && !userPasswd.isEmpty()) {
                         inPassword.setText(userPasswd);
                     }
-                    if (!name.isEmpty() && !userPasswd.isEmpty()) {
+                    if (name != null && !name.isEmpty() && userPasswd != null && !userPasswd.isEmpty()) {
                         // We have the user details, so sign in!
                         username = name;
                         password = userPasswd;
@@ -142,7 +121,7 @@ public class LoginActivity extends AppCompatActivity {
                 // Confirm register user
                 if(resultCode == RESULT_OK) {
                     String name = data.getStringExtra("name");
-                    if (!name.isEmpty()) {
+                    if (name != null && !name.isEmpty()) {
                         inUsername.setText(name);
                         inPassword.setText("");
                         inPassword.requestFocus();
@@ -192,7 +171,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     // App methods
-/*    // Register user - start process
+    /*// Register user - start process
     public void signUp(View view) {
         signUpNewUser();
     }*/
@@ -209,49 +188,6 @@ public class LoginActivity extends AppCompatActivity {
 
 
     // Private methods
-/*    // Handle when the a navigation item is selected
-    private void setNavDrawer() {
-        nDrawer.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(MenuItem item) {
-                performAction(item);
-                return true;
-            }
-        });
-    }
-
-    // Perform the action for the selected navigation item
-    private void performAction(MenuItem item) {
-        // Close the navigation drawer
-        mDrawer.closeDrawers();
-
-        // Find which item was selected
-        switch(item.getItemId()) {
-            case R.id.nav_sign_up:
-                // Start sign-up
-                signUpNewUser();
-                break;
-            case R.id.nav_sign_up_confirm:
-                // Confirm new user
-                confirmUser();
-                break;
-            case R.id.nav_sign_in_forgot_password:
-                // User has forgotten the password, start the process to set a new password
-                forgotpasswordUser();
-                break;
-            case R.id.nav_about:
-                // For the inquisitive
-                Intent aboutAppActivity = new Intent(this, AboutApp.class);
-                startActivity(aboutAppActivity);
-                break;
-
-        }
-    }*/
-
-/*    private void signUpNewUser() {
-        Intent registerActivity = new Intent(this, RegisterUser.class);
-        startActivityForResult(registerActivity, 1);
-    }*/
 
     private void signInUser() {
         username = inUsername.getText().toString();
@@ -318,8 +254,11 @@ public class LoginActivity extends AppCompatActivity {
         Map<String, String> newAttributes = AppHelper.getUserAttributesForFirstTimeLogin();
         if (newAttributes != null) {
             for(Map.Entry<String, String> attr: newAttributes.entrySet()) {
-                Log.d(TAG, String.format(" -- Adding attribute: %s, %s", attr.getKey(), attr.getValue()));
+                //Log.d(TAG, String.format(" -- Adding attribute: %s, %s", attr.getKey(), attr.getValue()));
                 newPasswordContinuation.setUserAttribute(attr.getKey(), attr.getValue());
+                if (attr.getKey().equals("name")) {
+                    name = attr.getValue();
+                }
             }
         }
         try {
@@ -345,48 +284,41 @@ public class LoginActivity extends AppCompatActivity {
 
     }*/
 
-    /*@SuppressWarnings("UnusedDeclaration")
-    private void launchUser() {
-        Intent mainIntent = new Intent(this, MainActivity.class);
-        mainIntent.putExtra("name", username);
-        mainIntent.putExtra("from_login", true);
-        if (getIntent() != null)
-            mainIntent.putExtra(Constants.MAIN_ACTIVITY_FIRST_FRAGMENT, getIntent().getSerializableExtra(Constants.MAIN_ACTIVITY_FIRST_FRAGMENT));
-        startActivity(mainIntent);
-        finish();
-    }*/
-
     private void launchMain() {
         if (getIntent() != null) {
             Intent receivedIntent = getIntent();
             String action = receivedIntent.getStringExtra(Constants.SPLASH_ACTIVITY_CODE);
             if (action != null) {
-                if (action.equals(Constants.SPLASH_ACTIVITY_CODE_RECIPE)) {
-                    // Open a specific recipe from deep link. Open as a single activity, without back stack
-                    String recipeId = receivedIntent.getStringExtra(Constants.RECIPE_ID);
-                    if (recipeId != null && !"".equals(recipeId)) {
-                        Intent recipeIntent = new Intent(this, RecipeActivity.class);
-                        recipeIntent.putExtra(Constants.RECIPE_ID, recipeId);
-                        recipeIntent.addFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
-                        startActivity(recipeIntent);
+                switch (action) {
+                    case Constants.SPLASH_ACTIVITY_CODE_RECIPE:
+                        // Open a specific recipe from deep link. Open as a single activity, without back stack
+                        String recipeId = receivedIntent.getStringExtra(Constants.RECIPE_ID);
+                        if (recipeId != null && !"".equals(recipeId)) {
+                            Intent recipeIntent = new Intent(this, RecipeActivity.class);
+                            recipeIntent.putExtra(Constants.RECIPE_ID, recipeId);
+                            recipeIntent.addFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
+                            startActivity(recipeIntent);
+                            finish();
+                        }
+                        break;
+                    case Constants.SPLASH_ACTIVITY_CODE_POST:
+                        // Post recipe shortcut, open with MainActivity in back stack
+                        TaskStackBuilder.create(this)
+                                .addNextIntent(new Intent(this, MainActivity.class)
+                                        .putExtra(Constants.MAIN_ACTIVITY_FIRST_FRAGMENT, Constants.MAIN_ACTIVITY_FRAGMENT_ALL))
+                                .addNextIntent(new Intent(this, PostRecipeActivity.class))
+                                .startActivities();
                         finish();
-                    }
-                } else if (action.equals(Constants.SPLASH_ACTIVITY_CODE_POST)) {
-                    // Post recipe shortcut, open with MainActivity in back stack
-                    TaskStackBuilder.create(this)
-                            .addNextIntent(new Intent(this, MainActivity.class)
-                                    .putExtra(Constants.MAIN_ACTIVITY_FIRST_FRAGMENT, Constants.MAIN_ACTIVITY_FRAGMENT_ALL))
-                            .addNextIntent(new Intent(this, PostRecipeActivity.class))
-                            .startActivities();
-                    finish();
-                } else if (action.equals(Constants.SPLASH_ACTIVITY_CODE_MAIN)) {
-                    // open main activity but not with the default fragment
-                    Intent mainIntent = new Intent(this, MainActivity.class);
-                    mainIntent.putExtra(Constants.MAIN_ACTIVITY_FIRST_FRAGMENT, receivedIntent.getSerializableExtra(Constants.MAIN_ACTIVITY_FIRST_FRAGMENT));
-                    mainIntent.putExtra("name", username);
-                    mainIntent.putExtra("from_login", true);
-                    startActivity(mainIntent);
-                    finish();
+                        break;
+                    case Constants.SPLASH_ACTIVITY_CODE_MAIN:
+                        // open main activity but not with the default fragment
+                        Intent mainIntent = new Intent(this, MainActivity.class);
+                        mainIntent.putExtra(Constants.MAIN_ACTIVITY_FIRST_FRAGMENT, receivedIntent.getSerializableExtra(Constants.MAIN_ACTIVITY_FIRST_FRAGMENT));
+                        mainIntent.putExtra("name", username);
+                        mainIntent.putExtra("from_login", true);
+                        startActivity(mainIntent);
+                        finish();
+                        break;
                 }
             } else {
                 loginFromMainFlow();
@@ -522,17 +454,18 @@ public class LoginActivity extends AppCompatActivity {
     AuthenticationHandler authenticationHandler = new AuthenticationHandler() {
         @Override
         public void onSuccess(CognitoUserSession cognitoUserSession, CognitoDevice device) {
-            Log.d(TAG, " -- Auth Success");
+            //Log.d(TAG, " -- Auth Success");
             AppHelper.setCurrSession(cognitoUserSession);
             AppHelper.setUserDetailsBackground(getApplicationContext());
             AppHelper.newDevice(device);
-            Log.e(TAG, "IDToken: " + cognitoUserSession.getIdToken().getJWTToken());
-            Log.e(TAG, "AccessToken: " + cognitoUserSession.getAccessToken().getJWTToken());
+            //Log.e(TAG, "IDToken: " + cognitoUserSession.getIdToken().getJWTToken());
+            //Log.e(TAG, "AccessToken: " + cognitoUserSession.getAccessToken().getJWTToken());
 
             AppHelper.setIdentityProvider(getApplicationContext(), cognitoUserSession);
 
             closeWaitDialog();
             writeCredentialsToSharedPref();
+
             launchMain();
         }
 
@@ -631,8 +564,12 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void writeCredentialsToSharedPref() {
-        SharedPreferencesHandler.writeString(getApplicationContext(), com.myapps.ron.family_recipes.layout.Constants.USERNAME, username);
-        SharedPreferencesHandler.writeString(getApplicationContext(), com.myapps.ron.family_recipes.layout.Constants.PASSWORD, password);
-        SharedPreferencesHandler.writeBoolean(getApplication(), "rememberMe", true);
+        SharedPreferencesHandler.writeString(this, com.myapps.ron.family_recipes.layout.Constants.USERNAME, username);
+        SharedPreferencesHandler.writeString(this, com.myapps.ron.family_recipes.layout.Constants.PASSWORD, password);
+        if (name != null) {
+            SharedPreferencesHandler.writeString(this, getString(R.string.preference_key_preferred_name), name);
+            SharedPreferencesHandler.writeString(this, com.myapps.ron.family_recipes.layout.Constants.FIRESTORE_SAVE_NAME, name);
+        }
+        //SharedPreferencesHandler.writeBoolean(getApplication(), "rememberMe", true);
     }
 }

@@ -25,6 +25,7 @@ import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.layout.Constants;
 import com.myapps.ron.family_recipes.layout.MiddleWareForNetwork;
 import com.myapps.ron.family_recipes.layout.cognito.AppHelper;
+import com.myapps.ron.family_recipes.layout.firebase.db.FirestoreHelper;
 import com.myapps.ron.family_recipes.logic.repository.AppRepository;
 import com.myapps.ron.family_recipes.utils.logic.SharedPreferencesHandler;
 
@@ -104,11 +105,23 @@ public class SettingsViewModel extends ViewModel implements SharedPreferences.On
                 .subscribe(success -> {
                     if (success && namePreference != null) {
                         String nameFromPreferences = SharedPreferencesHandler.getString(context, context.getString(R.string.preference_key_preferred_name));
-                        if (nameFromPreferences != null)
+                        if (nameFromPreferences != null) {
                             namePreference.setText(nameFromPreferences);
+                            SharedPreferencesHandler.writeString(context, Constants.FIRESTORE_SAVE_NAME, nameFromPreferences);
+                            updateDisplayedNameInFirebase(context, nameFromPreferences);
+                        }
                     } else
                         setInfo("Couldn't update name");
                 }));
+    }
+
+    private void updateDisplayedNameInFirebase(Context context, String name) {
+        compositeDisposable.add(FirestoreHelper.getInstance().setDisplayedName(name)
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .subscribe(success -> SharedPreferencesHandler.removeString(context, Constants.FIRESTORE_SAVE_NAME),
+                        throwable -> setInfo(throwable.getMessage()))
+        );
     }
 
     //private final Preference.OnPreferenceChangeListener blockingPreferenceListener = (preference1, newValue1) -> false;

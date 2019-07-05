@@ -7,11 +7,13 @@ import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
+import android.os.Handler;
 import android.util.Log;
 
 import com.myapps.ron.family_recipes.MyApplication;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.background.services.GetUserDetailsService;
+import com.myapps.ron.family_recipes.layout.firebase.db.FirestoreHelper;
 import com.myapps.ron.family_recipes.logic.repository.AppRepository;
 import com.myapps.ron.family_recipes.logic.repository.CategoryRepository;
 import com.myapps.ron.family_recipes.logic.repository.RecipeRepository;
@@ -93,6 +95,7 @@ public class DataViewModel extends ViewModel {
         // Check if new firebase token is available and needs to be registered
         registerNewFirebaseToken(MyApplication.getContext(),
                 SharedPreferencesHandler.getString(MyApplication.getContext(), com.myapps.ron.family_recipes.utils.Constants.NEW_FIREBASE_TOKEN));
+        new Handler().postDelayed(() -> saveDisplayedName(MyApplication.getContext()), 500);
     }
 
     private void registerNewFirebaseToken(Context context, @Nullable String token) {
@@ -262,5 +265,18 @@ public class DataViewModel extends ViewModel {
         super.onCleared();
         compositeDisposable.clear();
         //categoryRepository.getAllCategoriesLiveData().removeObserver(categoryObserver);
+    }
+
+    private void saveDisplayedName(Context context) {
+        //String name = SharedPreferencesHandler.getString(context, Constants.FIRESTORE_SAVE_NAME);
+        String name = SharedPreferencesHandler.getString(context, Constants.FIRESTORE_DISPLAYED_NAME);
+        if (name != null) {
+            compositeDisposable.add(FirestoreHelper.getInstance().setDisplayedName(name)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(Schedulers.io())
+                    .subscribe(success ->
+                            SharedPreferencesHandler.removeString(context, Constants.FIRESTORE_SAVE_NAME))
+            );
+        }
     }
 }

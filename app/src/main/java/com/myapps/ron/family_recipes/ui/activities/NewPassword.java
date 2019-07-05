@@ -40,6 +40,7 @@ public class NewPassword extends AppCompatActivity {
     //private String TAG = "NewPassword";
     private EditText newPassword;
 
+    @SuppressWarnings("FieldCanBeLocal")
     private Button continueSignIn;
     private AlertDialog userDialog;
     //private ProgressDialog waitDialog;

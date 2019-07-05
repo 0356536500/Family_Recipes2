@@ -219,16 +219,17 @@ public class MainActivity extends MyBaseActivity implements BackStack.BackStackH
 
     private void handleDataFromIntentAndStart() {
         //handle data from intent
+        Runnable startWithDefaultFragmentRunnable = () -> startWithDefaultFragment(getOrCreateFragment(R.string.nav_main_all_recipes));
         if (getIntent() != null && getIntent().getSerializableExtra(Constants.MAIN_ACTIVITY_FIRST_FRAGMENT) != null) {
             String firstFragment = getIntent().getStringExtra(Constants.MAIN_ACTIVITY_FIRST_FRAGMENT);
             Log.e(TAG, "firstFragment = " + firstFragment);
 
             if (Constants.MAIN_ACTIVITY_FRAGMENT_ALL.equals(firstFragment))
-                new Handler().postDelayed(() -> startWithDefaultFragment(getOrCreateFragment(R.string.nav_main_all_recipes)), 100);
+                new Handler().postDelayed(startWithDefaultFragmentRunnable, 100);
             else if (Constants.MAIN_ACTIVITY_FRAGMENT_FAVORITES.equals(firstFragment))
                 new Handler().postDelayed(() -> startWithDefaultFragment(getOrCreateFragment(R.string.nav_main_favorites)), 100);
         } else
-            new Handler().postDelayed(() -> startWithDefaultFragment(getOrCreateFragment(R.string.nav_main_all_recipes)), 100);
+            new Handler().postDelayed(startWithDefaultFragmentRunnable, 100);
 
         //check if got here from login activity
         if (getIntent() != null) {

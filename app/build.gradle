@@ -163,6 +163,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-auth:18.0.0'
     implementation 'com.google.firebase:firebase-storage:18.0.0'
     implementation 'com.google.firebase:firebase-messaging:19.0.1'
+    implementation 'com.google.firebase:firebase-firestore:20.1.0'
     implementation 'com.crashlytics.sdk.android:crashlytics:2.10.1'
 
     // endregion

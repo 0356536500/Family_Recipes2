@@ -2,11 +2,11 @@ package com.myapps.ron.family_recipes.layout.firebase.storage;
 
 import android.content.Context;
 import android.net.Uri;
-import android.util.Log;
 
 import com.google.firebase.storage.FirebaseStorage;
 import com.myapps.ron.family_recipes.layout.firebase.AppHelper;
 import com.myapps.ron.family_recipes.logic.storage.ExternalStorageHelper;
+import com.myapps.ron.family_recipes.utils.logic.CrashLogger;
 
 import java.io.File;
 
@@ -18,7 +18,7 @@ import io.reactivex.schedulers.Schedulers;
  * Created by ronginat on 21/04/2019.
  */
 public class FirebaseStorageHelper {
-    private static final String TAG = FirebaseStorageHelper.class.getSimpleName();
+    //private static final String TAG = FirebaseStorageHelper.class.getSimpleName();
 
     public static Single<Uri> downloadFile(Context context, String key, String dir) {
         /*if (AppHelper.isFirebaseTokenValidElseRefresh(context) == null) {
@@ -47,6 +47,7 @@ public class FirebaseStorageHelper {
                                                 } else {
                                                     if (task.getException() != null)
                                                         task.getException().printStackTrace();
+                                                    CrashLogger.logException(task.getException());
                                                     emitter.onError(task.getException());
                                                 }
                                             });
@@ -57,7 +58,8 @@ public class FirebaseStorageHelper {
 
                         @Override
                         public void onError(Throwable t) {
-                            Log.e(TAG, "error from firebase helper ,", t);
+                            //Log.e(TAG, "error from firebase helper ,", t);
+                            CrashLogger.logException(t);
                             emitter.onError(t);
                         }
 
@@ -91,6 +93,7 @@ public class FirebaseStorageHelper {
                             } else {
                                 if (task.getException() != null)
                                     task.getException().printStackTrace();
+                                CrashLogger.logException(task.getException());
                                 emitter.onError(task.getException());
                             }
                         })

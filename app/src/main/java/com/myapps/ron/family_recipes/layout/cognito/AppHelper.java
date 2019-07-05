@@ -205,6 +205,8 @@ public class AppHelper {
      * @param context application context
      */
     private static void setUserSessionBackground(Context context) {
+        if (getPool() == null)
+            return;
         CognitoUser user = getPool().getCurrentUser();
         String username = user.getUserId();
         //user saved in cache
@@ -268,7 +270,7 @@ public class AppHelper {
 
             @Override
             public void onFailure(Exception e) {
-                //launchLogin();
+                CrashLogger.logException(e);
                 if (retryOnError)
                     signInUser(context);
                 else
@@ -323,7 +325,8 @@ public class AppHelper {
 
     private static void setUserDetails(Context context, CognitoUserDetails details) {
         userDetails = details;
-        refreshWithSync(context);
+        if (details != null)
+            refreshWithSync(context);
     }
 
     public static CognitoUserDetails getUserDetails() {
@@ -654,7 +657,7 @@ public class AppHelper {
                     emailAvailable = true;
                     SharedPreferencesHandler.writeString(context, attr.getKey(), attr.getValue());
                     break;
-                case "preferred_username":
+                case Constants.FIRESTORE_DISPLAYED_NAME: // name
                     SharedPreferencesHandler.writeString(context, context.getString(R.string.preference_key_preferred_name), attr.getValue());
                     break;
                 case "phone_number":
@@ -749,6 +752,7 @@ public class AppHelper {
             public void onFailure(Exception exception) {
                 // Update failed
                 Log.e(TAG, "Update failed, " + AppHelper.formatException(exception));
+                CrashLogger.logException(exception);
                 updateAttributeSubject.onNext(false);
             }
         };
