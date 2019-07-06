@@ -116,7 +116,7 @@ public class SettingsViewModel extends ViewModel implements SharedPreferences.On
     }
 
     private void updateDisplayedNameInFirebase(Context context, String name) {
-        compositeDisposable.add(FirestoreHelper.getInstance().setDisplayedName(name)
+        compositeDisposable.add(FirestoreHelper.getInstance().setDisplayedName(context, name)
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
                 .subscribe(success -> SharedPreferencesHandler.removeString(context, Constants.FIRESTORE_SAVE_NAME),

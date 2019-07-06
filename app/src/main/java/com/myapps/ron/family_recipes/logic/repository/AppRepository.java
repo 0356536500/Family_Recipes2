@@ -193,7 +193,6 @@ public class AppRepository {
 
                     @Override
                     public void onError(Throwable t) {
-                        CrashLogger.logException(t);
                         emitter.onError(t);
                         dispose();
                     }

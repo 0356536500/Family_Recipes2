@@ -1,14 +1,16 @@
 package com.myapps.ron.family_recipes.layout.firebase.db;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
+import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.layout.Constants;
 import com.myapps.ron.family_recipes.layout.MiddleWareForNetwork;
 import com.myapps.ron.family_recipes.layout.firebase.AppHelper;
 import com.myapps.ron.family_recipes.utils.logic.CrashLogger;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,6 +22,7 @@ import io.reactivex.schedulers.Schedulers;
  * Created by ronginat on 05/07/2019
  */
 public class FirestoreHelper {
+    //private static final String TAG = FirestoreHelper.class.getSimpleName();
 
     private static FirestoreHelper INSTANCE;
 
@@ -84,9 +87,9 @@ public class FirestoreHelper {
 
                         @Override
                         public void onError(Throwable t) {
-                            Log.e(getClass().getSimpleName(), ERROR_MESSAGE + ", ", t);
+                            //Log.e(TAG, ERROR_MESSAGE + ", ", t);
                             CrashLogger.logException(t);
-                            emitter.onError(new Throwable(ERROR_MESSAGE));
+                            emitter.onSuccess(username);
                         }
 
                         @Override
@@ -112,29 +115,85 @@ public class FirestoreHelper {
                                 String name = task.getResult().getString(Constants.FIRESTORE_DISPLAYED_NAME);
                                 users.put(username, name);
                                 emitter.onSuccess(name);
-                            } else if (task.getException() != null) {
-                                CrashLogger.logException(task.getException());
-                                emitter.onError(task.getException());
-                            } else
-                                emitter.onError(new Throwable(ERROR_MESSAGE));
+                            } else {
+                                if (task.getException() != null)
+                                    CrashLogger.logException(task.getException());
+
+                                emitter.onSuccess(username);
+                            }
                         })
         );
     }
 
-    public Single<Boolean> setDisplayedName(String name) {
+    public Single<Boolean> setDisplayedName(Context context, String name) {
+        // when no network, return the username as displayed name
+        if (!MiddleWareForNetwork.checkInternetConnection(context))
+            return Single.error(new Throwable(context.getString(R.string.no_internet_message)));
+
+        if (AppHelper.isFirebaseTokenValidElseRefresh(context) == null) {
+            return Single.create(emitter -> AppHelper.firebaseTokenObservable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(Schedulers.io())
+                    .subscribe(new DisposableObserver<String>() {
+                        @Override
+                        public void onNext(String token) {
+                            // token NonNull from io.reactivex.Observer Interface
+                            INSTANCE.db
+                                    .collection(Constants.FIRESTORE_USERS)
+                                    .document(com.myapps.ron.family_recipes.layout.cognito.AppHelper.getCurrUser())
+                                    .set(Collections.singletonMap(Constants.FIRESTORE_DISPLAYED_NAME, name), SetOptions.merge())
+                                    .addOnCompleteListener(task -> {
+                                        if (task.isSuccessful()) {
+                                            //Log.e(TAG, "success setting new displayed name");
+                                            users.put(com.myapps.ron.family_recipes.layout.cognito.AppHelper.getCurrUser(), name);
+                                            emitter.onSuccess(true);
+                                        }
+                                        else if (task.getException() != null){
+                                            CrashLogger.logException(task.getException());
+                                            //Log.e(TAG, task.getException().getMessage(), task.getException());
+                                            emitter.onError(task.getException());
+                                        } else {
+                                            //Log.e(TAG, "error setting new displayed name");
+                                            emitter.onError(new Throwable(ERROR_MESSAGE));
+                                        }
+                                    });
+                        }
+
+                        @Override
+                        public void onError(Throwable t) {
+                            //Log.e(TAG, ERROR_MESSAGE + ", ", t);
+                            CrashLogger.logException(t);
+                            emitter.onError(new Throwable(ERROR_MESSAGE));
+                        }
+
+                        @Override
+                        public void onComplete() {
+                            if (!isDisposed())
+                                dispose();
+                        }
+                    }));
+        } else {
+            // token is valid
+            return setDisplayedName(name);
+        }
+
+    }
+
+
+    private Single<Boolean> setDisplayedName(String name) {
         return Single.create(emitter ->
            INSTANCE.db
-                   .collection(Constants.FIRESTORE_USERS + "/" + com.myapps.ron.family_recipes.layout.cognito.AppHelper.getCurrUser())
-                   .document(Constants.FIRESTORE_DISPLAYED_NAME)
-                   .set(name)
+                   .collection(Constants.FIRESTORE_USERS)
+                   .document(com.myapps.ron.family_recipes.layout.cognito.AppHelper.getCurrUser())
+                   .set(Collections.singletonMap(Constants.FIRESTORE_DISPLAYED_NAME, name), SetOptions.merge())
                    .addOnCompleteListener(task -> {
                        if (task.isSuccessful()) {
                            users.put(com.myapps.ron.family_recipes.layout.cognito.AppHelper.getCurrUser(), name);
                            emitter.onSuccess(true);
                        }
                        else if (task.getException() != null){
-                           CrashLogger.logException(task.getException());
-                           Log.e(FirestoreHelper.class.getSimpleName(), task.getException().getMessage(), task.getException());
+                           //CrashLogger.logException(task.getException());
+                           //Log.e(TAG, task.getException().getMessage(), task.getException());
                            emitter.onError(task.getException());
                        } else
                            emitter.onError(new Throwable(ERROR_MESSAGE));

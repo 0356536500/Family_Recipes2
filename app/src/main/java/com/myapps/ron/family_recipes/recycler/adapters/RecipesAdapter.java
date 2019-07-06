@@ -45,6 +45,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
+import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
@@ -149,9 +150,28 @@ public class RecipesAdapter extends PagedListAdapter<RecipeMinimal, RecipesAdapt
                     recipe.getDescription() :
                     com.myapps.ron.family_recipes.utils.Constants.DEFAULT_RECIPE_DESC);
 
-            this.uploader.setText(recipe.getUploader() != null ?
+            /*this.uploader.setText(recipe.getUploader() != null ?
                     recipe.getUploader() :
-                    com.myapps.ron.family_recipes.utils.Constants.DEFAULT_RECIPE_UPLOADER);
+                    com.myapps.ron.family_recipes.utils.Constants.DEFAULT_RECIPE_UPLOADER);*/
+
+            if (recipe.getUploader() != null) {
+                listener.getDisplayedName(recipe.getUploader())
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new DisposableSingleObserver<String>() {
+                            @Override
+                            public void onSuccess(String name) {
+                                uploader.setText(name);
+                                dispose();
+                            }
+
+                            @Override
+                            public void onError(Throwable t) {
+                                setDefaultUploader(uploader);
+                            }
+                        });
+            } else
+                setDefaultUploader(this.uploader);
 
             this.numberOfLikes.setText(String.valueOf(recipe.getLikes()));
             this.favoriteToggleButton.setBackgroundResource(R.drawable.favorite_selector);
@@ -166,6 +186,10 @@ public class RecipesAdapter extends PagedListAdapter<RecipeMinimal, RecipesAdapt
             //load image of the food or default if not exists
             loadImage(this, recipe);
         }
+    }
+
+    private void setDefaultUploader(TextView uploader) {
+        uploader.setText(com.myapps.ron.family_recipes.utils.Constants.DEFAULT_RECIPE_UPLOADER);
     }
 
 
@@ -334,5 +358,6 @@ public class RecipesAdapter extends PagedListAdapter<RecipeMinimal, RecipesAdapt
         void onImageClicked(RecipeMinimal recipe);
         void onThumbnailAccessed(String id);
         void onCurrentSizeChanged(int size);
+        Single<String> getDisplayedName(String username);
     }
 }

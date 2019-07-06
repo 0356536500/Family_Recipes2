@@ -33,7 +33,7 @@ public class AllRecipesFragment extends RecyclerWithFiltersAbstractFragment impl
         if (arguments != null && arguments.getBoolean(Constants.FIRST_LOAD_FRAGMENT, false)) {
             new Handler().postDelayed(() -> {
                 firstLoadingProgressBar.setVisibility(View.VISIBLE);
-                viewModel.fetchFromServer(getContext());
+                viewModel.fetchFromServer(activity, false);
                 viewModel.applyQuery(queryModel);
             }, 500);
 

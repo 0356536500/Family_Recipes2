@@ -466,6 +466,13 @@ public class AppHelper {
         refreshDisplayItemsForFirstTimeLogin();
     }
 
+    public static boolean isUserAttributeForFirstTimeLoginContainsAttribute(String attributeName) {
+        if (firstTimeLogInUserAttributes != null) {
+            return firstTimeLogInUserAttributes.get(attributeName) != null;
+        }
+        return false;
+    }
+
     public static Map<String, String> getUserAttributesForFirstTimeLogin() {
         return firstTimeLogInUpDatedAttributes;
     }

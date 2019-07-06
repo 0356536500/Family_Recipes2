@@ -52,6 +52,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.observers.DisposableMaybeObserver;
 import io.reactivex.schedulers.Schedulers;
@@ -222,7 +223,7 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
         params.gravity = Gravity.CENTER;
         ((FrameLayout)view.findViewById(R.id.main_container)).addView(progressBar, params);
         progressBar.setVisibility(View.VISIBLE);*/
-        onRefreshListener = () -> viewModel.fetchFromServer(activity);
+        onRefreshListener = () -> viewModel.fetchFromServer(activity, true);
         swipeRefreshLayout.setOnRefreshListener(onRefreshListener);
         swipeRefreshLayout.setColorSchemeColors(getResources().getIntArray(R.array.colors));
         //swipeRefreshLayout.setProgressViewOffset(false, swipeRefreshLayout.getProgressViewStartOffset(), swipeRefreshLayout.getProgressViewEndOffset());
@@ -433,6 +434,11 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
     public void onCurrentSizeChanged(int size) {
         if (mFilter != null)
             mFilter.setCustomTextView(getString(R.string.number_of_recipes_indicator, size));
+    }
+
+    @Override
+    public Single<String> getDisplayedName(String username) {
+        return viewModel.getDisplayedName(activity, username);
     }
 
     void scrollToTop() {

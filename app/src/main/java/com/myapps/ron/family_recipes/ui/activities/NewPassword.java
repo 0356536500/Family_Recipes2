@@ -110,9 +110,10 @@ public class NewPassword extends AppCompatActivity {
                 AppHelper.setPasswordForFirstTimeLogin(newUserPassword);
                 if (checkAttributes()) {
                     exit(true);
-                }
-            }
-            showDialogMessage("Error", "Enter all required attributed", false);
+                } else
+                    showDialogMessage("Error", "Enter all required attributed");
+            } else
+                showDialogMessage("Error", "Enter all required attributed");
         });
         refreshItemsDisplayed();
     }
@@ -163,18 +164,19 @@ public class NewPassword extends AppCompatActivity {
 
     private boolean checkAttributes() {
         // Check if all required attributes have values
-        return true;
+        return AppHelper.isUserAttributeForFirstTimeLoginContainsAttribute(getString(R.string.preference_key_preferred_name));
+        //return true;
     }
 
     @SuppressWarnings("SameParameterValue")
-    private void showDialogMessage(String title, String body, final boolean exit) {
+    private void showDialogMessage(String title, String body) {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(title).setMessage(body).setNeutralButton("OK", (dialog, which) -> {
             try {
                 userDialog.dismiss();
-                if (exit) {
+                /*if (exit) {
                     exit(false);
-                }
+                }*/
             } catch (Exception e) {
                 exit(false);
             }

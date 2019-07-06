@@ -7,6 +7,7 @@ import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,11 +44,8 @@ import java.util.Map;
 
 @SuppressLint("SetTextI18n")
 public class LoginActivity extends AppCompatActivity {
-    //private final String TAG = getClass().getSimpleName();
+    private final String TAG = getClass().getSimpleName();
 
-    //private ActionBarDrawerToggle mDrawerToggle;
-    //private Toolbar toolbar;
-    //private AlertDialog userDialog;
     private ProgressBar waitDialog;
 
     // Screen fields
@@ -256,7 +254,7 @@ public class LoginActivity extends AppCompatActivity {
             for(Map.Entry<String, String> attr: newAttributes.entrySet()) {
                 //Log.d(TAG, String.format(" -- Adding attribute: %s, %s", attr.getKey(), attr.getValue()));
                 newPasswordContinuation.setUserAttribute(attr.getKey(), attr.getValue());
-                if (attr.getKey().equals("name")) {
+                if (attr.getKey().equals(getString(R.string.preference_key_preferred_name))) {
                     name = attr.getValue();
                 }
             }
@@ -458,8 +456,8 @@ public class LoginActivity extends AppCompatActivity {
             AppHelper.setCurrSession(cognitoUserSession);
             AppHelper.setUserDetailsBackground(getApplicationContext());
             AppHelper.newDevice(device);
-            //Log.e(TAG, "IDToken: " + cognitoUserSession.getIdToken().getJWTToken());
-            //Log.e(TAG, "AccessToken: " + cognitoUserSession.getAccessToken().getJWTToken());
+            Log.e(TAG, "IDToken: " + cognitoUserSession.getIdToken().getJWTToken());
+            Log.e(TAG, "AccessToken: " + cognitoUserSession.getAccessToken().getJWTToken());
 
             AppHelper.setIdentityProvider(getApplicationContext(), cognitoUserSession);
 

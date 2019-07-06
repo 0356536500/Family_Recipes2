@@ -9,7 +9,6 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GetTokenResult;
 import com.myapps.ron.family_recipes.MyApplication;
 import com.myapps.ron.family_recipes.logic.repository.AppRepository;
-import com.myapps.ron.family_recipes.utils.logic.CrashLogger;
 import com.myapps.ron.family_recipes.utils.logic.SharedPreferencesHandler;
 
 import java.util.Calendar;
@@ -46,7 +45,8 @@ public class AppHelper {
         return firebaseSession;
     }*/
 
-    public static void initTokenObserver() {
+    public static void initTokenObserver(Context context) {
+        SharedPreferencesHandler.removeString(context, FIREBASE_TOKEN_EXPIRATION);
         waitingForFirebaseToken = false;
         if (disposable != null && !disposable.isDisposed())
             disposable.dispose();
@@ -100,7 +100,7 @@ public class AppHelper {
                         //Log.e(TAG, "signInWithCustomToken:success");
                     } else {
                         // If sign in fails, display a message to the user.
-                        CrashLogger.logException(task.getException());
+                        //CrashLogger.logException(task.getException());
                         if (task.getException() != null)
                             firebaseTokenObservable.onError(task.getException());
                         //Log.e(TAG, "signInWithCustomToken:failure", task.getException());
@@ -125,7 +125,8 @@ public class AppHelper {
                         //Log.e(TAG, "getIdToken:success");
                     } else {
                         SharedPreferencesHandler.writeLong(context, FIREBASE_TOKEN_EXPIRATION, DEFAULT_VALUE);
-                        CrashLogger.logException(task.getException());
+                        if (task.getException() != null)
+                            firebaseTokenObservable.onError(task.getException());
                         //Log.e(TAG, "getIdToken:failure", task.getException());
                     }
                 });
