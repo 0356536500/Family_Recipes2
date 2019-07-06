@@ -210,7 +210,7 @@
     <string name="preference_key_language" translatable="false">Locale.Helper.Selected.Language</string>
     <string name="preference_key_report_bug" translatable="false">report_bug</string>
     <string name="preference_key_check_for_updates" translatable="false">app_updates</string>
-    <string name="preference_key_preferred_name" translatable="false">name</string>
+    <string name="preference_key_preferred_name" translatable="false">nickname</string>
     <!--<string name="preference_key_language" translatable="false">system_language</string>-->
     <string name="preference_key_system_notification" translatable="false">system_notification</string>
     <string name="preference_key_notification_new_recipe" translatable="false">@string/notification_new_recipe_channel_id</string>

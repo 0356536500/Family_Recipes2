@@ -1,5 +1,4 @@
 .gradle
-.gitignore
 .iml
 /local.properties
 .idea/
@@ -7,7 +6,6 @@
 build/
 /captures
 .externalNativeBuild
-/app/src/main/java/com/myapps/ron/family_recipes/network/Constants.java
+/app/src/main/java/com/myapps/ron/family_recipes/layout/Constants.java
+/app/src/main/res/values/private_strings.xml
 pref_data_sync1.xml
-pref_headers1.xml
-pref_notification1.xml

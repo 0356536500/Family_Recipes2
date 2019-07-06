@@ -103,4 +103,9 @@ public class Constants {
     public static final String USERNAME = "username";
     public static final String PASSWORD = "password";
 
+    // Firestore
+    public static final String FIRESTORE_USERS = "users";
+    public static final String FIRESTORE_DISPLAYED_NAME = "name";
+
+    public static final String FIRESTORE_SAVE_NAME = "save_displayed_name";
 }
