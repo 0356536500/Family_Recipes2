@@ -15,4 +15,11 @@
         app:showAsAction="never"
         app:actionProviderClass="androidx.appcompat.widget.ShareActionProvider"/>
     <!--android:icon="@drawable/ic_share_expanded_24dp"-->
+
+    <item
+        android:id="@+id/action_keep_screen_on"
+        android:title="@string/action_keep_screen_on"
+        app:showAsAction="never"
+        android:checkable="true"
+        android:checked="false"/>
 </menu>

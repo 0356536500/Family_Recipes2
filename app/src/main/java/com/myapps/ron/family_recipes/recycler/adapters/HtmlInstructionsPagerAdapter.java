@@ -1,6 +1,6 @@
 package com.myapps.ron.family_recipes.recycler.adapters;
 
-import android.content.Context;
+import android.app.Activity;
 import android.text.Editable;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,16 +15,16 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import androidx.annotation.IdRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.StringRes;
+import androidx.viewpager.widget.PagerAdapter;
+
 import com.bumptech.glide.Glide;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.model.HtmlModel;
 import com.myapps.ron.family_recipes.utils.Constants;
 import com.myapps.ron.family_recipes.utils.logic.HtmlHelper;
-
-import androidx.annotation.IdRes;
-import androidx.annotation.NonNull;
-import androidx.annotation.StringRes;
-import androidx.viewpager.widget.PagerAdapter;
 
 /**
  * Created by ronginat on 17/03/2019.
@@ -32,11 +32,11 @@ import androidx.viewpager.widget.PagerAdapter;
 public class HtmlInstructionsPagerAdapter extends PagerAdapter {
     private static final float DIMMED_VIEWS_ALPHA = 0.5f;
     private final int INSTRUCTIONS_SIZE = 5;
-    private Context context;
+    private Activity activity;
     private Animation fadeIn;
 
-    public HtmlInstructionsPagerAdapter(Context context) {
-        this.context = context;
+    public HtmlInstructionsPagerAdapter(Activity activity) {
+        this.activity = activity;
         fadeIn = new AlphaAnimation(0f, 1f);
         fadeIn.setDuration(1000);
     }
@@ -158,7 +158,7 @@ public class HtmlInstructionsPagerAdapter extends PagerAdapter {
         Editable editable = getEditableFromResource(R.string.post_recipe_instructions_card_with_html_for_header);
         elementEditText.setText(editable);
 
-        webView.loadData(generateHtml(createModelFromView(view)), "text/html", "utf-8");
+        loadContentIntoWebView(webView, generateHtml(createModelFromView(view)));
     }
 
     /**
@@ -181,7 +181,7 @@ public class HtmlInstructionsPagerAdapter extends PagerAdapter {
         Editable editable = getEditableFromResource(R.string.post_recipe_instructions_card_with_html_for_paragraph_with_underscore);
         elementEditText.setText(editable);
 
-        webView.loadData(generateHtml(createModelFromView(view)), "text/html", "utf-8");
+        loadContentIntoWebView(webView, generateHtml(createModelFromView(view)));
     }
 
     /**
@@ -204,7 +204,7 @@ public class HtmlInstructionsPagerAdapter extends PagerAdapter {
         Editable editable = getEditableFromResource(R.string.post_recipe_instructions_card_with_html_for_unordered_list);
         elementEditText.setText(editable);
 
-        webView.loadData(generateHtml(createModelFromView(view)), "text/html", "utf-8");
+        loadContentIntoWebView(webView, generateHtml(createModelFromView(view)));
     }
 
     /**
@@ -223,7 +223,7 @@ public class HtmlInstructionsPagerAdapter extends PagerAdapter {
         dragDropSwipeTextView.startAnimation(fadeIn);
         expandCollapseTextView.startAnimation(fadeIn);
 
-        Glide.with(context)
+        Glide.with(activity)
                 .asGif()
                 .load(R.drawable.drag_drop_swipe_animation) // try move the gif to R.raw folder
                 .into(imageView);
@@ -232,6 +232,12 @@ public class HtmlInstructionsPagerAdapter extends PagerAdapter {
     // endregion
 
     // region Helpers
+
+    private void loadContentIntoWebView(@NonNull WebView webView, String content) {
+        webView.loadDataWithBaseURL(Constants.ASSET_FILE_BASE_URL,
+                HtmlHelper.GET_CSS_LINK(activity) + content, "text/html", "UTF-8", null);
+        //webView.loadData(generateHtml(createModelFromView(view)), "text/html", "utf-8");
+    }
 
     private void disableAllViewsInCardWithHtmlLayout(@NonNull View view) {
         view.findViewById(R.id.row_html_bold_checkBox).setClickable(false);
@@ -252,7 +258,7 @@ public class HtmlInstructionsPagerAdapter extends PagerAdapter {
 
     private void setSpinnerAdapterAndSelection(@NonNull Spinner spinner, int selection) {
         //setName the spinner
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(context,
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(activity,
                 R.array.html_elements, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
@@ -261,7 +267,7 @@ public class HtmlInstructionsPagerAdapter extends PagerAdapter {
     }
 
     private Editable getEditableFromResource(@StringRes int resId) {
-        return Editable.Factory.getInstance().newEditable(context.getText(resId));
+        return Editable.Factory.getInstance().newEditable(activity.getText(resId));
     }
 
     private String generateHtml(HtmlModel model) {

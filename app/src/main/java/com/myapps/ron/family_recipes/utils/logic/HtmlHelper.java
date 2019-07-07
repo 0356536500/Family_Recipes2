@@ -1,8 +1,12 @@
 package com.myapps.ron.family_recipes.utils.logic;
 
-import java.util.Stack;
+import android.app.Activity;
 
 import androidx.annotation.NonNull;
+
+import com.myapps.ron.family_recipes.MyApplication;
+
+import java.util.Stack;
 
 /**
  * Created by ronginat on 30/10/2018.
@@ -137,5 +141,15 @@ public class HtmlHelper {
     @Override
     public String toString() {
         return builder.toString();
+    }
+
+
+    public static String GET_CSS_LINK(@NonNull Activity activity) {
+        // font from online googleapis
+        //String openSans = "<link href=\"https://fonts.googleapis.com/css?family=Open+Sans&display=swap\" rel=\"stylesheet\">";
+
+        String styleCss = "<link rel=\"stylesheet\" type=\"text/css\" href=\"style_%s.css\" />";
+        String style = ((MyApplication)activity.getApplication()).isDarkTheme() ? "dark" : "light";
+        return String.format(styleCss, style);
     }
 }

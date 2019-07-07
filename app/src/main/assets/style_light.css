@@ -1,0 +1,10 @@
+@font-face {
+    font-family: 'open-sans';
+    src: url("file:///android_res/font/open_sans_regular.ttf")
+}
+
+body {
+    background-color: #FFFFFF;
+    color: #1D1E1E;
+    font-family: 'open-sans', sans-serif;
+}

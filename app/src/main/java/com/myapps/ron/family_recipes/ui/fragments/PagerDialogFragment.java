@@ -1,5 +1,6 @@
 package com.myapps.ron.family_recipes.ui.fragments;
 
+import android.app.Activity;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -30,9 +31,12 @@ public class PagerDialogFragment extends DialogFragment {
     private List<String> foodFiles;
     private PAGER_TYPE pagerType;
 
+    private Activity activity;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        activity = getActivity();
 
         if (getArguments() != null) {
             pagerType = (PAGER_TYPE) getArguments().getSerializable(PAGER_TYPE_KEY);
@@ -96,9 +100,9 @@ public class PagerDialogFragment extends DialogFragment {
         if (this.pagerType != null) {
             switch (this.pagerType) {
                 case IMAGES:
-                    return new ImagesPagerAdapter(getContext(), foodFiles);
+                    return new ImagesPagerAdapter(activity, foodFiles);
                 case INSTRUCTIONS:
-                    return new HtmlInstructionsPagerAdapter(getContext());
+                    return new HtmlInstructionsPagerAdapter(activity);
             }
         }
         return null;

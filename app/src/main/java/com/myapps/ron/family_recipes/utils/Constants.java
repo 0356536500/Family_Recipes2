@@ -59,6 +59,7 @@ public class Constants {
     //RecipeActivity
     public static final int MAX_FILES_TO_UPLOAD = com.myapps.ron.family_recipes.layout.Constants.MAX_FILES_TO_UPLOAD;
     public static final String PAGER_FOOD_IMAGES = RecipeEntity.KEY_FOOD_FILES;
+    public static final String ASSET_FILE_BASE_URL = "file:///android_asset/";
 
     //PostRecipeActivity
     public static final int MIN_NUMBER_OF_HTML_ELEMENTS = 2;

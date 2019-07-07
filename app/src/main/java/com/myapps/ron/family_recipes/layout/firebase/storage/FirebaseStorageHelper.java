@@ -21,9 +21,6 @@ public class FirebaseStorageHelper {
     //private static final String TAG = FirebaseStorageHelper.class.getSimpleName();
 
     public static Single<Uri> downloadFile(Context context, String key, String dir) {
-        /*if (AppHelper.isFirebaseTokenValidElseRefresh(context) == null) {
-            return Single.error(new Throwable(context.getString(R.string.invalid_access_token)));
-        }*/
         if (AppHelper.isFirebaseTokenValidElseRefresh(context) == null) {
             return Single.create(emitter -> AppHelper.firebaseTokenObservable
                     .subscribeOn(Schedulers.io())

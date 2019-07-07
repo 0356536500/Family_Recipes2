@@ -1,5 +1,6 @@
 package com.myapps.ron.family_recipes.ui.fragments;
 
+import android.app.Activity;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -11,17 +12,21 @@ import android.view.ViewGroup;
 import android.webkit.WebView;
 
 import com.myapps.ron.family_recipes.R;
+import com.myapps.ron.family_recipes.utils.Constants;
+import com.myapps.ron.family_recipes.utils.logic.HtmlHelper;
 
 /**
  * Created by ronginat on 29/10/2018.
  */
 public class PreviewDialogFragment extends Fragment {
 
+    private Activity activity;
     private String html;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        activity = getActivity();
 
         if (getArguments() != null) {
             html = getArguments().getString("html");
@@ -44,8 +49,8 @@ public class PreviewDialogFragment extends Fragment {
         getActivity().getTheme().resolveAttribute(R.attr.toolbarBackgroundSecondary, value, true);
         webView.setBackgroundColor(value.data);*/
 
-        webView.loadData(html, "text/html", "utf-8");
-
         //webView.loadData(html, "text/html", "utf-8");
+        webView.loadDataWithBaseURL(Constants.ASSET_FILE_BASE_URL,
+                HtmlHelper.GET_CSS_LINK(activity) + html, "text/html", "UTF-8", null);
     }
 }

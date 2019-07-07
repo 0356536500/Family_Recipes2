@@ -10,7 +10,6 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.BlendMode;
 import android.graphics.BlendModeColorFilter;
-import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -63,6 +62,9 @@ import com.myapps.ron.family_recipes.ui.baseclasses.MyBaseActivity;
 import com.myapps.ron.family_recipes.ui.fragments.PagerDialogFragment;
 import com.myapps.ron.family_recipes.ui.fragments.PickImagesMethodDialog;
 import com.myapps.ron.family_recipes.utils.Constants;
+import com.myapps.ron.family_recipes.utils.logic.CrashLogger;
+import com.myapps.ron.family_recipes.utils.logic.HtmlHelper;
+import com.myapps.ron.family_recipes.utils.logic.SharedPreferencesHandler;
 import com.myapps.ron.family_recipes.utils.ui.MyDividerItemDecoration;
 import com.myapps.ron.family_recipes.viewmodels.RecipeViewModel;
 import com.myapps.ron.searchfilter.animator.FiltersListItemAnimator;
@@ -362,50 +364,12 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
     private void loadRecipeHtml(String content) {
         /*File file = new File(path);
         Log.e(TAG, file.getAbsolutePath());*/
-        myWebView.loadData(content, "text/html; charset=utf-8", "UTF-8");
+        //myWebView.loadData(content, "text/html; charset=utf-8", "UTF-8");
+
+        // load recipe content with css file from assets folder
+        myWebView.loadDataWithBaseURL(Constants.ASSET_FILE_BASE_URL,
+                HtmlHelper.GET_CSS_LINK(this) + content, "text/html", "UTF-8", null);
     }
-
-    /*private void loadImage() {
-        if(recipe.getFoodFiles() != null && recipe.getFoodFiles().size() > 0) {
-            StorageWrapper.getFoodFile(this, recipe.getFoodFiles().get(0), new MyCallback<String>() {
-                @Override
-                public void onFinished(String path) {
-                    if(path != null) {
-                        CircularProgressDrawable circularProgressDrawable = new CircularProgressDrawable(getBaseContext());
-                        circularProgressDrawable.setStrokeWidth(5f);
-                        circularProgressDrawable.setCenterRadius(35f);
-                        circularProgressDrawable.start();
-
-                        GlideApp.with(getApplicationContext())
-                                .asDrawable()
-                                .load(Uri.fromFile(new File(path)))
-                                .placeholder(circularProgressDrawable)
-                                .error(android.R.drawable.stat_notify_error)
-                                .into(imageViewCollapsingImage);
-                    }
-                                .into(new CustomViewTarget<CollapsingToolbarLayout, Drawable>(collapsingToolbarLayout) {
-                                    @Override
-                                    public void onLoadFailed(@Nullable Drawable errorDrawable) {
-                                        collapsingToolbarLayout.setBackground(errorDrawable);
-                                    }
-
-                                    @Override
-                                    public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
-                                        collapsingToolbarLayout.setBackground(resource);
-                                    }
-
-                                    @Override
-                                    protected void onResourceCleared(@Nullable Drawable placeholder) {
-
-                                    }
-                                });
-                    }
-                    else
-                        collapsingToolbarLayout.setBackground(getDrawable(android.R.drawable.stat_notify_error));
-                }
-            });
-        }
-    }*/
 
     private View.OnClickListener postCommentListener = new View.OnClickListener() {
         @Override
@@ -458,16 +422,19 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
                     //toolbar.getOverflowIcon().setColorFilter(navigationCollapsedColor, PorterDuff.Mode.SRC_ATOP);
                 }
                 if (toolbar.getNavigationIcon() != null) {
-                    toolbar.getNavigationIcon().setColorFilter(navigationCollapsedColor, PorterDuff.Mode.SRC_ATOP);
+                    toolbar.getNavigationIcon().setColorFilter(new BlendModeColorFilter(navigationCollapsedColor, BlendMode.SRC_ATOP));
+                    //toolbar.getNavigationIcon().setColorFilter(navigationCollapsedColor, PorterDuff.Mode.SRC_ATOP);
                 }
             } else if (verticalOffset == 0) {
                 // Expanded
                 //menuItemShare.setIcon(R.drawable.ic_share_expanded_24dp);
                 if (toolbar.getOverflowIcon() != null) {
-                    toolbar.getOverflowIcon().setColorFilter(navigationExpandedColor, PorterDuff.Mode.SRC_ATOP);
+                    toolbar.getOverflowIcon().setColorFilter(new BlendModeColorFilter(navigationExpandedColor, BlendMode.SRC_ATOP));
+                    //toolbar.getOverflowIcon().setColorFilter(navigationExpandedColor, PorterDuff.Mode.SRC_ATOP);
                 }
                 if (toolbar.getNavigationIcon() != null) {
-                    toolbar.getNavigationIcon().setColorFilter(navigationExpandedColor, PorterDuff.Mode.SRC_ATOP);
+                    toolbar.getNavigationIcon().setColorFilter(new BlendModeColorFilter(navigationExpandedColor, BlendMode.SRC_ATOP));
+                    //toolbar.getNavigationIcon().setColorFilter(navigationExpandedColor, PorterDuff.Mode.SRC_ATOP);
                 }
             } /*else {
                         // Somewhere in between
@@ -489,6 +456,7 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
         getMenuInflater().inflate(R.menu.menu_recipe, menu);
         mShareActionProvider = (ShareActionProvider) MenuItemCompat
                 .getActionProvider(menu.findItem(R.id.action_share));
+        updateKeepScreenOn(menu.findItem(R.id.action_keep_screen_on), null);
         return true;
     }
 
@@ -505,8 +473,31 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
                 handleShareRecipe();
                 // https://developer.android.com/training/sharing/send
                 return true;
+            case R.id.action_keep_screen_on:
+                updateKeepScreenOn(item, !item.isChecked());
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * Read/Write Screen On attribute from {@link R.string#action_key_keep_screen_on} with {@link SharedPreferencesHandler}
+     *
+     * @param menuItem item to set its value with {@link MenuItem#setChecked(boolean)}
+     * @param keepScreenOn what the latest user choice. if null, read the previous from {@link SharedPreferencesHandler}
+     */
+    private void updateKeepScreenOn(@NonNull MenuItem menuItem, @Nullable Boolean keepScreenOn) {
+        if (keepScreenOn == null) {
+            boolean preferenceScreenOn = SharedPreferencesHandler.getBoolean(this,
+                    getString(R.string.action_key_keep_screen_on));
+            menuItem.setChecked(preferenceScreenOn);
+            findViewById(android.R.id.home).setKeepScreenOn(preferenceScreenOn);
+        } else {
+            // write keep screen setting and change menu item value
+            SharedPreferencesHandler.writeBoolean(this,
+                    getString(R.string.action_key_keep_screen_on), keepScreenOn);
+            menuItem.setChecked(keepScreenOn);
+            findViewById(android.R.id.home).setKeepScreenOn(keepScreenOn);
+        }
     }
 
     // region Add Photos
@@ -551,17 +542,15 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
             try {
                 // Create the File where the photo should go
                 File photoFile = StorageWrapper.createImageFile(this);
-                if (photoFile != null) {
-                    //imageUri = Uri.fromFile(photoFile);
-                    imageUri = FileProvider.getUriForFile(this,
-                            getString(R.string.appPackage),
-                            photoFile);
-                    //Log.e(TAG, "before shooting, file: " + imageUri.getPath());
-                    intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
-                    startActivityForResult(intent, CAMERA_REQUEST);
-                }
+                //imageUri = Uri.fromFile(photoFile);
+                imageUri = FileProvider.getUriForFile(this,
+                        getString(R.string.appPackage),
+                        photoFile);
+                //Log.e(TAG, "before shooting, file: " + imageUri.getPath());
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+                startActivityForResult(intent, CAMERA_REQUEST);
             } catch (IOException ex) {
-                Log.e(TAG, ex.getMessage());
+                ex.printStackTrace();
             }
         }
     }
@@ -597,16 +586,13 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch (requestCode) {
-            case MY_PERMISSIONS_REQUEST_STORAGE: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED
-                        && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+        // If request is cancelled, the result arrays are empty.
+        if (requestCode == MY_PERMISSIONS_REQUEST_STORAGE) {
+            if (grantResults.length > 0
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED
+                    && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
 
-                    showChooseDialog();
-                }
-                break;
+                showChooseDialog();
             }
         }
     }
@@ -618,26 +604,28 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
         try {
             switch (requestCode) {
                 case CAMERA_REQUEST:
-                    Log.e(TAG, "camera result, " + imageUri.getPath());
-                    if (resultCode == RESULT_OK) {
-                        File file = new File(imageUri.getPath());
-                        Log.e(TAG, "camera absolute path, " + file.getAbsolutePath());
-                        //Log.e(TAG, "file bytes = " + file.length());
+                    //Log.e(TAG, "camera result, " + imageUri.getPath());
+                    if (imageUri.getPath() != null) {
+                        if (resultCode == RESULT_OK) {
+                            File file = new File(imageUri.getPath());
+                            //Log.e(TAG, "camera absolute path, " + file.getAbsolutePath());
+                            //Log.e(TAG, "file bytes = " + file.length());
 
-                        imagesPathsToUpload.add(file.getAbsolutePath());
-                        cameraImagesToDeleteAfterUpload.add(file.getName());
-                        pickImagesConfirmationDialog();
+                            imagesPathsToUpload.add(file.getAbsolutePath());
+                            cameraImagesToDeleteAfterUpload.add(file.getName());
+                            pickImagesConfirmationDialog();
 
-                    } else {
-                        File file = new File(imageUri.getPath());
-                        if(file.delete())
-                            Toast.makeText(this, R.string.post_recipe_pick_photos_camera_empty_message, Toast.LENGTH_SHORT).show();
+                        } else {
+                            File file = new File(imageUri.getPath());
+                            if (file.delete())
+                                Toast.makeText(this, R.string.post_recipe_pick_photos_camera_empty_message, Toast.LENGTH_SHORT).show();
+                        }
                     }
                     break;
                 case GALLERY_REQUEST:
                     if (resultCode == RESULT_OK && null != data && data.getData() != null) {
                         //single image
-                        Log.e(TAG, data.getData().getPath());
+                        //Log.e(TAG, data.getData().getPath());
                         //Log.e(TAG, StorageWrapper.getRealPathFromURI(this, data.getData()));
                         imagesPathsToUpload.add(StorageWrapper.getRealPathFromURI(this, data.getData()));
 
@@ -645,14 +633,14 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
 
                     } else if(data != null && null != data.getClipData()) {
                         //multiple images
-                        Log.e(TAG, String.valueOf(data.getClipData().getItemCount()));
+                        //Log.e(TAG, String.valueOf(data.getClipData().getItemCount()));
 
                         ClipData mClipData = data.getClipData();
 
                         int pickedImageCounter;
 
                         for (pickedImageCounter = 0; pickedImageCounter < mClipData.getItemCount(); pickedImageCounter++) {
-                            Log.e(TAG, mClipData.getItemAt(pickedImageCounter).getUri().getPath());
+                            //Log.e(TAG, mClipData.getItemAt(pickedImageCounter).getUri().getPath());
 
                             imagesPathsToUpload.add(StorageWrapper.getRealPathFromURI(this, mClipData.getItemAt(pickedImageCounter).getUri()));
                         }
@@ -663,7 +651,8 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
                     }
             }
         } catch (Exception e) {
-            Log.e(TAG, e.getMessage());
+            CrashLogger.logException(e);
+            e.printStackTrace();
         }
     }
 

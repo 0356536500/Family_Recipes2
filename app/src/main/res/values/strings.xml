@@ -7,6 +7,7 @@
     <string name="action_search">Search</string>
     <string name="action_filter">Filter</string>
     <string name="action_share">Share</string>
+    <string name="action_keep_screen_on">Keep Screen On</string>
     <string name="action_add_photo">Add Photo</string>
     <string name="action_refresh">Refresh</string>
     <string name="action_sort_toggle">Sort By</string>
@@ -120,6 +121,10 @@
     <string name="alert_dialog_upload_photos_finish">Upload %1$d images</string>
     <string name="alert_dialog_upload_photos_take_more">More</string>
     <string name="alert_dialog_upload_photos_max_limit">Can upload up to %1$d images</string>
+
+    <!-- Recipe Activity Shared Preference -->
+    <string name="action_key_keep_screen_on" translatable="false">keep_screen_on</string>
+
 
     <!-- Recipe Activity Share a recipe -->
     <string name="recipe_share_pre_url">Hey check out this recipe!</string>

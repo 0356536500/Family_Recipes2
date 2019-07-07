@@ -1,6 +1,5 @@
 package com.myapps.ron.family_recipes;
 
-import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
 import android.net.Uri;
 import android.os.Bundle;
@@ -18,6 +17,7 @@ import com.google.gson.reflect.TypeToken;
 import com.myapps.ron.family_recipes.layout.APICallsHandler;
 import com.myapps.ron.family_recipes.logic.storage.ExternalStorageHelper;
 import com.myapps.ron.family_recipes.logic.storage.StorageWrapper;
+import com.myapps.ron.family_recipes.utils.logic.HtmlHelper;
 
 import java.io.File;
 import java.util.Map;
@@ -41,7 +41,8 @@ public class TestActivity extends AppCompatActivity {
         setContentView(R.layout.activity_test);
 
         compositeDisposable = new CompositeDisposable();
-        String html = "<div dir=rtl lang=he class=recipeStyle> \n" +
+        String html = HtmlHelper.GET_CSS_LINK(this) +
+                "<div dir=rtl lang=he class=recipeStyle> \n" +
                 "    <h2>מרכיבים:</h2>\n" +
                 "    <ul>\n" +
                 "        <li>טחינה גולמית</li>\n" +
@@ -60,7 +61,10 @@ public class TestActivity extends AppCompatActivity {
                 "    <h5>שיהיה בתיאבון!</h5>\n" +
                 "</div>";
         WebView webView = findViewById(R.id.webView);
-        webView.loadData(html, "text/html", "UTF-8");
+        webView.loadDataWithBaseURL("file:///android_asset/", html, "text/html", "UTF-8", null);
+        //webView.setBackgroundColor(ContextCompat.getColor(this, R.color.dark_background));
+        //webView.loadData(html, "text/html", "UTF-8");
+
 
         /*fileName = "chickenfood1.jpg";
         imageView = findViewById(R.id.test_image);

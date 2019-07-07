@@ -25,6 +25,8 @@ public class MyApplication extends LocaleAwareApplication {
 
     private static MyApplication mContext;
 
+    private boolean darkTheme;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -41,7 +43,7 @@ public class MyApplication extends LocaleAwareApplication {
 
             WorkManager.getInstance().enqueueUniquePeriodicWork(
                     DeleteOldFilesWorker.class.getSimpleName(),
-                    ExistingPeriodicWorkPolicy.REPLACE,
+                    ExistingPeriodicWorkPolicy.KEEP,
                     DeleteOldFilesWorker.createPostRecipesWorker());
         }
     }
@@ -56,36 +58,52 @@ public class MyApplication extends LocaleAwareApplication {
         return false;
     }*/
 
+    public boolean isDarkTheme() {
+        return darkTheme;
+    }
+
+    private void setDarkTheme(boolean darkTheme) {
+        this.darkTheme = darkTheme;
+    }
+
     public void applyTheme(Activity activity) {
         SharedPreferences sPref = SharedPreferencesHandler.getSharedPreferences(this);
         String themePreference = sPref.getString(getString(R.string.preference_key_dark_theme), Constants.DARK_THEME_NEVER);
-        if (themePreference != null) {
-            switch (themePreference) {
-                case Constants.DARK_THEME_ALWAYS: // always dark theme
+        switch (themePreference) {
+            case Constants.DARK_THEME_ALWAYS: // always dark theme
+                activity.setTheme(R.style.AppTheme_Dark);
+                setDarkTheme(true);
+                break;
+            case Constants.DARK_THEME_NEVER:
+                activity.setTheme(R.style.AppTheme_Light);
+                setDarkTheme(false);
+                break;
+            case Constants.DARK_THEME_NIGHT_BATTERY_SAVER:
+                //check if night
+                if(isPowerSaverOn() || isNightHours()) {
                     activity.setTheme(R.style.AppTheme_Dark);
-                    break;
-                case Constants.DARK_THEME_NEVER:
+                    setDarkTheme(true);
+                }
+                else {
                     activity.setTheme(R.style.AppTheme_Light);
-                    break;
-                case Constants.DARK_THEME_NIGHT_BATTERY_SAVER:
-                    //check if night
-                    if(isPowerSaverOn() || isNightHours())
-                        activity.setTheme(R.style.AppTheme_Dark);
-                    else
-                        activity.setTheme(R.style.AppTheme_Light);
-                    break;
-                case Constants.DARK_THEME_BATTERY_SAVER:
-                    if(isPowerSaverOn())
-                        activity.setTheme(R.style.AppTheme_Dark);
-                    else
-                        activity.setTheme(R.style.AppTheme_Light);
-                    break;
-                default:
+                    setDarkTheme(false);
+                }
+                break;
+            case Constants.DARK_THEME_BATTERY_SAVER:
+                if(isPowerSaverOn()) {
+                    activity.setTheme(R.style.AppTheme_Dark);
+                    setDarkTheme(true);
+                }
+                else {
                     activity.setTheme(R.style.AppTheme_Light);
-                    break;
-            }
-        } else
-            activity.setTheme(R.style.AppTheme_Light);
+                    setDarkTheme(false);
+                }
+                break;
+            default:
+                activity.setTheme(R.style.AppTheme_Light);
+                setDarkTheme(false);
+                break;
+        }
         //activity.setTheme(sPref.getBoolean(getString(R.string.preference_key_dark_theme), false) ? R.style.AppTheme_Dark : R.style.AppTheme_Light);
     }
 
@@ -101,7 +119,7 @@ public class MyApplication extends LocaleAwareApplication {
     private boolean isPowerSaverOn() {
         PowerManager powerManager = (PowerManager)
                 getSystemService(Context.POWER_SERVICE);
-        return powerManager.isPowerSaveMode();
+        return powerManager != null && powerManager.isPowerSaveMode();
     }
 
     private boolean isNightHours() {
