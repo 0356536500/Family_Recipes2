@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -305,7 +306,10 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
     }
 
     private void showPopupSortMenu() {
-        final PopupMenu popup = new PopupMenu(activity, activity.findViewById(R.id.action_sort));
+        TypedValue theme = new TypedValue();
+        activity.getTheme().resolveAttribute(R.attr.toolbar_theme, theme, true);
+        Context wrapper = new ContextThemeWrapper(activity, theme.resourceId);
+        final PopupMenu popup = new PopupMenu(wrapper, activity.findViewById(R.id.action_sort));
 
         // This activity implements OnMenuItemClickListener
         popup.setOnMenuItemClickListener(item -> {

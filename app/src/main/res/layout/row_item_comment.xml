@@ -17,7 +17,7 @@
         android:layout_toStartOf="@id/time_text"
         android:gravity="start"
         android:fontFamily="@font/open_sans_semibold"
-        android:textColor="?android:textColorPrimary"
+        android:textColor="?attr/textColorMain"
         android:text="@string/nav_main_all_recipes"
         android:textSize="@dimen/comment_primary" />
 
@@ -28,7 +28,7 @@
         android:layout_below="@id/sender"
         android:layout_marginTop="3dp"
         android:fontFamily="@font/open_sans"
-        android:textColor="?android:textColorSecondary"
+        android:textColor="?attr/textColorSecond"
         android:text="@string/app_main_desc"
         android:textSize="@dimen/comment_secondary" />
 
@@ -40,7 +40,7 @@
         android:layout_marginStart="3dp"
         android:layout_marginEnd="3dp"
         android:fontFamily="@font/open_sans"
-        android:textColor="?android:textColorSecondary"
+        android:textColor="?attr/textColorSecond"
         android:text="16/12/2018"
         android:textSize="@dimen/comment_time"/>
 

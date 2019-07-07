@@ -36,7 +36,7 @@ public class ExternalStorageHelper {
      * @param dir - dir of file to check
      * @return path of requested file from app root storage. null if file not exists
      */
-    public static Uri getFileUri(Context context, String dir, String fileName){
+    static Uri getFileUri(Context context, String dir, String fileName){
         File filesDir = context.getExternalFilesDir(dir);
         File file = new File(filesDir, fileName);
         Uri uri = FileProvider.getUriForFile(context, context.getString(R.string.appPackage), file);
@@ -111,7 +111,7 @@ public class ExternalStorageHelper {
         } /*catch (IllegalArgumentException e) {
             Log.e(ExternalStorageHelper.class.getSimpleName(), e.getMessage());
         }*/ catch (IOException e) {
-            Log.e("ExternalStorageHelper", e.getMessage());
+            //Log.e("ExternalStorageHelper", e.getMessage());
             e.printStackTrace();
         }
         return null;

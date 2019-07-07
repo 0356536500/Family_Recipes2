@@ -3,12 +3,17 @@ package com.myapps.ron.family_recipes.recycler.adapters;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+
+import androidx.annotation.NonNull;
+import androidx.swiperefreshlayout.widget.CircularProgressDrawable;
+import androidx.viewpager.widget.PagerAdapter;
 
 import com.bumptech.glide.Glide;
 import com.myapps.ron.family_recipes.R;
@@ -17,10 +22,6 @@ import com.myapps.ron.family_recipes.model.RecipeEntity;
 
 import java.io.File;
 import java.util.List;
-
-import androidx.annotation.NonNull;
-import androidx.swiperefreshlayout.widget.CircularProgressDrawable;
-import androidx.viewpager.widget.PagerAdapter;
 
 /**
  * Created by ronginat on 24/10/2018.
@@ -67,15 +68,14 @@ public class ImagesPagerAdapter extends PagerAdapter {
     private void loadImage(final ImageView view, final int position) {
         if (images != null && position < images.size()) {
             CircularProgressDrawable circularProgressDrawable = new CircularProgressDrawable(context);
-            circularProgressDrawable.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
+            circularProgressDrawable.setColorFilter(new PorterDuffColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP));
             circularProgressDrawable.setStrokeWidth(10f);
             circularProgressDrawable.setCenterRadius(75f);
             circularProgressDrawable.start();
             view.setImageDrawable(circularProgressDrawable);
 
             StorageWrapper.getFoodFile(context, images.get(position), path -> {
-                if(path != null) {
-
+                if(path != null && path.getPath() != null) {
                     File file = new File(path.getPath());
                     if (position > 0)
                         file.deleteOnExit();

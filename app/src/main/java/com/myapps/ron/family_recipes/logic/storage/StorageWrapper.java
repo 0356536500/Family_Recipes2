@@ -9,25 +9,21 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.layout.Constants;
 import com.myapps.ron.family_recipes.layout.MiddleWareForNetwork;
 import com.myapps.ron.family_recipes.layout.S3.OnlineStorageWrapper;
-import com.myapps.ron.family_recipes.utils.logic.DateUtil;
 import com.myapps.ron.family_recipes.utils.MyCallback;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.TimeZone;
-
-import androidx.annotation.NonNull;
-import androidx.loader.content.CursorLoader;
 
 import io.reactivex.Single;
 
@@ -74,7 +70,7 @@ public class StorageWrapper {
             callback.onFinished(null);
     }
 
-    public static void getRecipeFile(Context context, String fileName, MyCallback<Uri> callback) {
+    /*public static void getRecipeFile(Context context, String fileName, MyCallback<Uri> callback) {
         if(fileName == null || fileName.equals(""))
             return;
         Uri path = ExternalStorageHelper.getFileAbsolutePath(context, Constants.RECIPES_DIR, fileName);
@@ -114,9 +110,7 @@ public class StorageWrapper {
             out.write(data);
             out.close();
             Log.e("StorageWrapper", "createHtml File Saved : " + file.getPath());
-        }/* catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }*/ catch (IOException e) {
+        } catch (IOException e) {
             Log.e("StorageWrapper", "createHtml error: " + e.getMessage());
             return null;
         }
@@ -125,8 +119,8 @@ public class StorageWrapper {
     }
 
     public static File createImageFile1(Context context) throws IOException {
-        /*StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
-        StrictMode.setVmPolicy(builder.build());*/
+        *//*StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+        StrictMode.setVmPolicy(builder.build());*//*
         // Create an image file name
         DateFormat dateFormat = DateUtil.DATE_FORMAT;
         dateFormat.setTimeZone(TimeZone.getDefault());
@@ -136,15 +130,15 @@ public class StorageWrapper {
         //File storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         File storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         return File.createTempFile(
-                timeStamp,  /* prefix */
-                ".jpg",         /* suffix */
-                storageDir      /* directory */
+                timeStamp,  *//* prefix *//*
+                ".jpg",         *//* suffix *//*
+                storageDir      *//* directory *//*
         );
 
         // Save a file: path for use with ACTION_VIEW intents
         //mCurrentPhotoPath = image.getAbsolutePath();
         //return image;
-    }
+    }*/
 
     /**
      * Supply a file in local dedicated folder of the new update to be downloaded
@@ -152,6 +146,7 @@ public class StorageWrapper {
      * @param fileName the name of the new update file
      * @return file from {@link Context#getExternalFilesDir(String)} to store the app download
      */
+    @SuppressWarnings("JavadocReference")
     public static File getFileToDownloadUpdateInto(Context context, String fileName) {
         File dir = context.getExternalFilesDir(Constants.APK_DIR);
         return new File(dir, fileName);
@@ -197,23 +192,26 @@ public class StorageWrapper {
             bitmap.compress(Bitmap.CompressFormat.JPEG, 50, out);
             out.close();
         } catch (IOException e) {
-            Log.e(TAG, e.getMessage());
+            //Log.e(TAG, e.getMessage());
         }
         return filename;
     }
 
     public static String getRealPathFromURI(Context context, Uri contentUri) {
+        //TODO: overcome MediaStore.Images.Media.DATA deprecation issue. https://developer.android.com/reference/android/provider/MediaStore.MediaColumns#DATA
         String[] proj = { MediaStore.Images.Media.DATA };
-        CursorLoader loader = new CursorLoader(context, contentUri, proj, null, null, null);
-        Cursor cursor = loader.loadInBackground();
-        int column_index;
+        Cursor cursor = context.getContentResolver().query(contentUri, proj, null, null, null);
+        //Cursor cursor = context.getContentResolver().openFileDescriptor(contentUri, "r");
         if (cursor != null) {
-            column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-            cursor.moveToFirst();
-            String result = cursor.getString(column_index);
-            cursor.close();
-            Log.e(TAG, "getRealPathFromURI, " + result);
-            return result;
+            try {
+                int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+                cursor.moveToFirst();
+                String result = cursor.getString(column_index);
+                Log.e(TAG, "getRealPathFromURI, " + result);
+                return result;
+            } finally {
+                cursor.close();
+            }
         }
         return contentUri.getPath();
     }
@@ -222,8 +220,9 @@ public class StorageWrapper {
     public static void deleteFilesFromCamera(Context context, @NonNull List<String> filesNames) {
         for (String name: filesNames) {
             Uri uri = ExternalStorageHelper.getFileAbsolutePath(context, Environment.DIRECTORY_PICTURES, name);
-            if (uri != null) {
-                Log.e(TAG, "deleting " + name + ", " + new File(uri.getPath()).delete());
+            if (uri != null && uri.getPath() != null) {
+                new File(uri.getPath()).delete();
+                //Log.e(TAG, "deleting " + name + ", " + new File(uri.getPath()).delete());
             }
         }
     }

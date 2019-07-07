@@ -3,6 +3,7 @@ package com.myapps.ron.family_recipes.recycler.adapters;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Handler;
@@ -23,8 +24,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import androidx.annotation.ColorInt;
+import androidx.annotation.NonNull;
+import androidx.paging.PagedListAdapter;
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.CircularProgressDrawable;
+
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
+import com.google.android.material.chip.Chip;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.logic.storage.StorageWrapper;
 import com.myapps.ron.family_recipes.model.CategoryEntity;
@@ -35,12 +44,6 @@ import com.myapps.ron.family_recipes.utils.Constants;
 
 import java.util.List;
 
-import androidx.annotation.ColorInt;
-import androidx.annotation.NonNull;
-import androidx.paging.PagedListAdapter;
-import androidx.recyclerview.widget.DiffUtil;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.CircularProgressDrawable;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnCheckedChanged;
@@ -124,7 +127,7 @@ public class RecipesAdapter extends PagedListAdapter<RecipeMinimal, RecipesAdapt
             if (compoundButton.isPressed()) {
                 // not when programmatically changing checked value
                 CircularProgressDrawable circularProgressDrawable = new CircularProgressDrawable(context);
-                circularProgressDrawable.setColorFilter(circularColor, PorterDuff.Mode.SRC_ATOP);
+                circularProgressDrawable.setColorFilter(new PorterDuffColorFilter(circularColor, PorterDuff.Mode.SRC_ATOP));
                 circularProgressDrawable.setStrokeWidth(5f);
                 circularProgressDrawable.setCenterRadius(25f);
                 circularProgressDrawable.start();
@@ -257,9 +260,12 @@ public class RecipesAdapter extends PagedListAdapter<RecipeMinimal, RecipesAdapt
             for (String category: recipe.getCategories()) {
                 View view = LayoutInflater.from(context).inflate(R.layout.category_item_layout, internalWrapper, false);
                 //view.setLayoutParams(marginLayoutParams);
-                ((TextView) view.findViewById(R.id.category_text)).setText(category);
+                Chip chip = view.findViewById(R.id.category_text);
+                chip.setText(category);
+                chip.setBackgroundColor(RecipesAdapterHelper.getCategoryColorByName(categoryList, category));
+                //((TextView) view.findViewById(R.id.category_text)).setText(category);
                 //view.findViewById(R.id.category_text).getBackground().setTint(pickColor());
-                view.findViewById(R.id.category_text).getBackground().setColorFilter(RecipesAdapterHelper.getCategoryColorByName(categoryList, category), PorterDuff.Mode.SRC_ATOP);
+                //view.findViewById(R.id.category_text).getBackground().setColorFilter(RecipesAdapterHelper.getCategoryColorByName(categoryList, category), PorterDuff.Mode.SRC_ATOP);
                 /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     view.setForegroundGravity(Gravity.CENTER);
                 }*/
