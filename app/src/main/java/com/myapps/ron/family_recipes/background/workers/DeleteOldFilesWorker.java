@@ -11,6 +11,7 @@ import com.myapps.ron.family_recipes.model.AccessEntity.RecipeAccess;
 import com.myapps.ron.family_recipes.layout.Constants;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -20,6 +21,7 @@ import androidx.work.PeriodicWorkRequest;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
+import static com.myapps.ron.family_recipes.logic.Constants.MIN_APK_FOLDER_SIZE_TO_START_DELETING_CONTENT;
 import static com.myapps.ron.family_recipes.logic.Constants.MIN_FOOD_FOLDER_SIZE_TO_START_DELETING_CONTENT;
 import static com.myapps.ron.family_recipes.logic.Constants.MIN_RECIPE_RECORDS_COUNT_TO_START_DELETING_CONTENT;
 import static com.myapps.ron.family_recipes.logic.Constants.MIN_THUMB_FOLDER_SIZE_TO_START_DELETING_CONTENT;
@@ -45,7 +47,7 @@ public class DeleteOldFilesWorker extends Worker {
     @NonNull
     @Override
     public Result doWork() {
-        Log.e(TAG, "doWork");
+        //Log.e(TAG, "doWork");
         File dir = getApplicationContext().getExternalFilesDir(Constants.FOOD_DIR);
         if (dir != null) {
             long dirSize = folderSize(dir);
@@ -71,6 +73,14 @@ public class DeleteOldFilesWorker extends Worker {
                 deleteFilesByDb(dir, AccessEntity.KEY_ACCESSED_THUMBNAIL, dirSize, TARGET_THUMB_FOLDER_SIZE_AFTER_DELETING_CONTENT);
             }
         }
+        dir = getApplicationContext().getExternalFilesDir(Constants.APK_DIR);
+        if (dir != null) {
+            long dirSize = folderSize(dir);
+            if (dirSize > MIN_APK_FOLDER_SIZE_TO_START_DELETING_CONTENT) { // 2 apk file is larger than 20MB
+                deleteFilesKeepLastModified(dir);
+            }
+        }
+
         return Result.success();
     }
 
@@ -97,6 +107,7 @@ public class DeleteOldFilesWorker extends Worker {
     }
 
     private void deleteFilesByDb(@NonNull File dir, @NonNull String accessKey, long originalSize, long targetSize) {
+        long modifiedSize = originalSize;
         List<RecipeAccess> recipeAccesses = repository.getRecipesAccessesOrderBy(accessKey);
         if (recipeAccesses != null) {
             int deleteCount = 0;
@@ -108,7 +119,7 @@ public class DeleteOldFilesWorker extends Worker {
                     if (file.exists()) {
                         long currentFileSize = file.length();
                         if (file.delete()) {
-                            originalSize -= currentFileSize;
+                            modifiedSize -= currentFileSize;
                             deleteCount++;
                             repository.upsertRecipeAccess(access.id, accessKey, null);
                         }
@@ -121,14 +132,14 @@ public class DeleteOldFilesWorker extends Worker {
                         if (file.exists()) {
                             long currentFileSize = file.length();
                             if (file.delete()) {
-                                originalSize -= currentFileSize;
+                                modifiedSize -= currentFileSize;
                                 deleteCount++;
                                 repository.upsertRecipeAccess(access.id, accessKey, null);
                             }
                         }
                     }
                 }
-                if (originalSize <= targetSize)
+                if (modifiedSize <= targetSize)
                     break;
             }
 
@@ -136,11 +147,33 @@ public class DeleteOldFilesWorker extends Worker {
         }
     }
 
-    private long folderSize(File directory) {
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    private void deleteFilesKeepLastModified(@NonNull File dir) {
+        File[] files = dir.listFiles();
+        if (files == null)
+            return;
+        Arrays.sort(files, (file, other) -> { // ASC order, last modified is last
+            long result = file.lastModified() - other.lastModified();
+            if (result > 0)
+                return 1;
+            if (result < 0)
+                return -1;
+            return 0;
+        });
+
+        for (int i = 0; i < files.length - 1; i++) {
+            files[i].delete();
+        }
+    }
+
+    private long folderSize(@NonNull File directory) {
         long length = 0;
-        for (File file : directory.listFiles()) {
-            if (file.isFile())
-                length += file.length();
+        File[] listFiles = directory.listFiles();
+        if (listFiles != null) {
+            for (File file : listFiles) {
+                if (file.isFile())
+                    length += file.length();
+            }
         }
         return length;
     }

@@ -58,7 +58,7 @@ public class Util {
      */
     private AmazonS3Client getS3Client() {
         if (sS3Client == null) {
-            sS3Client = new AmazonS3Client(AppHelper.getCredentialsProvider(), Region.getRegion(Constants.COGNITO_REGION));
+            sS3Client = new AmazonS3Client(AppHelper.getCredentialsProvider(), Region.getRegion(Constants.BUCKET_REGION));
             //sS3Client.setRegion(Region.getRegion(Constants.COGNITO_REGION));
             /*sS3Client = new AmazonS3Client(getCredProvider(context.getApplicationContext()));
             sS3Client.setRegion(Region.getRegion(Regions.fromName(Constants.BUCKET_REGION)));*/

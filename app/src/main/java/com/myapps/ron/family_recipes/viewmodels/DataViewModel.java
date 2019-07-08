@@ -195,16 +195,15 @@ public class DataViewModel extends ViewModel {
 
     // App update
 
-    public Single<Map<String, String>> getDataToDownloadUpdate(ContextWrapper context) {
-        return Single.create(emitter ->
+    public Maybe<Map<String, String>> getDataToDownloadUpdate(ContextWrapper context) {
+        return Maybe.create(emitter ->
                 AppRepository.getInstance().getDataToDownloadUpdate(context)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(new DisposableMaybeObserver<Map<String, String>>() {
                             @Override
                             public void onSuccess(Map<String, String> map) {
-                                if (map != null) // always true
-                                    emitter.onSuccess(map);
+                                emitter.onSuccess(map);
                                 dispose();
                             }
 
@@ -217,7 +216,8 @@ public class DataViewModel extends ViewModel {
                             @Override
                             public void onComplete() {
                                 // notify up to-date
-                                emitter.onError(new Throwable(context.getString(R.string.main_activity_app_up_to_date)));
+                                //emitter.onError(new Throwable(context.getString(R.string.main_activity_app_up_to_date)));
+                                emitter.onComplete();
                                 dispose();
                             }
                         })

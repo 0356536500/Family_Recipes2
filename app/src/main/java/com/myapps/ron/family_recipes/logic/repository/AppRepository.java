@@ -1,7 +1,6 @@
 package com.myapps.ron.family_recipes.logic.repository;
 
 import android.content.Context;
-import android.os.Build;
 
 import com.myapps.ron.family_recipes.MyApplication;
 import com.myapps.ron.family_recipes.R;
@@ -113,7 +112,7 @@ public class AppRepository {
     public Maybe<Map<String, String>> getDataToDownloadUpdate(Context context) {
         if (MiddleWareForNetwork.checkInternetConnection(context)) {
             return Maybe.create(emitter ->
-                    APICallsHandler.getDetailsForUpdate(AppHelper.getAccessToken(), Build.VERSION.SDK_INT)
+                    APICallsHandler.getAppUpdates(AppHelper.getAccessToken(), MyApplication.getDeviceId())
                             .subscribeOn(Schedulers.io())
                             .observeOn(Schedulers.io())
                             .subscribe(new DisposableObserver<Response<Map<String, String>>>() {
@@ -139,9 +138,8 @@ public class AppRepository {
                                             emitter.onError(new Throwable(context.getString(R.string.load_error_message)));
                                         }
                                     } else {
-                                        emitter.onError(new Throwable("error updating the app"));
+                                        emitter.onError(new Throwable("error checking app updates"));
                                     }
-
                                     dispose();
                                 }
 

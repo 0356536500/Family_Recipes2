@@ -264,8 +264,10 @@ public class SettingsActivity extends MyBaseActivity
         private Uri uri;
 
         private boolean checkForUpdates() {
-            if (!MiddleWareForNetwork.checkInternetConnection(activity))
+            if (!MiddleWareForNetwork.checkInternetConnection(activity)) {
+                Toast.makeText(activity, R.string.no_internet_message, Toast.LENGTH_SHORT).show();
                 return false;
+            }
 
             viewModel.getDataToDownloadUpdate(activity)
                     .subscribeOn(Schedulers.io())

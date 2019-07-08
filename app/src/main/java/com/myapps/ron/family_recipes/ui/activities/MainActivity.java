@@ -14,8 +14,6 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
-import android.net.Network;
-import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -68,7 +66,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.observers.DisposableSingleObserver;
+import io.reactivex.observers.DisposableMaybeObserver;
 import io.reactivex.schedulers.Schedulers;
 
 public class MainActivity extends MyBaseActivity implements BackStack.BackStackHelper {
@@ -147,8 +145,10 @@ public class MainActivity extends MyBaseActivity implements BackStack.BackStackH
         super.onPostCreate(savedInstanceState);
         // create fragments only when first created, not after change language
         if (savedInstanceState == null) {
+            // first creation
             initFragments();
             handleDataFromIntentAndStart();
+            checkIfUpdateAvailable();
         } else {
             Log.e(TAG, "restore fragments!!!");
             getSupportFragmentManager().getFragments()
@@ -666,7 +666,7 @@ public class MainActivity extends MyBaseActivity implements BackStack.BackStackH
         viewModel.getDataToDownloadUpdate(this)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new DisposableSingleObserver<Map<String, String>>() {
+                .subscribe(new DisposableMaybeObserver<Map<String, String>>() {
                     @Override
                     public void onSuccess(Map<String, String> map) {
                         appUpdateFile = StorageWrapper.getFileToDownloadUpdateInto(getApplicationContext(),
@@ -686,7 +686,13 @@ public class MainActivity extends MyBaseActivity implements BackStack.BackStackH
 
                     @Override
                     public void onError(Throwable t) {
-                        Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_LONG).show();
+                        //Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_LONG).show();
+                        dispose();
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        // up to-date
                         dispose();
                     }
                 });
@@ -755,33 +761,11 @@ public class MainActivity extends MyBaseActivity implements BackStack.BackStackH
                 // When network state changes
                 case ConnectivityManager.CONNECTIVITY_ACTION:
                     //Log.d(TAG, "Network connectivity change");
-                    if (intent.getExtras() != null) {
-                        final ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-                        if (connectivityManager != null) {
-                            boolean isConnected;
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                                Network network = connectivityManager.getActiveNetwork();
-                                isConnected = network != null;
-                            } else {
-                                NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
-                                isConnected = activeNetwork != null && activeNetwork.isConnected();
-                            }
-                            MiddleWareForNetwork.setConnection(isConnected);
-                            //NetworkInfo ni = connectivityManager.getActiveNetworkInfo();
-                            if (isConnected) {
-                                Log.i(TAG, "Network " + connectivityManager.getActiveNetworkInfo().getTypeName() + " connected");
-                            } else {// if (intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, Boolean.FALSE)) {
-                                Log.d(TAG, "There's no network connectivity");
-                            }
-                        }
-                        else
-                            MiddleWareForNetwork.setConnection(false);
-                    }
+                    // refresh connection status in helper
+                    MiddleWareForNetwork.checkInternetConnection(getApplicationContext());
                     break;
                 case Constants.ACTION_UPDATE_FROM_SERVICE:
                     //Log.d(TAG, "Got an update from service");
-                    //unregisterReceiver(mReceiver);
-                    //registerReceiver(mReceiver, regularFilter);
                     if (intent.getExtras() != null) {
                         boolean update = intent.getBooleanExtra("refresh", false);
                         Toast.makeText(MainActivity.this, intent.getStringExtra("message"), Toast.LENGTH_SHORT).show();

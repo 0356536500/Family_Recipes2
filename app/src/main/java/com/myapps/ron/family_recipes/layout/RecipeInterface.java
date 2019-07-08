@@ -31,7 +31,7 @@ public interface RecipeInterface {
     String categories = Constants.URL_CATEGORIES;// + "/{" + Constants.DATE_QUERY + "}";
     String food = Constants.URL_FOOD + "/{" + Constants.ID_QUERY + "}";
     String subscriptions = Constants.URL_SUBSCRIPTIONS + "/{" + Constants.PATH_DEVICE_ID + "}";
-    String register_token = Constants.URL_TOKENS + "/{" + Constants.PATH_DEVICE_ID + "}" + "/{" + Constants.PATH_TOKEN + "}";
+    String registerToken = Constants.URL_TOKENS + "/{" + Constants.PATH_DEVICE_ID + "}" + "/{" + Constants.PATH_TOKEN + "}";
     String userWithID = Constants.URL_USERS + "/{" + Constants.PATH_DEVICE_ID + "}";
     String firebaseToken = Constants.URL_TOKENS + "/firebase";
     String update = "app";
@@ -168,12 +168,13 @@ public interface RecipeInterface {
             @Body Map<String, String> body
     );
 
-    @PUT(register_token)
+    @PUT(registerToken)
     Call<Void> registerNewToken(
             @Header(Constants.AUTHORIZATION) String auth,
             @Path(Constants.PATH_DEVICE_ID) String deviceId,
             @Path(Constants.PATH_TOKEN) String notificationsToken,
-            @Query(Constants.QUERY_PLATFORM) String platform
+            @QueryMap Map<String, Object> queries
+            //@Query(Constants.QUERY_PLATFORM) String platform
     );
 
     @GET(userWithID)
@@ -192,10 +193,9 @@ public interface RecipeInterface {
     // region App
 
     @GET(update)
-    Observable<Response<Map<String, String>>> getDetailsForUpdateObservable(
+    Observable<Response<Map<String, String>>> getAppUpdatesObservable(
             @Header(Constants.AUTHORIZATION) String auth,
-            @Query(Constants.QUERY_PLATFORM) String platform,
-            @Query(Constants.QUERY_PLATFORM) int androidVersion
+            @Path(Constants.PATH_DEVICE_ID) String deviceId
     );
 
     // endregion

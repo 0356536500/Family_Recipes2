@@ -9,9 +9,9 @@ public final class MiddleWareForNetwork {
 
     private static boolean internetConnection = false;
 
-    public static void setConnection(boolean connection) {
+    /*private static void setConnection(boolean connection) {
         internetConnection = connection;
-    }
+    }*/
 
     public static boolean getConnection() {
         return internetConnection;
@@ -24,9 +24,11 @@ public final class MiddleWareForNetwork {
         if (connectivityManager != null) {
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
                 NetworkCapabilities networkCapabilities = connectivityManager.getNetworkCapabilities(connectivityManager.getActiveNetwork());
-                if (networkCapabilities != null)
-                    return (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ||
-                            networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI));
+                if (networkCapabilities != null) {
+                    internetConnection = networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ||
+                            networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI);
+                    return internetConnection;
+                }
             } else {
                 //we are connected to a network
                 NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();

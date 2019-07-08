@@ -1,10 +1,13 @@
 package com.myapps.ron.family_recipes.layout;
 
+import android.os.Build;
 import android.os.StrictMode;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.google.common.collect.ImmutableMap;
+import com.myapps.ron.family_recipes.BuildConfig;
 import com.myapps.ron.family_recipes.layout.modelTO.CategoryTO;
 import com.myapps.ron.family_recipes.layout.modelTO.CommentTO;
 import com.myapps.ron.family_recipes.layout.modelTO.ContentTO;
@@ -356,8 +359,12 @@ public class APICallsHandler {
     // region USERS
 
     public static void registerNewToken(String authToken, String deviceId, String firebaseToken, final MyCallback<String> callback) {
+        Map<String, Object> queries = ImmutableMap.of(
+                Constants.QUERY_PLATFORM, "android",
+                Constants.QUERY_ANDROID_VERSION, Build.VERSION.SDK_INT,
+                Constants.QUERY_APP_VERSION, BuildConfig.VERSION_NAME);
         RecipeInterface service = getRetrofitInstance().create(RecipeInterface.class);
-        Call<Void> call = service.registerNewToken(authToken, deviceId, firebaseToken, "android");
+        Call<Void> call = service.registerNewToken(authToken, deviceId, firebaseToken, queries);
 
         call.enqueue(new Callback<Void>() {
             @Override
@@ -455,9 +462,9 @@ public class APICallsHandler {
 
     // region APP UPDATES
 
-    public static Observable<Response<Map<String, String>>> getDetailsForUpdate(String token, int androidVersion) {
+    public static Observable<Response<Map<String, String>>> getAppUpdates(String token, String deviceId) {
         RecipeInterface service = getReactiveRetrofitInstance().create(RecipeInterface.class);
-        return service.getDetailsForUpdateObservable(token, "android", androidVersion);
+        return service.getAppUpdatesObservable(token, deviceId);
     }
 
     // endregion
