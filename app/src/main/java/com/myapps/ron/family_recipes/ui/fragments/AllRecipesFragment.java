@@ -2,7 +2,6 @@ package com.myapps.ron.family_recipes.ui.fragments;
 
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -79,7 +78,7 @@ public class AllRecipesFragment extends RecyclerWithFiltersAbstractFragment impl
         });
 
         viewModel.getInfo().observe(this, message -> {
-            Log.e(TAG, message);
+            //Log.e(TAG, message);
             swipeRefreshLayout.setRefreshing(false);
             firstLoadingProgressBar.setVisibility(View.GONE);
             if (!message.equals(""))

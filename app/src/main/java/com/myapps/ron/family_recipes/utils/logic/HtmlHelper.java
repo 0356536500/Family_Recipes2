@@ -2,10 +2,14 @@ package com.myapps.ron.family_recipes.utils.logic;
 
 import android.app.Activity;
 
+import androidx.annotation.ArrayRes;
 import androidx.annotation.NonNull;
+import androidx.annotation.StringRes;
 
+import com.amazonaws.util.IOUtils;
 import com.myapps.ron.family_recipes.MyApplication;
 
+import java.io.IOException;
 import java.util.Stack;
 
 /**
@@ -151,5 +155,22 @@ public class HtmlHelper {
         String styleCss = "<link rel=\"stylesheet\" type=\"text/css\" href=\"style_%s.css\" />";
         String style = ((MyApplication)activity.getApplication()).isDarkTheme() ? "dark" : "light";
         return String.format(styleCss, style);
+    }
+
+    public static String GET_ABOUT_PAGE(@NonNull Activity activity, @StringRes int langKey, @ArrayRes int langArr) {
+        String locale = SharedPreferencesHandler.getString(
+                activity,
+                activity.getString(langKey),
+                activity.getResources().getStringArray(langArr)[1]
+        );
+
+        try {
+            String aboutFile = "about_%s.html";
+            String about = IOUtils.toString(activity.getResources().getAssets().open(String.format(aboutFile, locale)));
+            return HtmlHelper.GET_CSS_LINK(activity) + about;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "<h3>Failed to load about page</h3>";
+        }
     }
 }

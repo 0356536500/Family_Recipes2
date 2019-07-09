@@ -2,14 +2,13 @@ package com.myapps.ron.family_recipes.ui.baseclasses;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
+
+import androidx.annotation.Nullable;
 
 import com.myapps.ron.family_recipes.MyApplication;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.utils.logic.SharedPreferencesHandler;
 import com.myapps.ron.localehelper.LocaleAwareCompatActivity;
-
-import androidx.annotation.Nullable;
 
 /**
  * Created by ronginat on 13/12/2018.
@@ -28,7 +27,7 @@ public abstract class MyBaseActivity extends LocaleAwareCompatActivity implement
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.e(getClass().getSimpleName(), "on create");
+        //Log.e(getClass().getSimpleName(), "on create");
         ((MyApplication)getApplication()).applyTheme(this);
         //getSharedPreferences(getString(R.string.sharedPreferences), MODE_PRIVATE).registerOnSharedPreferenceChangeListener(this);
     }
@@ -42,7 +41,7 @@ public abstract class MyBaseActivity extends LocaleAwareCompatActivity implement
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.e(getClass().getSimpleName(), "on destroy");
+        //Log.e(getClass().getSimpleName(), "on destroy");
         SharedPreferencesHandler.getSharedPreferences(this).unregisterOnSharedPreferenceChangeListener(this);
         //getSharedPreferences(getString(R.string.sharedPreferences), MODE_PRIVATE).unregisterOnSharedPreferenceChangeListener(this);
     }

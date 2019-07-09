@@ -41,6 +41,7 @@
     <string name="title_activity_forgot_password">שכחתי סיסמא</string>
     <string name="title_activity_login">כניסה</string>
     <string name="title_activity_settings">הגדרות</string>
+    <string name="title_activity_about">אודות</string>
 
     <!-- strings for navigation drawer -->
     <string name="nav_main_post">תרומה לקהילה</string>
@@ -62,6 +63,7 @@
     <string name="email">אימייל</string>
 
     <!--#region MainActivity -->
+    <string name="main_activity_posted_new_recipe">תודה על המתכון!</string>
     <string name="main_activity_app_up_to_date">אין עדכונים</string>
     <string name="main_activity_update_available_title">יש גרסא חדשה לאפליקציה!</string>
     <string name="main_activity_update_available_message">להתחיל הורדה?</string>
@@ -72,6 +74,7 @@
     <!--#region ERRORS -->
     <string name="post_images_error">שגיאה בעת העלאת תמונות</string>
     <string name="post_recipe_error">שגיאה בעת העלאת מתכון</string>
+    <string name="change_displayed_name_error">שגיאה בשינוי השם שלך</string>
     <!--#endregion ERRORS -->
 
     <!-- AllRecipes Fragment -->

@@ -494,8 +494,7 @@ public class MainActivity extends MyBaseActivity implements BackStack.BackStackH
                 break;
             case R.id.nav_main_about:
                 // For the inquisitive
-                /*Intent aboutAppActivity = new Intent(this, AboutApp.class);
-                startActivity(aboutAppActivity);*/
+                showAboutPage();
                 break;
             case R.id.nav_main_post_recipe:
                 Intent intent = new Intent(MainActivity.this, PostRecipeActivity.class);
@@ -585,6 +584,11 @@ public class MainActivity extends MyBaseActivity implements BackStack.BackStackH
         startActivity(settingsIntent);
     }
 
+    private void showAboutPage() {
+        Intent settingsIntent = new Intent(MainActivity.this, AboutActivity.class);
+        startActivity(settingsIntent);
+    }
+
     /*private void exit () {
         String username = AppHelper.getCurrSession().getUsername();
         Intent intent = new Intent();
@@ -626,8 +630,7 @@ public class MainActivity extends MyBaseActivity implements BackStack.BackStackH
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == Constants.POST_RECIPE_ACTIVITY_CODE) {
             if (resultCode != RESULT_OK) {
-                //unregisterReceiver(mReceiver);
-                //registerReceiver(mReceiver, regularFilter);
+                Toast.makeText(this, R.string.main_activity_posted_new_recipe, Toast.LENGTH_SHORT).show();
             }
         }
     }

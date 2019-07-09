@@ -283,7 +283,7 @@ public class DataViewModel extends ViewModel {
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(success ->
                             SharedPreferencesHandler.removeString(context, Constants.FIRESTORE_SAVE_NAME),
-                            throwable -> setInfo("WTF?"))
+                            throwable -> setInfo(context.getString(R.string.change_displayed_name_error)))
             );
         }
     }

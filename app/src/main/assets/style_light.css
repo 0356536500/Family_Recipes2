@@ -3,6 +3,11 @@
     src: url("file:///android_res/font/open_sans_regular.ttf")
 }
 
+@font-face {
+    font-family: 'lemonada';
+    src: url("file:///android_res/font/lemonada.ttf")
+}
+
 body {
     background-color: #FFFFFF;
     color: #1D1E1E;

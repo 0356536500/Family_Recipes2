@@ -33,8 +33,6 @@ public class FirestoreHelper {
 
     private FirebaseFirestore db;
 
-    private final static String ERROR_MESSAGE = "error with firestore";
-
     public static FirestoreHelper getInstance() {
         if (INSTANCE == null) {
             INSTANCE = new FirestoreHelper();
@@ -151,10 +149,10 @@ public class FirestoreHelper {
                                         else if (task.getException() != null){
                                             CrashLogger.logException(task.getException());
                                             //Log.e(TAG, task.getException().getMessage(), task.getException());
-                                            emitter.onError(task.getException());
+                                            emitter.onError(new Throwable(context.getString(R.string.change_displayed_name_error)));
                                         } else {
                                             //Log.e(TAG, "error setting new displayed name");
-                                            emitter.onError(new Throwable(ERROR_MESSAGE));
+                                            emitter.onError(new Throwable(context.getString(R.string.change_displayed_name_error)));
                                         }
                                     });
                         }
@@ -162,8 +160,8 @@ public class FirestoreHelper {
                         @Override
                         public void onError(Throwable t) {
                             //Log.e(TAG, ERROR_MESSAGE + ", ", t);
-                            CrashLogger.logException(t);
-                            emitter.onError(new Throwable(ERROR_MESSAGE));
+                            //CrashLogger.logException(t);
+                            emitter.onError(t);
                         }
 
                         @Override
@@ -174,13 +172,13 @@ public class FirestoreHelper {
                     }));
         } else {
             // token is valid
-            return setDisplayedName(name);
+            return setDisplayedNameWithValidToken(context, name);
         }
 
     }
 
 
-    private Single<Boolean> setDisplayedName(String name) {
+    private Single<Boolean> setDisplayedNameWithValidToken(Context context, String name) {
         return Single.create(emitter ->
            INSTANCE.db
                    .collection(Constants.FIRESTORE_USERS)
@@ -192,11 +190,11 @@ public class FirestoreHelper {
                            emitter.onSuccess(true);
                        }
                        else if (task.getException() != null){
-                           //CrashLogger.logException(task.getException());
+                           CrashLogger.logException(task.getException());
                            //Log.e(TAG, task.getException().getMessage(), task.getException());
-                           emitter.onError(task.getException());
+                           emitter.onError(new Throwable(context.getString(R.string.change_displayed_name_error)));
                        } else
-                           emitter.onError(new Throwable(ERROR_MESSAGE));
+                           emitter.onError(new Throwable(context.getString(R.string.change_displayed_name_error)));
                    })
         );
     }
