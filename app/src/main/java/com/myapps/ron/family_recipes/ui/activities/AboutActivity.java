@@ -34,7 +34,7 @@ public class AboutActivity extends MyBaseActivity {
 
         webView.loadDataWithBaseURL(
                 Constants.ASSET_FILE_BASE_URL,
-                HtmlHelper.GET_ABOUT_PAGE(this, R.string.preference_key_language, R.array.pref_languages_list_values),
+                HtmlHelper.GET_ABOUT_PAGE(this),
                 "text/html", "UTF-8", null);
 
         /*TextView textView = findViewById(R.id.about_text);

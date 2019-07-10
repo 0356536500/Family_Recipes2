@@ -3,32 +3,11 @@ package com.myapps.ron.family_recipes.ui.activities;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
-
-import com.google.android.material.button.MaterialButton;
-import com.leinardi.android.speeddial.SpeedDialView;
-import com.myapps.ron.family_recipes.utils.ui.FabExtensionAnimator;
-import com.myapps.ron.family_recipes.R;
-import com.myapps.ron.family_recipes.utils.ui.ViewHider;
-import com.myapps.ron.family_recipes.logic.Injection;
-import com.myapps.ron.family_recipes.layout.MiddleWareForNetwork;
-import com.myapps.ron.family_recipes.ui.baseclasses.MyBaseActivity;
-import com.myapps.ron.family_recipes.ui.baseclasses.PostRecipeBaseFragment;
-import com.myapps.ron.family_recipes.ui.fragments.PagerDialogFragment;
-import com.myapps.ron.family_recipes.ui.fragments.PickImagesMethodDialog;
-import com.myapps.ron.family_recipes.ui.fragments.PostRecipeFirstFragment;
-import com.myapps.ron.family_recipes.ui.fragments.PostRecipeGenerateContentFragment;
-import com.myapps.ron.family_recipes.ui.fragments.PostRecipePickPhotosFragment;
-import com.myapps.ron.family_recipes.ui.fragments.PreviewDialogFragment;
-import com.myapps.ron.family_recipes.viewmodels.PostRecipeViewModel;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -40,6 +19,27 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProviders;
+
+import com.google.android.material.button.MaterialButton;
+import com.leinardi.android.speeddial.SpeedDialView;
+import com.myapps.ron.family_recipes.R;
+import com.myapps.ron.family_recipes.layout.MiddleWareForNetwork;
+import com.myapps.ron.family_recipes.logic.Injection;
+import com.myapps.ron.family_recipes.ui.baseclasses.MyBaseActivity;
+import com.myapps.ron.family_recipes.ui.baseclasses.PostRecipeBaseFragment;
+import com.myapps.ron.family_recipes.ui.fragments.PagerDialogFragment;
+import com.myapps.ron.family_recipes.ui.fragments.PickImagesMethodDialog;
+import com.myapps.ron.family_recipes.ui.fragments.PostRecipeFirstFragment;
+import com.myapps.ron.family_recipes.ui.fragments.PostRecipeGenerateContentFragment;
+import com.myapps.ron.family_recipes.ui.fragments.PostRecipePickPhotosFragment;
+import com.myapps.ron.family_recipes.ui.fragments.PreviewDialogFragment;
+import com.myapps.ron.family_recipes.utils.ui.FabExtensionAnimator;
+import com.myapps.ron.family_recipes.utils.ui.ViewHider;
+import com.myapps.ron.family_recipes.viewmodels.PostRecipeViewModel;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnTouch;
@@ -187,7 +187,7 @@ public class PostRecipeActivity extends MyBaseActivity {
         getSupportFragmentManager()
                 .beginTransaction()
                 .add(R.id.create_fragment_container, fragments.get(0))
-                .addToBackStack(null)
+                //.addToBackStack(null)
                 .commit();
 
         //new Handler().postDelayed(this::nextFragmentDelayed, 2500);
@@ -230,14 +230,14 @@ public class PostRecipeActivity extends MyBaseActivity {
 
     @Override
     public void onBackPressed() {
-        Log.e(getClass().getSimpleName(), "backPressed");
         if (inPreview) {
             backFromPreview();
             return;
         }
         if(!fragments.get(currentIndex).onBackPressed()) {
             //exit();
-            NavUtils.navigateUpFromSameTask(this);
+            super.onBackPressed();
+            //NavUtils.navigateUpFromSameTask(this);
         }
         //finish();
     }

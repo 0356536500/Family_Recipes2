@@ -11,25 +11,25 @@
             android:title="@string/nav_main_favorites"
             android:icon="@drawable/ic_action_favorites_black" />
 
-        <item android:id="@+id/nav_main_settings"
-            android:title="@string/nav_main_settings"
-            android:icon="@drawable/ic_action_settings_black" />
-
-        <item android:id="@+id/nav_main_sign_out"
-            android:title="@string/nav_main_sign_out"
-            android:icon="@drawable/ic_action_sign_out_black" />
-
-        <item android:id="@+id/nav_main_about"
-            android:title="@string/nav_main_about"
-            android:icon="@drawable/ic_action_about_black" />
+        <item android:id="@+id/nav_main_post_recipe"
+            android:title="@string/nav_main_post_recipe"
+            android:icon="@drawable/ic_action_post_black" />
 
         <item android:id="@+id/nav_main_sub_header"
-            android:title="@string/nav_main_post">
+            android:title="@string/nav_main_other">
 
             <menu>
-                <item android:id="@+id/nav_main_post_recipe"
-                    android:title="@string/nav_main_post_recipe"
-                    android:icon="@drawable/ic_action_post_black" />
+                <item android:id="@+id/nav_main_settings"
+                    android:title="@string/nav_main_settings"
+                    android:icon="@drawable/ic_action_settings_black" />
+
+                <item android:id="@+id/nav_main_about"
+                    android:title="@string/nav_main_about"
+                    android:icon="@drawable/ic_action_about_black" />
+
+                <item android:id="@+id/nav_main_sign_out"
+                    android:title="@string/nav_main_sign_out"
+                    android:icon="@drawable/ic_action_sign_out_black" />
             </menu>
 
         </item>

@@ -371,9 +371,10 @@ public class RecipeRepository {
     }
 
         // region Fetch
-    public void fetchRecipesReactive(final Context context) {
+    public void fetchRecipesReactive(final Context context, boolean requestedByUser) {
         if (!MiddleWareForNetwork.checkInternetConnection(context)) {
-            dispatchInfo.onNext(context.getString(R.string.no_internet_message));
+            if (requestedByUser)
+                dispatchInfo.onNext(context.getString(R.string.no_internet_message));
             return;
         }
         if (AppHelper.getAccessToken() == null) {
@@ -381,7 +382,8 @@ public class RecipeRepository {
             return;
         }
         if (!mayRefresh.get()){
-            dispatchInfo.onNext(context.getString(R.string.refresh_error_message));
+            if (requestedByUser)
+                dispatchInfo.onNext(context.getString(R.string.refresh_error_message));
             return;
         }
         mayRefresh.getAndSet(false);

@@ -159,7 +159,7 @@ public class MainActivity extends MyBaseActivity implements BackStack.BackStackH
                     .forEach(myFragment -> Log.e(TAG, getString(myFragment.getMyTag())));
             // restore after shutdown
             if (backStack == null)
-                backStack = BackStack.restoreBackStackFromList(savedInstanceState, this, getSupportFragmentManager().getFragments());
+                backStack = BackStack.restoreBackStackFromList(savedInstanceState, this, getSupportFragmentManager().getFragments()); // FragmentManager contains the last fragment
             currentFragment = backStack.peekTopFragment();
             /*currentFragment = (MyFragment) getSupportFragmentManager()
                     .findFragmentById(R.id.main_frame);*/
@@ -220,6 +220,7 @@ public class MainActivity extends MyBaseActivity implements BackStack.BackStackH
     private void handleDataFromIntentAndStart() {
         //handle data from intent
         Runnable startWithDefaultFragmentRunnable = () -> startWithDefaultFragment(getOrCreateFragment(R.string.nav_main_all_recipes));
+
         if (getIntent() != null && getIntent().getSerializableExtra(Constants.MAIN_ACTIVITY_FIRST_FRAGMENT) != null) {
             String firstFragment = getIntent().getStringExtra(Constants.MAIN_ACTIVITY_FIRST_FRAGMENT);
             Log.e(TAG, "firstFragment = " + firstFragment);
@@ -305,12 +306,9 @@ public class MainActivity extends MyBaseActivity implements BackStack.BackStackH
     }
 
     private void init() {
-        /*regularFilter = new IntentFilter();
-        regularFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);*/
-
         customFilter = new IntentFilter();
         customFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
-        customFilter.addAction(Constants.ACTION_UPDATE_FROM_SERVICE);
+        //customFilter.addAction(Constants.ACTION_UPDATE_FROM_SERVICE);
     }
 
     private void setToolbarBackground() {
@@ -629,7 +627,7 @@ public class MainActivity extends MyBaseActivity implements BackStack.BackStackH
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == Constants.POST_RECIPE_ACTIVITY_CODE) {
-            if (resultCode != RESULT_OK) {
+            if (resultCode == RESULT_OK) {
                 Toast.makeText(this, R.string.main_activity_posted_new_recipe, Toast.LENGTH_SHORT).show();
             }
         }
@@ -760,24 +758,10 @@ public class MainActivity extends MyBaseActivity implements BackStack.BackStackH
             String action = intent.getAction();
             if (action == null)
                 return;
-            switch(action) {
-                // When network state changes
-                case ConnectivityManager.CONNECTIVITY_ACTION:
-                    //Log.d(TAG, "Network connectivity change");
-                    // refresh connection status in helper
-                    MiddleWareForNetwork.checkInternetConnection(getApplicationContext());
-                    break;
-                case Constants.ACTION_UPDATE_FROM_SERVICE:
-                    //Log.d(TAG, "Got an update from service");
-                    if (intent.getExtras() != null) {
-                        boolean update = intent.getBooleanExtra("refresh", false);
-                        Toast.makeText(MainActivity.this, intent.getStringExtra("message"), Toast.LENGTH_SHORT).show();
-                        if (update) {
-                            //fetchRecipes();
-                            //Toast.makeText(MainActivity.this, "recipe uploaded successfully!", Toast.LENGTH_SHORT).show();
-                        } //else
-                            //Toast.makeText(MainActivity.this, "failed to post the recipe", Toast.LENGTH_SHORT).show();
-                    }
+            // When network state changes
+            if (ConnectivityManager.CONNECTIVITY_ACTION.equals(action)) {
+                // refresh connection status in helper
+                MiddleWareForNetwork.checkInternetConnection(getApplicationContext());
             }
         }
     };

@@ -5,10 +5,11 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.webkit.WebView;
 import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -17,9 +18,15 @@ import com.google.gson.reflect.TypeToken;
 import com.myapps.ron.family_recipes.layout.APICallsHandler;
 import com.myapps.ron.family_recipes.logic.storage.ExternalStorageHelper;
 import com.myapps.ron.family_recipes.logic.storage.StorageWrapper;
+import com.myapps.ron.family_recipes.model.CommentEntity;
+import com.myapps.ron.family_recipes.recycler.adapters.CommentsAdapter;
+import com.myapps.ron.family_recipes.utils.logic.DateUtil;
 import com.myapps.ron.family_recipes.utils.logic.HtmlHelper;
+import com.myapps.ron.family_recipes.utils.ui.MyDividerItemDecoration;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -41,29 +48,48 @@ public class TestActivity extends AppCompatActivity {
         setContentView(R.layout.activity_test);
 
         compositeDisposable = new CompositeDisposable();
-        String html = HtmlHelper.GET_CSS_LINK(this) +
-                "<div dir=rtl lang=he class=recipeStyle> \n" +
-                "    <h2>מרכיבים:</h2>\n" +
-                "    <ul>\n" +
-                "        <li>טחינה גולמית</li>\n" +
-                "        <li>חלב מרוכז</li>\n" +
-                "        <li>2 שמנת מתוקה</li>\n" +
-                "    </ul> \n" +
-                "    <hr>\n" +
-                "\n" +
-                "    <h2>אופן הכנה:</h2>\n" +
-                "\n" +
-                "    <ol>\n" +
-                "        <li>לשפוך הכל לקערה</li>\n" +
-                "        <li>לערבב טוב טוב</li>\n" +
-                "        <li>להכניס למקפיא ל4 שעות</li>\n" +
-                "    </ol>\n" +
-                "    <h5>שיהיה בתיאבון!</h5>\n" +
-                "</div>";
-        WebView webView = findViewById(R.id.webView);
-        webView.loadDataWithBaseURL("file:///android_asset/", html, "text/html", "UTF-8", null);
-        //webView.setBackgroundColor(ContextCompat.getColor(this, R.color.dark_background));
-        //webView.loadData(html, "text/html", "UTF-8");
+
+        RecyclerView recyclerView = findViewById(R.id.test_recycler);
+        CommentsAdapter mAdapter = new CommentsAdapter();
+        List<CommentEntity> comments = new ArrayList<>();
+        String message = "message#";
+        for (int i = 0; i < 30; i++) {
+            CommentEntity entity = new CommentEntity();
+            entity.setDate(DateUtil.getUTCTime());
+            entity.setUser("admin");
+            entity.setMessage(message + i);
+            comments.add(entity);
+        }
+        mAdapter.setComments(comments);
+        recyclerView.addItemDecoration(new MyDividerItemDecoration(this, DividerItemDecoration.VERTICAL, 36));
+        recyclerView.setAdapter(mAdapter);
+
+
+        if (false) {
+            String html = HtmlHelper.GET_CSS_LINK() +
+                    "<div dir=rtl lang=he class=recipeStyle> \n" +
+                    "    <h2>מרכיבים:</h2>\n" +
+                    "    <ul>\n" +
+                    "        <li>טחינה גולמית</li>\n" +
+                    "        <li>חלב מרוכז</li>\n" +
+                    "        <li>2 שמנת מתוקה</li>\n" +
+                    "    </ul> \n" +
+                    "    <hr>\n" +
+                    "\n" +
+                    "    <h2>אופן הכנה:</h2>\n" +
+                    "\n" +
+                    "    <ol>\n" +
+                    "        <li>לשפוך הכל לקערה</li>\n" +
+                    "        <li>לערבב טוב טוב</li>\n" +
+                    "        <li>להכניס למקפיא ל4 שעות</li>\n" +
+                    "    </ol>\n" +
+                    "    <h5>שיהיה בתיאבון!</h5>\n" +
+                    "</div>";
+            //WebView webView = findViewById(R.id.webView);
+            //webView.loadDataWithBaseURL("file:///android_asset/", html, "text/html", "UTF-8", null);
+            //webView.setBackgroundColor(ContextCompat.getColor(this, R.color.dark_background));
+            //webView.loadData(html, "text/html", "UTF-8");
+        }
 
 
         /*fileName = "chickenfood1.jpg";
@@ -123,7 +149,8 @@ public class TestActivity extends AppCompatActivity {
                     @Override
                     public void onError(Throwable throwable) {
                         throwable.printStackTrace();
-                        Log.e(TAG, throwable.getMessage());
+                        if (throwable.getMessage() != null)
+                            Log.e(TAG, throwable.getMessage());
                     }
                 });
     }
@@ -132,7 +159,7 @@ public class TestActivity extends AppCompatActivity {
         imageView.setImageResource(R.mipmap.ic_logo_foreground);
         imageView.setColorFilter(filter);
         Uri uri = ExternalStorageHelper.getFileAbsolutePath(this, "thumbnails", fileName);
-        if (uri != null) {
+        if (uri != null && uri.getPath() != null) {
             Log.e(TAG, "deleting file, " + new File(uri.getPath()).delete());
         }
     }

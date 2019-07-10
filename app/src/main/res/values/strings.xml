@@ -48,7 +48,7 @@
     <string name="support_email" translatable="false">familyrecipes.supp0rt@gmail.com</string>
 
     <!-- strings for navigation drawer -->
-    <string name="nav_main_post">Upload</string>
+    <string name="nav_main_other">Others</string>
     <string name="nav_main_post_recipe">New Recipe</string>
     <string name="nav_main_all_recipes">All recipes</string>
     <string name="nav_main_favorites">Favorites</string>
@@ -141,7 +141,7 @@
     <string name="post_recipe_finish">finish</string>
     <string name="post_recipe_field_required">Field is required</string>
     <string name="post_recipe_tags_required">must choose at least %1$d categories</string>
-    <string name="post_recipe_hint">Type here</string>
+    <string name="post_recipe_hint">Type here&#8230;</string>
     <string name="post_recipe_advanced_step_hr">divider</string>
     <string name="post_recipe_advanced_step_bold">Bold</string>
     <string name="post_recipe_advanced_step_under_score">Underscore</string>
@@ -180,7 +180,7 @@
     <string name="post_recipe_instructions_card_with_html_for_paragraph_with_underscore">Regular text with underscore</string>
     <string name="post_recipe_instructions_card_with_html_for_unordered_list">First row\nSecond row\nSeparated by new line (Enter)</string>
 
-    <string name="post_recipe_instructions_recycler_features_drag_drop_swipe">Drag and drop an item to relocate it vertically.\nSwipe to delete</string>
+    <string name="post_recipe_instructions_recycler_features_drag_drop_swipe">Drag and drop an item vertically to relocate.\nSwipe to delete</string>
     <string name="post_recipe_instructions_recycler_features_expand_collapse">Each item can be expanded and collapsed for your convenience</string>
 
     <!--#endregion PostRecipe Instructions -->
@@ -204,7 +204,7 @@
     <!--#endregion PostRecipe Activity -->
 
     <!-- SettingsActivity -->
-    <string name="invalid_access_token">Please try again later</string>
+    <string name="invalid_access_token">Wrong credentials, try again later</string>
 
     <string name="settings_category_display">Display</string>
     <string name="settings_category_notifications">Notifications</string>

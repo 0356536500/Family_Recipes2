@@ -7,7 +7,6 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,13 +15,19 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
+import androidx.lifecycle.ViewModelProviders;
+
 import com.bumptech.glide.Glide;
 import com.google.android.material.snackbar.Snackbar;
-import com.myapps.ron.family_recipes.utils.ui.FabExtensionAnimator;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.logic.storage.StorageWrapper;
 import com.myapps.ron.family_recipes.ui.baseclasses.PostRecipeBaseFragment;
 import com.myapps.ron.family_recipes.utils.Constants;
+import com.myapps.ron.family_recipes.utils.ui.FabExtensionAnimator;
 import com.myapps.ron.family_recipes.viewmodels.PostRecipeViewModel;
 
 import java.io.File;
@@ -30,11 +35,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
-import androidx.core.content.FileProvider;
-import androidx.lifecycle.ViewModelProviders;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -49,7 +49,7 @@ import static android.app.Activity.RESULT_OK;
  */
 public class PostRecipePickPhotosFragment extends PostRecipeBaseFragment {
     private static final int MY_PERMISSIONS_REQUEST_STORAGE = 11;
-    private final String TAG = getClass().getSimpleName();
+    //private final String TAG = getClass().getSimpleName();
 
     private static final int CAMERA_REQUEST = 0;
     private static final int GALLERY_REQUEST = 1;
@@ -141,7 +141,7 @@ public class PostRecipePickPhotosFragment extends PostRecipeBaseFragment {
     @SuppressWarnings("UnusedParameters")
     @OnClick(R.id.pick_photos_choose_button)
     void photosClickListener(View view){
-        if (imagesPathsToUpload.size() > Constants.MAX_FILES_TO_UPLOAD) {
+        if (imagesPathsToUpload.size() >= Constants.MAX_FILES_TO_UPLOAD) {
             maxImagesSnackbar.show();
             return;
         }
@@ -190,17 +190,16 @@ public class PostRecipePickPhotosFragment extends PostRecipeBaseFragment {
             try {
                 // Create the File where the photo should go
                 File photoFile = StorageWrapper.createImageFile(activity);
-                if (photoFile != null) {
-                    //imageUri = Uri.fromFile(photoFile);
-                    imageUri = FileProvider.getUriForFile(activity,
-                            getString(R.string.appPackage),
-                            photoFile);
-                    //Log.e(TAG, "before shooting, file: " + imageUri.getPath());
-                    intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
-                    startActivityForResult(intent, CAMERA_REQUEST);
-                }
+                //imageUri = Uri.fromFile(photoFile);
+                imageUri = FileProvider.getUriForFile(activity,
+                        getString(R.string.appPackage),
+                        photoFile);
+                //Log.e(TAG, "before shooting, file: " + imageUri.getPath());
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+                startActivityForResult(intent, CAMERA_REQUEST);
             } catch (IOException ex) {
-                Log.e(TAG, ex.getMessage());
+                //Log.e(TAG, ex.getMessage());
+                ex.printStackTrace();
             }
         }
     }
@@ -231,16 +230,13 @@ public class PostRecipePickPhotosFragment extends PostRecipeBaseFragment {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch (requestCode) {
-            case MY_PERMISSIONS_REQUEST_STORAGE: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED
-                        && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+        if (requestCode == MY_PERMISSIONS_REQUEST_STORAGE) {
+            // If request is cancelled, the result arrays are empty.
+            if (grantResults.length > 0
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED
+                    && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
 
-                    showChooseDialog();
-                }
-                break;
+                showChooseDialog();
             }
         }
     }
@@ -248,31 +244,33 @@ public class PostRecipePickPhotosFragment extends PostRecipeBaseFragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Log.e(TAG, "onActivityResult");
+        //Log.e(TAG, "onActivityResult");
         try {
             switch (requestCode) {
                 case CAMERA_REQUEST:
-                    Log.e(TAG, "camera result, " + imageUri.getPath());
-                    if (resultCode == RESULT_OK) {
-                        File file = new File(imageUri.getPath());
-                        Log.e(TAG, "camera absolute path, " + file.getAbsolutePath());
-                        //Log.e(TAG, "file bytes = " + file.length());
+                    //Log.e(TAG, "camera result, " + imageUri.getPath());
+                    if (imageUri.getPath() != null) {
+                        if (resultCode == RESULT_OK) {
+                            File file = new File(imageUri.getPath());
+                            //Log.e(TAG, "camera absolute path, " + file.getAbsolutePath());
+                            //Log.e(TAG, "file bytes = " + file.length());
 
-                        imagesPathsToUpload.add(file.getAbsolutePath());
-                        cameraImagesToDeleteAfterUpload.add(file.getName());
+                            imagesPathsToUpload.add(file.getAbsolutePath());
+                            cameraImagesToDeleteAfterUpload.add(file.getName());
 
-                        displayNewImage(imageUri.getPath());
+                            displayNewImage(imageUri.getPath());
 
-                    } else {
-                        File file = new File(imageUri.getPath());
-                        if(file.delete())
-                            Toast.makeText(activity, R.string.post_recipe_pick_photos_camera_empty_message, Toast.LENGTH_SHORT).show();
+                        } else {
+                            File file = new File(imageUri.getPath());
+                            if (file.delete())
+                                Toast.makeText(activity, R.string.post_recipe_pick_photos_camera_empty_message, Toast.LENGTH_SHORT).show();
+                        }
                     }
                     break;
                 case GALLERY_REQUEST:
                     if (resultCode == RESULT_OK && null != data && data.getData() != null) {
                         //single image
-                        Log.e(TAG, data.getData().getPath());
+                        //Log.e(TAG, data.getData().getPath());
                         //Log.e(TAG, StorageWrapper.getRealPathFromURI(this, data.getData()));
                         String path = StorageWrapper.getRealPathFromURI(activity, data.getData());
                         imagesPathsToUpload.add(path);
@@ -280,7 +278,7 @@ public class PostRecipePickPhotosFragment extends PostRecipeBaseFragment {
 
                     } else if(data != null && null != data.getClipData()) {
                         //multiple images
-                        Log.e(TAG, String.valueOf(data.getClipData().getItemCount()));
+                        //Log.e(TAG, String.valueOf(data.getClipData().getItemCount()));
 
                         ClipData mClipData = data.getClipData();
 
@@ -291,7 +289,7 @@ public class PostRecipePickPhotosFragment extends PostRecipeBaseFragment {
 
                         for (pickedImageCounter = 0; pickedImageCounter < mClipData.getItemCount()
                                 && imagesPathsToUpload.size() < Constants.MAX_FILES_TO_UPLOAD; pickedImageCounter++) {
-                            Log.e(TAG, mClipData.getItemAt(pickedImageCounter).getUri().getPath());
+                            //Log.e(TAG, mClipData.getItemAt(pickedImageCounter).getUri().getPath());
                             String path = StorageWrapper.getRealPathFromURI(activity, mClipData.getItemAt(pickedImageCounter).getUri());
                             imagesPathsToUpload.add(path);
                             displayNewImage(path);
@@ -302,7 +300,8 @@ public class PostRecipePickPhotosFragment extends PostRecipeBaseFragment {
                     }
             }
         } catch (Exception e) {
-            Log.e(TAG, e.getMessage());
+            //Log.e(TAG, e.getMessage());
+            e.printStackTrace();
         }
     }
 

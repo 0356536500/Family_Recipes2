@@ -235,7 +235,7 @@ public class HtmlInstructionsPagerAdapter extends PagerAdapter {
 
     private void loadContentIntoWebView(@NonNull WebView webView, String content) {
         webView.loadDataWithBaseURL(Constants.ASSET_FILE_BASE_URL,
-                HtmlHelper.GET_CSS_LINK(activity) + content, "text/html", "UTF-8", null);
+                HtmlHelper.GET_CSS_LINK() + content, "text/html", "UTF-8", null);
         //webView.loadData(generateHtml(createModelFromView(view)), "text/html", "utf-8");
     }
 
@@ -272,7 +272,7 @@ public class HtmlInstructionsPagerAdapter extends PagerAdapter {
 
     private String generateHtml(HtmlModel model) {
         HtmlHelper helper = new HtmlHelper();
-        helper.openStaticElements();
+        helper.openStaticElementsForInstructions();
 
         helper = model.buildHtmlFromElement(helper);
 

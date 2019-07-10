@@ -2,14 +2,14 @@ package com.myapps.ron.family_recipes.ui.fragments;
 
 import android.app.Activity;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.utils.Constants;
@@ -30,7 +30,7 @@ public class PreviewDialogFragment extends Fragment {
 
         if (getArguments() != null) {
             html = getArguments().getString("html");
-            Log.e(getClass().getSimpleName(), "html");
+            //Log.e(getClass().getSimpleName(), "html");
         }
     }
 
@@ -42,8 +42,6 @@ public class PreviewDialogFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-
-        Log.e("dialog", html);
         WebView webView = view.findViewById(R.id.html_preview_webView);
         /*TypedValue value = new TypedValue();
         getActivity().getTheme().resolveAttribute(R.attr.toolbarBackgroundSecondary, value, true);
@@ -51,6 +49,6 @@ public class PreviewDialogFragment extends Fragment {
 
         //webView.loadData(html, "text/html", "utf-8");
         webView.loadDataWithBaseURL(Constants.ASSET_FILE_BASE_URL,
-                HtmlHelper.GET_CSS_LINK(activity) + html, "text/html", "UTF-8", null);
+                HtmlHelper.GET_CSS_LINK() + html, "text/html", "UTF-8", null);
     }
 }

@@ -58,8 +58,8 @@ public class MyApplication extends LocaleAwareApplication {
         return false;
     }*/
 
-    public boolean isDarkTheme() {
-        return darkTheme;
+    public static boolean isDarkTheme() {
+        return mContext.darkTheme;
     }
 
     private void setDarkTheme(boolean darkTheme) {
@@ -126,6 +126,14 @@ public class MyApplication extends LocaleAwareApplication {
         Calendar cal = Calendar.getInstance();
         int hour = cal.get(Calendar.HOUR_OF_DAY);
         return hour < 6 || hour > 18;
+    }
+
+    public static String getLocale() {
+        return SharedPreferencesHandler.getString(
+                mContext,
+                mContext.getString(R.string.preference_key_language),
+                mContext.getResources().getStringArray(R.array.pref_languages_list_values)[1]
+        );
     }
 
     @SuppressLint("HardwareIds")

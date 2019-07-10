@@ -368,7 +368,7 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
 
         // load recipe content with css file from assets folder
         myWebView.loadDataWithBaseURL(Constants.ASSET_FILE_BASE_URL,
-                HtmlHelper.GET_CSS_LINK(this) + content, "text/html", "UTF-8", null);
+                HtmlHelper.GET_CSS_LINK() + content, "text/html", "UTF-8", null);
     }
 
     private View.OnClickListener postCommentListener = new View.OnClickListener() {

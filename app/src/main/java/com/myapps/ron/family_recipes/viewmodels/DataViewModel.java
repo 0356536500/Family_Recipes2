@@ -156,7 +156,7 @@ public class DataViewModel extends ViewModel {
 
     public void fetchFromServer(Context context, boolean userInteraction) {
         if (userInteraction || MiddleWareForNetwork.checkInternetConnection(context)) {
-            recipeRepository.fetchRecipesReactive(context);
+            recipeRepository.fetchRecipesReactive(context, userInteraction);
             categoryRepository.fetchCategoriesReactive(context);
         }
     }
@@ -275,8 +275,8 @@ public class DataViewModel extends ViewModel {
     }
 
     private void saveDisplayedName(Context context) {
-        //String name = SharedPreferencesHandler.getString(context, Constants.FIRESTORE_SAVE_NAME);
-        String name = SharedPreferencesHandler.getString(context, Constants.FIRESTORE_DISPLAYED_NAME);
+        String name = SharedPreferencesHandler.getString(context, Constants.FIRESTORE_SAVE_NAME);
+        //String name = SharedPreferencesHandler.getString(context, Constants.FIRESTORE_DISPLAYED_NAME);
         if (name != null) {
             compositeDisposable.add(FirestoreHelper.getInstance().setDisplayedName(context, name)
                     .subscribeOn(Schedulers.io())

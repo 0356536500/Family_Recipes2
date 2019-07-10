@@ -1,12 +1,11 @@
 package com.myapps.ron.family_recipes.utils.logic;
 
-import android.app.Activity;
+import android.content.Context;
 
-import androidx.annotation.ArrayRes;
 import androidx.annotation.NonNull;
-import androidx.annotation.StringRes;
 
 import com.amazonaws.util.IOUtils;
+import com.myapps.ron.family_recipes.BuildConfig;
 import com.myapps.ron.family_recipes.MyApplication;
 
 import java.io.IOException;
@@ -71,6 +70,13 @@ public class HtmlHelper {
 
     public void openStaticElements() {
         builder.append(addTag("div dir=rtl lang=he " + BODY_TEXT_STYLE));
+    }
+
+    public void openStaticElementsForInstructions() {
+        if ("he".equals(MyApplication.getLocale()))
+            builder.append(addTag("div dir=rtl lang=he " + BODY_TEXT_STYLE));
+        else
+            builder.append(addTag("div dir=ltr lang=en " + BODY_TEXT_STYLE));
     }
 
     public void closeStaticElements() {
@@ -148,26 +154,22 @@ public class HtmlHelper {
     }
 
 
-    public static String GET_CSS_LINK(@NonNull Activity activity) {
+    public static String GET_CSS_LINK() {
         // font from online googleapis
         //String openSans = "<link href=\"https://fonts.googleapis.com/css?family=Open+Sans&display=swap\" rel=\"stylesheet\">";
 
         String styleCss = "<link rel=\"stylesheet\" type=\"text/css\" href=\"style_%s.css\" />";
-        String style = ((MyApplication)activity.getApplication()).isDarkTheme() ? "dark" : "light";
+        String style = MyApplication.isDarkTheme() ? "dark" : "light";
         return String.format(styleCss, style);
     }
 
-    public static String GET_ABOUT_PAGE(@NonNull Activity activity, @StringRes int langKey, @ArrayRes int langArr) {
-        String locale = SharedPreferencesHandler.getString(
-                activity,
-                activity.getString(langKey),
-                activity.getResources().getStringArray(langArr)[1]
-        );
+    public static String GET_ABOUT_PAGE(@NonNull Context context) {
+        String locale = MyApplication.getLocale();
 
         try {
             String aboutFile = "about_%s.html";
-            String about = IOUtils.toString(activity.getResources().getAssets().open(String.format(aboutFile, locale)));
-            return HtmlHelper.GET_CSS_LINK(activity) + about;
+            String about = IOUtils.toString(context.getResources().getAssets().open(String.format(aboutFile, locale)));
+            return HtmlHelper.GET_CSS_LINK() + about + String.format("<span style=\"font-size=smaller\">version %s</span>", BuildConfig.VERSION_NAME);
         } catch (IOException e) {
             e.printStackTrace();
             return "<h3>Failed to load about page</h3>";

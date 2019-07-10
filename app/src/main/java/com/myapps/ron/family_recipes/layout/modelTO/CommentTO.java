@@ -14,7 +14,7 @@ public class CommentTO {
     @SerializedName("message")
     private String message;
     @SerializedName("user")
-    private String user;
+    private String username;
     @SerializedName("creationDate")
     private String creationDate;
 
@@ -31,12 +31,11 @@ public class CommentTO {
         }
     }*/
 
-    // TODO: switch from userId to username
     public CommentEntity toEntity() {
         CommentEntity entity = new CommentEntity();
-        entity.setMessage(this.message);
-        entity.setUser(this.user);
-        entity.setDate(this.creationDate);
+        entity.setMessage(getMessage());
+        entity.setUser(getUsername());
+        entity.setDate(getCreationDate());
         return entity;
     }
 
@@ -48,12 +47,12 @@ public class CommentTO {
         this.message = message;
     }
 
-    public String getUser() {
-        return user;
+    public String getUsername() {
+        return username;
     }
 
-    public void setUser(String user) {
-        this.user = user;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getCreationDate() {
@@ -67,11 +66,11 @@ public class CommentTO {
     @NonNull
     @Override
     public String toString() {
-        if (message == null || user == null || creationDate == null)
+        if (message == null || username == null || creationDate == null)
             return "null";
         return "CommentTO{" +
                 "message='" + message + '\'' +
-                ", user='" + user + '\'' +
+                ", username='" + username + '\'' +
                 ", creationDate='" + creationDate + '\'' +
                 '}';
     }
@@ -82,12 +81,12 @@ public class CommentTO {
         if (o == null || getClass() != o.getClass()) return false;
         CommentTO comment = (CommentTO) o;
         return this.message.equals(comment.message) &&
-                this.user.equals(comment.user) &&
+                this.username.equals(comment.username) &&
                 this.creationDate.equals(comment.creationDate);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(message, user, creationDate);
+        return Objects.hash(message, username, creationDate);
     }
 }
