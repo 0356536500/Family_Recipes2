@@ -194,7 +194,7 @@ public class MyMessagingService extends FirebaseMessagingService {
     }
 
     private NotificationCompat.Builder getSummaryBuilderUI() {
-        return new NotificationCompat.Builder(this, "newRecipes")
+        return new NotificationCompat.Builder(this, getString(R.string.notification_new_recipe_channel_id))
                 .setSmallIcon(R.drawable.ic_status_logo)
                 .setColorized(true)
                 .setColor(ContextCompat.getColor(this, R.color.logo_foreground))
@@ -219,11 +219,11 @@ public class MyMessagingService extends FirebaseMessagingService {
 
         channels.add(new NotificationChannel(getString(R.string.notification_like_channel_id),
                 getString(R.string.notification_like_channel_name),
-                NotificationManager.IMPORTANCE_DEFAULT));
+                NotificationManager.IMPORTANCE_LOW));
 
         channels.add(new NotificationChannel(getString(R.string.notification_app_updates_channel_id),
                 getString(R.string.notification_app_updates_channel_name),
-                NotificationManager.IMPORTANCE_HIGH));
+                NotificationManager.IMPORTANCE_DEFAULT));
 
         notificationManager.createNotificationChannels(channels);
     }

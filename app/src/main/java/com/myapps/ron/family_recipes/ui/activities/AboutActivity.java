@@ -23,6 +23,7 @@ public class AboutActivity extends MyBaseActivity {
         setContentView(R.layout.activity_about);
 
         Toolbar toolbar = findViewById(R.id.main_toolbar);
+        toolbar.setTitle(R.string.title_activity_about);
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);

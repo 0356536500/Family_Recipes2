@@ -20,8 +20,8 @@
 
         <!-- SearchFilter -->
         <item name="searchFilterBackgroundColor">?attr/toolbarBackgroundPrimary</item>
-        <item name="searchFilterTextColor">@color/search_filter_text_light</item>
-        <item name="searchFilterCustomTextColor">@color/search_filter_text_light</item>
+        <item name="searchFilterTextColor">@color/search_filter_text_dark</item>
+        <item name="searchFilterCustomTextColor">@color/search_filter_text_dark</item>
 
         <!-- collapsedToolbarLayout -->
         <item name="collapsedIconsColor">@color/md_grey_900</item>
@@ -68,9 +68,9 @@
         <item name="android:windowAnimationStyle">@style/WindowAnimationTransition</item>
 
         <!-- SearchFilter -->
-        <item name="searchFilterBackgroundColor">@color/md_grey_200</item>
+        <item name="searchFilterBackgroundColor">@color/md_grey_800</item>
         <item name="searchFilterTextColor">@color/search_filter_text_light</item>
-        <item name="searchFilterCustomTextColor">@color/grey_100</item>
+        <item name="searchFilterCustomTextColor">@color/search_filter_text_light</item>
 
         <!-- collapsedToolbarLayout -->
         <item name="collapsedIconsColor">@color/grey_100</item>

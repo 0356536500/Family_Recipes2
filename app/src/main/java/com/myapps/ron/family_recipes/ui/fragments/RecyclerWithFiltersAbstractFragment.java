@@ -378,18 +378,6 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
         Intent intent = new Intent(activity, RecipeActivity.class);
         intent.putExtra(Constants.RECIPE_ID, recipeMinimal.getId());
         startActivity(intent);
-        /*onItemSelectedDisposable = viewModel.getMaybeRecipeImages(recipeMinimal.getId())
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(recipeEntity -> {
-                    Log.e(TAG, "onItemSelected observer" + recipeEntity.toString());
-                    Intent intent = new Intent(activity, RecipeActivity.class);
-                    intent.putExtra(Constants.RECIPE, recipeEntity);
-                    startActivityForResult(intent, Constants.RECIPE_ACTIVITY_CODE);
-                    if (onItemSelectedDisposable != null)
-                        onItemSelectedDisposable.dispose();
-                }, error -> Log.e(TAG, error.getMessage()));*/
-        //compositeDisposable.add(disposable);
     }
 
     @Override

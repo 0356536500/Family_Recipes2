@@ -19,7 +19,7 @@
     <!-- Sort Menu in MainActivity -->
     <string name="sort_action_recent">חדשים</string>
     <string name="sort_action_popular">פופולריים</string>
-    <string name="sort_action_recent_modified">השתנו לאחרונה</string>
+    <string name="sort_action_recent_modified">עודכנו לאחרונה</string>
 
     <!--#region RecyclerWithFiltersFragment -->
     <string name="recipe_has_no_images_message">למתכון אין תמונות</string>

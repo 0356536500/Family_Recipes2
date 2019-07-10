@@ -51,7 +51,7 @@ public class FavoritesRecipesFragment extends RecyclerWithFiltersAbstractFragmen
                 tags = new ArrayList<>(categories);
                 tags.add(0, new CategoryEntity.CategoryBuilder()
                         .name(getString(R.string.str_all_selected))
-                        .color(ContextCompat.getColor(activity, R.color.search_filter_text_light))
+                        .color(ContextCompat.getColor(activity, R.color.search_filter_text_dark))
                         .build());
                 loadFiltersColor();
                 initCategories();

@@ -31,7 +31,8 @@ public class AllRecipesFragment extends RecyclerWithFiltersAbstractFragment impl
         Bundle arguments = getArguments();
         if (arguments != null && arguments.getBoolean(Constants.FIRST_LOAD_FRAGMENT, false)) {
             new Handler().postDelayed(() -> {
-                firstLoadingProgressBar.setVisibility(View.VISIBLE);
+                if (savedInstanceState == null)
+                    firstLoadingProgressBar.setVisibility(View.VISIBLE);
                 viewModel.fetchFromServer(activity, false);
                 viewModel.applyQuery(queryModel);
             }, 500);
@@ -69,7 +70,7 @@ public class AllRecipesFragment extends RecyclerWithFiltersAbstractFragment impl
                 tags = new ArrayList<>(categories);
                 tags.add(0, new CategoryEntity.CategoryBuilder()
                         .name(getString(R.string.str_all_selected))
-                        .color(ContextCompat.getColor(activity, R.color.search_filter_text_light))
+                        .color(ContextCompat.getColor(activity, R.color.search_filter_text_dark))
                         .build());
                 loadFiltersColor();
                 initCategories();

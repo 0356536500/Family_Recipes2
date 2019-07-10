@@ -314,7 +314,7 @@ public class AppHelper {
         }
         String password = SharedPreferencesHandler.getString(context, Constants.PASSWORD);
         if(password == null) {
-            Log.e(TAG, "enter password1");
+            //Log.e(TAG, "enter password1");
             return;
         }
 
@@ -736,6 +736,7 @@ public class AppHelper {
                     updateAttributeSubject.onNext(false);
                 } else {
                     setUserDetailsBackground(context);
+                    // give the background process time to update - 300 ms
                     Completable.timer(300, TimeUnit.MILLISECONDS, Schedulers.io())
                             .observeOn(Schedulers.io())
                             .observeOn(Schedulers.io())
@@ -749,7 +750,8 @@ public class AppHelper {
 
                                 @Override
                                 public void onError(Throwable e) {
-                                    Log.e(TAG, e.getMessage(), e);
+                                    // error
+                                    e.printStackTrace();
                                 }
                             });
                 }
@@ -758,7 +760,7 @@ public class AppHelper {
             @Override
             public void onFailure(Exception exception) {
                 // Update failed
-                Log.e(TAG, "Update failed, " + AppHelper.formatException(exception));
+                //Log.e(TAG, "Update failed, " + AppHelper.formatException(exception));
                 CrashLogger.logException(exception);
                 updateAttributeSubject.onNext(false);
             }

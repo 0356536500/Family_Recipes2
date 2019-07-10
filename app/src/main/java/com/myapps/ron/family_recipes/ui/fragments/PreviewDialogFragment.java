@@ -1,6 +1,5 @@
 package com.myapps.ron.family_recipes.ui.fragments;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,13 +19,11 @@ import com.myapps.ron.family_recipes.utils.logic.HtmlHelper;
  */
 public class PreviewDialogFragment extends Fragment {
 
-    private Activity activity;
     private String html;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        activity = getActivity();
 
         if (getArguments() != null) {
             html = getArguments().getString("html");

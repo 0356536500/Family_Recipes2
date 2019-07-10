@@ -9,7 +9,6 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Handler;
-import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.core.content.FileProvider;
@@ -93,7 +92,7 @@ public class SettingsViewModel extends ViewModel implements SharedPreferences.On
     public void setPreferredNamePreference(Context context, @Nullable EditTextPreference namePreference) {
         if (namePreference != null) {
             namePreference.setOnPreferenceChangeListener((preference, newValue) -> {
-                Log.e(getClass().getSimpleName(), "changing attribute, " + preference.getKey());
+                //Log.e(getClass().getSimpleName(), "changing attribute, " + preference.getKey());
                 AppHelper.modifyAttribute(context, preference.getKey(), String.valueOf(newValue));
                 return false;
             });
@@ -111,14 +110,14 @@ public class SettingsViewModel extends ViewModel implements SharedPreferences.On
                             updateDisplayedNameInFirebase(context, nameFromPreferences);
                         }
                     } else
-                        setInfo("Couldn't update name");
+                        setInfo(context.getString(R.string.change_displayed_name_error));
                 }));
     }
 
     private void updateDisplayedNameInFirebase(Context context, String name) {
         compositeDisposable.add(FirestoreHelper.getInstance().setDisplayedName(context, name)
                 .subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(success -> SharedPreferencesHandler.removeString(context, Constants.FIRESTORE_SAVE_NAME),
                         throwable -> setInfo(throwable.getMessage()))
         );
