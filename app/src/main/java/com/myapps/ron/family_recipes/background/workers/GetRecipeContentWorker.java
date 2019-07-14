@@ -59,19 +59,24 @@ public class GetRecipeContentWorker extends RxWorker {
                     .subscribe(response -> {
                         if (response.isSuccessful() && response.body() != null) {
                             repository.insertContentRecipe(response.body().toEntity());
+                            emitter.onSuccess(Result.success());
                         }
                         else if (!response.isSuccessful() && response.code() != 304) {
-                            try {
-                                String message = response.errorBody() != null ? response.errorBody().string() : "";
-                                repository.dispatchInfoForRecipe.onNext(
-                                        getApplicationContext().getString(R.string.load_error_message)
-                                                + ", " + message);
-                            } catch (IOException e) {
-                                e.printStackTrace();
+                            if (response.errorBody() != null) {
+                                try {
+                                    String message = response.errorBody().string();
+                                    repository.dispatchInfoForRecipe.onNext(message);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                    repository.dispatchInfoForRecipe.onNext(
+                                            getApplicationContext().getString(R.string.load_error_message));
+                                }
+                            } else
                                 repository.dispatchInfoForRecipe.onNext(
                                         getApplicationContext().getString(R.string.load_error_message));
-                            }
-                        }
+                            emitter.onSuccess(Result.failure());
+                        } else
+                            emitter.onSuccess(Result.success());
                     }, throwable -> {
                         repository.dispatchInfoForRecipe.onNext(
                                 getApplicationContext().getString(R.string.load_error_message));

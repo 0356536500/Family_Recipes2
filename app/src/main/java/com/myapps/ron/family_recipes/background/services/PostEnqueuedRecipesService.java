@@ -12,6 +12,8 @@ import android.os.Process;
 import android.os.StrictMode;
 import android.util.Log;
 
+import androidx.annotation.Nullable;
+
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.layout.APICallsHandler;
 import com.myapps.ron.family_recipes.layout.S3.OnlineStorageWrapper;
@@ -20,9 +22,9 @@ import com.myapps.ron.family_recipes.layout.modelTO.PendingRecipeTO;
 import com.myapps.ron.family_recipes.logic.Injection;
 import com.myapps.ron.family_recipes.logic.repository.PendingRecipeRepository;
 import com.myapps.ron.family_recipes.logic.repository.RecipeRepository;
+import com.myapps.ron.family_recipes.logic.storage.StorageWrapper;
 import com.myapps.ron.family_recipes.model.PendingRecipeEntity;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -160,13 +162,11 @@ public class PostEnqueuedRecipesService extends Service {
                 Map<String, String> results = response.body();
                 Log.e(TAG, "finished post pend, " + results.toString());
                 if (recipe.getFoodFiles() != null) {
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    } finally {
-                        uploadFoodFilesSync(results.get(RESPONSE_KEY_RECIPE_ID), results.get(RESPONSE_KEY_RECIPE_MODIFIED), recipe.getFoodFiles());
-                    }
+                    uploadFoodFilesSync(
+                            results.get(RESPONSE_KEY_RECIPE_ID),
+                            results.get(RESPONSE_KEY_RECIPE_MODIFIED),
+                            compressFiles(recipe.getFoodFiles())
+                    );
                 } else {
                     //no images to upload
                     new Handler().postDelayed(() -> Log.e(TAG, "recipe uploaded"), 2500);
@@ -212,10 +212,30 @@ public class PostEnqueuedRecipesService extends Service {
         deleteLocalFiles(recipe.getFoodFiles());*/
     }
 
-    private void uploadFoodFilesSync(String id, String lastModifiedDate, List<String> foodFiles) {
+    @Nullable
+    private List<String> compressFiles(List<String> paths) {
+        List<String> compressedFiles = null;
+        if (paths != null) {
+            compressedFiles = new ArrayList<>();
+            for (String path: paths) {
+                String compressedPath = StorageWrapper.compressFile(this, path);
+                if (compressedPath != null) {
+                    compressedFiles.add(compressedPath);
+                }
+            }
+        }
+        return compressedFiles;
+    }
+
+    private void uploadFoodFilesSync(String id, String lastModifiedDate, @Nullable List<String> foodFiles) {
         Log.e(TAG, "uploading images");
-        Log.e(TAG, "id = " + id + "\n files: " + foodFiles);
         RecipeRepository repository = Injection.provideRecipeRepository(getApplicationContext());
+
+        if (foodFiles == null) {
+            repository.dispatchInfo.onNext(getApplicationContext().getString(R.string.post_images_error));
+            return;
+        }
+        Log.e(TAG, "id = " + id + "\n files: " + foodFiles);
 
         //Synchronous request with retrofit 2.0
         Response<List<String>> response = APICallsHandler.requestUrlsForFoodPicturesSync(id, lastModifiedDate, foodFiles.size(), AppHelper.getAccessToken());
@@ -230,7 +250,7 @@ public class PostEnqueuedRecipesService extends Service {
                     Log.e(TAG, "uploading file #" + i);
                     OnlineStorageWrapper.uploadFoodFileSync(urlsForFood.get(i), foodFiles.get(i));
                 }
-                deleteLocalFiles(foodFiles);
+                //deleteLocalFiles(foodFiles);
                 new Handler().postDelayed(() -> Log.e(TAG, "images uploaded"), 2500);
             } else {
                 try {
@@ -244,11 +264,11 @@ public class PostEnqueuedRecipesService extends Service {
                     repository.dispatchInfo.onNext(getApplicationContext().getString(R.string.post_images_error));
                 }
             }
-        }
-        Log.e(TAG, "urls are null");
+        } else
+            Log.e(TAG, "urls are null");
     }
 
-    @SuppressWarnings("ResultOfMethodCallIgnored")
+    /*@SuppressWarnings("ResultOfMethodCallIgnored")
     private void deleteLocalFiles(List<String> files) {
         if (files != null && !files.isEmpty()) {
             for (int i = 0; i < files.size(); i++) {
@@ -256,5 +276,5 @@ public class PostEnqueuedRecipesService extends Service {
             }
         }
         //new File(recipe.getContent()).delete();
-    }
+    }*/
 }

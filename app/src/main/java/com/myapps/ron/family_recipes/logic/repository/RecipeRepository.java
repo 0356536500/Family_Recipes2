@@ -186,7 +186,7 @@ public class RecipeRepository {
                             return;
                         }
                         //Log.e(TAG, "getMaybeRecipe, onComplete, enqueue worker");
-                        WorkManager.getInstance().enqueue(GetOneRecipeWorker.getOneRecipeWorker(id));
+                        WorkManager.getInstance(context).enqueue(GetOneRecipeWorker.getOneRecipeWorker(id));
                         //BeginContinuationWorker.enqueueWorkContinuationWithValidSession(BeginContinuationWorker.WORKERS.GET_RECIPE, id);
                     }
                 });
@@ -720,7 +720,7 @@ public class RecipeRepository {
                     public void onSuccess(ContentEntity contentEntity) {
                         // fetch recipe content if possible
                         if (MiddleWareForNetwork.checkInternetConnection(context) && AppHelper.getAccessToken() != null)
-                            WorkManager.getInstance().enqueue(GetRecipeContentWorker.getRecipeContentWorker(recipeId, contentEntity.getLastModifiedDate()));
+                            WorkManager.getInstance(context).enqueue(GetRecipeContentWorker.getRecipeContentWorker(recipeId, contentEntity.getLastModifiedDate()));
                         dispose();
                     }
 
@@ -737,7 +737,7 @@ public class RecipeRepository {
                         if (!MiddleWareForNetwork.checkInternetConnection(context) || AppHelper.getAccessToken() == null)
                             dispatchInfoForRecipe.onNext(context.getString(R.string.recipe_content_not_found));
                         else
-                            WorkManager.getInstance().enqueue(GetRecipeContentWorker.getRecipeContentWorker(recipeId, null));
+                            WorkManager.getInstance(context).enqueue(GetRecipeContentWorker.getRecipeContentWorker(recipeId, null));
                     }
                 });
 

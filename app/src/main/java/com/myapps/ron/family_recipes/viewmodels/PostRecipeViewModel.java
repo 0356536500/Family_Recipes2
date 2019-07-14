@@ -1,5 +1,7 @@
 package com.myapps.ron.family_recipes.viewmodels;
 
+import android.content.Context;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
 
@@ -52,19 +54,19 @@ public class PostRecipeViewModel extends ViewModel {
         }
     }
 
-    public void postRecipe() {
+    public void postRecipe(Context context) {
         this.compositeDisposable.add(
                 this.pendingRecipeRepository
                         .insertOrUpdatePendingRecipe(this.recipe)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(this::initWorker, CrashLogger::logException)
+                        .subscribe(() -> initWorker(context), CrashLogger::logException)
         );
     }
 
-    private void initWorker() {
+    private void initWorker(Context context) {
         this.compositeDisposable.clear();
-        BeginContinuationWorker.enqueueWorkContinuationWithValidSession(BeginContinuationWorker.WORKERS.POST_RECIPE);
+        BeginContinuationWorker.enqueueWorkContinuationWithValidSession(context);
     }
 
     @Override

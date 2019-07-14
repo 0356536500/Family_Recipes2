@@ -2,16 +2,21 @@ package com.myapps.ron.family_recipes.viewmodels;
 
 import android.content.Context;
 import android.net.Uri;
+import android.os.Handler;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
+import androidx.work.WorkManager;
 
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.background.services.PostFoodImagesService;
+import com.myapps.ron.family_recipes.background.workers.GetOneRecipeWorker;
 import com.myapps.ron.family_recipes.layout.Constants;
+import com.myapps.ron.family_recipes.layout.MiddleWareForNetwork;
+import com.myapps.ron.family_recipes.layout.cognito.AppHelper;
 import com.myapps.ron.family_recipes.logic.repository.RecipeRepository;
 import com.myapps.ron.family_recipes.logic.storage.StorageWrapper;
 import com.myapps.ron.family_recipes.model.AccessEntity;
@@ -214,6 +219,13 @@ public class RecipeViewModel extends ViewModel {
         if (recipe != null)
             PostFoodImagesService.startActionPostImages(context, recipe.getId(),
                     recipe.getLastModifiedDate(), imagesPathsToUpload);
+    }
+
+    public void refreshRecipeDelayed(Context context) {
+        new Handler().postDelayed(() -> {
+            if (MiddleWareForNetwork.checkInternetConnection(context) && AppHelper.getAccessToken() != null)
+                WorkManager.getInstance(context).enqueue(GetOneRecipeWorker.getOneRecipeWorker(recipeId));
+        }, 3000);
     }
 
     // region Recipe Access

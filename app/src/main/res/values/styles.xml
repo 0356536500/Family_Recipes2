@@ -214,9 +214,11 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <!-- Edit text line color -->
         <item name="colorAccent">@color/black</item>
-        <item name="android:background">?attr/tileBackgroundColor</item>
+        <item name="android:background">@color/transparent</item>
+        <!--<item name="android:background">?attr/tileBackgroundColor</item>-->
 
         <item name="android:textColor">@color/black</item>
+        <item name="android:strokeColor">@color/black</item>
         <item name="android:editTextColor">@color/grey_700</item>
         <item name="android:textColorHint">@color/grey_600</item>
         <item name="android:textColorPrimary">@color/grey_700</item>
@@ -229,9 +231,11 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <!-- Edit text line color -->
         <item name="colorAccent">@color/grey_300</item>
+        <item name="android:background">@color/transparent</item>
         <!--<item name="android:background">?attr/tileBackgroundColor</item>-->
 
         <item name="android:textColor">@color/grey_100</item>
+        <item name="android:strokeColor">@color/grey_100</item>
         <item name="android:editTextColor">@color/grey_100</item>
         <item name="android:textColorHint">@color/grey_300</item>
         <item name="android:textColorPrimary">@color/grey_100</item>

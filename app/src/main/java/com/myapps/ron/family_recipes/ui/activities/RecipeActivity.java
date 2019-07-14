@@ -8,8 +8,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.graphics.BlendMode;
-import android.graphics.BlendModeColorFilter;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -35,7 +35,6 @@ import androidx.appcompat.widget.ShareActionProvider;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.core.content.FileProvider;
 import androidx.core.view.MenuItemCompat;
 import androidx.core.widget.ContentLoadingProgressBar;
 import androidx.fragment.app.DialogFragment;
@@ -55,6 +54,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.logic.Injection;
+import com.myapps.ron.family_recipes.logic.storage.ExternalStorageHelper;
 import com.myapps.ron.family_recipes.logic.storage.StorageWrapper;
 import com.myapps.ron.family_recipes.model.RecipeEntity;
 import com.myapps.ron.family_recipes.recycler.adapters.CommentsAdapter;
@@ -73,6 +73,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executors;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -143,6 +144,11 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
     protected void onDestroy() {
         super.onDestroy();
         compositeDisposable.clear();
+        try {
+            unregisterReceiver(mReceiver);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     // endregion
@@ -244,7 +250,6 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
 
     private void initRecycler() {
         //commentsAdapter = new CommentsAdapter(this.recipe.getComments());
-
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
         commentsRecyclerView.setLayoutManager(mLayoutManager);
         commentsRecyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -418,23 +423,23 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
                 // Collapsed
                 //menuItemShare.setIcon(R.drawable.ic_share_collapsed_24dp);
                 if (toolbar.getOverflowIcon() != null) {
-                    toolbar.getOverflowIcon().setColorFilter(new BlendModeColorFilter(navigationCollapsedColor, BlendMode.SRC_ATOP));
                     //toolbar.getOverflowIcon().setColorFilter(navigationCollapsedColor, PorterDuff.Mode.SRC_ATOP);
+                    toolbar.getOverflowIcon().setColorFilter(new PorterDuffColorFilter(navigationCollapsedColor, PorterDuff.Mode.SRC_ATOP));
                 }
                 if (toolbar.getNavigationIcon() != null) {
-                    toolbar.getNavigationIcon().setColorFilter(new BlendModeColorFilter(navigationCollapsedColor, BlendMode.SRC_ATOP));
                     //toolbar.getNavigationIcon().setColorFilter(navigationCollapsedColor, PorterDuff.Mode.SRC_ATOP);
+                    toolbar.getNavigationIcon().setColorFilter(new PorterDuffColorFilter(navigationCollapsedColor, PorterDuff.Mode.SRC_ATOP));
                 }
             } else if (verticalOffset == 0) {
                 // Expanded
                 //menuItemShare.setIcon(R.drawable.ic_share_expanded_24dp);
                 if (toolbar.getOverflowIcon() != null) {
-                    toolbar.getOverflowIcon().setColorFilter(new BlendModeColorFilter(navigationExpandedColor, BlendMode.SRC_ATOP));
                     //toolbar.getOverflowIcon().setColorFilter(navigationExpandedColor, PorterDuff.Mode.SRC_ATOP);
+                    toolbar.getOverflowIcon().setColorFilter(new PorterDuffColorFilter(navigationExpandedColor, PorterDuff.Mode.SRC_ATOP));
                 }
                 if (toolbar.getNavigationIcon() != null) {
-                    toolbar.getNavigationIcon().setColorFilter(new BlendModeColorFilter(navigationExpandedColor, BlendMode.SRC_ATOP));
                     //toolbar.getNavigationIcon().setColorFilter(navigationExpandedColor, PorterDuff.Mode.SRC_ATOP);
+                    toolbar.getNavigationIcon().setColorFilter(new PorterDuffColorFilter(navigationExpandedColor, PorterDuff.Mode.SRC_ATOP));
                 }
             } /*else {
                         // Somewhere in between
@@ -490,13 +495,13 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
             boolean preferenceScreenOn = SharedPreferencesHandler.getBoolean(this,
                     getString(R.string.action_key_keep_screen_on));
             menuItem.setChecked(preferenceScreenOn);
-            findViewById(android.R.id.home).setKeepScreenOn(preferenceScreenOn);
+            findViewById(android.R.id.content).setKeepScreenOn(preferenceScreenOn);
         } else {
             // write keep screen setting and change menu item value
             SharedPreferencesHandler.writeBoolean(this,
                     getString(R.string.action_key_keep_screen_on), keepScreenOn);
             menuItem.setChecked(keepScreenOn);
-            findViewById(android.R.id.home).setKeepScreenOn(keepScreenOn);
+            findViewById(android.R.id.content).setKeepScreenOn(keepScreenOn);
         }
     }
 
@@ -542,13 +547,16 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
             try {
                 // Create the File where the photo should go
                 File photoFile = StorageWrapper.createImageFile(this);
-                //imageUri = Uri.fromFile(photoFile);
-                imageUri = FileProvider.getUriForFile(this,
+                imageUri = Uri.fromFile(photoFile);
+                Uri uri = ExternalStorageHelper.getFileUri(this, photoFile);
+                /*imageUri = FileProvider.getUriForFile(this,
                         getString(R.string.appPackage),
-                        photoFile);
+                        photoFile);*/
                 //Log.e(TAG, "before shooting, file: " + imageUri.getPath());
-                intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
-                startActivityForResult(intent, CAMERA_REQUEST);
+                if (uri != null) {
+                    intent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
+                    startActivityForResult(intent, CAMERA_REQUEST);
+                }
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
@@ -600,19 +608,22 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Log.e(TAG, "onActivityResult");
+        //Log.e(TAG, "onActivityResult");
         try {
             switch (requestCode) {
                 case CAMERA_REQUEST:
-                    //Log.e(TAG, "camera result, " + imageUri.getPath());
+                    Log.e(TAG, "camera result, " + imageUri.getPath());
                     if (imageUri.getPath() != null) {
                         if (resultCode == RESULT_OK) {
                             File file = new File(imageUri.getPath());
                             //Log.e(TAG, "camera absolute path, " + file.getAbsolutePath());
                             //Log.e(TAG, "file bytes = " + file.length());
 
-                            imagesPathsToUpload.add(file.getAbsolutePath());
+                            imagesPathsToUpload.add(imageUri.getPath());
                             cameraImagesToDeleteAfterUpload.add(file.getName());
+
+                            Executors.newSingleThreadExecutor().execute(() ->
+                                    StorageWrapper.rotateImageIfRequired(this, imageUri));
                             pickImagesConfirmationDialog();
 
                         } else {
@@ -708,24 +719,20 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
             String action = intent.getAction();
             if (action == null)
                 return;
-            switch(action) {
-                // When network state changes
-                case Constants.ACTION_UPLOAD_IMAGES_SERVICE:
-                    Log.d(TAG, "Got an update from service");
-                    //unregisterReceiver(mReceiver);
-                    //registerReceiver(mReceiver, regularFilter);
-                    if (intent.getExtras() != null) {
-                        boolean finishUpload = intent.getBooleanExtra("flag", false);
-                        if (finishUpload) {
-                            Toast.makeText(RecipeActivity.this, "photos uploaded successfully!", Toast.LENGTH_SHORT).show();
-                        } else {
-                            Toast.makeText(RecipeActivity.this, "failed to upload the photos", Toast.LENGTH_SHORT).show();
-                        }
-                        uploadImagesProgressBar.setVisibility(View.INVISIBLE);
-                        resetUploadDetails();
+            if (Constants.ACTION_UPLOAD_IMAGES_SERVICE.equals(action)) {
+                Log.e(TAG, "Got an update from service");
+                if (intent.getExtras() != null) {
+                    boolean finishUpload = intent.getBooleanExtra("flag", false);
+                    if (finishUpload) {
+                        Toast.makeText(RecipeActivity.this, "photos uploaded successfully!", Toast.LENGTH_SHORT).show();
+                        viewModel.refreshRecipeDelayed(getApplicationContext());
+                    } else {
+                        Toast.makeText(RecipeActivity.this, "failed to upload the photos", Toast.LENGTH_SHORT).show();
                     }
-                    unregisterReceiver(mReceiver);
-                    break;
+                    uploadImagesProgressBar.setVisibility(View.INVISIBLE);
+                    resetUploadDetails();
+                }
+                unregisterReceiver(mReceiver);
             }
         }
     };

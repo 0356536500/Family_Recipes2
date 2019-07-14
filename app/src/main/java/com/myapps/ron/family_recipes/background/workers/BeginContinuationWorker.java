@@ -19,11 +19,11 @@ import io.reactivex.disposables.CompositeDisposable;
  * Created by ronginat on 20/06/2019
  *
  * This worker is waiting for a valid cognito session.
- * When acquired, continue with the actual work defined by {@link WORKERS}
+ * When acquired, continue with the actual work
  */
 public class BeginContinuationWorker extends RxWorker {
 
-    public enum WORKERS { GET_RECIPE, GET_CONTENT, POST_RECIPE, GET_USER }
+    //public enum WORKERS { GET_RECIPE, GET_CONTENT, POST_RECIPE, GET_USER }
 
     private CompositeDisposable compositeDisposable;
 
@@ -34,6 +34,7 @@ public class BeginContinuationWorker extends RxWorker {
         this.compositeDisposable = new CompositeDisposable();
     }
 
+    @NonNull
     @Override
     public Single<Result> createWork() {
         if (AppHelper.getAccessToken() != null)
@@ -51,12 +52,13 @@ public class BeginContinuationWorker extends RxWorker {
         this.compositeDisposable.clear();
     }
 
-    private static OneTimeWorkRequest getSessionWaiterWorker(WORKERS nextWorker) {
+    private static OneTimeWorkRequest getSessionWaiterWorker(/*WORKERS nextWorker*/) {
         // Create a Constraints object that defines when the task should run
         Constraints.Builder constraintsBuilder =  new Constraints.Builder()
-                .setRequiredNetworkType(NetworkType.CONNECTED);
-        if (nextWorker.equals(WORKERS.POST_RECIPE))
-            constraintsBuilder.setRequiresBatteryNotLow(true);
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .setRequiresBatteryNotLow(true);
+        /*if (nextWorker.equals(WORKERS.POST_RECIPE))
+            constraintsBuilder.setRequiresBatteryNotLow(true);*/
 
         // then create a OneTimeWorkRequest that uses those constraints
 
@@ -65,22 +67,19 @@ public class BeginContinuationWorker extends RxWorker {
                 .build();
     }
 
-    public static void enqueueWorkContinuationWithValidSession(WORKERS nextWorker) {
+    public static void enqueueWorkContinuationWithValidSession(Context context/*, WORKERS nextWorker*/) {
         try {
-            WorkManager.getInstance()
-                    .beginWith(getSessionWaiterWorker(nextWorker))
-                    .then(getNextWorkerRequest(nextWorker))
+            WorkManager.getInstance(context)
+                    .beginWith(getSessionWaiterWorker())
+                    .then(getNextWorkerRequest())
                     .enqueue();
         } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
 
-    private static OneTimeWorkRequest getNextWorkerRequest(WORKERS worker) {
-        if (worker.equals(WORKERS.POST_RECIPE))
-            return PostRecipeScheduledWorker.createPostRecipesWorker();
-        else
-            throw new RuntimeException("Worker is not valid!");
+    private static OneTimeWorkRequest getNextWorkerRequest(/*WORKERS worker*/) {
+        return PostRecipeScheduledWorker.createPostRecipesWorker();
 
         /*switch (worker) {
             case GET_RECIPE:

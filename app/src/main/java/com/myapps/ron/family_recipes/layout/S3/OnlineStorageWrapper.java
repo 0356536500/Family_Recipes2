@@ -69,13 +69,11 @@ public class OnlineStorageWrapper {
                     @Override
                     public void onSuccess(Uri uri) {
                         callback.onFinished(uri);
-                        dispose();
                     }
 
                     @Override
                     public void onError(Throwable e) {
                         callback.onFinished(null);
-                        dispose();
                     }
                 });
     }

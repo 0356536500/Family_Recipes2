@@ -97,7 +97,7 @@
     <string name="no_comments">תגובות (0)</string>
     <string name="post_comment_hint">תגובה חדשה</string>
     <string name="post_comment_succeeded">ההודעה נשלחה בהצלחה</string>
-    <string name="alert_dialog_upload_photos_confirmation">אישור</string>
+    <string name="alert_dialog_upload_photos_confirmation">העלאת תמונות</string>
     <string name="alert_dialog_upload_photos_cancel">ביטול</string>
     <string name="alert_dialog_upload_photos_finish">העלה %1$d תמונות</string>
     <string name="alert_dialog_upload_photos_take_more">עוד</string>

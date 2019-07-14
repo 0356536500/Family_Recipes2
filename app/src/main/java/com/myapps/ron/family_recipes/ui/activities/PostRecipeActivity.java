@@ -180,9 +180,9 @@ public class PostRecipeActivity extends MyBaseActivity {
     private void setFragments() {
         fragments = new ArrayList<>();
 
+        fragments.add(new PostRecipePickPhotosFragment());
         fragments.add(new PostRecipeFirstFragment());
         fragments.add(new PostRecipeGenerateContentFragment());
-        fragments.add(new PostRecipePickPhotosFragment());
 
         getSupportFragmentManager()
                 .beginTransaction()
@@ -357,7 +357,7 @@ public class PostRecipeActivity extends MyBaseActivity {
     }
 
     public void postRecipe() {
-        viewModel.postRecipe();
+        viewModel.postRecipe(this);
         if (MiddleWareForNetwork.checkInternetConnection(this))
             Toast.makeText(this, R.string.post_recipe_online_upload_message, Toast.LENGTH_LONG).show();
         else

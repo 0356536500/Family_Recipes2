@@ -4,12 +4,13 @@ import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
 
+import androidx.annotation.Nullable;
+import androidx.core.content.FileProvider;
+
 import com.myapps.ron.family_recipes.R;
 
 import java.io.File;
 import java.io.IOException;
-
-import androidx.core.content.FileProvider;
 
 public class ExternalStorageHelper {
 
@@ -19,6 +20,7 @@ public class ExternalStorageHelper {
      * @param dir - dir of file to check
      * @return path of requested file from cache if available or from app root storage. null if file not exists
      */
+    @Nullable
     public static Uri getFileAbsolutePath(Context context, String dir, String fileName){
         File filesDir = context.getExternalFilesDir(dir);
         File file = new File(filesDir, fileName);
@@ -36,9 +38,24 @@ public class ExternalStorageHelper {
      * @param dir - dir of file to check
      * @return path of requested file from app root storage. null if file not exists
      */
+    @Nullable
     static Uri getFileUri(Context context, String dir, String fileName){
         File filesDir = context.getExternalFilesDir(dir);
         File file = new File(filesDir, fileName);
+        Uri uri = FileProvider.getUriForFile(context, context.getString(R.string.appPackage), file);
+        if (file.exists()) {
+            //Log.e("ExternalStorageHelper", uri.getPath() + " exists");
+            return uri;
+        }
+        return null;
+    }
+
+    /**
+     * @see ExternalStorageHelper#getFileAbsolutePath(Context, String, String)
+     */
+    @SuppressWarnings("JavadocReference")
+    @Nullable
+    public static Uri getFileUri(Context context, File file) {
         Uri uri = FileProvider.getUriForFile(context, context.getString(R.string.appPackage), file);
         if (file.exists()) {
             //Log.e("ExternalStorageHelper", uri.getPath() + " exists");

@@ -18,12 +18,12 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
-import androidx.core.content.FileProvider;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.bumptech.glide.Glide;
 import com.google.android.material.snackbar.Snackbar;
 import com.myapps.ron.family_recipes.R;
+import com.myapps.ron.family_recipes.logic.storage.ExternalStorageHelper;
 import com.myapps.ron.family_recipes.logic.storage.StorageWrapper;
 import com.myapps.ron.family_recipes.ui.baseclasses.PostRecipeBaseFragment;
 import com.myapps.ron.family_recipes.utils.Constants;
@@ -34,6 +34,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executors;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -190,13 +191,16 @@ public class PostRecipePickPhotosFragment extends PostRecipeBaseFragment {
             try {
                 // Create the File where the photo should go
                 File photoFile = StorageWrapper.createImageFile(activity);
-                //imageUri = Uri.fromFile(photoFile);
-                imageUri = FileProvider.getUriForFile(activity,
+                imageUri = Uri.fromFile(photoFile);
+                Uri uri = ExternalStorageHelper.getFileUri(activity, photoFile);
+                /*Uri uri = FileProvider.getUriForFile(activity,
                         getString(R.string.appPackage),
-                        photoFile);
+                        photoFile);*/
                 //Log.e(TAG, "before shooting, file: " + imageUri.getPath());
-                intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
-                startActivityForResult(intent, CAMERA_REQUEST);
+                if (uri != null) {
+                    intent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
+                    startActivityForResult(intent, CAMERA_REQUEST);
+                }
             } catch (IOException ex) {
                 //Log.e(TAG, ex.getMessage());
                 ex.printStackTrace();
@@ -258,6 +262,8 @@ public class PostRecipePickPhotosFragment extends PostRecipeBaseFragment {
                             imagesPathsToUpload.add(file.getAbsolutePath());
                             cameraImagesToDeleteAfterUpload.add(file.getName());
 
+                            Executors.newSingleThreadExecutor().execute(() ->
+                                    StorageWrapper.rotateImageIfRequired(activity, imageUri));
                             displayNewImage(imageUri.getPath());
 
                         } else {

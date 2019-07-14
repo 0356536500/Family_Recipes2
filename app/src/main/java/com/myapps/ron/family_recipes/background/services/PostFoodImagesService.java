@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+import androidx.annotation.Nullable;
+
 import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.layout.APICallsHandler;
 import com.myapps.ron.family_recipes.layout.S3.OnlineStorageWrapper;
@@ -91,6 +93,7 @@ public class PostFoodImagesService extends IntentService {
         //new File(recipe.getContent()).delete();
     }
 
+    @Nullable
     private List<String> compressFiles(List<String> paths) {
         List<String> compressedFiles = null;
         if (paths != null) {
@@ -99,9 +102,9 @@ public class PostFoodImagesService extends IntentService {
                 String compressedPath = StorageWrapper.compressFile(this, path);
                 if (compressedPath != null) {
                     compressedFiles.add(compressedPath);
-                    File compressedFile = new File(compressedPath);
+                    /*File compressedFile = new File(compressedPath);
                     Log.e(TAG, "compressed file bytes = " + compressedFile.length());
-                    compressedFile.deleteOnExit();
+                    compressedFile.deleteOnExit();*/
                 }
             }
         }
@@ -112,8 +115,12 @@ public class PostFoodImagesService extends IntentService {
      * Handle action {@link PostFoodImagesService#ACTION_POST_IMAGES} in the provided background thread
      * with the provided parameters.
      */
-    private void handleActionPostImagesSync(String id, String lastModifiedDate, List<String> foodFiles) {
+    private void handleActionPostImagesSync(String id, String lastModifiedDate, @Nullable List<String> foodFiles) {
         //uploadFoodFilesSync(id, localPaths);
+        if (foodFiles == null || foodFiles.size() == 0) {
+            sendIntentUploadImagesFinishedToUser(false);
+            return;
+        }
         Log.e(TAG, "handle post images");
         Log.e(TAG, "id = " + id + "\n files: " + foodFiles);
         RecipeRepository repository = Injection.provideRecipeRepository(getApplicationContext());

@@ -3,6 +3,7 @@ package com.myapps.ron.family_recipes.utils.logic;
 import android.content.Context;
 
 import com.crashlytics.android.Crashlytics;
+import com.myapps.ron.family_recipes.BuildConfig;
 
 import io.fabric.sdk.android.Fabric;
 
@@ -16,7 +17,8 @@ public class CrashLogger {
      * @param context application context
      */
     public static void init(Context context) {
-        Fabric.with(context, new Crashlytics());
+        if (!BuildConfig.DEBUG)
+            Fabric.with(context, new Crashlytics());
     }
 
     /**
@@ -24,7 +26,8 @@ public class CrashLogger {
      * @param name username of AWS Cognito account
      */
     public static void setName(String name) {
-        Crashlytics.setUserName(name);
+        if (!BuildConfig.DEBUG)
+            Crashlytics.setUserName(name);
     }
 
     /**
@@ -32,6 +35,7 @@ public class CrashLogger {
      * @param throwable Throwable to be logged
      */
     public static void logException(Throwable throwable) {
-        Crashlytics.logException(throwable);
+        if (!BuildConfig.DEBUG)
+            Crashlytics.logException(throwable);
     }
 }

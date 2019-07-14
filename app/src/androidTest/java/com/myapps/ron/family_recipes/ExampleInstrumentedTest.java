@@ -1,16 +1,15 @@
 package com.myapps.ron.family_recipes;
 
 import android.content.Context;
+import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
 
-import com.myapps.ron.family_recipes.layout.cognito.AppHelper;
-
-import androidx.test.InstrumentationRegistry;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
-import io.reactivex.Maybe;
-import io.reactivex.disposables.CompositeDisposable;
+
+import com.myapps.ron.family_recipes.layout.cognito.AppHelper;
+import com.myapps.ron.family_recipes.logic.storage.StorageWrapper;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -18,7 +17,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static org.junit.Assert.*;
+import io.reactivex.Maybe;
+import io.reactivex.disposables.CompositeDisposable;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Instrumented test, which will execute on an Android device.
@@ -30,9 +33,22 @@ public class ExampleInstrumentedTest {
     @Test
     public void useAppContext() {
         // Context of the app under test.
-        Context appContext = InstrumentationRegistry.getTargetContext();
+        Context appContext = ApplicationProvider.getApplicationContext();
 
         assertEquals("com.myapps.ron.family_recipes", appContext.getPackageName());
+    }
+
+    @Test
+    public void textCompression() {
+        //Uri uri = Uri.parse("/storage/emulated/0/Download/eagckh5.jpg");
+        //String realPath = "/storage/emulated/0/Download/eagckh5.jpg";//StorageWrapper.getRealPathFromURI(ApplicationProvider.getApplicationContext(), uri);
+        //String realPath = "/storage/emulated/0/Download/legion_ver5_xxlg.jpg";
+        String realPath = "/storage/emulated/0/Download/20190520_121440.jpg"; // 10MB > 902KB > 224KB (-10 quality) | 580KB (-5 quality)
+        //String realPath = "/storage/emulated/0/Download/20190119_114310.jpg"; // 7MB > 585KB
+        //String compressPath = StorageWrapper.compressFile(ApplicationProvider.getApplicationContext(), realPath);
+
+        //assertTrue(!realPath.equals(compressPath));
+        assertTrue(true);
     }
 
     @Test

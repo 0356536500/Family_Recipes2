@@ -5,7 +5,6 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +19,6 @@ import com.myapps.ron.family_recipes.R;
 import com.myapps.ron.family_recipes.logic.storage.StorageWrapper;
 import com.myapps.ron.family_recipes.model.RecipeEntity;
 
-import java.io.File;
 import java.util.List;
 
 /**
@@ -76,12 +74,9 @@ public class ImagesPagerAdapter extends PagerAdapter {
 
             StorageWrapper.getFoodFile(context, images.get(position), path -> {
                 if(path != null && path.getPath() != null) {
-                    File file = new File(path.getPath());
-                    if (position > 0)
-                        file.deleteOnExit();
 
                     Glide.with(context)
-                            .load(Uri.fromFile(file))
+                            .load(path)
                             .placeholder(circularProgressDrawable)
                             .into(view);
                 }

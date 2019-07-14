@@ -1,6 +1,7 @@
 package com.myapps.ron.family_recipes.recycler.adapters;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
@@ -262,13 +263,11 @@ public class RecipesAdapter extends PagedListAdapter<RecipeMinimal, RecipesAdapt
                 //view.setLayoutParams(marginLayoutParams);
                 Chip chip = view.findViewById(R.id.category_text);
                 chip.setText(category);
-                chip.setBackgroundColor(RecipesAdapterHelper.getCategoryColorByName(categoryList, category));
-                //((TextView) view.findViewById(R.id.category_text)).setText(category);
-                //view.findViewById(R.id.category_text).getBackground().setTint(pickColor());
+                chip.setChipBackgroundColor(ColorStateList.valueOf(RecipesAdapterHelper.getCategoryColorByName(categoryList, category)));
+                /*((TextView) view.findViewById(R.id.category_text)).setText(category);
+                view.findViewById(R.id.category_text).getBackground().setTint(RecipesAdapterHelper.getCategoryColorByName(categoryList, category));*/
+
                 //view.findViewById(R.id.category_text).getBackground().setColorFilter(RecipesAdapterHelper.getCategoryColorByName(categoryList, category), PorterDuff.Mode.SRC_ATOP);
-                /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    view.setForegroundGravity(Gravity.CENTER);
-                }*/
 
                 //view.getBackground().setColorFilter(pickColor(), PorterDuff.Mode.SRC_ATOP);
                 //((GradientDrawable)view.getBackground()).setStroke(5, Color.BLACK);

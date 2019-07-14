@@ -29,6 +29,7 @@
     <dimen name="item_desc_text_size">16sp</dimen>
     <dimen name="item_uploader_text_size">16sp</dimen>
     <dimen name="item_likes_text_size">16sp</dimen>
+    <dimen name="item_category_min_height">60dp</dimen>
 
     <dimen name="item_corner_radius">5dp</dimen>
     <dimen name="item_more_info_bottom_margin">4dp</dimen>

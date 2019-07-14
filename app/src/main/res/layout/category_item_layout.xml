@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<com.google.android.material.chip.Chip xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.chip.Chip
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/category_text"
     style="@style/Widget.MaterialComponents.Chip.Filter"
-    android:theme="@style/Theme.MaterialComponents.Light.NoActionBar"
+    android:theme="?attr/material_theme"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
     android:clickable="false"
     app:rippleColor="@color/grey_700"
+    app:chipMinHeight="@dimen/item_category_min_height"
     app:chipStrokeWidth="1dp"
-    app:chipStrokeColor="@color/colorPrimaryDark"
+    app:chipStrokeColor="?android:strokeColor"
     app:chipCornerRadius="@dimen/material_corner_radius"
     android:textColor="@color/white"
     android:textSize="@dimen/item_desc_text_size"

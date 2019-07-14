@@ -160,8 +160,10 @@ class S3Helper {
                         // Handle a completed upload.
                         emitter.onSuccess(ExternalStorageHelper.getFileAbsolutePath(context, dir, key));
                     }
-                    if (TransferState.FAILED == state)
-                        emitter.onError(new Throwable("can\'t download file"));
+                    if (TransferState.FAILED == state) {
+                        if (!emitter.isDisposed())
+                            emitter.onError(new Throwable("can\'t download file"));
+                    }
                 }
 
                 @Override

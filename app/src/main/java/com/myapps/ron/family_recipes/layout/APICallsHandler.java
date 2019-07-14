@@ -298,33 +298,6 @@ public class APICallsHandler {
         }
     }
 
-    /*public static List<String> requestUrlsForFoodPicturesSyncOld(String id, String lastModifiedDate, int numOfFiles, String token) {
-        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
-                .permitAll().build();
-        StrictMode.setThreadPolicy(policy);
-
-        RecipeInterface service = getRetrofitInstance().create(RecipeInterface.class);
-        Call<List<String>> call = service.requestFoodUrls(token, id, lastModifiedDate, numOfFiles, "jpg");
-        try {
-            Response<List<String>> response = call.execute();
-            Log.e(TAG, "response code for requesting urls, " + response.code());
-            if (response.isSuccessful()) {
-                Log.e(TAG, "response urls:\n" + response.body());
-                return response.body();
-            } else {
-                if (response.errorBody() != null) {
-                    Log.e(TAG, "errorBody: " +response.errorBody().string());
-                }
-                return null;
-            }
-        } catch (IOException e) {
-            if (e.getMessage() != null)
-                Log.e(TAG, e.getMessage());
-            e.printStackTrace();
-            return null;
-        }
-    }*/
-
     // region Observable
 
     public static Observable<Response<RecipeTO>> getRecipeObservable(String id, String token) {
@@ -336,7 +309,7 @@ public class APICallsHandler {
     public static Observable<Response<ContentTO>> getRecipeContentObservable(String id, String lastModified, String token) {
         RecipeInterface service = getReactiveRetrofitInstance().create(RecipeInterface.class);
 
-        return service.getRecipeContentObservable(token, lastModified, id);
+        return service.getRecipeContentObservable(token, id, lastModified);
     }
 
     public static Observable<Response<List<CategoryTO>>> getAllCategoriesObservable(String date, String token) {
