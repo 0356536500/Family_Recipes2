@@ -102,6 +102,8 @@
     <string name="alert_dialog_upload_photos_finish">העלה %1$d תמונות</string>
     <string name="alert_dialog_upload_photos_take_more">עוד</string>
     <string name="alert_dialog_upload_photos_max_limit">מותר להעלות עד %1$d תמונות</string>
+    <string name="upload_images_success">התמונות הועלו בהצלחה!</string>
+    <string name="upload_images_failed">שגיאה בהעלאת התמונות</string>
 
     <!-- Recipe Activity Share a recipe -->
     <string name="recipe_share_pre_url">תראו את המתכון הזה!</string>

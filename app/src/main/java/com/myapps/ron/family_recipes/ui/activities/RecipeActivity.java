@@ -14,7 +14,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -85,7 +84,7 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
     private static final int CAMERA_REQUEST = 2;
     private static final int GALLERY_REQUEST = 1;
 
-    private final String TAG = RecipeActivity.class.getSimpleName();
+    //private final String TAG = RecipeActivity.class.getSimpleName();
     private AppBarLayout appBarLayout;
 
     private Toolbar toolbar;
@@ -195,8 +194,6 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
         initToolbar();
         initRecycler();
 
-        /*WebSettings webSettings = myWebView.getSettings();
-        webSettings.setJavaScriptEnabled(false);*/
         postCommentButton.setOnClickListener(postCommentListener);
     }
 
@@ -301,7 +298,7 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
             circularProgressDrawable.start();*/
 
             if (path != null) {
-                Log.e(TAG, "found path: " + path);
+                //Log.e(TAG, "found path: " + path);
 
                 Glide.with(getApplicationContext())
                         .asDrawable()
@@ -449,9 +446,10 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        if (viewModel.getRecipe().getValue() != null &&
-                viewModel.getRecipe().getValue().getFoodFiles() != null &&
-                viewModel.getRecipe().getValue().getFoodFiles().size() > Constants.MAX_FILES_TO_UPLOAD * 2)
+        RecipeEntity recipe = viewModel.getRecipe().getValue();
+        if (recipe != null &&
+                recipe.getFoodFiles() != null &&
+                recipe.getFoodFiles().size() >= Constants.MAX_FILES_TO_UPLOAD * 2)
             menu.findItem(R.id.action_add_photo).setVisible(false);
         return super.onPrepareOptionsMenu(menu);
     }
@@ -612,7 +610,7 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
         try {
             switch (requestCode) {
                 case CAMERA_REQUEST:
-                    Log.e(TAG, "camera result, " + imageUri.getPath());
+                    //Log.e(TAG, "camera result, " + imageUri.getPath());
                     if (imageUri.getPath() != null) {
                         if (resultCode == RESULT_OK) {
                             File file = new File(imageUri.getPath());
@@ -720,14 +718,14 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
             if (action == null)
                 return;
             if (Constants.ACTION_UPLOAD_IMAGES_SERVICE.equals(action)) {
-                Log.e(TAG, "Got an update from service");
+                //Log.e(TAG, "Got an update from service");
                 if (intent.getExtras() != null) {
                     boolean finishUpload = intent.getBooleanExtra("flag", false);
                     if (finishUpload) {
-                        Toast.makeText(RecipeActivity.this, "photos uploaded successfully!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(RecipeActivity.this, R.string.upload_images_success, Toast.LENGTH_SHORT).show();
                         viewModel.refreshRecipeDelayed(getApplicationContext());
                     } else {
-                        Toast.makeText(RecipeActivity.this, "failed to upload the photos", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(RecipeActivity.this, R.string.upload_images_failed, Toast.LENGTH_SHORT).show();
                     }
                     uploadImagesProgressBar.setVisibility(View.INVISIBLE);
                     resetUploadDetails();

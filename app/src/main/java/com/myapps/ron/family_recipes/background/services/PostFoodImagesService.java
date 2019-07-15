@@ -70,10 +70,22 @@ public class PostFoodImagesService extends IntentService {
                     String id = intent.getStringExtra(EXTRA_PARAM2);
                     String lastModifiedDate = intent.getStringExtra(EXTRA_PARAM3);
                     handleActionPostImagesSync(id, lastModifiedDate, compressFiles(files));
-                    //deleteLocalFiles(files);
+                    deleteLocalFiles(getLocalImages(files));
                 }
             }
         }
+    }
+
+    private List<String> getLocalImages(@Nullable List<String> images) {
+        if (images != null) {
+            List<String> localImages = new ArrayList<>();
+            for (String path : images) {
+                if (path.contains(getApplicationContext().getString(R.string.appPackage)))
+                    localImages.add(path);
+            }
+            return localImages;
+        }
+        return null;
     }
 
     private void sendIntentUploadImagesFinishedToUser(boolean finish) {
@@ -114,6 +126,7 @@ public class PostFoodImagesService extends IntentService {
     /**
      * Handle action {@link PostFoodImagesService#ACTION_POST_IMAGES} in the provided background thread
      * with the provided parameters.
+     * @param foodFiles - image paths after compression
      */
     private void handleActionPostImagesSync(String id, String lastModifiedDate, @Nullable List<String> foodFiles) {
         //uploadFoodFilesSync(id, localPaths);

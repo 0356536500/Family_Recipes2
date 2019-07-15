@@ -18,19 +18,21 @@ public class OnlineStorageWrapper {
 
     //region uploads
 
+    @SuppressWarnings("UnusedReturnValue")
     public static boolean uploadFoodFileSync(String url, String localPath) {
         return uploadFileSync(url, localPath, S3Helper.CONTENT_IMAGE);
     }
 
-    public static boolean uploadRecipeFileSync(String url, String localPath) {
+    /*public static boolean uploadRecipeFileSync(String url, String localPath) {
         return uploadFileSync(url, localPath, S3Helper.CONTENT_TEXT);
-    }
+    }*/
 
+    @SuppressWarnings("SameParameterValue")
     private static boolean uploadFileSync(String url, String localPath, String mimeType) {
         return S3Helper.uploadFileSync(url, localPath, mimeType);
     }
 
-    public static void uploadFoodFile(String url, String localPath, MyCallback<Boolean> callback) {
+    /*public static void uploadFoodFile(String url, String localPath, MyCallback<Boolean> callback) {
         uploadFile(url, localPath, S3Helper.CONTENT_IMAGE, callback);
     }
 
@@ -40,12 +42,13 @@ public class OnlineStorageWrapper {
 
     private static void uploadFile(String url, String localPath, String mimeType, MyCallback<Boolean> callback) {
         S3Helper.uploadFile(url, localPath, mimeType, callback);
-    }
+    }*/
 
     //endregion
 
     //region downloads
 
+    @SuppressWarnings("SameParameterValue")
     private static Single<Uri> downloadFile(Context context, String key, String dir) {
         S3Helper s3 = S3Helper.getInstance(context);
         return s3.downloadFile(context, key, dir);
@@ -78,7 +81,7 @@ public class OnlineStorageWrapper {
                 });
     }
 
-    public static void downloadRecipeFile(Context context, String key, final MyCallback<Uri> callback) {
+    /*public static void downloadRecipeFile(Context context, String key, final MyCallback<Uri> callback) {
         downloadFile(context, key, Constants.RECIPES_DIR)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -95,7 +98,7 @@ public class OnlineStorageWrapper {
                         dispose();
                     }
                 });
-    }
+    }*/
 
     //endregion
 

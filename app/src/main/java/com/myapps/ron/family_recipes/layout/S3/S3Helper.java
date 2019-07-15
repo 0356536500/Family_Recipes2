@@ -3,7 +3,6 @@ package com.myapps.ron.family_recipes.layout.S3;
 import android.content.Context;
 import android.net.Uri;
 import android.os.StrictMode;
-import androidx.annotation.NonNull;
 import android.util.Log;
 
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener;
@@ -12,7 +11,7 @@ import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferState;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
 import com.myapps.ron.family_recipes.logic.storage.ExternalStorageHelper;
-import com.myapps.ron.family_recipes.utils.MyCallback;
+import com.myapps.ron.family_recipes.utils.logic.CrashLogger;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,7 +20,6 @@ import io.reactivex.Single;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import retrofit2.Call;
-import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 
@@ -30,7 +28,7 @@ class S3Helper {
 
     private static final int STATUS_OK = 200;
     static final String CONTENT_IMAGE = "image/jpeg";
-    static final String CONTENT_TEXT = "text/html";
+    //static final String CONTENT_TEXT = "text/html";
 
     private static final String BASE_URL = "http://www.dummy.com/";
 
@@ -55,7 +53,7 @@ class S3Helper {
                         .build();*/
     }
 
-    static void uploadFile(String url, String localPath, String contentType, final MyCallback<Boolean> callback) {
+    /*static void uploadFile(String url, String localPath, String contentType, final MyCallback<Boolean> callback) {
         Log.e(TAG, "uploadFile, " + url);
         File file = new File(localPath);    // create new file on device
         //RequestBody requestFile = RequestBody.create(MediaType.parse(contentType), file);
@@ -63,10 +61,10 @@ class S3Helper {
         RequestBody requestBody = RequestBody.create(MediaType.parse(contentType),file);
         //MultipartBody.Part filePart = MultipartBody.Part.createFormData("file", file.getName(), requestBody);
 
-        /* since the pre-signed URL from S3 contains a host, this dummy URL will
+        *//* since the pre-signed URL from S3 contains a host, this dummy URL will
          * be replaced completely by the pre-signed URL.  (I'm using baseURl(String) here
          * but see baseUrl(okHttp3.HttpUrl) in Javadoc for how base URLs are handled
-         */
+         *//*
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
                 .build();
@@ -88,13 +86,13 @@ class S3Helper {
                 callback.onFinished(false);
             }
         });
-    }
+    }*/
 
     static boolean uploadFileSync(String url, String localPath, String contentType) {
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
                 .permitAll().build();
         StrictMode.setThreadPolicy(policy);
-        Log.e(TAG, "uploadFile, " + url);
+        //Log.e(TAG, "uploadFile, " + url);
         File file = new File(localPath);    // create new file on device
         //RequestBody requestFile = RequestBody.create(MediaType.parse(contentType), file);
 
@@ -115,10 +113,18 @@ class S3Helper {
         Response<Void> response;
         try {
             response = call.execute();
-            Log.e(TAG, "upload code = " + response.code());
-            Log.e(TAG, "upload message = " + response.message());
+            //Log.e(TAG, "upload code = " + response.code());
+            //Log.e(TAG, "upload message = " + response.message());
+            if (!response.isSuccessful()) {
+                String throwed = "upload to s3 failed with code: " + response.code() + ", message:" + response.message();
+                if (response.errorBody() != null)
+                    throwed += ", error: " + response.errorBody().string();
+                throwed += "\nurl: " + url + "\nlocal path: " + localPath;
+                CrashLogger.logException(new Throwable(throwed));
+            }
             return response.code() == STATUS_OK;
         } catch (IOException e) {
+            CrashLogger.logException(e);
             Log.e(TAG, "error in " + localPath + ", " + e.getMessage());
         }
         return false;
@@ -140,7 +146,7 @@ class S3Helper {
                         new File("/path/to/file/localFile.txt"));*/
 
         String s3Key = dir + "/" + key;
-        Log.e(TAG, "downloadFile, " + s3Key);
+        //Log.e(TAG, "downloadFile, " + s3Key);
         final File file = ExternalStorageHelper.getFileForOnlineDownload(context, dir, key);
         if (file == null) {
             return Single.error(new Throwable("can\'t create local file"));
@@ -177,7 +183,8 @@ class S3Helper {
                 @Override
                 public void onError(int id, Exception ex) {
                     // Handle errors
-                    Log.e(TAG, "error downloading file " + id + "\n" + ex.getMessage());
+                    CrashLogger.logException(ex);
+                    //Log.e(TAG, "error downloading file " + id + "\n" + ex.getMessage());
                     ex.printStackTrace();
                     emitter.onError(ex);
                 }

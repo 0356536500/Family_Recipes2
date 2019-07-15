@@ -7,9 +7,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Build;
-import android.os.FileUtils;
 import android.provider.MediaStore;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.exifinterface.media.ExifInterface;
@@ -38,19 +36,7 @@ import static com.myapps.ron.family_recipes.logic.Constants.COMPRESSION_MIN;
 import static com.myapps.ron.family_recipes.logic.Constants.COMPRESSION_REQUIRED;
 
 public class StorageWrapper {
-    private static final String TAG = StorageWrapper.class.getSimpleName();
-    /*private static StorageWrapper storage;
-
-    public static StorageWrapper getInstance(Context context) {
-        if(storage == null) {
-            storage = new StorageWrapper(context);
-        }
-        return storage;
-    }
-
-    private StorageWrapper(Context context) {
-
-    }*/
+    //private static final String TAG = StorageWrapper.class.getSimpleName();
 
     public static Single<Uri> getThumbFile(Context context, String fileName) {
         if(fileName == null || fileName.equals(""))
@@ -118,34 +104,6 @@ public class StorageWrapper {
         );
     }
 
-    /*public static String compressFile(Context context, @Nullable Uri uri) {
-        if (uri == null)
-            return null;
-
-        try {
-            String fileName = uri.getLastPathSegment();
-            File compressedFile = StorageWrapper.createCompressedFile(context, fileName);
-            Uri originUri = ExternalStorageHelper.getFileUri(context, Constants.TEMP_IMAGES_DIR, fileName);
-            File originFile = new File(originUri.getPath());
-            Log.e(TAG, uri.getPath() + ", size = " + originFile.length());
-
-            if (originFile.length() > COMPRESSION_REQUIRED) {
-                // need to compress
-                Bitmap bitmap = BitmapFactory.decodeFile(originFile.getPath());
-                return compressFile(bitmap, originFile, compressedFile);
-
-            } else {
-                // file is small enough
-                return copyFile(originFile, compressedFile);
-            }
-            //Log.e(TAG, compressedFile.getAbsolutePath() + ", size = " + compressedFile.length());
-        } catch (IOException e) {
-            //Log.e(TAG, e.getMessage());
-            e.printStackTrace();
-        }
-        return null;
-    }*/
-
     /**
      * Compress a file with {@link Bitmap#compress(Bitmap.CompressFormat, int, OutputStream)} method.
      * Goal is to reach as close as possible to target size {@link com.myapps.ron.family_recipes.logic.Constants#COMPRESSION_REQUIRED}
@@ -159,7 +117,7 @@ public class StorageWrapper {
 
         try {
             //String fileName = Uri.parse(fileName).getLastPathSegment();
-            Log.e(TAG, "input path: " + path);
+            //Log.e(TAG, "input path: " + path);
             File originalFile = new File(path);
             if (!originalFile.exists())
                 return null;
@@ -167,9 +125,9 @@ public class StorageWrapper {
             Uri originUri = Uri.fromFile(originalFile);//ExternalStorageHelper.getFileUri(context, Constants.TEMP_IMAGES_DIR, path);
             if (originUri == null || originUri.getPath() == null)
                 return null;
-            //File originFile = new File(originUri.getPath());
-            Log.e(TAG, "original file path: " + originUri.getPath());
-            Log.e(TAG, path + ", size = " + originalFile.length());
+
+            //Log.e(TAG, "original file path: " + originUri.getPath());
+            //Log.e(TAG, path + ", size = " + originalFile.length());
 
             if (originalFile.length() > COMPRESSION_REQUIRED) {
                 // need to compress
@@ -204,22 +162,22 @@ public class StorageWrapper {
             bitmap.compress(Bitmap.CompressFormat.JPEG, quality - (qualityDiff / 2), out);
         }
         out.close();
-        Log.e(TAG, dest.getAbsolutePath() + ", size = " + dest.length());
+        //Log.e(TAG, dest.getAbsolutePath() + ", size = " + dest.length());
         return dest.getAbsolutePath();
     }
 
     private static String copyFile(File src, File dest) throws IOException {
         FileInputStream in = new FileInputStream(src);
         FileOutputStream out = new FileOutputStream(dest);
-        /*byte[] buf = new byte[1024];
+        byte[] buf = new byte[1024];
         int len;
         while ((len = in.read(buf)) > 0)
-            out.write(buf, 0, len);*/
-        FileUtils.copy(in, out);
+            out.write(buf, 0, len);
+        //FileUtils.copy(in, out);
 
         in.close();
         out.close();
-        Log.e(TAG, "dest size = " + dest.length());
+        //Log.e(TAG, "dest size = " + dest.length());
         return dest.getAbsolutePath();
     }
 
@@ -232,9 +190,9 @@ public class StorageWrapper {
             try {
                 int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
                 cursor.moveToFirst();
-                String result = cursor.getString(column_index);
-                Log.e(TAG, "getRealPathFromURI, " + result);
-                return result;
+                //String result = cursor.getString(column_index);
+                //Log.e(TAG, "getRealPathFromURI, " + result);
+                return cursor.getString(column_index);
             } finally {
                 cursor.close();
             }

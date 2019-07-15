@@ -2,7 +2,6 @@ package com.myapps.ron.family_recipes.logic.storage;
 
 import android.content.Context;
 import android.net.Uri;
-import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.core.content.FileProvider;
@@ -115,7 +114,7 @@ public class ExternalStorageHelper {
             File file = new File(filesDir, fileName);
             if(!file.exists()) {
                 if(!file.createNewFile()) {
-                    Log.e("ExternalStorageHelper", "couldn't create the file in " + file.getAbsolutePath());
+                    //Log.e("ExternalStorageHelper", "couldn't create the file in " + file.getAbsolutePath());
                     return null;
                 }
             }

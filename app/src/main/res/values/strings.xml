@@ -124,6 +124,8 @@
     <string name="alert_dialog_upload_photos_finish">Upload %1$d images</string>
     <string name="alert_dialog_upload_photos_take_more">More</string>
     <string name="alert_dialog_upload_photos_max_limit">Can upload up to %1$d images</string>
+    <string name="upload_images_success">Images uploaded successfully!</string>
+    <string name="upload_images_failed">Failed to upload images</string>
 
     <!-- Recipe Activity Shared Preference -->
     <string name="action_key_keep_screen_on" translatable="false">keep_screen_on</string>

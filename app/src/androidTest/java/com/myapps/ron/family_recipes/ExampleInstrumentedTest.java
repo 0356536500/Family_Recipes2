@@ -17,6 +17,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.io.File;
+
 import io.reactivex.Maybe;
 import io.reactivex.disposables.CompositeDisposable;
 
@@ -39,7 +41,7 @@ public class ExampleInstrumentedTest {
     }
 
     @Test
-    public void textCompression() {
+    public void testCompression() {
         //Uri uri = Uri.parse("/storage/emulated/0/Download/eagckh5.jpg");
         //String realPath = "/storage/emulated/0/Download/eagckh5.jpg";//StorageWrapper.getRealPathFromURI(ApplicationProvider.getApplicationContext(), uri);
         //String realPath = "/storage/emulated/0/Download/legion_ver5_xxlg.jpg";
@@ -49,6 +51,13 @@ public class ExampleInstrumentedTest {
 
         //assertTrue(!realPath.equals(compressPath));
         assertTrue(true);
+    }
+
+    @Test
+    public void copyFileTest() {
+        String path = "/storage/emulated/0/Android/data/com.myapps.ron.family_recipes/files/Pictures/food--1.jpg";
+        String cloned = StorageWrapper.compressFile(ApplicationProvider.getApplicationContext(), path);
+        assertEquals(new File(path).length(), new File(cloned).length());
     }
 
     @Test
