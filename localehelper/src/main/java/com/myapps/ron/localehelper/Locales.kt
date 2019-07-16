@@ -27,7 +27,7 @@ object Locales {
     }
 
     fun getLocale(language: String): Locale {
-        return if (Locales.containsKey(language)) Locales[language]!! else English
+        return (if (Locales.containsKey(language)) Locales[language] else English)!!
     }
 
 

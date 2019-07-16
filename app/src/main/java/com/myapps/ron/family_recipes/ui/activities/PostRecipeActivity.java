@@ -180,9 +180,9 @@ public class PostRecipeActivity extends MyBaseActivity {
     private void setFragments() {
         fragments = new ArrayList<>();
 
-        fragments.add(new PostRecipePickPhotosFragment());
         fragments.add(new PostRecipeFirstFragment());
         fragments.add(new PostRecipeGenerateContentFragment());
+        fragments.add(new PostRecipePickPhotosFragment());
 
         getSupportFragmentManager()
                 .beginTransaction()

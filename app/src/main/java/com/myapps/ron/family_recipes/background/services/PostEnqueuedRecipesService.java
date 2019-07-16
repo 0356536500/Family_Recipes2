@@ -169,10 +169,11 @@ public class PostEnqueuedRecipesService extends Service {
                             compressFiles(recipe.getFoodFiles())
                     );
                     deleteLocalFiles(getLocalImages(recipe.getFoodFiles()));
-                } /*else {
-                    //no images to upload
-                    new Handler().postDelayed(() -> Log.e(TAG, "recipe uploaded"), 2500);
-                }*/
+                } else {
+                    // finish upload the recipe
+                    repository.dispatchInfo.onNext(getApplicationContext().getString(
+                                    R.string.main_activity_posted_new_recipe));
+                }
 
             } else {
                 try {
@@ -227,7 +228,7 @@ public class PostEnqueuedRecipesService extends Service {
             repository.dispatchInfo.onNext(getApplicationContext().getString(R.string.post_images_error));
             return;
         }
-        Log.e(TAG, "id = " + id + "\n files: " + foodFiles);
+        //Log.e(TAG, "id = " + id + "\n files: " + foodFiles);
 
         //Synchronous request with retrofit 2.0
         Response<List<String>> response = APICallsHandler.requestUrlsForFoodPicturesSync(id, lastModifiedDate, foodFiles.size(), AppHelper.getAccessToken());
@@ -238,11 +239,22 @@ public class PostEnqueuedRecipesService extends Service {
 
                 //upload the images to s3
                 //Log.e(TAG, "urls: " + urlsForFood);
+                boolean uploadImagesSuccess = true;
                 for (int i = 0; i < urlsForFood.size() && i < foodFiles.size(); i++) {
-                    //Log.e(TAG, "uploading file #" + i);
-                    OnlineStorageWrapper.uploadFoodFileSync(urlsForFood.get(i), foodFiles.get(i));
+                    Log.e(TAG, "uploading file #" + i);
+                    uploadImagesSuccess = uploadImagesSuccess && OnlineStorageWrapper.uploadFoodFileSync(urlsForFood.get(i), foodFiles.get(i));
+                    if (i < urlsForFood.size() - 1 && i < foodFiles.size() - 1) {
+                        try {
+                            Thread.sleep(2500);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
                 }
                 deleteLocalFiles(foodFiles);
+                repository.dispatchInfo.onNext(getApplicationContext().getString(
+                        uploadImagesSuccess ?
+                                R.string.main_activity_posted_new_recipe : R.string.post_recipe_error));
                 //new Handler().postDelayed(() -> Log.e(TAG, "images uploaded"), 2500);
             } else {
                 try {

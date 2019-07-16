@@ -144,11 +144,19 @@ public class PostFoodImagesService extends IntentService {
                 List<String> urlsForFood = response.body();
 
                 Log.e(TAG, "urls: " + urlsForFood);
+                boolean uploadImagesSuccess = true;
                 for (int i = 0; i < urlsForFood.size() && i < foodFiles.size(); i++) {
                     Log.e(TAG, "uploading file #" + i);
-                    OnlineStorageWrapper.uploadFoodFileSync(urlsForFood.get(i), foodFiles.get(i));
+                    uploadImagesSuccess = uploadImagesSuccess && OnlineStorageWrapper.uploadFoodFileSync(urlsForFood.get(i), foodFiles.get(i));
+                    if (i < urlsForFood.size() - 1 && i < foodFiles.size() - 1) {
+                        try {
+                            Thread.sleep(2500);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
                 }
-                sendIntentUploadImagesFinishedToUser(true);
+                sendIntentUploadImagesFinishedToUser(uploadImagesSuccess);
 
             } else {
                 try {

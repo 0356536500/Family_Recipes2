@@ -56,7 +56,7 @@ object LocaleHelper {
         val language = preferences.getString(SELECTED_LANGUAGE, Locale.getDefault().language)
         //val country = preferences.getString(SELECTED_COUNTRY, Locale.getDefault().country)
 
-        return Locale(language/*, country*/)
+        return Locale(language!!/*, country*/)
     }
 
     private fun updateResources(context: Context, locale: Locale): Context {

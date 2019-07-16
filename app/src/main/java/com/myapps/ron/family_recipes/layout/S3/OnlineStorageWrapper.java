@@ -18,7 +18,6 @@ public class OnlineStorageWrapper {
 
     //region uploads
 
-    @SuppressWarnings("UnusedReturnValue")
     public static boolean uploadFoodFileSync(String url, String localPath) {
         return uploadFileSync(url, localPath, S3Helper.CONTENT_IMAGE);
     }
