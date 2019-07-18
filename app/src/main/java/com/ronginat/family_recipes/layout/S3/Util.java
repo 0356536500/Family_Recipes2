@@ -1,42 +1,30 @@
 package com.ronginat.family_recipes.layout.S3;
 
 import android.content.Context;
-import android.net.Uri;
-import android.util.Log;
 
-import com.amazonaws.auth.CognitoCachingCredentialsProvider;
-import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
 import com.amazonaws.regions.Region;
-import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.ronginat.family_recipes.layout.Constants;
 import com.ronginat.family_recipes.layout.cognito.AppHelper;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Map;
-import java.util.UUID;
-
 /*
  * Handles basic helper functions used throughout the app.
  */
-public class Util {
+class Util {
 
     private AmazonS3Client sS3Client;
-    private CognitoCachingCredentialsProvider sCredProvider;
+    //private CognitoCachingCredentialsProvider sCredProvider;
     private TransferUtility sTransferUtility;
 
-    /**
+    /*
      * Gets an instance of CognitoCachingCredentialsProvider which is
      * constructed using the given Context.
      *
      * @param context An Context instance.
      * @return A default credential provider.
      */
-    private CognitoCachingCredentialsProvider getCredProvider(Context context) {
+    /*private CognitoCachingCredentialsProvider getCredProvider(Context context) {
         sCredProvider = AppHelper.getCredentialsProvider();
         if(sCredProvider != null) {
             Log.e("S3 Util", "credentials from AppHelper " + sCredProvider.getIdentityPoolId());
@@ -49,7 +37,7 @@ public class Util {
                     Regions.fromName(Constants.COGNITO_POOL_REGION));
         }
         return sCredProvider;
-    }
+    }*/
 
     /**
      * Gets an instance of a S3 client.
@@ -85,13 +73,13 @@ public class Util {
         return sTransferUtility;
     }
 
-    /**
+    /*
      * Converts number of bytes into proper scale.
      *
      * @param bytes number of bytes to be converted.
      * @return A string that represents the bytes in a proper scale.
      */
-    public String getBytesString(long bytes) {
+    /*public String getBytesString(long bytes) {
         String[] quantifiers = new String[] {
                 "KB", "MB", "GB", "TB"
         };
@@ -105,9 +93,9 @@ public class Util {
                 return String.format("%.2f", speedNum) + " " + quantifiers[i];
             }
         }
-    }
+    }*/
 
-    /**
+    /*
      * Copies the data from the passed in Uri, to a new file for use with the
      * Transfer Service
      *
@@ -116,7 +104,7 @@ public class Util {
      * @return
      * @throws IOException
      */
-    public File copyContentUriToFile(Context context, Uri uri) throws IOException {
+    /*public File copyContentUriToFile(Context context, Uri uri) throws IOException {
         InputStream is = context.getContentResolver().openInputStream(uri);
         File copiedData = new File(context.getDir("SampleImagesDir", Context.MODE_PRIVATE), UUID
                 .randomUUID().toString());
@@ -133,13 +121,13 @@ public class Util {
         fos.close();
 
         return copiedData;
-    }
+    }*/
 
     /*
      * Fills in the map with information in the observer so that it can be used
      * with a SimpleAdapter to populate the UI
      */
-    public void fillMap(Map<String, Object> map, TransferObserver observer, boolean isChecked) {
+    /*public void fillMap(Map<String, Object> map, TransferObserver observer, boolean isChecked) {
         int progress = (int) ((double) observer.getBytesTransferred() * 100 / observer
                 .getBytesTotal());
         map.put("id", observer.getId());
@@ -151,5 +139,5 @@ public class Util {
                         + getBytesString(observer.getBytesTotal()));
         map.put("state", observer.getState());
         map.put("percentage", progress + "%");
-    }
+    }*/
 }

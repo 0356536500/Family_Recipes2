@@ -58,12 +58,6 @@ public interface RecipeInterface {
             @Path(Constants.ID_QUERY) String id
     );
     //region recipes
-    /*@GET(recipes)
-    Call<List<RecipeTO>> getAllRecipes(
-            @Header(Constants.AUTHORIZATION) String auth,
-            @Query(Constants.DATE_QUERY) String date
-    );*/
-
     @GET(recipes)
     Observable<Response<List<RecipeTO>>> getAllRecipesObservable(
             @Header(Constants.AUTHORIZATION) String auth,
@@ -72,34 +66,12 @@ public interface RecipeInterface {
             @Query(Constants.LIMIT_QUERY) Integer limit
     );
 
-    /*@GET(recipes)
-    Call<List<RecipeTO>> getAllRecipesPagination(
-            @Header(Constants.AUTHORIZATION) String auth,
-            @Query(Constants.LAST_MODIFIED_QUERY) String date,
-            @Query(Constants.EXCLUSIVE_START_KEY_QUERY) String startKey,
-            @Query(Constants.LIMIT_QUERY) int limit
-    );*/
-
-    /*@POST(recipes)
-    Call<Map<String, String>> postPendRecipe(
-            @HeaderMap Map<String, String> headers,
-            @Body Map<String, Object> body
-    );*/
-
     @POST(recipes)
     // response structure { id: "id", lastModifiedDate: "lastModifiedDate" }
     Call<Map<String, String>> postRecipe(
             @HeaderMap Map<String, String> headers,
             @Body Map<String, Object> body
     );
-
-    /*@PATCH(recipeWithID)
-    Call<RecipeTO> patchRecipe1(
-            @HeaderMap Map<String, String> headers,
-            @Path(Constants.ID_QUERY) String id,
-            @Query(Constants.LAST_MODIFIED_QUERY) String lastModifiedDate,
-            @Body Map<String, Object> body
-    );*/
 
     @PATCH(recipeWithID)
     Observable<Response<RecipeTO>> patchRecipe(
@@ -121,11 +93,6 @@ public interface RecipeInterface {
     //endregion
 
     //region categories
-    /*@GET(categories)
-    Call<List<CategoryTO>> getAllCategories(
-            @Header(Constants.AUTHORIZATION) String auth,
-            @Query(Constants.LAST_MODIFIED_QUERY) String date
-    );*/
 
     @GET(categories)
     Observable<Response<List<CategoryTO>>> getAllCategoriesObservable(
@@ -136,13 +103,6 @@ public interface RecipeInterface {
     //endregion
 
     //region food
-    /*@PUT(food)
-    Call<List<String>> requestFoodUrls(
-            @Header(Constants.AUTHORIZATION) String auth,
-            @Path(Constants.ID_QUERY) String id,
-            @Query(Constants.LAST_MODIFIED_QUERY) String lastModifiedDate,
-            @Body Map<String, String> body
-    );*/
 
     @GET(food)
     Call<List<String>> requestFoodUrls(

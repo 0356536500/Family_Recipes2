@@ -33,28 +33,6 @@ public interface RecipeDao {
             RecipeEntity.KEY_CATEGORIES + ", " + RecipeEntity.KEY_THUMBNAIL + ", " +
             RecipeEntity.KEY_LIKES + ", " + RecipeEntity.KEY_FAVORITE;
 
-   /* @Query("SELECT " + recipeMinimalFields + " FROM " + AppDatabases.TABLE_RECIPES + " ORDER BY " + RecipeEntity.KEY_CREATED + " DESC")
-    DataSource.Factory<Integer, RecipeMinimal> getRecipesDataMinimalOrderByCreation();
-
-    @Query("SELECT " + recipeMinimalFields + " FROM " + AppDatabases.TABLE_RECIPES + " order by " + RecipeEntity.KEY_MODIFIED + " DESC")
-    DataSource.Factory<Integer, RecipeMinimal> getRecipesDataMinimalOrderByModified();
-
-    @Query("SELECT " + recipeMinimalFields + " FROM " + AppDatabases.TABLE_RECIPES + " order by " + RecipeEntity.KEY_LIKES + " DESC")
-    DataSource.Factory<Integer, RecipeMinimal> getRecipesDataMinimalOrderByLikes();*/
-
-    /*@Query("SELECT " + recipeMinimalFields + " FROM " + AppDatabases.TABLE_RECIPES
-            + " ORDER BY :orderBy DESC")
-    DataSource.Factory<Integer, RecipeMinimal> findAllOrderBy(String orderBy);
-
-    @Query("SELECT " + recipeMinimalFields + " FROM " + AppDatabases.TABLE_RECIPES +
-            " WHERE " + RecipeEntity.KEY_CATEGORIES + " LIKE :filters ORDER BY :order DESC")
-    DataSource.Factory<Integer, RecipeMinimal> findAllByCategoriesLikeOrderBy(String filters, String order);
-
-    @Query("SELECT " + recipeMinimalFields + " FROM " + AppDatabases.TABLE_RECIPES + " WHERE ("
-            + RecipeEntity.KEY_NAME + " LIKE :search) OR ("
-            + RecipeEntity.KEY_DESCRIPTION + " LIKE :search) ORDER BY :order DESC")
-    DataSource.Factory<Integer, RecipeMinimal> findAllByNameLikeOrDescriptionLikeOrderBy(String search, String order);*/
-
     // fetch recipes
     @Query("SELECT " + recipeMinimalFields + " FROM " + AppDatabases.TABLE_RECIPES + " WHERE (("
             + RecipeEntity.KEY_NAME + " LIKE :search) OR ("
@@ -109,9 +87,9 @@ public interface RecipeDao {
     @Query("SELECT " + recipeMinimalFields + " FROM " + AppDatabases.TABLE_RECIPES)
     List<RecipeMinimal> findAllSync(); //testing only
 
-    @Query("SELECT " + recipeMinimalFields + " FROM " + AppDatabases.TABLE_RECIPES + " WHERE "
+    /*@Query("SELECT " + recipeMinimalFields + " FROM " + AppDatabases.TABLE_RECIPES + " WHERE "
             + RecipeEntity.KEY_FAVORITE + " = " + Constants.TRUE)
-    List<RecipeMinimal> findAllFavoritesSync(); //testing only
+    List<RecipeMinimal> findAllFavoritesSync(); //testing only*/
 
     // endregion
 
@@ -177,30 +155,11 @@ public interface RecipeDao {
     @Update(onConflict = OnConflictStrategy.IGNORE)
     void updateRecipeAccess(AccessEntity access);
 
-    /*@Query("UPDATE " + AppDatabases.TABLE_ACCESS + " SET lastAccessedThumbnail = :timestamp where " + AccessEntity.KEY_ID + " = :id")
-    void updateRecipeAccessThumbnailbyId(String id, long timestamp);
-
-    @Query("UPDATE " + AppDatabases.TABLE_ACCESS + " SET lastAccessedRecipe = :timestamp where " + AccessEntity.KEY_ID + " = :id")
-    void updateRecipeAccessFilesById(String id, long timestamp);*/
-
-    // endregion
-
-    // Emits the number of users added to the database.
-    //@Insert
-    //Maybe<Integer> insertList(List<RecipeEntity> recipeEntities);
-
-    // Makes sure that the operation finishes successfully.
-    /*@Insert(onConflict = OnConflictStrategy.REPLACE)
-    Completable insertRecipeCompletable(RecipeEntity recipeEntity);*/
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertRecipe(RecipeEntity recipeEntity);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertAll(List<RecipeEntity> list);
-
-    /*@Update
-    void updateRecipes(RecipeEntity... recipeEntities);*/
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     void updateRecipe(RecipeEntity recipeEntity);
@@ -208,16 +167,16 @@ public interface RecipeDao {
     @Query("UPDATE " + AppDatabases.TABLE_RECIPES + " SET meLike = :meLike where " + RecipeEntity.KEY_ID + " = :id")
     void updateLikeRecipe(String id, int meLike);
 
-    @Delete
-    void deleteRecipe(RecipeEntity recipeEntity);
+    /*@Delete
+    void deleteRecipe(RecipeEntity recipeEntity);*/
 
     @Query("DELETE FROM " + AppDatabases.TABLE_RECIPES)
     void deleteAllRecipes();
 
     // region tests
 
-    @Query("SELECT * FROM " + AppDatabases.TABLE_RECIPES + " where " + RecipeEntity.KEY_NAME + " = :name")
-    List<RecipeEntity> findRecipesByName(String name);
+    /*@Query("SELECT * FROM " + AppDatabases.TABLE_RECIPES + " where " + RecipeEntity.KEY_NAME + " = :name")
+    List<RecipeEntity> findRecipesByName(String name);*/
 
     // endregion
 
@@ -235,9 +194,6 @@ public interface RecipeDao {
 
     @Query("SELECT " + ContentEntity.KEY_CONTENT + " FROM " + AppDatabases.TABLE_CONTENTS + " where " + ContentEntity.KEY_ID + " = :recipeId")
     Flowable<String> findContentById(String recipeId);
-
-    /*@Query("SELECT " + ContentEntity.KEY_MODIFIED + " FROM " + AppDatabases.TABLE_CONTENTS + " where " + ContentEntity.KEY_ID + " = :recipeId")
-    String getLastModifiedContentById(String recipeId);*/
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void upsertRecipeContent(ContentEntity contentEntity);

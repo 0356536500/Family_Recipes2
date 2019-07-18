@@ -2,7 +2,6 @@ package com.ronginat.family_recipes.layout.cognito;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.util.Log;
 
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoDevice;
@@ -247,12 +246,12 @@ public class AppHelper {
         return new AuthenticationHandler() {
             @Override
             public void onSuccess(CognitoUserSession cognitoUserSession, CognitoDevice device) {
-                Log.d(TAG, " -- Auth Success");
+                //Log.d(TAG, " -- Auth Success");
                 AppHelper.setCurrSession(cognitoUserSession);
                 AppHelper.setUserDetailsBackground(context);
                 AppHelper.newDevice(device);
                 //Log.e(TAG, "IDToken: " + cognitoUserSession.getIdToken().getJWTToken());
-                Log.e(TAG, "AccessToken: " + cognitoUserSession.getAccessToken().getJWTToken());
+                //Log.e(TAG, "AccessToken: " + cognitoUserSession.getAccessToken().getJWTToken());
 
                 AppHelper.setIdentityProvider(context, cognitoUserSession);
             }
@@ -275,7 +274,7 @@ public class AppHelper {
                     signInUser(context);
                 else
                     currSessionObservable.onError(e);
-                Log.e(TAG, "Sign-in failed, " + AppHelper.formatException(e));
+                //Log.e(TAG, "Sign-in failed, " + AppHelper.formatException(e));
             }
 
             /**
@@ -303,7 +302,7 @@ public class AppHelper {
             @Override
             public void onFailure(Exception exception) {
                 CrashLogger.logException(exception);
-                Log.e(TAG, exception.getMessage(), exception);
+                //Log.e(TAG, exception.getMessage(), exception);
             }
         };
     }
@@ -408,8 +407,8 @@ public class AppHelper {
 
     public static String formatException(Exception exception) {
         String formattedString = "Internal Error";
-        Log.e(TAG, " -- Error: "+exception.toString());
-        Log.getStackTraceString(exception);
+        CrashLogger.e(TAG, " -- Error: " + exception.toString());
+        //Log.getStackTraceString(exception);
 
         String temp = exception.getMessage();
 
@@ -420,7 +419,7 @@ public class AppHelper {
             }
         }
 
-        return  formattedString;
+        return formattedString;
     }
 
     public  static  int getItemCount() {
@@ -732,7 +731,7 @@ public class AppHelper {
             public void onSuccess(List<CognitoUserCodeDeliveryDetails> attributesVerificationList) {
                 // Update successful
                 if (attributesVerificationList.size() > 0) {
-                    Log.e(TAG, "The updated attributes has to be verified");
+                    //Log.e(TAG, "The updated attributes has to be verified");
                     updateAttributeSubject.onNext(false);
                 } else {
                     setUserDetailsBackground(context);
@@ -743,7 +742,7 @@ public class AppHelper {
                             .subscribe(new DisposableCompletableObserver() {
                                 @Override
                                 public void onComplete() {
-                                    Log.e(TAG, "attribute updated");
+                                    //Log.e(TAG, "attribute updated");
                                     updateAttributeSubject.onNext(true);
                                     dispose();
                                 }

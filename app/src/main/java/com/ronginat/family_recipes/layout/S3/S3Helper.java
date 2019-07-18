@@ -125,7 +125,7 @@ class S3Helper {
             return response.code() == STATUS_OK;
         } catch (IOException e) {
             CrashLogger.logException(e);
-            Log.e(TAG, "error in " + localPath + ", " + e.getMessage());
+            CrashLogger.e(TAG, "error in " + localPath + ", " + e.getMessage());
         }
         return false;
     }
@@ -161,7 +161,7 @@ class S3Helper {
 
                 @Override
                 public void onStateChanged(int id, TransferState state) {
-                    Log.e(TAG, "state changed, " + state.name());
+                    CrashLogger.e(TAG, "state changed, " + state.name());
                     if (TransferState.COMPLETED == state) {
                         // Handle a completed upload.
                         emitter.onSuccess(ExternalStorageHelper.getFileAbsolutePath(context, dir, key));
@@ -177,7 +177,7 @@ class S3Helper {
                     float percentDonef = ((float)bytesCurrent/(float)bytesTotal) * 100;
                     int percentDone = (int)percentDonef;
 
-                    Log.d(TAG, "   ID:" + id + "   bytesCurrent: " + bytesCurrent + "   bytesTotal: " + bytesTotal + " " + percentDone + "%");
+                    CrashLogger.d(TAG, "   ID:" + id + "   bytesCurrent: " + bytesCurrent + "   bytesTotal: " + bytesTotal + " " + percentDone + "%");
                 }
 
                 @Override

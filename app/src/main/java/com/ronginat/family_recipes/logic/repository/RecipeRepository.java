@@ -237,10 +237,6 @@ public class RecipeRepository {
         String order = query.getOrderBy();
         String filters = query.getSQLFilters();
 
-        /*Log.e(getClass().getSimpleName(), order);
-        Log.e(getClass().getSimpleName(), search);
-        Log.e(getClass().getSimpleName(), filters);*/
-
         if (query.isFavorites()) {
             dataSource = switchCaseOrderFavorites(search, filters, order);
         } else
@@ -291,14 +287,6 @@ public class RecipeRepository {
                 e.printStackTrace();
             }
         });
-
-        /*new Handler().postDelayed(() ->
-                        dispatchInfo.onNext(
-                                context.getString(
-                                        R.string.message_from_fetch_recipes,
-                                        addedModifiedSize.added,
-                                        addedModifiedSize.modified)),
-                DELAYED_DISPATCH);*/
     }
 
     // endregion

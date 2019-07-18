@@ -82,7 +82,7 @@ public abstract class AppDatabases extends RoomDatabase {
         return INSTANCE;
     }
 
-    private static List<RecipeEntity> generate5Recipes() {
+    /*private static List<RecipeEntity> generate5Recipes() {
         List<RecipeEntity> recipeEntities = new ArrayList<>();
         recipeEntities.add(new RecipeEntity.RecipeBuilder()
                 .id("1")
@@ -111,7 +111,7 @@ public abstract class AppDatabases extends RoomDatabase {
                 .build());
 
         return recipeEntities;
-    }
+    }*/
 
     public static List<RecipeEntity> generateData(String name, int size) {
         List<RecipeEntity> data = new ArrayList<>();

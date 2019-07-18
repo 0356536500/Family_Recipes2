@@ -20,21 +20,9 @@ public interface CategoryDao {
     @Query("SELECT * FROM " + AppDatabases.TABLE_CATEGORIES)
     LiveData<List<CategoryEntity>> getAllCategoriesLiveData();
 
-    /*@Query("SELECT * FROM " + AppDatabases.TABLE_CATEGORIES)
-    List<CategoryEntity> getAllCategories();*/
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     Completable insertAll(List<CategoryEntity> categoryEntities);
 
-    /*@Query("SELECT * FROM " + AppDatabases.TABLE_CATEGORIES + " WHERE " + CategoryEntity.KEY_NAME + " = :name")
-    Maybe<CategoryEntity> getCategory(String name);*/
-
-    /*@Insert(onConflict = OnConflictStrategy.REPLACE)
-    Completable insertAll(CategoryEntity... categoryEntities);*/
-
     /*@Insert
     void insertCategory(CategoryEntity categoryEntity);*/
-
-    /*@Query("DELETE FROM " + AppDatabases.TABLE_CATEGORIES)
-    void deleteAllCategories();*/
 }

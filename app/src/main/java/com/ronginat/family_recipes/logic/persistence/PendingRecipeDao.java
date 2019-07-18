@@ -27,6 +27,6 @@ public interface PendingRecipeDao {
     @Delete
     void delete(PendingRecipeEntity recipe);
 
-    @Query("DELETE FROM " + AppDatabases.TABLE_PENDING_RECIPES)
-    void deleteAll();
+    /*@Query("DELETE FROM " + AppDatabases.TABLE_PENDING_RECIPES)
+    void deleteAll();*/
 }

@@ -1,6 +1,7 @@
 package com.ronginat.family_recipes.utils.logic;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
 import com.ronginat.family_recipes.BuildConfig;
@@ -37,5 +38,15 @@ public class CrashLogger {
     public static void logException(Throwable throwable) {
         if (!BuildConfig.DEBUG)
             Crashlytics.logException(throwable);
+    }
+
+    public static void e (String TAG, String message) {
+        if ((BuildConfig.DEBUG))
+            Log.e(TAG, message);
+    }
+
+    public static void d (String TAG, String message) {
+        if ((BuildConfig.DEBUG))
+            Log.d(TAG, message);
     }
 }
