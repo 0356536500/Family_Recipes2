@@ -68,7 +68,7 @@
     <string name="ok" translatable="false">OK</string>
 
     <!--#region UNUSED SplashActivity -->
-    <!-- values equal to com.myapps.ron.family_recipes.utils.Constants$SPLASH_ACTIVITY_CODE -->
+    <!-- values equal to com.myapps.family_recipes.utils.Constants$SPLASH_ACTIVITY_CODE -->
     <string name="splash_activity_code" translatable="false">splash_code</string>
     <string name="splash_activity_code_main" translatable="false">splash_code_main</string>
     <string name="splash_activity_code_post" translatable="false">splash_code_post</string>
@@ -77,7 +77,7 @@
     <!--#endregion UNUSED SplashActivity -->
 
     <!--#region UNUSED MainActivity -->
-    <!-- values equal to com.myapps.ron.family_recipes.utils.Constants$MAIN_ACTIVITY_FIRST_FRAGMENT -->
+    <!-- values equal to com.myapps.family_recipes.utils.Constants$MAIN_ACTIVITY_FIRST_FRAGMENT -->
     <string name="main_activity_first_fragment" translatable="false">first_fragment</string>
     <string name="main_activity_first_fragment_all" translatable="false">fragment_all</string>
     <string name="main_activity_first_fragment_favorites" translatable="false">fragment_favorites</string>
@@ -159,7 +159,7 @@
     <string name="post_recipe_advanced_step_fab_template">Basic Template</string>
     <string name="post_recipe_advanced_step_fab_reset">Reset</string>
 
-    <string name="bottom_transient_bar_behavior" translatable="false">com.myapps.ron.family_recipes.utils.ui.TransientBarBehavior</string>
+    <string name="bottom_transient_bar_behavior" translatable="false">com.ronginat.family_recipes.utils.ui.TransientBarBehavior</string>
     <!--#endregion PostRecipe Fab Menu -->
 
     <string name="post_recipe_advanced_step_reset_message">What you wrote will be deleted. Continue?</string>
@@ -274,7 +274,7 @@
     </string-array>
 
     <!-- SharedPreferences -->
-    <string name="sharedPreferences" translatable="false">com.myapps.ron.family_recipes_preferences</string>
+    <string name="sharedPreferences" translatable="false">com.ronginat.family_recipes_preferences</string>
 
 
     <!--

@@ -6,6 +6,6 @@
 build/
 /captures
 .externalNativeBuild
-/app/src/main/java/com/myapps/ron/family_recipes/layout/Constants.java
+/app/src/main/java/com/ronginat/family_recipes/layout/Constants.java
 /app/src/main/res/values/private_strings.xml
 pref_data_sync1.xml

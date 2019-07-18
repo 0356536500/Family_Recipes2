@@ -131,13 +131,13 @@
     </RelativeLayout>
 
 
-    <com.myapps.ron.searchfilter.widget.Filter
+    <com.ronginat.searchfilter.widget.Filter
         android:id="@+id/first_step_filter"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:collapsedBackground="?attr/toolbarBackgroundPrimary"
         app:expandedBackground="?attr/toolbarBackgroundPrimary">
 
-    </com.myapps.ron.searchfilter.widget.Filter>
+    </com.ronginat.searchfilter.widget.Filter>
 
 </FrameLayout>

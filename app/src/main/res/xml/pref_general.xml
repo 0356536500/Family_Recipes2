@@ -63,7 +63,7 @@
 
     <Preference
         app:fragment=
-            "com.myapps.ron.family_recipes.ui.activities.SettingsActivity$AccountPreferenceFragment"
+            "com.ronginat.family_recipes.ui.activities.SettingsActivity$AccountPreferenceFragment"
         app:title="@string/settings_category_account"
         app:iconSpaceReserved="false" />
 
@@ -74,7 +74,7 @@
 
     <Preference
         app:fragment=
-            "com.myapps.ron.family_recipes.ui.activities.SettingsActivity$NotificationPreferenceFragment"
+            "com.ronginat.family_recipes.ui.activities.SettingsActivity$NotificationPreferenceFragment"
         app:title="@string/settings_category_notifications"
         app:iconSpaceReserved="false" />
 

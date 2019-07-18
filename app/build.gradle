@@ -5,7 +5,7 @@ apply plugin: 'io.fabric'
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "com.myapps.ron.family_recipes"
+        applicationId "com.ronginat.family_recipes"
         minSdkVersion 21
         targetSdkVersion rootProject.ext.compileSdkVersion
         versionCode 1

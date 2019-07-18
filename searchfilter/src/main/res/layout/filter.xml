@@ -14,7 +14,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <com.myapps.ron.searchfilter.widget.ExpandedFilterView
+            <com.ronginat.searchfilter.widget.ExpandedFilterView
                 android:id="@+id/expandedFilter"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -22,7 +22,7 @@
         </ScrollView>
     </FrameLayout>
 
-    <com.myapps.ron.searchfilter.widget.CollapsedFilterContainer
+    <com.ronginat.searchfilter.widget.CollapsedFilterContainer
         android:id="@+id/collapsedContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

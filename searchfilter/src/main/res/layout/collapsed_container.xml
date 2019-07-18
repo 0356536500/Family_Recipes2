@@ -53,7 +53,7 @@
     </HorizontalScrollView>-->
 
 
-    <com.myapps.ron.searchfilter.widget.CollapseView
+    <com.ronginat.searchfilter.widget.CollapseView
         android:id="@+id/collapseView"
         android:layout_width="@dimen/item_height"
         android:layout_height="@dimen/item_height"

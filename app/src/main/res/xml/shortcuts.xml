@@ -11,8 +11,8 @@
         tools:targetApi="n_mr1">
         <intent
             android:action="android.intent.action.VIEW"
-            android:targetPackage="com.myapps.ron.family_recipes"
-            android:targetClass="com.myapps.ron.family_recipes.ui.activities.SplashActivity">
+            android:targetPackage="com.ronginat.family_recipes"
+            android:targetClass="com.ronginat.family_recipes.ui.activities.SplashActivity">
             <extra
                 android:name="splash_code"
                 android:value="splash_code_post" />
@@ -33,8 +33,8 @@
         tools:targetApi="n_mr1">
         <intent
             android:action="android.intent.action.VIEW"
-            android:targetPackage="com.myapps.ron.family_recipes"
-            android:targetClass="com.myapps.ron.family_recipes.ui.activities.SplashActivity">
+            android:targetPackage="com.ronginat.family_recipes"
+            android:targetClass="com.ronginat.family_recipes.ui.activities.SplashActivity">
 
             <extra
                 android:name="splash_code"
