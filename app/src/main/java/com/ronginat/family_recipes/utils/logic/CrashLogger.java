@@ -38,6 +38,13 @@ public class CrashLogger {
     public static void logException(Throwable throwable) {
         if (!BuildConfig.DEBUG)
             Crashlytics.logException(throwable);
+        else
+            e(CrashLogger.class.getSimpleName(), throwable.getMessage(), throwable);
+    }
+
+    public static void e (String TAG, String message, Throwable t) {
+        if ((BuildConfig.DEBUG))
+            Log.e(TAG, message, t);
     }
 
     public static void e (String TAG, String message) {

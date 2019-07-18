@@ -674,12 +674,14 @@ public class MainActivity extends MyBaseActivity implements BackStack.BackStackH
                         appUpdateFile = StorageWrapper.getFileToDownloadUpdateInto(getApplicationContext(),
                                 map.get(com.ronginat.family_recipes.layout.Constants.RESPONSE_KEY_APP_NAME));
                         uri = Uri.parse(map.get(com.ronginat.family_recipes.layout.Constants.RESPONSE_KEY_APP_URL));
-                        new AlertDialog.Builder(getApplicationContext())
+                        new AlertDialog.Builder(MainActivity.this)
                                 .setCancelable(true)
                                 .setTitle(R.string.main_activity_update_available_title)
                                 .setMessage(R.string.main_activity_update_available_message)
-                                .setPositiveButton(android.R.string.yes, (dialog, which) ->
+                                .setPositiveButton(R.string.yes, (dialog, which) ->
                                         updateApp())
+                                .setNegativeButton(R.string.no, (dialog, which) ->
+                                        dialog.dismiss())
                                 .create()
                                 .show();
 

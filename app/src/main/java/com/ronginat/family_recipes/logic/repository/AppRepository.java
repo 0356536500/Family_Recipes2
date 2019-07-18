@@ -23,6 +23,7 @@ import retrofit2.Response;
  * Created by ronginat on 17/04/2019.
  */
 public class AppRepository {
+    //private final String TAG = getClass().getSimpleName();
 
     private static AppRepository INSTANCE;
 
@@ -119,8 +120,9 @@ public class AppRepository {
                                 @Override
                                 public void onNext(Response<Map<String, String>> response) {
                                     if (response.isSuccessful()) { // status 2xx
-                                        if (response.code() == APICallsHandler.STATUS_OK_NO_CONTENT) // up to date
+                                        if (response.code() == APICallsHandler.STATUS_OK_NO_CONTENT) {// up to date
                                             emitter.onComplete();
+                                        }
                                         else if (response.code() == APICallsHandler.STATUS_OK && response.body() != null) { // update available
                                             Map<String, String> body = response.body();
                                             if (body.containsKey(Constants.RESPONSE_KEY_APP_URL) && body.containsKey(Constants.RESPONSE_KEY_APP_NAME))

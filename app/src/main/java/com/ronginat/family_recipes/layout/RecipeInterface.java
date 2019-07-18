@@ -34,7 +34,7 @@ public interface RecipeInterface {
     String registerToken = Constants.URL_TOKENS + "/{" + Constants.PATH_DEVICE_ID + "}" + "/{" + Constants.PATH_TOKEN + "}";
     String userWithID = Constants.URL_USERS + "/{" + Constants.PATH_DEVICE_ID + "}";
     String firebaseToken = Constants.URL_TOKENS + "/firebase";
-    String update = "app";
+    String update = Constants.URL_APP + "/{" + Constants.PATH_DEVICE_ID + "}";
 
     @GET("test")
     Observable<Response<Object>> getTestObservable();
