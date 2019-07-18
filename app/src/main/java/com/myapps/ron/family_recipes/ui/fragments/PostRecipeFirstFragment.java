@@ -3,7 +3,6 @@ package com.myapps.ron.family_recipes.ui.fragments;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,9 +10,14 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.lifecycle.ViewModelProviders;
+
 import com.myapps.ron.family_recipes.R;
-import com.myapps.ron.family_recipes.model.CategoryEntity;
 import com.myapps.ron.family_recipes.layout.Constants;
+import com.myapps.ron.family_recipes.model.CategoryEntity;
 import com.myapps.ron.family_recipes.ui.baseclasses.PostRecipeBaseFragment;
 import com.myapps.ron.family_recipes.viewmodels.PostRecipeViewModel;
 import com.myapps.ron.searchfilter.adapter.FilterAdapter;
@@ -25,10 +29,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
-import androidx.lifecycle.ViewModelProviders;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnTextChanged;
@@ -72,7 +72,6 @@ public class PostRecipeFirstFragment extends PostRecipeBaseFragment implements F
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        Log.e(getClass().getSimpleName(), "on view created");
 
         ButterKnife.bind(this, view);
         initViewModel();

@@ -28,7 +28,6 @@ import retrofit2.Response;
  * An {@link IntentService} subclass for handling asynchronous task requests in
  * a service on a separate handler thread.
  * <p>
- * TODO: Customize class - update intent actions, extra parameters and static
  * helper methods.
  */
 public class PostFoodImagesService extends IntentService {
@@ -150,7 +149,7 @@ public class PostFoodImagesService extends IntentService {
                     uploadImagesSuccess = uploadImagesSuccess && OnlineStorageWrapper.uploadFoodFileSync(urlsForFood.get(i), foodFiles.get(i));
                     if (i < urlsForFood.size() - 1 && i < foodFiles.size() - 1) {
                         try {
-                            Thread.sleep(2500);
+                            Thread.sleep(1500);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }

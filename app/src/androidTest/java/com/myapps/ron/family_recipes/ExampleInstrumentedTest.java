@@ -8,9 +8,11 @@ import android.util.Log;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
+import com.myapps.ron.family_recipes.layout.Constants;
 import com.myapps.ron.family_recipes.layout.cognito.AppHelper;
 import com.myapps.ron.family_recipes.logic.storage.StorageWrapper;
 
+import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -23,6 +25,7 @@ import io.reactivex.Maybe;
 import io.reactivex.disposables.CompositeDisposable;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -45,22 +48,34 @@ public class ExampleInstrumentedTest {
         //Uri uri = Uri.parse("/storage/emulated/0/Download/eagckh5.jpg");
         //String realPath = "/storage/emulated/0/Download/eagckh5.jpg";//StorageWrapper.getRealPathFromURI(ApplicationProvider.getApplicationContext(), uri);
         //String realPath = "/storage/emulated/0/Download/legion_ver5_xxlg.jpg";
-        String realPath = "/storage/emulated/0/Download/20190520_121440.jpg"; // 10MB > 902KB > 224KB (-10 quality) | 580KB (-5 quality)
+        //String realPath = "/storage/emulated/0/Download/20190520_121440.jpg"; // 10MB > 902KB > 224KB (-10 quality) | 580KB (-5 quality)
         //String realPath = "/storage/emulated/0/Download/20190119_114310.jpg"; // 7MB > 585KB
         //String compressPath = StorageWrapper.compressFile(ApplicationProvider.getApplicationContext(), realPath);
 
+        String path = "/storage/emulated/0/Android/data/com.myapps.ron.family_recipes/files/Pictures/test_large.jpg"; // ~6MB
+        String compressPath = StorageWrapper.compressFile(ApplicationProvider.getApplicationContext(), path);
+
         //assertTrue(!realPath.equals(compressPath));
-        assertTrue(true);
+        assertThat(new File(compressPath).length(), Matchers.lessThan(new File(path).length()));
     }
 
-    @Test
+    //@Test
     public void copyFileTest() {
         String path = "/storage/emulated/0/Android/data/com.myapps.ron.family_recipes/files/Pictures/food--1.jpg";
         String cloned = StorageWrapper.compressFile(ApplicationProvider.getApplicationContext(), path);
         assertEquals(new File(path).length(), new File(cloned).length());
     }
 
-    @Test
+    //@Test
+    public void rotationFromGalleryTest() {
+        String path = "/storage/emulated/0/Android/data/com.myapps.ron.family_recipes/files/Pictures/test.jpg";
+        File pictures = ApplicationProvider.getApplicationContext().getExternalFilesDir(Constants.TEMP_IMAGES_DIR);
+        File image = new File(pictures, "test.jpg");
+        StorageWrapper.rotateImageIfRequired(ApplicationProvider.getApplicationContext(), Uri.fromFile(image));
+        assertTrue(true);
+    }
+
+    //@Test
     public void mailMessageTest() {
         Context context = ApplicationProvider.getApplicationContext();
         StringBuilder stringBuilder = new StringBuilder();
@@ -87,17 +102,17 @@ public class ExampleInstrumentedTest {
 
     private CompositeDisposable compositeDisposable;
 
-    @Before
+    //@Before
     public void initCompositeDisposable() {
         compositeDisposable = new CompositeDisposable();
     }
 
-    @After
+    //@After
     public void clearCompositeDisposable() {
         compositeDisposable.clear();
     }
 
-    @Test
+    //@Test
     public void catchEmptyValueFromMaybeTest() {
         compositeDisposable.add(Maybe.empty()
                 .subscribe(Assert::assertNull));

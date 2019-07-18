@@ -22,9 +22,9 @@ public class Constants {
 
 
     // region Upload Images
-    public static final long COMPRESSION_REQUIRED = 614400L; // 600KB in bytes
-    public static final long COMPRESSION_MIN = (long)(0.75 * COMPRESSION_REQUIRED); // 460KB
-    public static final long COMPRESSION_MAX = (long)(1.3 * COMPRESSION_REQUIRED); // 798KB
+    public static final long COMPRESSION_REQUIRED = 409600L; // 400KB in bytes
+    public static final long COMPRESSION_MIN = (long)(0.75 * COMPRESSION_REQUIRED); // 307KB
+    public static final long COMPRESSION_MAX = (long)(1.3 * COMPRESSION_REQUIRED); // 532KB
 
     // endregion
 }

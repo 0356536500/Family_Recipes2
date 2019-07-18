@@ -101,7 +101,7 @@
 
     <!-- AllRecipes Fragment -->
     <string name="str_all_selected">All categories</string>
-    <string name="refresh_error_message">can refresh once every minute</string>
+    <string name="refresh_error_message">Please don\'t refresh frequently</string>
     <string name="load_error_message">error has occurred</string>
     <string name="message_from_fetch_recipes">%1$d added, %2$d modified</string>
     <string name="message_from_fetch_recipes_not_modified">no updates</string>

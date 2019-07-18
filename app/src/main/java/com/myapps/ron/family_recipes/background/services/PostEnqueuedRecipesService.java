@@ -245,7 +245,7 @@ public class PostEnqueuedRecipesService extends Service {
                     uploadImagesSuccess = uploadImagesSuccess && OnlineStorageWrapper.uploadFoodFileSync(urlsForFood.get(i), foodFiles.get(i));
                     if (i < urlsForFood.size() - 1 && i < foodFiles.size() - 1) {
                         try {
-                            Thread.sleep(2500);
+                            Thread.sleep(1500);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
@@ -255,6 +255,12 @@ public class PostEnqueuedRecipesService extends Service {
                 repository.dispatchInfo.onNext(getApplicationContext().getString(
                         uploadImagesSuccess ?
                                 R.string.main_activity_posted_new_recipe : R.string.post_recipe_error));
+                try {
+                    Thread.sleep(2000);
+                    repository.fetchRecipesReactive(getApplicationContext(), false);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 //new Handler().postDelayed(() -> Log.e(TAG, "images uploaded"), 2500);
             } else {
                 try {

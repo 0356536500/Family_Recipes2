@@ -132,11 +132,14 @@ public class StorageWrapper {
             if (originalFile.length() > COMPRESSION_REQUIRED) {
                 // need to compress
                 Bitmap bitmap = BitmapFactory.decodeFile(originalFile.getPath());
-                return compressFile(bitmap, originalFile, compressedFile);
-
+                String newPath = compressFile(bitmap, originalFile, compressedFile);
+                copyExif(path, newPath);
+                return newPath;
             } else {
                 // file is small enough
-                return copyFile(originalFile, compressedFile);
+                String newPath = copyFile(originalFile, compressedFile);
+                copyExif(path, newPath);
+                return newPath;
             }
         } catch (IOException e) {
             //Log.e(TAG, e.getMessage());
@@ -149,8 +152,8 @@ public class StorageWrapper {
         final int qualityDiff = 10;
 
         int quality = (int)(((float)COMPRESSION_REQUIRED / (float)src.length()) * 200);
-        if (quality > 100)
-            quality = 100;
+        quality = quality > 100 ? 100 : quality;
+
         FileOutputStream out = new FileOutputStream(dest);
         bitmap.compress(Bitmap.CompressFormat.JPEG, quality, out);
         out.close();
@@ -179,6 +182,25 @@ public class StorageWrapper {
         out.close();
         //Log.e(TAG, "dest size = " + dest.length());
         return dest.getAbsolutePath();
+    }
+
+    /**
+     * Copy image orientation when compressing an existing file
+     */
+    private static void copyExif(String oldPath, String newPath) {
+        try {
+            ExifInterface oldExif = new ExifInterface(oldPath);
+            String exifOrientation = oldExif.getAttribute(ExifInterface.TAG_ORIENTATION);
+            String date = oldExif.getAttribute(ExifInterface.TAG_DATETIME);
+
+            ExifInterface newExif = new ExifInterface(newPath);
+            newExif.setAttribute(ExifInterface.TAG_ORIENTATION, exifOrientation);
+            newExif.setAttribute(ExifInterface.TAG_DATETIME, date);
+            newExif.saveAttributes();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public static String getRealPathFromURI(Context context, Uri contentUri) {
