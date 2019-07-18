@@ -49,4 +49,9 @@ public class CrashLogger {
         if ((BuildConfig.DEBUG))
             Log.d(TAG, message);
     }
+
+    public static void i (String TAG, String message) {
+        if ((BuildConfig.DEBUG))
+            Log.i(TAG, message);
+    }
 }

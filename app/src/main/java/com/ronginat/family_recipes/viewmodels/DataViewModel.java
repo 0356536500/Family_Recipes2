@@ -8,11 +8,20 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Handler;
-import android.util.Log;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.content.FileProvider;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Transformations;
+import androidx.lifecycle.ViewModel;
+import androidx.paging.PagedList;
 
 import com.ronginat.family_recipes.MyApplication;
 import com.ronginat.family_recipes.R;
 import com.ronginat.family_recipes.background.services.GetUserDetailsService;
+import com.ronginat.family_recipes.layout.Constants;
 import com.ronginat.family_recipes.layout.MiddleWareForNetwork;
 import com.ronginat.family_recipes.layout.firebase.db.FirestoreHelper;
 import com.ronginat.family_recipes.logic.repository.AppRepository;
@@ -24,7 +33,6 @@ import com.ronginat.family_recipes.model.CategoryEntity;
 import com.ronginat.family_recipes.model.QueryModel;
 import com.ronginat.family_recipes.model.RecipeEntity;
 import com.ronginat.family_recipes.model.RecipeMinimal;
-import com.ronginat.family_recipes.layout.Constants;
 import com.ronginat.family_recipes.utils.logic.CrashLogger;
 import com.ronginat.family_recipes.utils.logic.SharedPreferencesHandler;
 
@@ -34,14 +42,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.content.FileProvider;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Transformations;
-import androidx.lifecycle.ViewModel;
-import androidx.paging.PagedList;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -133,7 +133,7 @@ public class DataViewModel extends ViewModel {
      * Send request to server and then,
      */
     private void updateLike(final Context context, @NonNull RecipeEntity recipe, Runnable onErrorUpdateUI) {
-        Log.e(getClass().getSimpleName(), "updateLike");
+        //Log.e(getClass().getSimpleName(), "updateLike");
         Map<String, Object> attrs = new HashMap<>();
         String likeStr = recipe.isUserLiked() ? "unlike" : "like";
         attrs.put(Constants.LIKES, likeStr);

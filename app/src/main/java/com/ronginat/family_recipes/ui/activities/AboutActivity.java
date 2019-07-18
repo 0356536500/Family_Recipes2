@@ -37,19 +37,5 @@ public class AboutActivity extends MyBaseActivity {
                 Constants.ASSET_FILE_BASE_URL,
                 HtmlHelper.GET_ABOUT_PAGE(this),
                 "text/html", "UTF-8", null);
-
-        /*TextView textView = findViewById(R.id.about_text);
-        try {
-            String html = IOUtils.toString(getResources().getAssets().open("about_eng.html"));
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                textView.setText(Html.fromHtml(HtmlHelper.GET_CSS_LINK(this) + html, Html.FROM_HTML_MODE_LEGACY));
-            } else {
-                textView.setText(Html.fromHtml(HtmlHelper.GET_CSS_LINK(this) + html));
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            String failed = "Failed loading html.";
-            textView.setText(failed);
-        }*/
     }
 }

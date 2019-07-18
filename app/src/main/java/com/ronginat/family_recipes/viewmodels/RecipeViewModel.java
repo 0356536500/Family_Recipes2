@@ -3,7 +3,6 @@ package com.ronginat.family_recipes.viewmodels;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Handler;
-import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
@@ -22,6 +21,7 @@ import com.ronginat.family_recipes.logic.storage.StorageWrapper;
 import com.ronginat.family_recipes.model.AccessEntity;
 import com.ronginat.family_recipes.model.CommentEntity;
 import com.ronginat.family_recipes.model.RecipeEntity;
+import com.ronginat.family_recipes.utils.logic.CrashLogger;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -125,7 +125,7 @@ public class RecipeViewModel extends ViewModel {
                     this.recipe.setValue(recipeEntity);
                 }, error -> {
                     if (error.getMessage() != null)
-                        Log.e(getClass().getSimpleName(), error.getMessage());
+                        CrashLogger.e(getClass().getSimpleName(), error.getMessage());
                     setInfo(context.getString(R.string.recipe_content_not_found));
                 }));
     }
@@ -179,28 +179,6 @@ public class RecipeViewModel extends ViewModel {
                     setRecipeContent(content);
                     updateAccessToRecipeContent(recipeId);
                 }));
-
-        /*String recipeFile = null;
-        if (recipe.getValue() != null)
-            recipeFile = recipe.getValue().getRecipeFile();
-
-        if(recipeFile != null && !recipeFile.equals("\"\"")) {
-            StorageWrapper.getRecipeFile(context, recipeFile, path -> {
-                //Log.e(getClass().getSimpleName(), "return from getContent");
-                if(path != null) {
-                    updateAccessToRecipeContent(recipeId);
-                    setRecipePath(Constants.FILE_PREFIX + path.getPath());
-                }
-                else {
-                    setInfo(context.getString(R.string.no_internet_message));
-                    setRecipePath(null);
-                }
-            });
-        }
-        else {
-            setInfo(context.getString(R.string.recipe_not_in_server));
-            setRecipePath(null);
-        }*/
     }
 
     public void loadRecipeFoodImage(final Context context) {

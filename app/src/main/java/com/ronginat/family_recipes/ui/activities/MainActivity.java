@@ -18,7 +18,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,7 +27,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
@@ -54,6 +52,7 @@ import com.ronginat.family_recipes.ui.fragments.AllRecipesFragment;
 import com.ronginat.family_recipes.ui.fragments.FavoritesRecipesFragment;
 import com.ronginat.family_recipes.utils.BackStack;
 import com.ronginat.family_recipes.utils.Constants;
+import com.ronginat.family_recipes.utils.logic.CrashLogger;
 import com.ronginat.family_recipes.utils.logic.SharedPreferencesHandler;
 import com.ronginat.family_recipes.viewmodels.DataViewModel;
 import com.ronginat.localehelper.LocaleHelper;
@@ -139,7 +138,7 @@ public class MainActivity extends MyBaseActivity implements BackStack.BackStackH
         //whiteNotificationBar(recyclerView);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
+    //@RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onPostCreate(@Nullable Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
@@ -150,13 +149,15 @@ public class MainActivity extends MyBaseActivity implements BackStack.BackStackH
             handleDataFromIntentAndStart();
             checkIfUpdateAvailable();
         } else {
-            Log.e(TAG, "restore fragments!!!");
-            getSupportFragmentManager().getFragments()
-                    .stream()
-                    .filter(fragment -> fragment instanceof MyFragment)
-                    .map(fragment -> (MyFragment) fragment)
-                    .collect(Collectors.toList())
-                    .forEach(myFragment -> Log.e(TAG, getString(myFragment.getMyTag())));
+            CrashLogger.e(TAG, "restore fragments!!!");
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                getSupportFragmentManager().getFragments()
+                        .stream()
+                        .filter(fragment -> fragment instanceof MyFragment)
+                        .map(fragment -> (MyFragment) fragment)
+                        .collect(Collectors.toList())
+                        .forEach(myFragment -> CrashLogger.e(TAG, getString(myFragment.getMyTag())));
+            }
             // restore after shutdown
             if (backStack == null)
                 backStack = BackStack.restoreBackStackFromList(savedInstanceState, this, getSupportFragmentManager().getFragments()); // FragmentManager contains the last fragment
@@ -223,7 +224,7 @@ public class MainActivity extends MyBaseActivity implements BackStack.BackStackH
 
         if (getIntent() != null && getIntent().getSerializableExtra(Constants.MAIN_ACTIVITY_FIRST_FRAGMENT) != null) {
             String firstFragment = getIntent().getStringExtra(Constants.MAIN_ACTIVITY_FIRST_FRAGMENT);
-            Log.e(TAG, "firstFragment = " + firstFragment);
+            CrashLogger.e(TAG, "firstFragment = " + firstFragment);
 
             if (Constants.MAIN_ACTIVITY_FRAGMENT_ALL.equals(firstFragment))
                 new Handler().postDelayed(startWithDefaultFragmentRunnable, 100);

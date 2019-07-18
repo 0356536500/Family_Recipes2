@@ -76,14 +76,6 @@ public class SettingsActivity extends MyBaseActivity
         fragmentCounter++;
     }
 
-    /*@Override
-    protected void onResume() {
-        super.onResume();
-        Log.e(getClass().getSimpleName(), getResources().getConfiguration().locale.toLanguageTag());
-        //Log.e(getClass().getSimpleName(), getResources().getConfiguration().getLocales().get(0).toLanguageTag());
-        Log.e(getClass().getSimpleName(), Locale.getDefault().toLanguageTag());
-    }*/
-
     /**
      * Set up the {android.app.ActionBar}, if the API is available.
      */
@@ -131,8 +123,6 @@ public class SettingsActivity extends MyBaseActivity
         }
         if (key.equals(getString(R.string.preference_key_language))) {
             updateLocale(new Locale(sharedPreferences.getString(key, "he")));
-            /*LocaleHelper.setLocale(SettingsActivity.this, sharedPreferences.getString(key, "he"));
-            recreate();*/
         }
     }
 

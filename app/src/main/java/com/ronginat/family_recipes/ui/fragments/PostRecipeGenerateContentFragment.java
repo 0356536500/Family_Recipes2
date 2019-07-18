@@ -4,11 +4,21 @@ import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
+
+import androidx.annotation.IdRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.res.ResourcesCompat;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.SimpleItemAnimator;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.leinardi.android.speeddial.SpeedDialActionItem;
@@ -25,22 +35,11 @@ import com.ronginat.family_recipes.viewmodels.PostRecipeViewModel;
 
 import java.util.List;
 
-import androidx.annotation.IdRes;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.core.content.res.ResourcesCompat;
-import androidx.lifecycle.ViewModelProviders;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.ItemTouchHelper;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.SimpleItemAnimator;
-
 /**
  * Created by ronginat on 29/10/2018.
  */
 public class PostRecipeGenerateContentFragment extends PostRecipeBaseFragment {
-    private final String TAG = getClass().getSimpleName();
+    //private final String TAG = getClass().getSimpleName();
 
     private List<HtmlModel> elements;
     private HtmlElementsAdapter mAdapter;
@@ -110,7 +109,7 @@ public class PostRecipeGenerateContentFragment extends PostRecipeBaseFragment {
         return view -> {
             if(mAdapter.checkValidInput()) {
                 String html = mAdapter.generateHtml();
-                Log.e(TAG, html);
+                //Log.e(TAG, html);
                 viewModel.setRecipeContent(html);
                 activity.nextFragmentDelayed();
             } else {

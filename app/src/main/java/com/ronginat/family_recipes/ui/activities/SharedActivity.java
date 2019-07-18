@@ -16,10 +16,6 @@ public class SharedActivity extends AppCompatActivity {
     private final String TAG = getClass().getSimpleName();
     private final int OPEN_RECIPE_REQUEST = 1;
 
-    /*@Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-    }*/
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,17 +57,9 @@ public class SharedActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode) {
-            case OPEN_RECIPE_REQUEST:
-                if (resultCode == RESULT_OK) {
-                    /*Intent intent = new Intent(SharedActivity.this, MainActivity.class);
-                    startActivity(intent);*/
-                    setResult(RESULT_OK);
-                    finish();
-                } else {
-                    setResult(RESULT_CANCELED);
-                    finish();
-                }
+        if (requestCode == OPEN_RECIPE_REQUEST) {
+            setResult(resultCode == RESULT_OK ? RESULT_OK : RESULT_CANCELED);
+            finish();
         }
     }
 }

@@ -1,13 +1,11 @@
 package com.ronginat.family_recipes.ui.activities;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,7 +17,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.TaskStackBuilder;
 
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoDevice;
@@ -35,15 +32,16 @@ import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.Authentic
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.ForgotPasswordHandler;
 import com.ronginat.family_recipes.R;
 import com.ronginat.family_recipes.layout.cognito.AppHelper;
+import com.ronginat.family_recipes.ui.baseclasses.MyBaseActivity;
 import com.ronginat.family_recipes.utils.Constants;
-import com.ronginat.family_recipes.utils.logic.LocaleHelper;
+import com.ronginat.family_recipes.utils.logic.CrashLogger;
 import com.ronginat.family_recipes.utils.logic.SharedPreferencesHandler;
 
 import java.util.Locale;
 import java.util.Map;
 
 @SuppressLint("SetTextI18n")
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends MyBaseActivity {
     private final String TAG = getClass().getSimpleName();
 
     private ProgressBar waitDialog;
@@ -65,10 +63,6 @@ public class LoginActivity extends AppCompatActivity {
     // User attribute name
     private String name;
 
-    @Override
-    protected void attachBaseContext(Context newBase) {
-        super.attachBaseContext(LocaleHelper.onAttach(newBase));
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -452,12 +446,12 @@ public class LoginActivity extends AppCompatActivity {
     AuthenticationHandler authenticationHandler = new AuthenticationHandler() {
         @Override
         public void onSuccess(CognitoUserSession cognitoUserSession, CognitoDevice device) {
-            //Log.d(TAG, " -- Auth Success");
+            CrashLogger.d(TAG, " -- Auth Success");
             AppHelper.setCurrSession(cognitoUserSession);
             AppHelper.setUserDetailsBackground(getApplicationContext());
             AppHelper.newDevice(device);
-            Log.e(TAG, "IDToken: " + cognitoUserSession.getIdToken().getJWTToken());
-            Log.e(TAG, "AccessToken: " + cognitoUserSession.getAccessToken().getJWTToken());
+            //Log.e(TAG, "IDToken: " + cognitoUserSession.getIdToken().getJWTToken());
+            CrashLogger.e(TAG, "AccessToken: " + cognitoUserSession.getAccessToken().getJWTToken());
 
             AppHelper.setIdentityProvider(getApplicationContext(), cognitoUserSession);
 

@@ -87,34 +87,6 @@ public class RecipesAdapter extends PagedListAdapter<RecipeMinimal, RecipesAdapt
                     listener.onItemSelected(getItem(getAdapterPosition())));
 
             ButterKnife.bind(this, itemView);
-            /*name = itemView.findViewById(R.id.name);
-            description = itemView.findViewById(R.id.description);
-            thumbnail = itemView.findViewById(R.id.thumbnail);
-            uploader = itemView.findViewById(R.id.uploader);
-            numberOfLikes = itemView.findViewById(R.id.number_of_likes);
-            horizontalScrollView = itemView.findViewById(R.id.categories_scroll_container);
-            favoriteToggleButton = itemView.findViewById(R.id.favorite_toggle_button);
-
-
-            thumbnail.setOnClickListener(view ->
-                    listener.onImageClicked(getItem((getAdapterPosition()))));
-
-            favoriteToggleButton.setOnCheckedChangeListener((compoundButton, b) -> {
-                if (compoundButton.isPressed()) {
-                    // not when programmatically changing checked value
-                    //listener.onFavoriteCheckedChanged(getItem(getAdapterPosition()));
-                    CircularProgressDrawable circularProgressDrawable = new CircularProgressDrawable(context);
-                    circularProgressDrawable.setStrokeWidth(4f);
-                    circularProgressDrawable.setCenterRadius(25f);
-                    circularProgressDrawable.start();
-                    compoundButton.setBackground(circularProgressDrawable);
-                    new Handler().postDelayed(() -> {
-                        compoundButton.setBackgroundResource(R.drawable.favorite_selector);
-                        compoundButton.startAnimation(scaleAnimation);
-                        }, 2000);
-                    Log.e(getClass().getSimpleName(), "checked changed, " + Boolean.toString(b));
-                }
-            });*/
         }
 
         @SuppressWarnings("UnusedParameters")

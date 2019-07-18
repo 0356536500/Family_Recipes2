@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
@@ -40,6 +39,7 @@ import com.ronginat.family_recipes.ui.activities.MainActivity;
 import com.ronginat.family_recipes.ui.activities.RecipeActivity;
 import com.ronginat.family_recipes.ui.baseclasses.MyFragment;
 import com.ronginat.family_recipes.utils.Constants;
+import com.ronginat.family_recipes.utils.logic.CrashLogger;
 import com.ronginat.family_recipes.utils.ui.ViewHider;
 import com.ronginat.family_recipes.viewmodels.DataViewModel;
 import com.ronginat.searchfilter.Constant;
@@ -144,7 +144,7 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
                              @Nullable Bundle savedInstanceState) {
         //Log.e(TAG, "on createView");
         if (parent == null) {
-            Log.e(TAG, "on createView parent was null");
+            CrashLogger.e(TAG, "on createView parent was null");
             view = inflater.inflate(R.layout.content_main_recipes, container, false);
             parent = (FrameLayout) view;
         } else
@@ -156,7 +156,7 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
     public void onViewCreated(@NonNull View itemView, @Nullable Bundle savedInstanceState) {
         //Log.e(TAG, "on viewCreated");
         if (mFilter == null) {
-            Log.e(TAG, "on viewCreated mFilter was null");
+            CrashLogger.e(TAG, "on viewCreated mFilter was null");
             swipeRefreshLayout = view.findViewById(R.id.content_main_refresh);
             recyclerView = view.findViewById(R.id.recycler_view);
             mFilter = view.findViewById(R.id.content_main_filters);
@@ -242,7 +242,7 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
             menu.findItem(R.id.action_search).setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
                 @Override
                 public boolean onMenuItemActionExpand(MenuItem item) {
-                    Log.e(TAG, "expanded, search: " + lastQuery);
+                    CrashLogger.e(TAG, "expanded, search: " + lastQuery);
                     searchView.setQuery(lastQuery, false);
                     return true;
                 }

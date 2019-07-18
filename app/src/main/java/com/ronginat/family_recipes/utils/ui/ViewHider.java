@@ -110,7 +110,9 @@ public class ViewHider {
         WindowManager manager = (WindowManager) view.getContext().getSystemService(WINDOW_SERVICE);
 
         view.getLocationInWindow(location);
-        manager.getDefaultDisplay().getSize(displaySize);
+        if (manager != null) {
+            manager.getDefaultDisplay().getSize(displaySize);
+        }
 
         // These calculations don't take the status bar into account, unlikely to matter however
         switch (direction) {

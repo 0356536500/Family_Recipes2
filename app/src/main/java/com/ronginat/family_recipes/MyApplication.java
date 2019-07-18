@@ -41,22 +41,12 @@ public class MyApplication extends LocaleAwareApplication {
         if (SharedPreferencesHandler.getBoolean(this, Constants.FIRST_APP_LAUNCH, true)) {
             SharedPreferencesHandler.writeBoolean(this, Constants.FIRST_APP_LAUNCH, false);
 
-            WorkManager.getInstance().enqueueUniquePeriodicWork(
+            WorkManager.getInstance(this).enqueueUniquePeriodicWork(
                     DeleteOldFilesWorker.class.getSimpleName(),
                     ExistingPeriodicWorkPolicy.KEEP,
                     DeleteOldFilesWorker.createPostRecipesWorker());
         }
     }
-
-    /*public boolean checkInternetConnection(){
-        ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (connectivityManager != null) {
-            //we are connected to a network
-            return connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
-                    connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED;
-        }
-        return false;
-    }*/
 
     public static boolean isDarkTheme() {
         return mContext.darkTheme;
@@ -106,11 +96,6 @@ public class MyApplication extends LocaleAwareApplication {
         }
         //activity.setTheme(sPref.getBoolean(getString(R.string.preference_key_dark_theme), false) ? R.style.AppTheme_Dark : R.style.AppTheme_Light);
     }
-
-    /*@Override
-    protected void attachBaseContext(Context base) {
-        super.attachBaseContext(LocaleHelper.onAttach(base, "en"));
-    }*/
 
     public static Context getContext() {
         return mContext;

@@ -364,8 +364,6 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
     }
 
     private void loadRecipeHtml(String content) {
-        /*File file = new File(path);
-        Log.e(TAG, file.getAbsolutePath());*/
         //myWebView.loadData(content, "text/html; charset=utf-8", "UTF-8");
 
         // load recipe content with css file from assets folder

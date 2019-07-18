@@ -16,30 +16,26 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 public class DateUtil {
-    private static final String TAG = "DateUtil";
+    //private static final String TAG = "DateUtil";
 
     private static final String UPDATED_TIME_KEY = "last_updated_time";
     private static final String UPDATED_CATS_KEY = "last_updated_categories";
     private static final String DATE_TIME_TEMPLATE = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
 
-    public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat(DATE_TIME_TEMPLATE, Locale.ENGLISH);
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat(DATE_TIME_TEMPLATE, Locale.ENGLISH);
 
-    /*public static String getUTCTimeOld() {
-        DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC"));
-        return DATE_FORMAT.format(new Date());
-    }*/
 
     public static String getUTCTime() {
         DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC"));
         return DATE_FORMAT.format(new Date());
     }
 
-    public static String getLocalFromUTC(String dateUTC) {
+    /*public static String getLocalFromUTC(String dateUTC) {
         DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC"));
         Date date = getDateFromStringTimestamp(dateUTC);
         DATE_FORMAT.setTimeZone(TimeZone.getDefault());
         return DATE_FORMAT.format(date);
-    }
+    }*/
 
     public static CharSequence getPrettyDateFromTime(String utcTime) {
         DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC"));

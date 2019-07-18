@@ -3,8 +3,10 @@ package com.ronginat.family_recipes.ui.activities;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.TaskStackBuilder;
 
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoDevice;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUser;
@@ -22,9 +24,6 @@ import com.ronginat.family_recipes.utils.logic.CrashLogger;
 import com.ronginat.family_recipes.utils.logic.SharedPreferencesHandler;
 
 import java.util.Locale;
-
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.TaskStackBuilder;
 
 import static com.ronginat.family_recipes.layout.Constants.PASSWORD;
 import static com.ronginat.family_recipes.layout.Constants.USERNAME;
@@ -66,7 +65,7 @@ public class SplashActivity extends AppCompatActivity {
         username = user.getUserId();
         //user saved in cache
         if(username != null && SharedPreferencesHandler.getString(this, USERNAME) != null) {
-            Log.e(TAG, "username = " + username);
+            CrashLogger.e(TAG, "username = " + username);
             AppHelper.setUser(username);
             user.getSessionInBackground(authenticationHandler);
         }
@@ -83,8 +82,8 @@ public class SplashActivity extends AppCompatActivity {
             AppHelper.setCurrSession(cognitoUserSession);
             AppHelper.setUserDetailsBackground(getApplicationContext());
             AppHelper.newDevice(device);
-            Log.e(TAG, "IDToken: " + cognitoUserSession.getIdToken().getJWTToken());
-            Log.e(TAG, "AccessToken: " + cognitoUserSession.getAccessToken().getJWTToken());
+            //Log.e(TAG, "IDToken: " + cognitoUserSession.getIdToken().getJWTToken());
+            CrashLogger.e(TAG, "AccessToken: " + cognitoUserSession.getAccessToken().getJWTToken());
 
             AppHelper.setIdentityProvider(getApplicationContext(), cognitoUserSession);
 
@@ -112,7 +111,7 @@ public class SplashActivity extends AppCompatActivity {
         public void onFailure(Exception e) {
             closeWaitDialog();
             //signInUser();
-            Log.e(TAG, "Sign-in failed, " + AppHelper.formatException(e));
+            CrashLogger.e(TAG, "Sign-in failed, " + AppHelper.formatException(e));
             Toast.makeText(getApplicationContext(), AppHelper.formatException(e), Toast.LENGTH_SHORT).show();
             launchLogin();
             //showDialogMessage("Sign-in failed", AppHelper.formatException(e));
@@ -125,7 +124,7 @@ public class SplashActivity extends AppCompatActivity {
         @Override
         public void authenticationChallenge(ChallengeContinuation continuation) {
             if ("NEW_PASSWORD_REQUIRED".equals(continuation.getChallengeName())) {
-                Log.i(TAG, "NEW PASSWORD REQUIRED");
+                CrashLogger.i(TAG, "NEW PASSWORD REQUIRED");
                 // This is the first sign-in attempt for an admin created user
                /* newPasswordContinuation = (NewPasswordContinuation) continuation;
                 AppHelper.setUserAttributeForDisplayFirstLogIn(newPasswordContinuation.getCurrentUserAttributes(),
@@ -134,7 +133,7 @@ public class SplashActivity extends AppCompatActivity {
                 firstTimeSignIn();*/
             } else if ("SELECT_MFA_TYPE".equals(continuation.getChallengeName())) {
                 closeWaitDialog();
-                Log.i(TAG, "SELECT MFA TYPE");
+                CrashLogger.i(TAG, "SELECT MFA TYPE");
                 /*mfaOptionsContinuation = (ChooseMfaContinuation) continuation;
                 List<String> mfaOptions = mfaOptionsContinuation.getMfaOptions();
                 selectMfaToSignIn(mfaOptions, continuation.getParameters());*/
@@ -223,7 +222,7 @@ public class SplashActivity extends AppCompatActivity {
         if(this.password == null) {
             password = SharedPreferencesHandler.getString(this, PASSWORD);
             if(password == null) {
-                Log.e(TAG, "missing password");
+                CrashLogger.e(TAG, "missing password");
                 return;
             }
         }
