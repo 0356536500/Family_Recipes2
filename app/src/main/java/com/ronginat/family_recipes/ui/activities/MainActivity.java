@@ -41,6 +41,7 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.google.android.material.navigation.NavigationView;
+import com.ronginat.family_recipes.BuildConfig;
 import com.ronginat.family_recipes.R;
 import com.ronginat.family_recipes.layout.MiddleWareForNetwork;
 import com.ronginat.family_recipes.layout.cognito.AppHelper;
@@ -150,7 +151,7 @@ public class MainActivity extends MyBaseActivity implements BackStack.BackStackH
             checkIfUpdateAvailable();
         } else {
             CrashLogger.e(TAG, "restore fragments!!!");
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && BuildConfig.DEBUG) {
                 getSupportFragmentManager().getFragments()
                         .stream()
                         .filter(fragment -> fragment instanceof MyFragment)

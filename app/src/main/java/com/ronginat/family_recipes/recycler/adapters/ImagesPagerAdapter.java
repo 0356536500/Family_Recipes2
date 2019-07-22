@@ -89,7 +89,7 @@ public class ImagesPagerAdapter extends PagerAdapter {
     private void loadDefaultImage(@NonNull final ImageView view, @NonNull Drawable placeholder) {
 
         Glide.with(context)
-                .load(RecipeEntity.image)
+                .load(R.mipmap.ic_logo_foreground)
                 .placeholder(placeholder)
                 .into(view);
     }

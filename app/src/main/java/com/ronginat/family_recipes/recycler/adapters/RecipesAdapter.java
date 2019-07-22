@@ -10,7 +10,6 @@ import android.net.Uri;
 import android.os.Handler;
 import android.text.Spannable;
 import android.text.style.ForegroundColorSpan;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,9 +17,7 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.ScaleAnimation;
 import android.widget.CompoundButton;
-import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -38,10 +35,10 @@ import com.google.android.material.chip.Chip;
 import com.ronginat.family_recipes.R;
 import com.ronginat.family_recipes.logic.storage.StorageWrapper;
 import com.ronginat.family_recipes.model.CategoryEntity;
-import com.ronginat.family_recipes.model.RecipeEntity;
 import com.ronginat.family_recipes.model.RecipeMinimal;
 import com.ronginat.family_recipes.recycler.helpers.RecipesAdapterHelper;
 import com.ronginat.family_recipes.utils.Constants;
+import com.ronginat.family_recipes.utils.logic.CrashLogger;
 
 import java.util.List;
 
@@ -76,8 +73,8 @@ public class RecipesAdapter extends PagedListAdapter<RecipeMinimal, RecipesAdapt
         TextView numberOfLikes;
         @BindView(R.id.thumbnail)
         ImageView thumbnail;
-        @BindView(R.id.categories_scroll_container)
-        HorizontalScrollView horizontalScrollView;
+        @BindView(R.id.categories_layout_container)
+        ViewGroup categoriesLayout; // flexbox
         @BindView(R.id.favorite_button)
         ToggleButton favoriteToggleButton;
 
@@ -216,10 +213,27 @@ public class RecipesAdapter extends PagedListAdapter<RecipeMinimal, RecipesAdapt
 
     private void inflateCategories(MyViewHolder holder, RecipeMinimal recipe) {
         if (recipe.getCategories() != null && !recipe.getCategories().isEmpty()) {
-            /*LinearLayout internalWrapper = new LinearLayout(context);
-            internalWrapper.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
-            internalWrapper.setOrientation(LinearLayout.HORIZONTAL);*/
+            holder.categoriesLayout.removeAllViewsInLayout();
 
+            //margins of every view in the flexbox
+            ViewGroup.MarginLayoutParams marginLayoutParams = new ViewGroup.MarginLayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            marginLayoutParams.setMarginStart(6);
+            marginLayoutParams.setMarginEnd(6);
+
+            for (String category: recipe.getCategories()) {
+                View view = LayoutInflater.from(context).inflate(R.layout.category_item_layout, holder.categoriesLayout, false);
+                //view.setLayoutParams(marginLayoutParams);
+                Chip chip = view.findViewById(R.id.category_text);
+                chip.setText(category);
+                chip.setChipBackgroundColor(ColorStateList.valueOf(RecipesAdapterHelper.getCategoryColorByName(categoryList, category)));
+                holder.categoriesLayout.addView(view, marginLayoutParams);
+            }
+        }
+    }
+
+    /*private void inflateCategories1(MyViewHolder holder, RecipeMinimal recipe) {
+        if (recipe.getCategories() != null && !recipe.getCategories().isEmpty()) {
             //only child of the scroll view is a linear layout containing all the views
             LinearLayout internalWrapper = holder.horizontalScrollView.findViewById(R.id.categories_layout_container);
             internalWrapper.removeAllViews();
@@ -236,8 +250,8 @@ public class RecipesAdapter extends PagedListAdapter<RecipeMinimal, RecipesAdapt
                 Chip chip = view.findViewById(R.id.category_text);
                 chip.setText(category);
                 chip.setChipBackgroundColor(ColorStateList.valueOf(RecipesAdapterHelper.getCategoryColorByName(categoryList, category)));
-                /*((TextView) view.findViewById(R.id.category_text)).setText(category);
-                view.findViewById(R.id.category_text).getBackground().setTint(RecipesAdapterHelper.getCategoryColorByName(categoryList, category));*/
+                //((TextView) view.findViewById(R.id.category_text)).setText(category);
+                //view.findViewById(R.id.category_text).getBackground().setTint(RecipesAdapterHelper.getCategoryColorByName(categoryList, category));
 
                 //view.findViewById(R.id.category_text).getBackground().setColorFilter(RecipesAdapterHelper.getCategoryColorByName(categoryList, category), PorterDuff.Mode.SRC_ATOP);
 
@@ -250,7 +264,7 @@ public class RecipesAdapter extends PagedListAdapter<RecipeMinimal, RecipesAdapt
             holder.horizontalScrollView.removeAllViews();
             holder.horizontalScrollView.addView(internalWrapper);
         }
-    }
+    }*/
 
     private void loadImage(final MyViewHolder holder, final RecipeMinimal recipe) {
         CircularProgressDrawable circularProgressDrawable = new CircularProgressDrawable(context);
@@ -282,7 +296,7 @@ public class RecipesAdapter extends PagedListAdapter<RecipeMinimal, RecipesAdapt
                         @Override
                         public void onError(Throwable throwable) {
                             Toast.makeText(context, throwable.getMessage(), Toast.LENGTH_SHORT).show();
-                            Log.e(getClass().getSimpleName(), "error from storage, ", throwable);
+                            CrashLogger.e(getClass().getSimpleName(), "error from storage, ", throwable);
                             loadDefaultImage(holder, circularProgressDrawable);
                             dispose();
                         }
@@ -293,7 +307,7 @@ public class RecipesAdapter extends PagedListAdapter<RecipeMinimal, RecipesAdapt
 
     private void loadDefaultImage(@NonNull final MyViewHolder holder, @NonNull Drawable placeholder) {
         Glide.with(context)
-                .load(RecipeEntity.image)
+                .load(R.drawable.food_default_black)
                 .placeholder(placeholder)
                 .optionalCircleCrop()
                 .into(holder.thumbnail);

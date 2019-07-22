@@ -20,7 +20,8 @@ import java.util.Stack;
  */
 public class HtmlHelper {
 
-    private static final String BODY_TEXT_STYLE = "style=font-family:sans-serif";
+    //private static final String BODY_TEXT_STYLE = "style=font-family:sans-serif";
+    private static final String DIV_META_STYLE_HEB = "dir=rtl lang=he class=recipe";
     private static final String LINE_BREAK = "br";
     public static final String HORIZONTAL_RULE = "hr";
     public static final String LIST_ROW = "li";
@@ -69,14 +70,17 @@ public class HtmlHelper {
 
 
     public void openStaticElements() {
-        builder.append(addTag("div dir=rtl lang=he " + BODY_TEXT_STYLE));
+        builder.append(addTag("div " + DIV_META_STYLE_HEB));
+        //builder.append(addTag("div dir=rtl lang=he " + BODY_TEXT_STYLE));
     }
 
     public void openStaticElementsForInstructions() {
         if ("he".equals(MyApplication.getLocale()))
-            builder.append(addTag("div dir=rtl lang=he " + BODY_TEXT_STYLE));
+            builder.append(addTag("div " + DIV_META_STYLE_HEB));
+            //builder.append(addTag("div dir=rtl lang=he " + BODY_TEXT_STYLE));
         else
-            builder.append(addTag("div dir=ltr lang=en " + BODY_TEXT_STYLE));
+            builder.append(addTag("div dir=ltr lang=en"));
+            //builder.append(addTag("div dir=ltr lang=en " + BODY_TEXT_STYLE));
     }
 
     public void closeStaticElements() {

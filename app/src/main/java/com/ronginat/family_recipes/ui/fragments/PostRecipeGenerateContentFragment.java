@@ -108,7 +108,7 @@ public class PostRecipeGenerateContentFragment extends PostRecipeBaseFragment {
     protected View.OnClickListener getFabClickListener() {
         return view -> {
             if(mAdapter.checkValidInput()) {
-                String html = mAdapter.generateHtml();
+                String html = mAdapter.generateHtml(activity);
                 //Log.e(TAG, html);
                 viewModel.setRecipeContent(html);
                 activity.nextFragmentDelayed();
@@ -179,7 +179,7 @@ public class PostRecipeGenerateContentFragment extends PostRecipeBaseFragment {
                     mAdapter.addElementToScreen();
                     break;
                 case R.id.fab_preview_action:
-                    activity.showPreviewDialog(mAdapter.generateHtml());
+                    activity.showPreviewDialog(mAdapter.generateHtml(activity));
                     break;
                 case R.id.fab_template_action:
                     if (shouldDisplayDialog())

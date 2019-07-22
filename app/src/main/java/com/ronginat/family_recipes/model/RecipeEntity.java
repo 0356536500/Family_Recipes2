@@ -1,5 +1,10 @@
 package com.ronginat.family_recipes.model;
 
+import androidx.annotation.NonNull;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.ronginat.family_recipes.logic.persistence.AppDatabases;
@@ -9,12 +14,6 @@ import java.io.Serializable;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Objects;
-
-import androidx.annotation.NonNull;
-import androidx.room.ColumnInfo;
-import androidx.room.Entity;
-import androidx.room.Ignore;
-import androidx.room.PrimaryKey;
 
 import static com.ronginat.family_recipes.utils.Constants.FALSE;
 import static com.ronginat.family_recipes.utils.Constants.TRUE;
@@ -32,15 +31,14 @@ public class RecipeEntity implements Serializable {
     public static final String KEY_CATEGORIES = "categories";
     public static final String KEY_CREATED = "creationDate";
     public static final String KEY_MODIFIED = "lastModifiedDate";
-    //public static final String KEY_RECIPE_FILE = "recipeFile";
     public static final String KEY_UPLOADER = "uploader";
     public static final String KEY_THUMBNAIL = "thumbnail";
     public static final String KEY_FOOD_FILES = "foodFiles";
     public static final String KEY_LIKES = "likes";
     public static final String KEY_FAVORITE = "meLike";
 
-    @Ignore
-    public static String image = "https://api.androidhive.info/json/images/keanu.jpg";
+    //@Ignore
+    //public static String image = "https://api.androidhive.info/json/images/keanu.jpg";
 
     @NonNull
     @PrimaryKey
@@ -54,8 +52,6 @@ public class RecipeEntity implements Serializable {
     private String creationDate;
     @ColumnInfo(name = KEY_MODIFIED)
     private String lastModifiedDate;
-    /*@ColumnInfo(name = KEY_RECIPE_FILE)
-    private String recipeFile;*/
     @ColumnInfo(name = KEY_UPLOADER)
     private String uploader;
     @ColumnInfo(name = KEY_THUMBNAIL)
@@ -87,7 +83,7 @@ public class RecipeEntity implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, creationDate, lastModifiedDate/*, recipeFile*/, uploader, thumbnail, categories, foodFiles, likes, meLike);
+        return Objects.hash(id, name, description, creationDate, lastModifiedDate, uploader, thumbnail, categories, foodFiles, likes, meLike);
     }
 
     /**
@@ -103,7 +99,6 @@ public class RecipeEntity implements Serializable {
         boolean thumbnails = Objects.equals(getThumbnail(), other.getThumbnail());
         boolean created = Objects.equals(getCreationDate(), other.getCreationDate());
         boolean modified = Objects.equals(getCreationDate(), other.getCreationDate());
-        //boolean file = Objects.equals(getRecipeFile(), other.getRecipeFile());
         boolean likes = getLikes() == other.getLikes();
 
         boolean cats = getCategoriesToString().equals(other.getCategoriesToString());
@@ -112,7 +107,7 @@ public class RecipeEntity implements Serializable {
         //boolean meLikes = getMeLike() == other.getMeLike();
 
         return ids && names && descriptions && uploaders && thumbnails && cats && created && modified
-                /*&& file*/ && images && likes/* && meLikes*/;
+                && images && likes/* && meLikes*/;
     }
 
     private String getCategoriesToString() {
@@ -196,14 +191,6 @@ public class RecipeEntity implements Serializable {
         this.lastModifiedDate = lastModifiedDate;
     }
 
-    /*public String getRecipeFile() {
-        return recipeFile;
-    }
-
-    public void setRecipeFile(String recipeFile) {
-        this.recipeFile = recipeFile;
-    }*/
-
     public String getUploader() {
         if(uploader != null)
             return uploader;
@@ -275,7 +262,6 @@ public class RecipeEntity implements Serializable {
                 ", description='" + description + '\'' +
                 ", creationDate='" + creationDate + '\'' +
                 ", lastModifiedDate='" + lastModifiedDate + '\'' +
-                /*", recipeFile='" + recipeFile + '\'' +*/
                 ", uploader='" + uploader + '\'' +
                 ", categories=" + categories +
                 ", foodFiles=" + foodFiles +
@@ -290,7 +276,6 @@ public class RecipeEntity implements Serializable {
         private String builderDescription;
         private String builderCreatedAt;
         private String builderLastModifiedAt;
-        //private String builderRecipeFile;
         private String builderUploader;
         private String builderCategories;
         private String builderThumbnail;
@@ -327,11 +312,6 @@ public class RecipeEntity implements Serializable {
             this.builderLastModifiedAt = lastModifiedAt;
             return this;
         }
-
-        /*public RecipeEntity.RecipeBuilder recipeFile (String recipeFile) {
-            this.builderRecipeFile = recipeFile;
-            return this;
-        }*/
 
         public RecipeEntity.RecipeBuilder uploader (String uploader) {
             this.builderUploader = uploader;
@@ -375,7 +355,6 @@ public class RecipeEntity implements Serializable {
             recipe.setDescription(builderDescription);
             recipe.setCreationDate(builderCreatedAt);
             recipe.setLastModifiedDate(builderLastModifiedAt);
-            //recipe.setRecipeFile(builderRecipeFile);
             recipe.setUploader(builderUploader);
             recipe.setThumbnail(builderThumbnail);
             recipe.setStringCategories(builderCategories);

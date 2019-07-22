@@ -54,7 +54,7 @@
             android:id="@+id/description"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
+            android:layout_marginStart="10dp"
             android:layout_marginTop="12dp"
             android:layout_marginEnd="8dp"
             android:ellipsize="end"
@@ -72,7 +72,27 @@
             tools:fontFamily="@font/open_sans_bold" />
         <!--android:textColor="@color/contact_number"-->
 
-        <HorizontalScrollView
+        <com.google.android.flexbox.FlexboxLayout
+            android:id="@+id/categories_layout_container"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:flexWrap="wrap"
+            app:flexDirection="row"
+            app:alignItems="flex_start"
+            app:alignContent="flex_start"
+            app:justifyContent="flex_start"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="4dp"
+            android:layout_marginBottom="4dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/thumbnail"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/description">
+
+        </com.google.android.flexbox.FlexboxLayout>
+
+        <!--<HorizontalScrollView
             android:id="@+id/categories_scroll_container"
             android:layout_width="0dp"
             android:layout_height="40dp"
@@ -94,7 +114,7 @@
                 android:orientation="horizontal">
             </LinearLayout>
 
-        </HorizontalScrollView>
+        </HorizontalScrollView>-->
 
         <TextView
             android:id="@+id/uploader"

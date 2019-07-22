@@ -274,7 +274,7 @@ public class HtmlInstructionsPagerAdapter extends PagerAdapter {
         HtmlHelper helper = new HtmlHelper();
         helper.openStaticElementsForInstructions();
 
-        helper = model.buildHtmlFromElement(helper);
+        helper = model.buildHtmlFromElement(activity, helper);
 
         helper.closeStaticElements();
 

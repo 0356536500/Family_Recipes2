@@ -92,7 +92,9 @@ public class RecipeMinimal {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         RecipeMinimal that = (RecipeMinimal) o;
-        return likes == that.likes && meLike == that.meLike &&
+        return
+                Objects.equals(likes, that.likes) &&
+                Objects.equals(meLike, that.meLike) &&
                 Objects.equals(id, that.id) &&
                 Objects.equals(name, that.name) &&
                 Objects.equals(description, that.description) &&

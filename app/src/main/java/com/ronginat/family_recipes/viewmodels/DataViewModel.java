@@ -18,6 +18,7 @@ import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 import androidx.paging.PagedList;
 
+import com.ronginat.family_recipes.BuildConfig;
 import com.ronginat.family_recipes.MyApplication;
 import com.ronginat.family_recipes.R;
 import com.ronginat.family_recipes.background.services.GetUserDetailsService;
@@ -196,6 +197,8 @@ public class DataViewModel extends ViewModel {
     // App update
 
     public Maybe<Map<String, String>> getDataToDownloadUpdate(ContextWrapper context) {
+        if (BuildConfig.DEBUG)
+            return Maybe.empty();
         return Maybe.create(emitter ->
                 AppRepository.getInstance().getDataToDownloadUpdate(context)
                         .subscribeOn(Schedulers.io())

@@ -3,13 +3,12 @@ package com.ronginat.family_recipes.model;
 import android.content.Context;
 import android.text.Editable;
 
-import com.ronginat.family_recipes.MyApplication;
+import androidx.annotation.NonNull;
+
 import com.ronginat.family_recipes.R;
 import com.ronginat.family_recipes.utils.logic.HtmlHelper;
 
 import java.io.Serializable;
-
-import androidx.annotation.NonNull;
 
 import static com.ronginat.family_recipes.recycler.adapters.HtmlElementsAdapter.ORDERED_LIST_POS;
 import static com.ronginat.family_recipes.recycler.adapters.HtmlElementsAdapter.UNORDERED_LIST_POS;
@@ -78,13 +77,13 @@ public class HtmlModel implements Serializable {
         return text != null && text.toString().length() > 0;
     }
 
-    public HtmlHelper buildHtmlFromElement(HtmlHelper helper) {
+    public HtmlHelper buildHtmlFromElement(Context context, HtmlHelper helper) {
         if (text == null || text.toString().isEmpty())
             return helper;
         String fromEditText = getText().toString();
 
         if (spinnerPos >= 0) {
-            String htmlElement = MyApplication.getContext().getResources().getStringArray(R.array.html_elements_types)[spinnerPos];
+            String htmlElement = context.getResources().getStringArray(R.array.html_elements_types)[spinnerPos];
 
             helper.openElement(htmlElement); // can be list/header/paragraph
 

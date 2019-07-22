@@ -309,7 +309,7 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
             } else {
                 Glide.with(getApplicationContext())
                         .asDrawable()
-                        .load(RecipeEntity.image)
+                        .load(R.mipmap.ic_logo_foreground)
                         //.placeholder(circularProgressDrawable)
                         .error(android.R.drawable.stat_notify_error)
                         .into(imageViewCollapsingImage);
