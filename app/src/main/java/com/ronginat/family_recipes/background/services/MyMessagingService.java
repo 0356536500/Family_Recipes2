@@ -10,7 +10,6 @@ import android.graphics.BitmapFactory;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
@@ -21,6 +20,7 @@ import com.google.firebase.messaging.RemoteMessage;
 import com.ronginat.family_recipes.R;
 import com.ronginat.family_recipes.ui.activities.SplashActivity;
 import com.ronginat.family_recipes.utils.Constants;
+import com.ronginat.family_recipes.utils.logic.CrashLogger;
 import com.ronginat.family_recipes.utils.logic.SharedPreferencesHandler;
 
 import java.util.ArrayList;
@@ -58,12 +58,12 @@ public class MyMessagingService extends FirebaseMessagingService {
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
-        Log.e(TAG, "onMessageReceived");
-        Log.e(TAG, remoteMessage.getData().toString());
+        CrashLogger.e(TAG, "onMessageReceived");
+        CrashLogger.e(TAG, remoteMessage.getData().toString());
 
         // Check if message contains a notification payload.
         if (remoteMessage.getNotification() != null) {
-            Log.e(TAG, "Message Notification: " + remoteMessage.getNotification().toString());
+            CrashLogger.e(TAG, "Message Notification: " + remoteMessage.getNotification().toString());
             remoteMessage.getNotification().getClickAction();
         }
 
@@ -81,7 +81,7 @@ public class MyMessagingService extends FirebaseMessagingService {
     @Override
     public void onNewToken(String token) {
         super.onNewToken(token);
-        Log.e(TAG, "Refreshed token: " + token);
+        CrashLogger.e(TAG, "Refreshed token: " + token);
         SharedPreferencesHandler.writeString(getApplicationContext(), Constants.NEW_FIREBASE_TOKEN, token);
         /*compositeDisposable.add(AppHelper.currSessionObservable
                 .subscribeOn(Schedulers.io())
@@ -113,7 +113,7 @@ public class MyMessagingService extends FirebaseMessagingService {
      * @param data FCM message data received.
      */
     private void sendNotification(@NonNull Map<String, String> data) {
-        Log.e(TAG, "sendNotification");
+        CrashLogger.e(TAG, "sendNotification");
         String channelId = data.get(Constants.CHANNEL);
         if (channelId == null)
             channelId = getString(R.string.notification_new_recipe_channel_name);
@@ -239,7 +239,7 @@ public class MyMessagingService extends FirebaseMessagingService {
     @Override
     public void onDeletedMessages() {
         super.onDeletedMessages();
-        Log.e(TAG, "onDeletedMessages");
+        CrashLogger.e(TAG, "onDeletedMessages");
     }
 
     /*private static final int NOTIFICATION_DELETION_REQUEST = 2;
