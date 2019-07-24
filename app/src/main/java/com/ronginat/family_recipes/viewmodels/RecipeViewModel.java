@@ -54,9 +54,9 @@ public class RecipeViewModel extends ViewModel {
     }
 
     @Nullable
-    public ArrayList<String> getFoodFiles() {
+    public ArrayList<String> getImages() {
         if (recipe.getValue() != null)
-            return new ArrayList<>(recipe.getValue().getFoodFiles());
+            return new ArrayList<>(recipe.getValue().getImages());
         return null;
     }
 
@@ -184,7 +184,7 @@ public class RecipeViewModel extends ViewModel {
     public void loadRecipeFoodImage(final Context context) {
         List<String> foodFiles = null;
         if (recipe.getValue() != null)
-            foodFiles = recipe.getValue().getFoodFiles();
+            foodFiles = recipe.getValue().getImages();
         if (foodFiles != null && foodFiles.size() > 0) {
             StorageWrapper.getFoodFile(context, foodFiles.get(0), this::setImagePath);
         } else {

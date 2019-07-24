@@ -23,7 +23,7 @@ public class PendingRecipeEntity {
     public static final String KEY_CATEGORIES = "categories";
     public static final String KEY_CREATED = "creationDate";
     public static final String KEY_CONTENT = "content";
-    public static final String KEY_FOOD_FILES = "foodFiles";
+    public static final String KEY_IMAGES = "images";
 
     @NonNull
     @PrimaryKey
@@ -37,23 +37,15 @@ public class PendingRecipeEntity {
     private String content;
     @ColumnInfo(name = KEY_CATEGORIES)
     private List<String> categories;
-    @ColumnInfo(name = KEY_FOOD_FILES)
-    private List<String> foodFiles;
+    @ColumnInfo(name = KEY_IMAGES)
+    private List<String> images;
 
     public PendingRecipeEntity() {
         this.creationDate = DateUtil.getUTCTime();
         categories = new ArrayList<>();
-        foodFiles = new ArrayList<>();
+        images = new ArrayList<>();
     }
 
-    /*public PendingRecipeEntity(RecipeEntity entity) {
-        this.creationDate = entity.getCreationDate();
-        this.name = entity.getName();
-        this.description = entity.getDescription();
-        this.recipeContent = entity.getRecipeFile();
-        this.categories = entity.getCategories();
-        this.foodFiles = entity.getFoodFiles();
-    }*/
 
     @NonNull
     public String getCreationDate() {
@@ -96,11 +88,11 @@ public class PendingRecipeEntity {
         this.categories = categories;
     }
 
-    public List<String> getFoodFiles() {
-        return foodFiles;
+    public List<String> getImages() {
+        return images;
     }
 
-    public void setFoodFiles(List<String> foodFiles) {
-        this.foodFiles = foodFiles;
+    public void setImages(List<String> images) {
+        this.images = images;
     }
 }

@@ -162,13 +162,13 @@ public class PostEnqueuedRecipesService extends Service {
             if (response.isSuccessful() && response.body() != null) {
                 Map<String, String> results = response.body();
                 //Log.e(TAG, "finished post recipe, " + results.toString());
-                if (recipe.getFoodFiles() != null) {
+                if (recipe.getImages() != null) {
                     uploadFoodFilesSync(
                             results.get(RESPONSE_KEY_RECIPE_ID),
                             results.get(RESPONSE_KEY_RECIPE_MODIFIED),
-                            compressFiles(recipe.getFoodFiles())
+                            compressFiles(recipe.getImages())
                     );
-                    deleteLocalFiles(getLocalImages(recipe.getFoodFiles()));
+                    deleteLocalFiles(getLocalImages(recipe.getImages()));
                 } else {
                     // finish upload the recipe
                     repository.dispatchInfo.onNext(getApplicationContext().getString(

@@ -51,14 +51,14 @@ public class Constants {
 
     public static final String DEFAULT_RECIPE_NAME = "anonymous";
     public static final String DEFAULT_RECIPE_DESC = "A sample app to showcase Cognito Identity and the SDK for Android.";
-    public static final String DEFAULT_RECIPE_UPLOADER = "unknown";
+    public static final String DEFAULT_RECIPE_AUTHOR = "unknown";
 
     public static final int FALSE = 0;
     public static final int TRUE = 1;
 
     //RecipeActivity
     public static final int MAX_FILES_TO_UPLOAD = com.ronginat.family_recipes.layout.Constants.MAX_FILES_TO_UPLOAD;
-    public static final String PAGER_FOOD_IMAGES = RecipeEntity.KEY_FOOD_FILES;
+    public static final String PAGER_FOOD_IMAGES = RecipeEntity.KEY_IMAGES;
     public static final String ASSET_FILE_BASE_URL = "file:///android_asset/";
 
     //PostRecipeActivity

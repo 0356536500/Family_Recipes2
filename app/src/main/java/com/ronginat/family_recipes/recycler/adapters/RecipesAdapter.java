@@ -67,8 +67,8 @@ public class RecipesAdapter extends PagedListAdapter<RecipeMinimal, RecipesAdapt
         TextView name;
         @BindView(R.id.description)
         TextView description;
-        @BindView(R.id.uploader)
-        TextView uploader;
+        @BindView(R.id.author)
+        TextView author;
         @BindView(R.id.number_of_likes)
         TextView numberOfLikes;
         @BindView(R.id.thumbnail)
@@ -123,28 +123,28 @@ public class RecipesAdapter extends PagedListAdapter<RecipeMinimal, RecipesAdapt
                     recipe.getDescription() :
                     com.ronginat.family_recipes.utils.Constants.DEFAULT_RECIPE_DESC);
 
-            /*this.uploader.setText(recipe.getUploader() != null ?
-                    recipe.getUploader() :
-                    com.myapps.family_recipes.utils.Constants.DEFAULT_RECIPE_UPLOADER);*/
+            /*this.uploader.setText(recipe.getAuthor() != null ?
+                    recipe.getAuthor() :
+                    com.myapps.family_recipes.utils.Constants.DEFAULT_RECIPE_AUTHOR);*/
 
-            if (recipe.getUploader() != null) {
-                listener.getDisplayedName(recipe.getUploader())
+            if (recipe.getAuthor() != null) {
+                listener.getDisplayedName(recipe.getAuthor())
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(new DisposableSingleObserver<String>() {
                             @Override
                             public void onSuccess(String name) {
-                                uploader.setText(name);
+                                author.setText(name);
                                 dispose();
                             }
 
                             @Override
                             public void onError(Throwable t) {
-                                setDefaultUploader(uploader);
+                                setDefaultAuthor(author);
                             }
                         });
             } else
-                setDefaultUploader(this.uploader);
+                setDefaultAuthor(this.author);
 
             this.numberOfLikes.setText(String.valueOf(recipe.getLikes()));
             this.favoriteToggleButton.setBackgroundResource(R.drawable.favorite_selector);
@@ -161,8 +161,8 @@ public class RecipesAdapter extends PagedListAdapter<RecipeMinimal, RecipesAdapt
         }
     }
 
-    private void setDefaultUploader(TextView uploader) {
-        uploader.setText(com.ronginat.family_recipes.utils.Constants.DEFAULT_RECIPE_UPLOADER);
+    private void setDefaultAuthor(TextView uploader) {
+        uploader.setText(com.ronginat.family_recipes.utils.Constants.DEFAULT_RECIPE_AUTHOR);
     }
 
 
@@ -286,7 +286,7 @@ public class RecipesAdapter extends PagedListAdapter<RecipeMinimal, RecipesAdapt
                                 Glide.with(context)
                                         .load(path)
                                         .placeholder(circularProgressDrawable)
-                                        .transform(new RoundedCorners(50))// TODO: change to constant
+                                        .transform(new RoundedCorners(40))// TODO: change to constant
                                         //.optionalCircleCrop()
                                         .into(holder.thumbnail);
                             }
@@ -307,9 +307,9 @@ public class RecipesAdapter extends PagedListAdapter<RecipeMinimal, RecipesAdapt
 
     private void loadDefaultImage(@NonNull final MyViewHolder holder, @NonNull Drawable placeholder) {
         Glide.with(context)
-                .load(R.drawable.food_default_black)
+                .load(R.drawable.food_default_small)
                 .placeholder(placeholder)
-                .optionalCircleCrop()
+                //.optionalCircleCrop()
                 .into(holder.thumbnail);
     }
 

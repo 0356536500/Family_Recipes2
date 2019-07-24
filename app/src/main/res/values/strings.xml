@@ -31,7 +31,7 @@
     <!-- Item in recycler -->
     <string name="recycler_item_name">A recipe</string>
     <string name="recycler_item_description">A sample app to showcase Cognito Identity and the SDK for Android.</string>
-    <string name="recycler_item_uploader">uploader</string>
+    <string name="recycler_item_author">author</string>
     <string name="recycler_item_number_of_likes">12</string>
 
     <string name="sort_toggle_text_on">recent</string>
@@ -58,8 +58,8 @@
 
     <!-- Strings related to login -->
     <string name="app_main_screen">Sign in</string>
-    <string name="app_main_screen_title">Cognito Identity</string>
-    <string name="app_main_desc">A sample app to showcase Cognito Identity and the SDK for Android.</string>
+    <string name="app_main_screen_title">Family Recipes</string>
+    <string name="app_main_desc">A small app to manage our best recipes.</string>
     <string name="nav_drawer_open">Open navigation drawer</string>
     <string name="nav_drawer_close">Close navigation drawer</string>
     <string name="Username">Username</string>
@@ -196,8 +196,8 @@
     </string-array>
 
     <string-array name="html_elements_types">
-        <item>h2</item>
         <item>h3</item>
+        <item>h4</item>
         <item>p</item>
         <item>ul</item>
         <item>ol</item>

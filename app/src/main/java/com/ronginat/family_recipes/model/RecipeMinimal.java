@@ -15,7 +15,7 @@ public class RecipeMinimal {
     private String id;
     private String name;
     private String description;
-    private String uploader;
+    private String author;
     private List<String> categories;
     private String thumbnail;
     private int likes;
@@ -48,12 +48,12 @@ public class RecipeMinimal {
         this.description = description;
     }
 
-    public String getUploader() {
-        return uploader;
+    public String getAuthor() {
+        return author;
     }
 
-    public void setUploader(String uploader) {
-        this.uploader = uploader;
+    public void setAuthor(String author) {
+        this.author = author;
     }
 
     public List<String> getCategories() {
@@ -98,14 +98,14 @@ public class RecipeMinimal {
                 Objects.equals(id, that.id) &&
                 Objects.equals(name, that.name) &&
                 Objects.equals(description, that.description) &&
-                Objects.equals(uploader, that.uploader) &&
+                Objects.equals(author, that.author) &&
                 Objects.equals(categories, that.categories) &&
                 Objects.equals(thumbnail, that.thumbnail);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, uploader, categories, thumbnail, likes, meLike);
+        return Objects.hash(id, name, description, author, categories, thumbnail, likes, meLike);
     }
 
     @NonNull

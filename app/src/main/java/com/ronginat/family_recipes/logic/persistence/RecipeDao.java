@@ -2,7 +2,6 @@ package com.ronginat.family_recipes.logic.persistence;
 
 import androidx.paging.DataSource;
 import androidx.room.Dao;
-import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
@@ -29,7 +28,7 @@ public interface RecipeDao {
 
     // region recipeMinimal
     String recipeMinimalFields = RecipeEntity.KEY_ID + ", " + RecipeEntity.KEY_NAME + ", " +
-            RecipeEntity.KEY_DESCRIPTION + ", " + RecipeEntity.KEY_UPLOADER + ", " +
+            RecipeEntity.KEY_DESCRIPTION + ", " + RecipeEntity.KEY_AUTHOR + ", " +
             RecipeEntity.KEY_CATEGORIES + ", " + RecipeEntity.KEY_THUMBNAIL + ", " +
             RecipeEntity.KEY_LIKES + ", " + RecipeEntity.KEY_FAVORITE;
 
@@ -105,7 +104,7 @@ public interface RecipeDao {
 
     // endregion
 
-    @Query("SELECT " + RecipeEntity.KEY_FOOD_FILES + " FROM " + AppDatabases.TABLE_RECIPES + " where " + RecipeEntity.KEY_ID + " = :id")
+    @Query("SELECT " + RecipeEntity.KEY_IMAGES + " FROM " + AppDatabases.TABLE_RECIPES + " where " + RecipeEntity.KEY_ID + " = :id")
     Maybe<String> getMaybeRecipeImages(String id);
 
     // region Get Accessed Time
@@ -114,7 +113,7 @@ public interface RecipeDao {
             AppDatabases.TABLE_RECIPES + "." + RecipeEntity.KEY_ID + ", " +
             //AppDatabases.TABLE_RECIPES + "." + RecipeEntity.KEY_RECIPE_FILE + ", " +
             AppDatabases.TABLE_RECIPES + "." + RecipeEntity.KEY_THUMBNAIL + ", " +
-            AppDatabases.TABLE_RECIPES + "." + RecipeEntity.KEY_FOOD_FILES + ", " +
+            AppDatabases.TABLE_RECIPES + "." + RecipeEntity.KEY_IMAGES + ", " +
             AppDatabases.TABLE_ACCESS + "." + AccessEntity.KEY_ACCESSED_THUMBNAIL + ", " +
             AppDatabases.TABLE_ACCESS + "." + AccessEntity.KEY_ACCESSED_CONTENT + ", " +
             AppDatabases.TABLE_ACCESS + "." + AccessEntity.KEY_ACCESSED_IMAGES;

@@ -29,7 +29,7 @@
     <!-- Item in recycler -->
     <string name="recycler_item_name">שם מתכון</string>
     <string name="recycler_item_description">תיאור מעולה שמתאר את המתכון בקצרה במשפט או שניים כדי שהקורא יקבל רושם ראשוני על המתכון.</string>
-    <string name="recycler_item_uploader">מעלה המתכון</string>
+    <string name="recycler_item_author">מעלה המתכון</string>
     <string name="recycler_item_number_of_likes">12</string>
 
     <string name="sort_toggle_text_on">חדשים</string>
@@ -54,8 +54,8 @@
 
     <!-- Strings related to login -->
     <string name="app_main_screen">Sign in</string>
-    <string name="app_main_screen_title">Cognito Identity</string>
-    <string name="app_main_desc">A sample app to showcase Cognito Identity and the SDK for Android.</string>
+    <string name="app_main_screen_title">מתכונים של המשפחה</string>
+    <string name="app_main_desc">אפליקציה שמארגנת את המתכונים הכי טובים שיש</string>
     <string name="nav_drawer_open">Open navigation drawer</string>
     <string name="nav_drawer_close">Close navigation drawer</string>
     <string name="Username">שם משתמש</string>

@@ -27,14 +27,14 @@ public class RecipeTO {
     private String creationDate;
     @SerializedName("lastModifiedDate")
     private String lastModifiedDate;
-    @SerializedName("uploader")
-    private String uploader;
+    @SerializedName("author")
+    private String author;
     @SerializedName("thumbnail")
     private String thumbnail;
     @SerializedName("categories")
     private List<String> categories;
-    @SerializedName("foodFiles")
-    private List<String> foodFiles;
+    @SerializedName("images")
+    private List<String> images;
     @SerializedName("likes")
     private int likes;
 
@@ -51,7 +51,7 @@ public class RecipeTO {
             this.description = recipe.getDescription();
             this.creationDate = recipe.getCreationDate();
             this.lastModifiedDate = recipe.getLastModifiedDate();
-            this.uploader = recipe.getUploader();
+            this.uploader = recipe.getAuthor();
             this.thumbnail = recipe.getThumbnail();
             this.categories = recipe.getCategories();
             this.foodFiles = recipe.getFoodFiles();
@@ -66,10 +66,10 @@ public class RecipeTO {
         rv.setDescription(this.description);
         rv.setCreationDate(this.creationDate);
         rv.setLastModifiedDate(this.lastModifiedDate);
-        rv.setUploader(this.uploader);
+        rv.setAuthor(this.author);
         rv.setThumbnail(this.thumbnail);
         rv.setCategories(this.categories);
-        rv.setFoodFiles(this.foodFiles);
+        rv.setImages(this.images);
         rv.setLikes(this.likes);
 
         return rv;
@@ -87,7 +87,7 @@ public class RecipeTO {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, creationDate, lastModifiedDate, uploader, thumbnail, categories, foodFiles, likes);
+        return Objects.hash(id, name, description, creationDate, lastModifiedDate, author, thumbnail, categories, images, likes);
     }
 
     public String getId() {
@@ -136,14 +136,14 @@ public class RecipeTO {
         this.lastModifiedDate = lastModifiedDate;
     }
 
-    public String getUploader() {
-        if(uploader != null)
-            return uploader;
-        return Constants.DEFAULT_RECIPE_UPLOADER;
+    public String getAuthor() {
+        if(author != null)
+            return author;
+        return Constants.DEFAULT_RECIPE_AUTHOR;
     }
 
-    public void setUploader(String uploader) {
-        this.uploader = uploader;
+    public void setAuthor(String author) {
+        this.author = author;
     }
 
     public String getThumbnail() {
@@ -162,12 +162,12 @@ public class RecipeTO {
         this.categories = categories;
     }
 
-    public List<String> getFoodFiles() {
-        return foodFiles;
+    public List<String> getImages() {
+        return images;
     }
 
-    public void setFoodFiles(List<String> foodFiles) {
-        this.foodFiles = foodFiles;
+    public void setImages(List<String> images) {
+        this.images = images;
     }
 
     public int getLikes() {
@@ -188,10 +188,10 @@ public class RecipeTO {
                 /*", description='" + description + '\'' +*/
                 ", creationDate='" + creationDate + '\'' +
                 ", lastModifiedDate='" + lastModifiedDate + '\'' +
-                /*", uploader='" + uploader + '\'' +*/
+                /*", author='" + author + '\'' +*/
                 ", thumbnail='" + thumbnail + '\'' +
                 ", categories=" + categories +
-                ", foodFiles=" + foodFiles +
+                ", images=" + images +
                 /*", likes=" + likes +*/
                 '}';
     }

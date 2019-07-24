@@ -225,14 +225,14 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
             }
             ft.addToBackStack(null);
 
-            if (viewModel.getFoodFiles() != null && !viewModel.getFoodFiles().isEmpty())
+            if (viewModel.getImages() != null && !viewModel.getImages().isEmpty())
                 viewModel.updateAccessToRecipeImages(recipeId);
 
             // Create and show the dialog.
             DialogFragment newFragment = new PagerDialogFragment();
             Bundle bundle = new Bundle();
             bundle.putSerializable(PagerDialogFragment.PAGER_TYPE_KEY, PagerDialogFragment.PAGER_TYPE.IMAGES);
-            bundle.putStringArrayList(Constants.PAGER_FOOD_IMAGES, viewModel.getFoodFiles());
+            bundle.putStringArrayList(Constants.PAGER_FOOD_IMAGES, viewModel.getImages());
             newFragment.setArguments(bundle);
             newFragment.show(ft, "dialog");
         });
@@ -307,12 +307,13 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
                         .error(android.R.drawable.stat_notify_error)
                         .into(imageViewCollapsingImage);
             } else {
-                Glide.with(getApplicationContext())
+                imageViewCollapsingImage.setImageDrawable(null);
+                /*Glide.with(getApplicationContext())
                         .asDrawable()
-                        .load(R.mipmap.ic_logo_foreground)
+                        .load(R.drawable.food_default_medium)
                         //.placeholder(circularProgressDrawable)
                         .error(android.R.drawable.stat_notify_error)
-                        .into(imageViewCollapsingImage);
+                        .into(imageViewCollapsingImage);*/
             }
         });
         viewModel.getInfo().observe(this, message -> {
@@ -446,8 +447,8 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
     public boolean onPrepareOptionsMenu(Menu menu) {
         RecipeEntity recipe = viewModel.getRecipe().getValue();
         if (recipe != null &&
-                recipe.getFoodFiles() != null &&
-                recipe.getFoodFiles().size() >= Constants.MAX_FILES_TO_UPLOAD * 2)
+                recipe.getImages() != null &&
+                recipe.getImages().size() >= Constants.MAX_FILES_TO_UPLOAD * 2)
             menu.findItem(R.id.action_add_photo).setVisible(false);
         return super.onPrepareOptionsMenu(menu);
     }

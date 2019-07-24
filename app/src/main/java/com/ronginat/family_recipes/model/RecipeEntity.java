@@ -31,9 +31,9 @@ public class RecipeEntity implements Serializable {
     public static final String KEY_CATEGORIES = "categories";
     public static final String KEY_CREATED = "creationDate";
     public static final String KEY_MODIFIED = "lastModifiedDate";
-    public static final String KEY_UPLOADER = "uploader";
+    public static final String KEY_AUTHOR = "author";
     public static final String KEY_THUMBNAIL = "thumbnail";
-    public static final String KEY_FOOD_FILES = "foodFiles";
+    public static final String KEY_IMAGES = "images";
     public static final String KEY_LIKES = "likes";
     public static final String KEY_FAVORITE = "meLike";
 
@@ -52,14 +52,14 @@ public class RecipeEntity implements Serializable {
     private String creationDate;
     @ColumnInfo(name = KEY_MODIFIED)
     private String lastModifiedDate;
-    @ColumnInfo(name = KEY_UPLOADER)
-    private String uploader;
+    @ColumnInfo(name = KEY_AUTHOR)
+    private String author;
     @ColumnInfo(name = KEY_THUMBNAIL)
     private String thumbnail;
     @ColumnInfo(name = KEY_CATEGORIES)
     private List<String> categories;
-    @ColumnInfo(name = KEY_FOOD_FILES)
-    private List<String> foodFiles;
+    @ColumnInfo(name = KEY_IMAGES)
+    private List<String> images;
     @ColumnInfo(name = KEY_LIKES)
     private int likes;
     @ColumnInfo(name = KEY_FAVORITE)
@@ -83,7 +83,7 @@ public class RecipeEntity implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, creationDate, lastModifiedDate, uploader, thumbnail, categories, foodFiles, likes, meLike);
+        return Objects.hash(id, name, description, creationDate, lastModifiedDate, author, thumbnail, categories, images, likes, meLike);
     }
 
     /**
@@ -95,7 +95,7 @@ public class RecipeEntity implements Serializable {
         boolean ids = Objects.equals(getId(), other.getId());
         boolean names = Objects.equals(getName(), other.getName());
         boolean descriptions = Objects.equals(getDescription(), other.getDescription());
-        boolean uploaders = Objects.equals(getUploader(), other.getUploader());
+        boolean uploaders = Objects.equals(getAuthor(), other.getAuthor());
         boolean thumbnails = Objects.equals(getThumbnail(), other.getThumbnail());
         boolean created = Objects.equals(getCreationDate(), other.getCreationDate());
         boolean modified = Objects.equals(getCreationDate(), other.getCreationDate());
@@ -103,7 +103,7 @@ public class RecipeEntity implements Serializable {
 
         boolean cats = getCategoriesToString().equals(other.getCategoriesToString());
 
-        boolean images = getFoodFilesToString().equals(other.getFoodFilesToString());
+        boolean images = getImagesToString().equals(other.getImagesToString());
         //boolean meLikes = getMeLike() == other.getMeLike();
 
         return ids && names && descriptions && uploaders && thumbnails && cats && created && modified
@@ -127,20 +127,20 @@ public class RecipeEntity implements Serializable {
         }
     }
 
-    private String getFoodFilesToString() {
-        if (getFoodFiles() != null)
-            return gson.toJson(getFoodFiles());
+    private String getImagesToString() {
+        if (getImages() != null)
+            return gson.toJson(getImages());
         return "";
     }
 
-    private void setStringFoodFiles(String foodFiles) {
+    private void setStringImages(String foodFiles) {
         if (foodFiles == null) {
-            setFoodFiles(null);
+            setImages(null);
         } else {
             Type type = new TypeToken<List<String>>() {
             }.getType();
             List<String> value = gson.fromJson(foodFiles, type);
-            setFoodFiles(value);
+            setImages(value);
         }
     }
 
@@ -191,14 +191,14 @@ public class RecipeEntity implements Serializable {
         this.lastModifiedDate = lastModifiedDate;
     }
 
-    public String getUploader() {
-        if(uploader != null)
-            return uploader;
-        return Constants.DEFAULT_RECIPE_UPLOADER;
+    public String getAuthor() {
+        if(author != null)
+            return author;
+        return Constants.DEFAULT_RECIPE_AUTHOR;
     }
 
-    public void setUploader(String uploader) {
-        this.uploader = uploader;
+    public void setAuthor(String author) {
+        this.author = author;
     }
 
     public String getThumbnail() {
@@ -217,12 +217,12 @@ public class RecipeEntity implements Serializable {
         this.categories = categories;
     }
 
-    public List<String> getFoodFiles() {
-        return foodFiles;
+    public List<String> getImages() {
+        return images;
     }
 
-    public void setFoodFiles(List<String> foodFiles) {
-        this.foodFiles = foodFiles;
+    public void setImages(List<String> images) {
+        this.images = images;
     }
 
     public int getLikes() {
@@ -262,9 +262,9 @@ public class RecipeEntity implements Serializable {
                 ", description='" + description + '\'' +
                 ", creationDate='" + creationDate + '\'' +
                 ", lastModifiedDate='" + lastModifiedDate + '\'' +
-                ", uploader='" + uploader + '\'' +
+                ", author='" + author + '\'' +
                 ", categories=" + categories +
-                ", foodFiles=" + foodFiles +
+                ", images=" + images +
                 ", likes=" + likes +
                 ", meLike=" + meLike +
                 '}';
@@ -276,10 +276,10 @@ public class RecipeEntity implements Serializable {
         private String builderDescription;
         private String builderCreatedAt;
         private String builderLastModifiedAt;
-        private String builderUploader;
+        private String builderAuthor;
         private String builderCategories;
         private String builderThumbnail;
-        private String builderFoodFiles;
+        private String builderImages;
         private int builderLikes;
 
         private List<String> builderListCategories;
@@ -313,8 +313,8 @@ public class RecipeEntity implements Serializable {
             return this;
         }
 
-        public RecipeEntity.RecipeBuilder uploader (String uploader) {
-            this.builderUploader = uploader;
+        public RecipeEntity.RecipeBuilder author (String author) {
+            this.builderAuthor = author;
             return this;
         }
 
@@ -333,8 +333,8 @@ public class RecipeEntity implements Serializable {
             return this;
         }
 
-        public RecipeEntity.RecipeBuilder foodFilesJson (String foodFilesJson) {
-            this.builderFoodFiles = foodFilesJson;
+        public RecipeEntity.RecipeBuilder imagesJson (String foodFilesJson) {
+            this.builderImages = foodFilesJson;
             return this;
         }
 
@@ -355,10 +355,10 @@ public class RecipeEntity implements Serializable {
             recipe.setDescription(builderDescription);
             recipe.setCreationDate(builderCreatedAt);
             recipe.setLastModifiedDate(builderLastModifiedAt);
-            recipe.setUploader(builderUploader);
+            recipe.setAuthor(builderAuthor);
             recipe.setThumbnail(builderThumbnail);
             recipe.setStringCategories(builderCategories);
-            recipe.setStringFoodFiles(builderFoodFiles);
+            recipe.setStringImages(builderImages);
             recipe.setLikes(builderLikes);
             recipe.setMeLike(builderMeLike ? TRUE : FALSE);
 

@@ -50,7 +50,7 @@ public class PostRecipeViewModel extends ViewModel {
     public void setImagesUris(List<String> imagesUris) {
         if (imagesUris != null) {
             List<String> paths = new ArrayList<>(imagesUris);
-            recipe.setFoodFiles(paths);
+            recipe.setImages(paths);
         }
     }
 
