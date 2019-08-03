@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Family Recipes</string>
+    <string name="app_name">מתכונים</string>
     <!-- Menu and Navigation drawer-->
     <string name="action_settings">הגדרות</string>
     <string name="toolbar_title">מתכונים</string>

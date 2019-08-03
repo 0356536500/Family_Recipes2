@@ -4,6 +4,7 @@
 .idea/
 .DS_Store
 build/
+gradle/
 /captures
 .externalNativeBuild
 /app/src/main/java/com/ronginat/family_recipes/layout/Constants.java

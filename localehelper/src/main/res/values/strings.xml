@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">LocaleHelper</string>
 
-    <string name="sharedPreferences" translatable="false">com.myapps.ron.family_recipes_preferences</string>
+    <string name="sharedPreferences" translatable="false">com.ronginat.family_recipes_preferences</string>
 </resources>

@@ -83,7 +83,7 @@ public class QueryModel implements Serializable {
 
     private String wrapQueryWithPercent(String query) {
         if (query != null && !"".equals(query))
-            return "%" + query + "%";
+            return "%\"" + query + "\"%";
         return "%";
     }
 
