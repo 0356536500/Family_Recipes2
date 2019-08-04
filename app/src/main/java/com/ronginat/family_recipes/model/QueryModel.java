@@ -74,7 +74,7 @@ public class QueryModel implements Serializable {
         if (filters != null && !filters.isEmpty()) {
             StringBuilder builder = new StringBuilder();
             for (String c : filters) {
-                builder.append(wrapQueryWithPercent(c));
+                builder.append(wrapQueryWithPercent(wrapQueryWithQuotations(c)));
             }
             return builder.toString();
         }
@@ -83,8 +83,14 @@ public class QueryModel implements Serializable {
 
     private String wrapQueryWithPercent(String query) {
         if (query != null && !"".equals(query))
-            return "%\"" + query + "\"%";
+            return "%" + query + "%";
         return "%";
+    }
+
+    private String wrapQueryWithQuotations(String query) {
+        if (query != null && !"".equals(query))
+            return "\"" + query + "\"";
+        return query;
     }
 
     @Override

@@ -262,7 +262,7 @@ public class DataViewModel extends ViewModel {
     }
 
     private void registerNewFirebaseToken(Context context, @Nullable String token) {
-        if (token != null) {
+        if (token != null && !BuildConfig.DEBUG) {
             compositeDisposable.add(AppRepository.getInstance().registerNewFirebaseToken(context, token)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())

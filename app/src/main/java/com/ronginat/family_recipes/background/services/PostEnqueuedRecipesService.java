@@ -228,7 +228,7 @@ public class PostEnqueuedRecipesService extends Service {
             repository.dispatchInfo.onNext(getApplicationContext().getString(R.string.post_images_error));
             return;
         }
-        //Log.e(TAG, "id = " + id + "\n files: " + foodFiles);
+        //Log.e(TAG, "id = " + id + "\n files: " + images);
 
         //Synchronous request with retrofit 2.0
         Response<List<String>> response = APICallsHandler.requestUrlsForFoodPicturesSync(id, lastModifiedDate, foodFiles.size(), AppHelper.getAccessToken());

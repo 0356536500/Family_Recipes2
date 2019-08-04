@@ -57,6 +57,7 @@ public class RecipesAdapter extends PagedListAdapter<RecipeMinimal, RecipesAdapt
 
     private List<CategoryEntity> categoryList;
 
+    private RecipesAdapterHelper categoriesHelper;
     private RecipesAdapterListener listener;
     private Animation scaleAnimation;
     @ColorInt
@@ -170,6 +171,7 @@ public class RecipesAdapter extends PagedListAdapter<RecipeMinimal, RecipesAdapt
         super(DIFF_CALLBACK);
         this.context = context;
         this.listener = listener;
+        this.categoriesHelper = new RecipesAdapterHelper();
 
         this.scaleAnimation = new ScaleAnimation(0.7f, 1f, 0.7f, 1f,
                 Animation.RELATIVE_TO_SELF, 0.7f, Animation.RELATIVE_TO_SELF, 0.7f);
@@ -182,6 +184,7 @@ public class RecipesAdapter extends PagedListAdapter<RecipeMinimal, RecipesAdapt
 
     public void setCategoryList(List<CategoryEntity> categoryList) {
         this.categoryList = categoryList;
+        this.categoriesHelper.setCategories(categoryList);
         notifyDataSetChanged();
     }
 
@@ -226,7 +229,7 @@ public class RecipesAdapter extends PagedListAdapter<RecipeMinimal, RecipesAdapt
                 //view.setLayoutParams(marginLayoutParams);
                 Chip chip = view.findViewById(R.id.category_text);
                 chip.setText(category);
-                chip.setChipBackgroundColor(ColorStateList.valueOf(RecipesAdapterHelper.getCategoryColorByName(categoryList, category)));
+                chip.setChipBackgroundColor(ColorStateList.valueOf(categoriesHelper.getCategoryColor(category)));
                 holder.categoriesLayout.addView(view, marginLayoutParams);
             }
         }

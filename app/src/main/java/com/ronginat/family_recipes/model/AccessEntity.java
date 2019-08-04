@@ -82,7 +82,7 @@ public class AccessEntity {
         public String id;
         //public String recipeFile;
         public String thumbnail;
-        public List<String> foodFiles;
+        public List<String> images;
 
         public Long lastAccessedThumbnail;
         public Long lastAccessedContent;
@@ -96,7 +96,7 @@ public class AccessEntity {
                 case KEY_ACCESSED_CONTENT:
                     return id;
                 case KEY_ACCESSED_IMAGES:
-                    return foodFiles;
+                    return images;
                 default:
                     return null;
             }

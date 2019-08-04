@@ -30,6 +30,7 @@ android {
                     'proguard-android-optimize.txt'),
                     'proguard-rules.pro'
             proguardFiles fileTree('proguard').asList().toArray()
+            //proguardFiles fileTree(dir: 'proguard', include: ['*.pro']).asList().toArray()
 
             /*minifyEnabled true
             shrinkResources true

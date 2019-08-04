@@ -166,7 +166,7 @@ public class CategoryEntity implements FilterModel {
 
         public CategoryBuilder() {}
 
-        public CategoryBuilder name (String name) {
+        public CategoryBuilder name (@NonNull String name) {
             this.builderName = name;
             return this;
         }

@@ -20,15 +20,15 @@ public class PendingRecipeTO implements PostRecipe {
     private String content;
     @SerializedName("categories")
     private List<String> categories;
-    /*@SerializedName("foodFiles")
-    private List<String> foodFiles;*/
+    /*@SerializedName("images")
+    private List<String> images;*/
 
     public PendingRecipeTO(PendingRecipeEntity entity) {
         this.name = entity.getName();
         this.description = entity.getDescription();
         this.content = entity.getContent();
         this.categories = new ArrayList<>(entity.getCategories());
-        //this.foodFiles = new ArrayList<>(entity.getFoodFiles());
+        //this.images = new ArrayList<>(entity.getFoodFiles());
     }
 
     @Override
@@ -53,7 +53,7 @@ public class PendingRecipeTO implements PostRecipe {
 
     /*@Override
     public List<String> getFoodFiles() {
-        return foodFiles;
+        return images;
     }*/
 
     @Override

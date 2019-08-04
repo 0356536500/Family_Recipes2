@@ -54,7 +54,7 @@ public class RecipeTO {
             this.uploader = recipe.getAuthor();
             this.thumbnail = recipe.getThumbnail();
             this.categories = recipe.getCategories();
-            this.foodFiles = recipe.getFoodFiles();
+            this.images = recipe.getFoodFiles();
             this.likes = recipe.getLikes();
         }
     }*/
