@@ -55,8 +55,9 @@ public class RecipeViewModel extends ViewModel {
 
     @Nullable
     public ArrayList<String> getImages() {
-        if (recipe.getValue() != null)
-            return new ArrayList<>(recipe.getValue().getImages());
+        RecipeEntity entity = recipe.getValue();
+        if (entity != null && entity.getImages() != null)
+            return new ArrayList<>(entity.getImages());
         return null;
     }
 

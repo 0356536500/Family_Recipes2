@@ -23,6 +23,7 @@
 
     <!--#region RecyclerWithFiltersFragment -->
     <string name="recipe_has_no_images_message">למתכון אין תמונות</string>
+    <string name="search_submit_message">תוצאות עבור %1$s</string>
 
     <!--#endregion RecyclerWithFiltersFragment -->
 

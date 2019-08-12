@@ -23,10 +23,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                android:nestedScrollingEnabled="true"
                 android:scrollbars="vertical"
                 android:paddingTop="@dimen/container_height"
-                android:clipToPadding="false"/>
+                android:clipToPadding="true"/>
 
             <com.ronginat.searchfilter.widget.Filter
                 android:id="@+id/content_main_filters"

@@ -20,4 +20,5 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
+-keep class com.ronginat.family_recipes.viewmodels.**
 -keep class com.ronginat.family_recipes.viewmodels.** { *; }

@@ -54,6 +54,7 @@ import io.reactivex.schedulers.Schedulers;
 
 public class RecipesAdapter extends PagedListAdapter<RecipeMinimal, RecipesAdapter.MyViewHolder> {
     private Context context;
+    private int thumbnailSize, thumbnailDefaultSize;
 
     private List<CategoryEntity> categoryList;
 
@@ -155,7 +156,9 @@ public class RecipesAdapter extends PagedListAdapter<RecipeMinimal, RecipesAdapt
             //inflate categories
             if (categoryList != null)
                 inflateCategories(this, recipe);
-            //inflateCategories(this, recipe);
+            // hide previous categories
+            else
+                prepareCategoriesLayout(this, recipe);
 
             //load image of the food or default if not exists
             loadImage(this, recipe);
@@ -180,6 +183,8 @@ public class RecipesAdapter extends PagedListAdapter<RecipeMinimal, RecipesAdapt
         TypedValue typedValue = new TypedValue();
         context.getTheme().resolveAttribute(R.attr.textColorMain, typedValue, true);
         circularColor = typedValue.data;
+        this.thumbnailSize = (int) this.context.getResources().getDimension(R.dimen.thumbnail);
+        this.thumbnailDefaultSize = (int) this.context.getResources().getDimension(R.dimen.thumbnail_default);
     }
 
     public void setCategoryList(List<CategoryEntity> categoryList) {
@@ -206,7 +211,6 @@ public class RecipesAdapter extends PagedListAdapter<RecipeMinimal, RecipesAdapt
             // Null defines a placeholder item - PagedListAdapter automatically
             // invalidates this row when the actual object is loaded from the
             // database.
-            //Log.e(getClass().getSimpleName(), "bind with null object");
             Spannable spannable = Spannable.Factory.getInstance().newSpannable("Not exists!");
             spannable.setSpan(new ForegroundColorSpan(Color.RED), 0, spannable.length(), 0);
             holder.name.setText(spannable , TextView.BufferType.SPANNABLE);
@@ -216,58 +220,47 @@ public class RecipesAdapter extends PagedListAdapter<RecipeMinimal, RecipesAdapt
 
     private void inflateCategories(MyViewHolder holder, RecipeMinimal recipe) {
         if (recipe.getCategories() != null && !recipe.getCategories().isEmpty()) {
-            holder.categoriesLayout.removeAllViewsInLayout();
+            prepareCategoriesLayout(holder, recipe);
 
+            int i = 0;
+            for (String category: recipe.getCategories()) {
+                View view = holder.categoriesLayout.getChildAt(i++);
+                // show view
+                view.setVisibility(View.VISIBLE);
+                Chip chip = view.findViewById(R.id.category_text);
+                chip.setText(category);
+                chip.setChipBackgroundColor(ColorStateList.valueOf(categoriesHelper.getCategoryColor(category)));
+            }
+        }
+    }
+
+    /**
+     * Do as little changes as possible to the categories layout, to avoid redundant inflation
+     */
+    private void prepareCategoriesLayout(MyViewHolder holder, RecipeMinimal recipe) {
+        int numberOfCategories = recipe.getCategories() != null ? recipe.getCategories().size() : 0;
+        int currentNumOfViews = holder.categoriesLayout.getChildCount();
+        // hide redundant views
+        if (currentNumOfViews > numberOfCategories) {
+            //holder.categoriesLayout.removeViewsInLayout(numberOfCategories, currentNumOfViews - numberOfCategories);
+            for (int i = numberOfCategories; i < currentNumOfViews; i++)
+                holder.categoriesLayout.getChildAt(i).setVisibility(View.GONE);
+        }
+        // inflate missing views
+        else if (numberOfCategories > currentNumOfViews) {
             //margins of every view in the flexbox
             ViewGroup.MarginLayoutParams marginLayoutParams = new ViewGroup.MarginLayoutParams(
                     ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             marginLayoutParams.setMarginStart(6);
             marginLayoutParams.setMarginEnd(6);
 
-            for (String category: recipe.getCategories()) {
+            for (int i = 0; i < numberOfCategories - currentNumOfViews; i++) {
                 View view = LayoutInflater.from(context).inflate(R.layout.category_item_layout, holder.categoriesLayout, false);
-                //view.setLayoutParams(marginLayoutParams);
-                Chip chip = view.findViewById(R.id.category_text);
-                chip.setText(category);
-                chip.setChipBackgroundColor(ColorStateList.valueOf(categoriesHelper.getCategoryColor(category)));
                 holder.categoriesLayout.addView(view, marginLayoutParams);
             }
         }
+
     }
-
-    /*private void inflateCategories1(MyViewHolder holder, RecipeMinimal recipe) {
-        if (recipe.getCategories() != null && !recipe.getCategories().isEmpty()) {
-            //only child of the scroll view is a linear layout containing all the views
-            LinearLayout internalWrapper = holder.horizontalScrollView.findViewById(R.id.categories_layout_container);
-            internalWrapper.removeAllViews();
-
-            //margins of every view in linear layout
-            ViewGroup.MarginLayoutParams marginLayoutParams = new ViewGroup.MarginLayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            marginLayoutParams.setMarginStart(6);
-            marginLayoutParams.setMarginEnd(6);
-
-            for (String category: recipe.getCategories()) {
-                View view = LayoutInflater.from(context).inflate(R.layout.category_item_layout, internalWrapper, false);
-                //view.setLayoutParams(marginLayoutParams);
-                Chip chip = view.findViewById(R.id.category_text);
-                chip.setText(category);
-                chip.setChipBackgroundColor(ColorStateList.valueOf(RecipesAdapterHelper.getCategoryColorByName(categoryList, category)));
-                //((TextView) view.findViewById(R.id.category_text)).setText(category);
-                //view.findViewById(R.id.category_text).getBackground().setTint(RecipesAdapterHelper.getCategoryColorByName(categoryList, category));
-
-                //view.findViewById(R.id.category_text).getBackground().setColorFilter(RecipesAdapterHelper.getCategoryColorByName(categoryList, category), PorterDuff.Mode.SRC_ATOP);
-
-                //view.getBackground().setColorFilter(pickColor(), PorterDuff.Mode.SRC_ATOP);
-                //((GradientDrawable)view.getBackground()).setStroke(5, Color.BLACK);
-                //((TextView) view.findViewById(R.id.category_text)).setTextColor(color);
-                internalWrapper.addView(view, marginLayoutParams);
-            }
-
-            holder.horizontalScrollView.removeAllViews();
-            holder.horizontalScrollView.addView(internalWrapper);
-        }
-    }*/
 
     private void loadImage(final MyViewHolder holder, final RecipeMinimal recipe) {
         CircularProgressDrawable circularProgressDrawable = new CircularProgressDrawable(context);
@@ -277,6 +270,7 @@ public class RecipesAdapter extends PagedListAdapter<RecipeMinimal, RecipesAdapt
         holder.thumbnail.setImageDrawable(circularProgressDrawable);
 
         if(recipe.getThumbnail() != null) {
+            setThumbnailSize(holder, thumbnailSize);
             //.apply(RequestOptions.circleCropTransform())
             StorageWrapper.getThumbFile(context, recipe.getThumbnail())
                     .subscribeOn(Schedulers.io())
@@ -289,6 +283,7 @@ public class RecipesAdapter extends PagedListAdapter<RecipeMinimal, RecipesAdapt
                                 Glide.with(context)
                                         .load(path)
                                         .placeholder(circularProgressDrawable)
+                                        //.apply(new RequestOptions().override((int) context.getResources().getDimension(R.dimen.thumbnail)))
                                         .transform(new RoundedCorners(40))// TODO: change to constant
                                         //.optionalCircleCrop()
                                         .into(holder.thumbnail);
@@ -309,11 +304,22 @@ public class RecipesAdapter extends PagedListAdapter<RecipeMinimal, RecipesAdapt
     }
 
     private void loadDefaultImage(@NonNull final MyViewHolder holder, @NonNull Drawable placeholder) {
+        setThumbnailSize(holder, thumbnailDefaultSize);
         Glide.with(context)
                 .load(R.drawable.food_default_small)
                 .placeholder(placeholder)
+                //.apply(new RequestOptions().override((int) context.getResources().getDimension(R.dimen.thumbnail_default)))
                 //.optionalCircleCrop()
                 .into(holder.thumbnail);
+    }
+
+    private void setThumbnailSize(MyViewHolder holder, int size) {
+        ViewGroup.LayoutParams lp = holder.thumbnail.getLayoutParams();
+        if (lp.width != size) {
+            lp.width = size;
+            lp.height = size;
+            //holder.thumbnail.requestLayout();
+        }
     }
 
     private int lastSize = 0;

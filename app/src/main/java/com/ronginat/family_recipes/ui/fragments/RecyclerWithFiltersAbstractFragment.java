@@ -1,5 +1,6 @@
 package com.ronginat.family_recipes.ui.fragments;
 
+import android.animation.ValueAnimator;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
@@ -160,7 +161,7 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
             swipeRefreshLayout = view.findViewById(R.id.content_main_refresh);
             recyclerView = view.findViewById(R.id.recycler_view);
             mFilter = view.findViewById(R.id.content_main_filters);
-            filtersViewHider = ViewHider.of(mFilter).setDirection(ViewHider.TOP).setDuration(250L).build();
+            filtersViewHider = ViewHider.of(mFilter).setDirection(ViewHider.TOP).setDuration(Constants.FILTERS_TRANSLATE_ANIMATION_DURATION).build();
             firstLoadingProgressBar = view.findViewById(R.id.content_main_fist_loading_animation);
 
             orderBy = com.ronginat.family_recipes.logic.Constants.SORT_RECENT;
@@ -192,6 +193,16 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
         mFilter.build();
     }
 
+    /**
+     * Change {@link #recyclerView} padding according to
+     */
+    private void changeRecyclerPadding(int from, int to) {
+        ValueAnimator animator = ValueAnimator.ofInt(from, to);
+        animator.setDuration(Constants.RECYCLER_TRANSLATE_ANIMATION_DURATION);
+        animator.addUpdateListener(valueAnimator -> recyclerView.post(() -> recyclerView.setPadding(0, (int) valueAnimator.getAnimatedValue() , 0, 0)));
+        animator.start();
+    }
+
     // region setName Views
     private void initRecycler() {
         recyclerView.setItemAnimator(new FiltersListItemAnimator());
@@ -200,6 +211,8 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
             public void show() {
                 if (mFilter != null && mFilter.isCollapsed()) {
                     filtersViewHider.show();
+                    changeRecyclerPadding(0, getResources().getDimensionPixelSize(R.dimen.container_height));
+                    //recyclerView.post(() -> recyclerView.setPadding(0, getResources().getDimensionPixelSize(R.dimen.container_height) , 0, 0));
                     //mFilter.animate().translationY(0).setInterpolator(new DecelerateInterpolator(1.5f)).start();
                 }
             }
@@ -208,6 +221,8 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
             public void hide() {
                 if (mFilter != null && mFilter.isCollapsed()) {
                     filtersViewHider.hide();
+                    changeRecyclerPadding(getResources().getDimensionPixelSize(R.dimen.container_height), 0);
+                    //recyclerView.post(() -> recyclerView.setPadding(0, 0, 0, 0));
                     //mFilter.animate().translationY(-mFilter.getHeight()).setInterpolator(new AccelerateInterpolator(2)).start();
                 }
             }
@@ -243,7 +258,8 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
                 @Override
                 public boolean onMenuItemActionExpand(MenuItem item) {
                     CrashLogger.e(TAG, "expanded, search: " + lastQuery);
-                    searchView.setQuery(lastQuery, false);
+                    searchView.post(() ->
+                            searchView.setQuery(lastQuery, false));
                     return true;
                 }
 
@@ -262,7 +278,7 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
                     if (searchMenuItem != null) {
                         searchMenuItem.collapseActionView();
                     }
-                    Toast.makeText(activity, "Submitted, " + query, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(activity, getString(R.string.search_submit_message, query), Toast.LENGTH_SHORT).show();
                     lastQuery = query;
                     queryModel.setSearch(lastQuery);
                     viewModel.applyQuery(queryModel);
@@ -272,9 +288,11 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
                 @Override
                 public boolean onQueryTextChange(String query) {
                     // filter recycler view when text is changed
+                    if ("".equals(query))
+                        lastQuery = query;
                     queryModel.setSearch(query);
                     viewModel.applyQuery(queryModel);
-                    return false;
+                    return true;
                 }
             });
         }
@@ -436,7 +454,7 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
     void scrollToTop() {
         LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
         if (layoutManager != null) {
-            layoutManager.scrollToPositionWithOffset(0, 0);
+            recyclerView.postDelayed(() -> layoutManager.scrollToPositionWithOffset(0, 0), 300);
             filtersViewHider.show();
         }
     }

@@ -44,6 +44,8 @@ public class Constants {
     //public static final int RECIPE_ACTIVITY_CODE = 0;
     public static final int POST_RECIPE_ACTIVITY_CODE = 1;
 
+    public static final long FILTERS_TRANSLATE_ANIMATION_DURATION = 250L;
+    public static final long RECYCLER_TRANSLATE_ANIMATION_DURATION = 150L;
     public static final long FADE_ANIMATION_DURATION = 200;
     public static final long SCALE_ANIMATION_DURATION = 500L;
 
