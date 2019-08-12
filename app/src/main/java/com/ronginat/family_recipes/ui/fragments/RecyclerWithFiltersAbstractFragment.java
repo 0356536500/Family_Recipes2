@@ -84,7 +84,7 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
     RecipesAdapter mAdapter;
 
     protected DataViewModel viewModel;
-    String orderBy;
+    private String orderBy;
     private String lastQuery = "";
 
     ProgressBar firstLoadingProgressBar;
