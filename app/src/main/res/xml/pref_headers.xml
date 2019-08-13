@@ -12,6 +12,10 @@
         android:title="@string/pref_header_notifications" />
     <!--android:icon="@drawable/ic_notifications_black_24dp"-->
 
+    <header
+        android:fragment="com.ronginat.family_recipes.ui.activities.SettingsActivity$AccountPreferenceFragment"
+        android:title="@string/settings_category_account" />
+
     <!--<header
         android:fragment="com.myapps.family_recipes.ui.activities.SettingsActivity$DataSyncPreferenceFragment"
         android:icon="@drawable/ic_sync_black_24dp"

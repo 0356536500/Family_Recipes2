@@ -22,3 +22,5 @@
 
 -keep class com.ronginat.family_recipes.viewmodels.**
 -keep class com.ronginat.family_recipes.viewmodels.** { *; }
+
+-keepnames class com.ronginat.family_recipes.ui.activities.SettingsActivity.** { *; }
