@@ -216,6 +216,15 @@
     <string name="pick_image_dialog_choose">בחירה</string>
     <string name="pick_image_dialog_cancel">ביטול</string>
 
+    <!--#region Notifications builder -->
+    <string name="notification_new_recipe_channel_title">התחדשנו במתכון! %1$s, מאת %2$s</string>
+    <string name="notification_comment_channel_title">תגובה חדשה מ-%1$s על מתכונך, %2$s</string>
+    <string name="notification_like_channel_title">סימון \'אהבתי\' מ-%1$s על מתכונך, %2$s</string>
+
+    <string name="notification_generic_message">לחצו לצפייה במתכון</string>
+
+    <!--#endregion Notifications builders -->
+
 
     <!--#region Shortcuts -->
     <string name="shortcut_post_recipe_short_label">מתכון חדש</string>

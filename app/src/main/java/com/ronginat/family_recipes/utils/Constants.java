@@ -13,6 +13,8 @@ public class Constants {
     public static final String ID = "id";
     public static final String NOTIFICATION = "notification";
 
+    public static final String AUTHOR = "author";
+
     // endregion
 
     // region Splash Activity

@@ -116,7 +116,7 @@ public class MyMessagingService extends FirebaseMessagingService {
         CrashLogger.e(TAG, "sendNotification");
         String channelId = data.get(Constants.CHANNEL);
         if (channelId == null)
-            channelId = getString(R.string.notification_new_recipe_channel_name);
+            channelId = getString(R.string.notification_new_recipe_channel_id);
 
         int notificationID = new Random(System.currentTimeMillis()).nextInt();
         // create notification click intent
@@ -170,15 +170,15 @@ public class MyMessagingService extends FirebaseMessagingService {
         return PendingIntent.getBroadcast(this, NOTIFICATION_DELETION_REQUEST, intent, PendingIntent.FLAG_ONE_SHOT);
     }*/
 
-    private NotificationCompat.Builder getNotificationBuilderUI(Map<String, String> data, String channelId, PendingIntent pendingIntent/*, PendingIntent deletionIntent*/) {
+    private NotificationCompat.Builder getNotificationBuilderUI(Map<String, String> data, @NonNull String channelId, PendingIntent pendingIntent/*, PendingIntent deletionIntent*/) {
         // set the notification UI
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder =
                 new NotificationCompat.Builder(this, channelId)
                         .setSmallIcon(R.drawable.ic_status_logo)
                         .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_logo_foreground))
-                        .setContentTitle(data.get(Constants.TITLE))
-                        .setContentText(data.get(Constants.BODY))
+                        .setContentTitle(buildNotificationTitle(channelId, data))
+                        .setContentText(buildNotificationMessage(channelId, data.get(Constants.BODY)))
                         .setAutoCancel(true)
                         .setSound(defaultSoundUri)
                         .setColorized(true)
@@ -191,6 +191,24 @@ public class MyMessagingService extends FirebaseMessagingService {
             notificationBuilder.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_action_post_black));
         }
         return notificationBuilder;
+    }
+
+    private String buildNotificationTitle(@NonNull String channelId, Map<String, String> data) {
+        // new recipe notification
+        if (getString(R.string.notification_new_recipe_channel_id).equals(channelId))
+            return getString(R.string.notification_new_recipe_channel_title, data.get(Constants.TITLE), data.get(Constants.AUTHOR));
+        else if (getString(R.string.notification_comment_channel_id).equals(channelId))
+            return getString(R.string.notification_comment_channel_title, data.get(Constants.AUTHOR), data.get(Constants.TITLE));
+        else if (getString(R.string.notification_like_channel_id).equals(channelId))
+            return getString(R.string.notification_like_channel_title, data.get(Constants.AUTHOR), data.get(Constants.TITLE));
+        return data.get(Constants.TITLE);
+    }
+
+    private String buildNotificationMessage(@NonNull String channelId, String message) {
+        String defaultMessage = getString(R.string.notification_generic_message);
+        if (getString(R.string.notification_like_channel_id).equals(channelId))
+            return defaultMessage;
+        return message != null ? message : defaultMessage;
     }
 
     private NotificationCompat.Builder getSummaryBuilderUI() {
