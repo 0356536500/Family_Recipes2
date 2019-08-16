@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 public class RecipeMinimal {
 
     private String id;
+    private String lastModifiedDate;
     private String name;
     private String description;
     private String author;
@@ -30,6 +31,14 @@ public class RecipeMinimal {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getLastModifiedDate() {
+        return lastModifiedDate;
+    }
+
+    public void setLastModifiedDate(String lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
     }
 
     public String getName() {
@@ -79,6 +88,7 @@ public class RecipeMinimal {
     public void setLikes(int likes) {
         this.likes = likes;
     }
+
     public int getMeLike() {
         return meLike;
     }
@@ -96,6 +106,7 @@ public class RecipeMinimal {
                 Objects.equals(likes, that.likes) &&
                 Objects.equals(meLike, that.meLike) &&
                 Objects.equals(id, that.id) &&
+                Objects.equals(lastModifiedDate, that.lastModifiedDate) &&
                 Objects.equals(name, that.name) &&
                 Objects.equals(description, that.description) &&
                 Objects.equals(author, that.author) &&

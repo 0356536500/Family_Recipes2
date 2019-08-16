@@ -129,10 +129,10 @@ public class APICallsHandler {
 
     // region Observable
 
-    public static Observable<Response<RecipeTO>> getRecipeObservable(String id, String token) {
+    public static Observable<Response<RecipeTO>> getRecipeObservable(String id, String lastModified, String token) {
         RecipeInterface service = getReactiveRetrofitInstance().create(RecipeInterface.class);
 
-        return service.getRecipeObservable(token, id);
+        return service.getRecipeObservable(token, id, lastModified);
     }
 
     public static Observable<Response<ContentTO>> getRecipeContentObservable(String id, String lastModified, String token) {

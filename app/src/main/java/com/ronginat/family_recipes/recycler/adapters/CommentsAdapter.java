@@ -17,12 +17,18 @@ import com.ronginat.family_recipes.utils.logic.DateUtil;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.reactivex.Single;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.observers.DisposableSingleObserver;
+import io.reactivex.schedulers.Schedulers;
+
 /**
  * Created by ronginat on 06/12/2018.
  */
 public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.MyViewHolder> {
 
     private List<CommentEntity> commentList;
+    private CommentsAdapterListener listener;
 
     class MyViewHolder extends RecyclerView.ViewHolder {
         TextView sender, message, time;
@@ -35,8 +41,9 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.MyView
         }
     }
 
-    public CommentsAdapter() {
+    public CommentsAdapter(CommentsAdapterListener listener) {
         this.commentList = new ArrayList<>();
+        this.listener = listener;
     }
 
     @NonNull
@@ -50,9 +57,26 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.MyView
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         CommentEntity comment = commentList.get(position);
 
-        holder.sender.setText(comment.getUser());
         holder.message.setText(comment.getMessage());
         holder.time.setText(DateUtil.getPrettyDateFromTime(comment.getDate()));
+        //holder.sender.setText(comment.getUser());
+        if (comment.getUser() != null) {
+            listener.getDisplayedName(comment.getUser())
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new DisposableSingleObserver<String>() {
+                        @Override
+                        public void onSuccess(String name) {
+                            holder.sender.setText(name);
+                            dispose();
+                        }
+
+                        @Override
+                        public void onError(Throwable t) {
+                            holder.sender.setText(comment.getUser());
+                        }
+                    });
+        }
     }
 
     @Override
@@ -70,5 +94,9 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.MyView
                 DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new CommentsDiffCallback(oldTemp, commentList));
                 diffResult.dispatchUpdatesTo(this);
         }
+    }
+
+    public interface CommentsAdapterListener {
+        Single<String> getDisplayedName(String username);
     }
 }

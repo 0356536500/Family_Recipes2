@@ -28,6 +28,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import static com.ronginat.family_recipes.layout.Constants.ID_QUERY;
+import static com.ronginat.family_recipes.layout.Constants.LAST_MODIFIED_QUERY;
+
 /**
  * Created by ronginat on 10/02/2019.
  */
@@ -144,7 +147,7 @@ public class MyMessagingService extends FirebaseMessagingService {
 
     private PendingIntent getIntentToStartActivity(Map<String, String> data, String channelId) {
         Intent intent;
-        if (data.get(Constants.ID) != null) {
+        if (data.get(ID_QUERY) != null) {
             intent = new Intent(this, SplashActivity.class);
             /*Bundle bundle = new Bundle();
             bundle.putString(Constants.RECIPE_ID, recipeId);
@@ -152,7 +155,8 @@ public class MyMessagingService extends FirebaseMessagingService {
             bundle.putString("channel", channelId);
             intent.putExtras(bundle);*/
             intent.putExtra(Constants.SPLASH_ACTIVITY_CODE, Constants.SPLASH_ACTIVITY_CODE_RECIPE);
-            intent.putExtra(Constants.RECIPE_ID, data.get(Constants.ID));
+            intent.putExtra(Constants.RECIPE_ID, data.get(ID_QUERY));
+            intent.putExtra(Constants.LAST_MODIFIED, data.get(LAST_MODIFIED_QUERY));
             intent.putExtra(Constants.NOTIFICATION, true);
             intent.putExtra(Constants.CHANNEL, channelId); // whether to fetch new recipes or just load comments normally
         }

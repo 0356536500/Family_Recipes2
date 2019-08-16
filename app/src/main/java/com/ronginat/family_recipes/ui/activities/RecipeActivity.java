@@ -14,6 +14,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
+import android.util.Base64;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -94,7 +95,7 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
 
     private ContentLoadingProgressBar progressBar;
     private WebView myWebView;
-    private String recipeId;
+    private String recipeId, lastModified;
     private TextView textViewCommentTitle, textViewDescription;
     private RecipeViewModel viewModel;
 
@@ -128,7 +129,8 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
 
         Bundle extras = getIntent().getExtras();
         if(extras != null) {
-            recipeId = extras.getString(Constants.RECIPE_ID);
+            this.recipeId = extras.getString(Constants.RECIPE_ID);
+            this.lastModified = extras.getString(Constants.LAST_MODIFIED);
             //String path = extras.getString(Constants.RECIPE_PATH, Constants.DEFAULT_RECIPE_PATH);
             if (recipeId != null) {
                 bindUI();
@@ -158,8 +160,8 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
         TypedValue navigationCollapsedValue = new TypedValue();
         TypedValue navigationExpandedValue = new TypedValue();
 
-        getTheme().resolveAttribute(android.R.attr.textColorPrimary, primaryValue, true);
-        getTheme().resolveAttribute(android.R.attr.colorPrimaryDark, secondValue, true);
+        getTheme().resolveAttribute(/*android.R.attr.textColorPrimary*/R.attr.collapsedIconsColor, primaryValue, true);
+        getTheme().resolveAttribute(/*android.R.attr.colorPrimaryDark*/R.attr.expandedIconsColor, secondValue, true);
         getTheme().resolveAttribute(R.attr.collapsedIconsColor, navigationCollapsedValue, true);
         getTheme().resolveAttribute(R.attr.expandedIconsColor, navigationExpandedValue, true);
 
@@ -258,10 +260,12 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
     private void initViewModel() {
         viewModel = ViewModelProviders.of(this, Injection.provideViewModelFactory(this)).get(RecipeViewModel.class);
         //viewModel = ViewModelProviders.of(this).get(RecipeViewModel.class);
-        viewModel.setInitialRecipe(this, recipeId);
+        viewModel.setInitialRecipe(this, this.recipeId, this.lastModified);
 
         viewModel.getRecipe().observe(this, recipe -> {
             if (recipe != null) {
+                if (recipe.getName().length() > 14)
+                    collapsingToolbarLayout.setExpandedTitleTextAppearance(android.R.style.TextAppearance_Material_Widget_ActionBar_Subtitle);
                 collapsingToolbarLayout.setTitle(recipe.getName());
                 textViewDescription.setText(recipe.getDescription());
                 textViewDescription.animate().alpha(1f).setDuration(1000).start();
@@ -330,14 +334,15 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
             //Log.e(TAG, "showing full heart");
             like.setImageResource(R.drawable.ic_favorite_red_36dp);
             //like.setImageDrawable(getResources().getDrawable(R.drawable.ic_favorite_red_36dp));
-            message = "like";
+            message = "liked";
         }
         else {
             //Log.e(this.getClass().getSimpleName(), "showing empty heart");
             like.setImageResource(R.drawable.ic_favorite_border_red_36dp);
             //like.setImageDrawable(getResources().getDrawable(R.drawable.ic_favorite_border_red_36dp));
-            message = "unlike";
+            message = "unliked";
         }
+        // don't show the snackbar when first loading the activity
         if(showLikeMessage)
             Snackbar.make(like, message, Snackbar.LENGTH_SHORT)
                     .setAction("Action", null).show();
@@ -355,7 +360,7 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
     }
 
     private void initCommentsRecycler() {
-        commentsAdapter = new CommentsAdapter();
+        commentsAdapter = new CommentsAdapter(username -> viewModel.getDisplayedName(this, username));
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
         commentsRecyclerView.setLayoutManager(mLayoutManager);
         //recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -748,11 +753,15 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
     private void handleShareRecipe() {
         /*StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
         StrictMode.setVmPolicy(builder.build());*/
+        RecipeEntity entity = viewModel.getRecipe().getValue();
+        String lastModifiedDate = entity != null && entity.getLastModifiedDate() != null ? entity.getLastModifiedDate() : "";
         Intent sendIntent = new Intent();
         sendIntent.setAction(Intent.ACTION_SEND);
         sendIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.app_name));
-        sendIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.recipe_share_pre_url) + "\n\n"
-                + getString(R.string.share_url, recipeId));
+        sendIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.recipe_share_pre_url) + "\n\n" +
+                getString(R.string.share_url,
+                        Base64.encodeToString(recipeId.getBytes(), Base64.URL_SAFE),
+                        Base64.encodeToString(lastModifiedDate.getBytes(), Base64.URL_SAFE)));
         /*sendIntent.putExtra(Intent.EXTRA_STREAM, ExternalStorageHelper.getFileUri(this,
                 com.myapps.family_recipes.network.Constants.RECIPES_DIR, viewModel.getMaybeRecipeImages().getContent()));*/
         sendIntent.setType(getString(R.string.share_mime_type));

@@ -395,6 +395,7 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
     public void onItemSelected(RecipeMinimal recipeMinimal) {
         Intent intent = new Intent(activity, RecipeActivity.class);
         intent.putExtra(Constants.RECIPE_ID, recipeMinimal.getId());
+        intent.putExtra(Constants.LAST_MODIFIED, recipeMinimal.getLastModifiedDate());
         startActivity(intent);
     }
 

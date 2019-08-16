@@ -5,7 +5,8 @@ import android.content.Context;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.ronginat.family_recipes.background.workers.BeginContinuationWorker;
+import com.ronginat.family_recipes.background.workers.MyWorkerManager;
+import com.ronginat.family_recipes.background.workers.PostRecipeScheduledWorker;
 import com.ronginat.family_recipes.logic.repository.CategoryRepository;
 import com.ronginat.family_recipes.logic.repository.PendingRecipeRepository;
 import com.ronginat.family_recipes.model.CategoryEntity;
@@ -66,7 +67,11 @@ public class PostRecipeViewModel extends ViewModel {
 
     private void initWorker(Context context) {
         this.compositeDisposable.clear();
-        BeginContinuationWorker.enqueueWorkContinuationWithValidSession(context);
+        new MyWorkerManager.Builder()
+                .context(context)
+                .requiresBattery(true)
+                .nextWorkRequest(PostRecipeScheduledWorker.createPostRecipesWorker())
+                .startWork();
     }
 
     @Override

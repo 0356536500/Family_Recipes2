@@ -37,6 +37,8 @@ public class RecipeTO {
     private List<String> images;
     @SerializedName("likes")
     private int likes;
+    @SerializedName("isDeleted")
+    private boolean deleted;
 
 
     public RecipeTO() {
@@ -176,6 +178,14 @@ public class RecipeTO {
 
     public void setLikes(int likes) {
         this.likes = likes;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 
 

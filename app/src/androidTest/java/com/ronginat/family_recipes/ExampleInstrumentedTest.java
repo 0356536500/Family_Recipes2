@@ -1,8 +1,10 @@
 package com.ronginat.family_recipes;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
+import android.util.Base64;
 import android.util.Log;
 
 import androidx.test.core.app.ApplicationProvider;
@@ -11,6 +13,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 import com.ronginat.family_recipes.layout.Constants;
 import com.ronginat.family_recipes.layout.cognito.AppHelper;
 import com.ronginat.family_recipes.logic.storage.StorageWrapper;
+import com.ronginat.family_recipes.utils.logic.DateUtil;
 
 import org.hamcrest.Matchers;
 import org.junit.Assert;
@@ -18,6 +21,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.io.File;
+import java.nio.charset.Charset;
 
 import io.reactivex.Maybe;
 import io.reactivex.disposables.CompositeDisposable;
@@ -95,6 +99,52 @@ public class ExampleInstrumentedTest {
 
 
         Log.e("mailMessageTest", stringBuilder.toString());
+        assertTrue(true);
+    }
+
+    @Test
+    public void intentExtrasTest() {
+        Intent intent1 = new Intent();
+        intent1.putExtra("att1", "val1");
+        intent1.putExtra("att2", "val2");
+
+        Intent intent2 = new Intent();
+        intent2.putExtras(intent1);
+
+        Intent intent3 = new Intent();
+        intent3.putExtras(intent1);
+
+        assertEquals("val1", intent1.getExtras().getString("att1"));
+        assertEquals("val1", intent2.getExtras().getString("att1"));
+        assertEquals("val2", intent3.getExtras().getString("att2"));
+    }
+
+    @Test
+    public void parseUriTest() {
+        String id = "kE5zymiS_wD_";
+        String date = "2019-08-16T15:48:24.095Z";
+        //String str =  "https://www.familyrecipes.com/recipes/kE5zymiS_wD_?" + com.ronginat.family_recipes.utils.Constants.SHARE_DATE_QUERY + "=" + date;
+        String uriStr = "https://www.familyrecipes.com/recipes/a0U1enltaVNfd0Rf?d=MjAxOS0wOC0xNlQxNDo1NDo0My4yMDJa";
+        Uri uri = Uri.parse(uriStr);
+        //Log.e("parseUriTest", uri.getPathSegments().toString());
+        //Log.e("parseUriTest", uri.getQueryParameterNames().toString());
+        //Log.e("parseUriTest", uri.getQueryParameter(com.ronginat.family_recipes.utils.Constants.SHARE_DATE_QUERY));
+        assertEquals(uri.getLastPathSegment(), id);
+        assertEquals(uri.getQueryParameter(com.ronginat.family_recipes.utils.Constants.SHARE_DATE_QUERY), date);
+    }
+
+    @Test
+    public void encodeUriTest() {
+        String id = "kE5zymiS_wD_";
+        String date = DateUtil.getUTCTime();
+        Log.e("encodeUriTest", "decoded date, " + date);
+        String encodedId = Base64.encodeToString(id.getBytes(), Base64.URL_SAFE);
+        String encodedDate = Base64.encodeToString(date.getBytes(), Base64.URL_SAFE);
+        assertEquals(date, new String(Base64.decode(encodedDate, Base64.URL_SAFE)));
+        Log.e("encodeUriTest", "encoded id, " + encodedId);
+        Log.e("encodeUriTest", "encoded date, " + encodedDate);
+        String url = ApplicationProvider.getApplicationContext().getString(R.string.share_url, encodedId, encodedDate);
+        Log.e("encodeUriTest", Uri.parse(url).toString());
         assertTrue(true);
     }
 

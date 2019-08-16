@@ -36,8 +36,8 @@ public class Constants {
     // endregion
 
     public static final String RECIPE_ID = "recipe";
-    public static final String CONTENT_MODIFIED = "lastModified";
-    public static final String RECIPE_PATH = "recipe_file";
+    public static final String LAST_MODIFIED = "lastModified";
+    public static final String SHARE_DATE_QUERY = "d";
     public static final String DEFAULT_RECIPE_PATH = "/recipe/default.html";
 
     //public static final String ACTION_UPDATE_FROM_SERVICE = "update_from_service";
@@ -82,9 +82,9 @@ public class Constants {
     private final String HTML_SAMPLE_RECIPE_URL = "https://www.sugat.com/recipes/fast-easy-brownies/";
     public enum HTML_SAMPLE_SPINNER { HEADER, SUB_HEADER, PARAGRAPH, UNORDERED_LIST, ORDERED_LIST }
     public static final String HTML_SAMPLE_TEXT_CHECK_THE_PREVIEW = "כדאי לבדוק את התוצאה הסופית בלחיצה על כפתור התצוגה המקדימה";
-    public static final String HTML_SAMPLE_TEXT_INGREDIENTS = "מרכיבים";
-    public static final String HTML_SAMPLE_TEXT_INFO = "חומרים לתבנית בגודל 20X30 ס\"מ";
-    public static final String HTML_SAMPLE_TEXT_HOW_TO_MAKE = "אופן הכנה";
+    public static final String HTML_SAMPLE_TEXT_INGREDIENTS = "חומרים:";
+    public static final String HTML_SAMPLE_TEXT_INFO = "כמות ל-16 מנות.";// "חומרים לתבנית בגודל 20X30 ס\"מ";
+    public static final String HTML_SAMPLE_TEXT_HOW_TO_MAKE = "אופן הכנה:";
     public static final String HTML_SAMPLE_INGREDIENT_LIST = "3 ביצים\n200 גרם חמאה\n 100 גרם אגוזי מלך";
     public static final String HTML_SAMPLE_HOW_TO_MAKE_STEPS_LIST = "מחממים תנור ל-170 מעלות ומשמנים את התבנית \nטורפים את הביצים בקערה במשך כחצי דקה \nמוסיפים חמאה ומאחדים לקרם חלק \nהבנתם את הרעיון";
 

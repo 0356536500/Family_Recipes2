@@ -74,7 +74,7 @@
 
         <!-- collapsedToolbarLayout -->
         <item name="collapsedIconsColor">@color/grey_100</item>
-        <item name="expandedIconsColor">@color/black</item>
+        <item name="expandedIconsColor">@color/white</item>
 
         <item name="colorControlHighlight">?attr/toolbarBackgroundSecondary</item>
         <!-- Active thumb color & Active track color(30% transparency) -->

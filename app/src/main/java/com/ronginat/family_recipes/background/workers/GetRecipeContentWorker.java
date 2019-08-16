@@ -41,7 +41,7 @@ public class GetRecipeContentWorker extends RxWorker {
     public GetRecipeContentWorker(@NonNull Context appContext, @NonNull WorkerParameters workerParams) {
         super(appContext, workerParams);
         recipeId = workerParams.getInputData().getString(Constants.RECIPE_ID);
-        lastModifiedContent = workerParams.getInputData().getString(Constants.CONTENT_MODIFIED);
+        lastModifiedContent = workerParams.getInputData().getString(Constants.LAST_MODIFIED);
         repository = Injection.provideRecipeRepository(getApplicationContext());
         compositeDisposable = new CompositeDisposable();
     }
@@ -52,10 +52,11 @@ public class GetRecipeContentWorker extends RxWorker {
         compositeDisposable.clear();
     }
 
+    @NonNull
     @Override
     public Single<Result> createWork() {
         return Single.create(emitter ->
-                compositeDisposable.add(APICallsHandler.getRecipeContentObservable(this.recipeId, lastModifiedContent, AppHelper.getAccessToken())
+                compositeDisposable.add(APICallsHandler.getRecipeContentObservable(this.recipeId, this.lastModifiedContent, AppHelper.getAccessToken())
                     .subscribe(response -> {
                         if (response.isSuccessful() && response.body() != null) {
                             repository.insertContentRecipe(response.body().toEntity());
@@ -99,7 +100,7 @@ public class GetRecipeContentWorker extends RxWorker {
                 .setConstraints(myConstraints)
                 .setInputData(new Data.Builder()
                         .putString(Constants.RECIPE_ID, recipeId)
-                        .putString(Constants.CONTENT_MODIFIED, lastModified)
+                        .putString(Constants.LAST_MODIFIED, lastModified)
                         .build())
                 .build();
     }

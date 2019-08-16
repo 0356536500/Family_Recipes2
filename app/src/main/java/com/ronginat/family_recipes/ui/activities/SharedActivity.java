@@ -3,13 +3,14 @@ package com.ronginat.family_recipes.ui.activities;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
-
-import com.ronginat.family_recipes.R;
-import com.ronginat.family_recipes.utils.Constants;
+import android.util.Base64;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.ronginat.family_recipes.R;
+import com.ronginat.family_recipes.utils.Constants;
+import com.ronginat.family_recipes.utils.logic.CrashLogger;
 
 public class SharedActivity extends AppCompatActivity {
 
@@ -25,15 +26,17 @@ public class SharedActivity extends AppCompatActivity {
         if (Intent.ACTION_VIEW.equals(receivedIntent.getAction()) && receivedIntent.getData() != null) {
             //Log.e(TAG, receivedIntent.getType());
             Uri data = receivedIntent.getData();
-            Log.e(TAG, data.toString());
+            CrashLogger.e(TAG, data.toString());
             if (getString(R.string.scheme).equals(data.getScheme()) &&
                     getString(R.string.host).equals(data.getHost())) {
                 //Log.e(TAG, data.getLastPathSegment());
-                Log.e(TAG, data.getPathSegments().toString());
+                CrashLogger.e(TAG, data.getPathSegments().toString());
                 String recipeId = data.getLastPathSegment();
-                if (!"".equals(recipeId)) {
+                String recipeDate = data.getQueryParameter(Constants.LAST_MODIFIED);
+                if (recipeId != null && !"".equals(recipeId) && recipeDate != null && !"".equals(recipeDate)) {
                     Intent splashIntent = new Intent(SharedActivity.this, SplashActivity.class);
-                    splashIntent.putExtra(Constants.RECIPE_ID, recipeId);
+                    splashIntent.putExtra(Constants.RECIPE_ID, new String(Base64.decode(recipeId.getBytes(), Base64.URL_SAFE)));
+                    splashIntent.putExtra(Constants.LAST_MODIFIED, new String(Base64.decode(recipeId.getBytes(), Base64.URL_SAFE)));
                     splashIntent.putExtra(Constants.SPLASH_ACTIVITY_CODE, Constants.SPLASH_ACTIVITY_CODE_RECIPE);
                     startActivityForResult(splashIntent, OPEN_RECIPE_REQUEST);
                 }
@@ -51,7 +54,7 @@ public class SharedActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.e(TAG, "onDestroy");
+        CrashLogger.e(TAG, "onDestroy");
     }
 
     @Override

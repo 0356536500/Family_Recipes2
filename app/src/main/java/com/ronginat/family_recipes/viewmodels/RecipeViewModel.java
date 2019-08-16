@@ -8,14 +8,14 @@ import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
-import androidx.work.WorkManager;
 
 import com.ronginat.family_recipes.R;
 import com.ronginat.family_recipes.background.services.PostFoodImagesService;
 import com.ronginat.family_recipes.background.workers.GetOneRecipeWorker;
+import com.ronginat.family_recipes.background.workers.MyWorkerManager;
 import com.ronginat.family_recipes.layout.Constants;
 import com.ronginat.family_recipes.layout.MiddleWareForNetwork;
-import com.ronginat.family_recipes.layout.cognito.AppHelper;
+import com.ronginat.family_recipes.layout.firebase.db.FirestoreHelper;
 import com.ronginat.family_recipes.logic.repository.RecipeRepository;
 import com.ronginat.family_recipes.logic.storage.StorageWrapper;
 import com.ronginat.family_recipes.model.AccessEntity;
@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
@@ -100,7 +101,7 @@ public class RecipeViewModel extends ViewModel {
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
     private RecipeRepository recipeRepository;
 
-    private String recipeId;
+    private String recipeId, lastModified;
 
     public RecipeViewModel(RecipeRepository recipeRepository) {
         this.recipeRepository = recipeRepository;
@@ -110,15 +111,17 @@ public class RecipeViewModel extends ViewModel {
                 .subscribe(this::setInfo));
     }
 
-    public void setInitialRecipe(Context context, String recipeId) {
+    public void setInitialRecipe(Context context, String recipeId, String lastModified) {
         //this.recipe = initialRecipe;
         //isUserLiked.setValue(initialRecipe.isUserLiked());
         this.recipeId = recipeId;
-        compositeDisposable.add(this.recipeRepository.getObservableRecipe(context, recipeId)
+        this.lastModified = lastModified;
+        compositeDisposable.add(this.recipeRepository.getObservableRecipe(context, recipeId, lastModified)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(recipeEntity -> {
                     //Log.e(getClass().getSimpleName(), "in recipe observer, " + recipeEntity);
+                    this.lastModified = recipeEntity.getLastModifiedDate();
                     //if user like had changed
                     if (this.recipe.getValue() == null || this.recipe.getValue().isUserLiked() != recipeEntity.isUserLiked())
                         this.isUserLiked.setValue(recipeEntity.isUserLiked());
@@ -127,7 +130,7 @@ public class RecipeViewModel extends ViewModel {
                 }, error -> {
                     if (error.getMessage() != null)
                         CrashLogger.e(getClass().getSimpleName(), error.getMessage());
-                    setInfo(context.getString(R.string.recipe_content_not_found));
+                    //setInfo(context.getString(R.string.recipe_content_not_found));
                 }));
     }
 
@@ -202,9 +205,17 @@ public class RecipeViewModel extends ViewModel {
 
     public void refreshRecipeDelayed(Context context) {
         new Handler().postDelayed(() -> {
-            if (MiddleWareForNetwork.checkInternetConnection(context) && AppHelper.getAccessToken() != null)
-                WorkManager.getInstance(context).enqueue(GetOneRecipeWorker.getOneRecipeWorker(recipeId));
+            if (MiddleWareForNetwork.checkInternetConnection(context))
+                new MyWorkerManager.Builder()
+                        .context(context)
+                        .nextWorkRequest(GetOneRecipeWorker.getOneRecipeWorker(recipeId, lastModified))
+                        .startWork();
+                //WorkManager.getInstance(context).enqueue(GetOneRecipeWorker.getOneRecipeWorker(recipeId, lastModified));
         }, 3000);
+    }
+
+    public Single<String> getDisplayedName(Context context, String username) {
+        return FirestoreHelper.getInstance().getUserDisplayedName(context, username);
     }
 
     // region Recipe Access

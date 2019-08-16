@@ -284,10 +284,9 @@ public class LoginActivity extends MyBaseActivity {
                 switch (action) {
                     case Constants.SPLASH_ACTIVITY_CODE_RECIPE:
                         // Open a specific recipe from deep link. Open as a single activity, without back stack
-                        String recipeId = receivedIntent.getStringExtra(Constants.RECIPE_ID);
-                        if (recipeId != null && !"".equals(recipeId)) {
+                        if (receivedIntent.getExtras() != null) {
                             Intent recipeIntent = new Intent(this, RecipeActivity.class);
-                            recipeIntent.putExtra(Constants.RECIPE_ID, recipeId);
+                            recipeIntent.putExtras(receivedIntent);
                             recipeIntent.addFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
                             startActivity(recipeIntent);
                             finish();

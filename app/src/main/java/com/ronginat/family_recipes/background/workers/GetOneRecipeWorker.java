@@ -27,7 +27,7 @@ import io.reactivex.disposables.CompositeDisposable;
  */
 public class GetOneRecipeWorker extends RxWorker {
 
-    private final String recipeId;
+    private final String recipeId, lastModified;
     private final RecipeRepository repository;
     private final CompositeDisposable compositeDisposable;
     /**
@@ -38,6 +38,7 @@ public class GetOneRecipeWorker extends RxWorker {
     public GetOneRecipeWorker(@NonNull Context appContext, @NonNull WorkerParameters workerParams) {
         super(appContext, workerParams);
         recipeId = workerParams.getInputData().getString(Constants.RECIPE_ID);
+        lastModified = workerParams.getInputData().getString(Constants.LAST_MODIFIED);
         repository = Injection.provideRecipeRepository(getApplicationContext());
         compositeDisposable = new CompositeDisposable();
     }
@@ -52,7 +53,7 @@ public class GetOneRecipeWorker extends RxWorker {
     @Override
     public Single<Result> createWork() {
         return Single.create(emitter ->
-                compositeDisposable.add(APICallsHandler.getRecipeObservable(recipeId, AppHelper.getAccessToken())
+                compositeDisposable.add(APICallsHandler.getRecipeObservable(this.recipeId, this.lastModified, AppHelper.getAccessToken())
                         .subscribe(response -> {
                             if (response.isSuccessful() && response.body() != null) {
                                 Log.e(getClass().getSimpleName(), response.body().toString());
@@ -76,7 +77,7 @@ public class GetOneRecipeWorker extends RxWorker {
         );
     }
 
-    public static OneTimeWorkRequest getOneRecipeWorker(@NonNull String recipeId) {
+    public static OneTimeWorkRequest getOneRecipeWorker(@NonNull String recipeId, String lastModified) {
         // Create a Constraints object that defines when the task should run
         Constraints myConstraints = new Constraints.Builder()
                 .setRequiredNetworkType(NetworkType.CONNECTED)
@@ -87,6 +88,7 @@ public class GetOneRecipeWorker extends RxWorker {
                 .setConstraints(myConstraints)
                 .setInputData(new Data.Builder()
                         .putString(Constants.RECIPE_ID, recipeId)
+                        .putString(Constants.LAST_MODIFIED, lastModified)
                         .build())
                 .build();
     }

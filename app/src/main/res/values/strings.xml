@@ -303,7 +303,7 @@
     <string name="notification_default_channel_group_name" translatable="false">recipes</string>
 
     <!--#region Notifications builder -->
-    <string name="notification_new_recipe_channel_title">New recipe, %1$s by %2$s</string>
+    <string name="notification_new_recipe_channel_title">New recipe! %1$s by %2$s</string>
     <string name="notification_comment_channel_title">New comment from %1$s on your recipe, %2$s</string>
     <string name="notification_like_channel_title">%1$s likes your recipe, %2$s</string>
 

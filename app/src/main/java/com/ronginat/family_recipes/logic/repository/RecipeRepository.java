@@ -9,12 +9,12 @@ import androidx.lifecycle.LiveData;
 import androidx.paging.DataSource;
 import androidx.paging.LivePagedListBuilder;
 import androidx.paging.PagedList;
-import androidx.work.WorkManager;
 
 import com.ronginat.family_recipes.MyApplication;
 import com.ronginat.family_recipes.R;
 import com.ronginat.family_recipes.background.workers.GetOneRecipeWorker;
 import com.ronginat.family_recipes.background.workers.GetRecipeContentWorker;
+import com.ronginat.family_recipes.background.workers.MyWorkerManager;
 import com.ronginat.family_recipes.layout.APICallsHandler;
 import com.ronginat.family_recipes.layout.Constants;
 import com.ronginat.family_recipes.layout.MiddleWareForNetwork;
@@ -150,7 +150,7 @@ public class RecipeRepository {
      * @return {@link Flowable<RecipeEntity>} {@link RecipeEntity} to
      * {@link com.ronginat.family_recipes.viewmodels.RecipeViewModel} used by {@link com.ronginat.family_recipes.ui.activities.RecipeActivity}
      */
-    public Flowable<RecipeEntity> getObservableRecipe(Context context, String id) {
+    public Flowable<RecipeEntity> getObservableRecipe(Context context, String id, @Nullable String lastModified) {
         // check whether the recipe is available locally with getMaybeRecipe
         // return the Flowable anyways, it will do onNext when the recipe will be available
         recipeDao.getMaybeRecipe(id)
@@ -181,12 +181,16 @@ public class RecipeRepository {
                             dispatchInfoForRecipe.onNext(context.getString(R.string.no_internet_message));
                             return;
                         }
-                        if (AppHelper.getAccessToken() == null) {
+                        /*if (AppHelper.getAccessToken() == null) {
                             dispatchInfoForRecipe.onNext(context.getString(R.string.invalid_access_token));
                             return;
-                        }
-                        //Log.e(TAG, "getMaybeRecipe, onComplete, enqueue worker");
-                        WorkManager.getInstance(context).enqueue(GetOneRecipeWorker.getOneRecipeWorker(id));
+                        }*/
+                        //CrashLogger.e(TAG, "getMaybeRecipe, onComplete, enqueue worker");
+                        new MyWorkerManager.Builder()
+                                .context(context)
+                                .nextWorkRequest(GetOneRecipeWorker.getOneRecipeWorker(id, lastModified))
+                                .startWork();
+                        //WorkManager.getInstance(context).enqueue(GetOneRecipeWorker.getOneRecipeWorker(id));
                         //BeginContinuationWorker.enqueueWorkContinuationWithValidSession(BeginContinuationWorker.WORKERS.GET_RECIPE, id);
                     }
                 });
@@ -298,62 +302,88 @@ public class RecipeRepository {
             //Log.e(TAG, "recipes from server, null");
             return;
         }
-        //Log.e(TAG, "recipes from server, " + list.toString());
         executor.execute(() -> {
             // first cell is for added and second cell is for modified recipes
             for (RecipeTO fromServer: list) {
                 // Iterate through recipes list.
                 // For each item, if exists, save previous meLike flag
                 // if not exists, insert to db.
-                recipeDao.getMaybeRecipe(fromServer.getId())
-                        .subscribe(new DisposableMaybeObserver<RecipeEntity>() {
-                            RecipeEntity update = fromServer.toEntity();
-                            @Override
-                            public void onSuccess(RecipeEntity recipeEntity) {
-                                // found a recipe
-                                // update it and save the current 'like' of the user
-                                //Log.e(TAG, "updateFromServer, found, id " + fromServer.getId());
-                                if (!update.identical(recipeEntity)) {
-                                    update.setMeLike(recipeEntity.getMeLike());
+                // if deleted attribute is 'true' from server, delete locally.
+                if (fromServer.isDeleted()) {
+                    recipeDao.deleteRecipeById(fromServer.getId());
+                    recipeDao.deleteContentById(fromServer.getId());
+                    addedModifiedSize.incrementModified();
+                    addedModifiedSize.incrementSize();
+                } else {
+                    recipeDao.getMaybeRecipe(fromServer.getId())
+                            .subscribe(new DisposableMaybeObserver<RecipeEntity>() {
+                                RecipeEntity update = fromServer.toEntity();
 
-                                    recipeDao.updateRecipe(update);
-                                    addedModifiedSize.incrementModified();
+                                @Override
+                                public void onSuccess(RecipeEntity recipeEntity) {
+                                    // found a recipe
+                                    // update it and save the current 'like' of the user
+                                    if (!update.identical(recipeEntity)) {
+                                        update.setMeLike(recipeEntity.getMeLike());
+
+                                        recipeDao.updateRecipe(update);
+                                        addedModifiedSize.incrementModified();
+                                        dispose();
+                                    }
+
+                                    addedModifiedSize.incrementSize();
+
                                     dispose();
                                 }
 
-                                addedModifiedSize.incrementSize();
+                                @Override
+                                public void onError(Throwable t) {
+                                    //Log.e("updateFromServer", t.getMessage(), t);
+                                    dispatchInfo.onNext(MyApplication.getContext().getString(R.string.load_error_message));
+                                    CrashLogger.logException(t);
+                                    dispose();
+                                }
 
-                                dispose();
-                            }
+                                @Override
+                                public void onComplete() {
+                                    // no recipe found. Insert a new recipe
+                                    //Log.e(TAG, "updateFromServer, recipe not found, id " + fromServer.getId());
+                                    recipeDao.insertRecipe(fromServer.toEntity());
+                                    addedModifiedSize.incrementAdded();
+                                    addedModifiedSize.incrementSize();
 
-                            @Override
-                            public void onError(Throwable t) {
-                                //Log.e("updateFromServer", t.getMessage(), t);
-                                dispatchInfo.onNext(MyApplication.getContext().getString(R.string.load_error_message));
-                                CrashLogger.logException(t);
-                                dispose();
-                            }
-
-                            @Override
-                            public void onComplete() {
-                                // no recipe found. Insert a new recipe
-                                //Log.e(TAG, "updateFromServer, recipe not found, id " + fromServer.getId());
-                                recipeDao.insertRecipe(fromServer.toEntity());
-                                addedModifiedSize.incrementAdded();
-                                addedModifiedSize.incrementSize();
-
-                                dispose();
-                            }
-                        });
+                                    dispose();
+                                }
+                            });
+                }
             }
         });
     }
 
+    /**
+     * Update {@link RecipeEntity#meLike} for all recipes in local db.
+     * @param favorites list of favorite recipe that current user had liked and been fetched from server
+     */
+    @SuppressWarnings("JavadocReference")
     public void updateFavoritesFromUserRecord(List<String> favorites) {
         if (favorites != null) {
             executor.execute(() -> {
-                for (String id : favorites)
-                    recipeDao.updateLikeRecipe(id, TRUE);
+                for (RecipeMinimal recipe : recipeDao.findAllSync()) {
+                    boolean isPrevLiked = recipe.getMeLike() == TRUE;
+                    String id = recipe.getId();
+                    if (favorites.contains(id)) {
+                        // if in favorites
+                        if (!isPrevLiked) {
+                            recipeDao.updateLikeRecipe(id, TRUE);
+                        }
+                    } else {
+                        // if was previously liked and not in favorites
+                        if (isPrevLiked)
+                            recipeDao.updateLikeRecipe(id, FALSE);
+                    }
+                }
+                /*for (String id : favorites)
+                    recipeDao.updateLikeRecipe(id, TRUE);*/
             });
         }
     }
@@ -707,8 +737,12 @@ public class RecipeRepository {
                     @Override
                     public void onSuccess(ContentEntity contentEntity) {
                         // fetch recipe content if possible
-                        if (MiddleWareForNetwork.checkInternetConnection(context) && AppHelper.getAccessToken() != null)
-                            WorkManager.getInstance(context).enqueue(GetRecipeContentWorker.getRecipeContentWorker(recipeId, contentEntity.getLastModifiedDate()));
+                        if (MiddleWareForNetwork.checkInternetConnection(context)/* && AppHelper.getAccessToken() != null*/)
+                            new MyWorkerManager.Builder()
+                                    .context(context)
+                                    .nextWorkRequest(GetRecipeContentWorker.getRecipeContentWorker(recipeId, contentEntity.getLastModifiedDate()))
+                                    .startWork();
+                            //WorkManager.getInstance(context).enqueue(GetRecipeContentWorker.getRecipeContentWorker(recipeId, contentEntity.getLastModifiedDate()));
                         dispose();
                     }
 
@@ -722,10 +756,14 @@ public class RecipeRepository {
                     @Override
                     public void onComplete() {
                         // no local content
-                        if (!MiddleWareForNetwork.checkInternetConnection(context) || AppHelper.getAccessToken() == null)
+                        if (!MiddleWareForNetwork.checkInternetConnection(context) /*|| AppHelper.getAccessToken() == null*/)
                             dispatchInfoForRecipe.onNext(context.getString(R.string.recipe_content_not_found));
                         else
-                            WorkManager.getInstance(context).enqueue(GetRecipeContentWorker.getRecipeContentWorker(recipeId, null));
+                            new MyWorkerManager.Builder()
+                                    .context(context)
+                                    .nextWorkRequest(GetRecipeContentWorker.getRecipeContentWorker(recipeId, null))
+                                    .startWork();
+                            //WorkManager.getInstance(context).enqueue(GetRecipeContentWorker.getRecipeContentWorker(recipeId, null));
                     }
                 });
 

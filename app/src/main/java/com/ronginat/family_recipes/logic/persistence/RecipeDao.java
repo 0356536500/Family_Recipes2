@@ -27,7 +27,8 @@ import io.reactivex.Single;
 public interface RecipeDao {
 
     // region recipeMinimal
-    String recipeMinimalFields = RecipeEntity.KEY_ID + ", " + RecipeEntity.KEY_NAME + ", " +
+    String recipeMinimalFields = RecipeEntity.KEY_ID + ", " +
+            RecipeEntity.KEY_MODIFIED + ", " + RecipeEntity.KEY_NAME + ", " +
             RecipeEntity.KEY_DESCRIPTION + ", " + RecipeEntity.KEY_AUTHOR + ", " +
             RecipeEntity.KEY_CATEGORIES + ", " + RecipeEntity.KEY_THUMBNAIL + ", " +
             RecipeEntity.KEY_LIKES + ", " + RecipeEntity.KEY_FAVORITE;
@@ -168,6 +169,9 @@ public interface RecipeDao {
 
     /*@Delete
     void deleteRecipe(RecipeEntity recipeEntity);*/
+
+    @Query("DELETE FROM " + AppDatabases.TABLE_RECIPES + " where " + RecipeEntity.KEY_ID + " = :recipeId")
+    void deleteRecipeById(String recipeId);
 
     @Query("DELETE FROM " + AppDatabases.TABLE_RECIPES)
     void deleteAllRecipes();

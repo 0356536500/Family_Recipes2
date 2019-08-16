@@ -212,7 +212,8 @@ public class HtmlElementsAdapter extends RecyclerView.Adapter<HtmlElementsAdapte
         }
         else {
             this.elements = new ArrayList<>();
-            addElementToScreen();
+            loadTemplate();
+            //addElementToScreen();
         }
         this.vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
     }
@@ -337,7 +338,7 @@ public class HtmlElementsAdapter extends RecyclerView.Adapter<HtmlElementsAdapte
         model = new HtmlModel();
         model.setSpinnerPos(Constants.HTML_SAMPLE_SPINNER.UNORDERED_LIST.ordinal());
         model.setText(factory.newEditable(Constants.HTML_SAMPLE_INGREDIENT_LIST));
-        model.setDivider(true);
+        //model.setDivider(true);
         elements.add(model);
         //notifyItemInserted(elements.size());
 

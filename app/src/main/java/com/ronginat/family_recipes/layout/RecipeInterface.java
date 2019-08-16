@@ -42,7 +42,8 @@ public interface RecipeInterface {
     @GET(recipeWithID)
     Observable<Response<RecipeTO>> getRecipeObservable(
             @Header(Constants.AUTHORIZATION) String token,
-            @Path(Constants.ID_QUERY) String id
+            @Path(Constants.ID_QUERY) String id,
+            @Query(Constants.LAST_MODIFIED_QUERY) String date
     );
 
     @GET(contents)

@@ -35,7 +35,7 @@ public class PostRecipeScheduledWorker extends Worker {
         // Result.failure() says not to try again
     }
 
-    static OneTimeWorkRequest createPostRecipesWorker() {
+    public static OneTimeWorkRequest createPostRecipesWorker() {
         // Create a Constraints object that defines when the task should run
         Constraints myConstraints = new Constraints.Builder()
                 .setRequiredNetworkType(NetworkType.CONNECTED)

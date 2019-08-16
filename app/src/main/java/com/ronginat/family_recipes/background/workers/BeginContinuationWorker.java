@@ -7,7 +7,6 @@ import androidx.work.Constraints;
 import androidx.work.NetworkType;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.RxWorker;
-import androidx.work.WorkManager;
 import androidx.work.WorkerParameters;
 
 import com.ronginat.family_recipes.layout.cognito.AppHelper;
@@ -22,8 +21,6 @@ import io.reactivex.disposables.CompositeDisposable;
  * When acquired, continue with the actual work
  */
 public class BeginContinuationWorker extends RxWorker {
-
-    //public enum WORKERS { GET_RECIPE, GET_CONTENT, POST_RECIPE, GET_USER }
 
     private CompositeDisposable compositeDisposable;
 
@@ -52,46 +49,16 @@ public class BeginContinuationWorker extends RxWorker {
         this.compositeDisposable.clear();
     }
 
-    private static OneTimeWorkRequest getSessionWaiterWorker(/*WORKERS nextWorker*/) {
+    static OneTimeWorkRequest getSessionWaiterWorker(boolean batteryNoTooLow) {
         // Create a Constraints object that defines when the task should run
         Constraints.Builder constraintsBuilder =  new Constraints.Builder()
                 .setRequiredNetworkType(NetworkType.CONNECTED)
-                .setRequiresBatteryNotLow(true);
-        /*if (nextWorker.equals(WORKERS.POST_RECIPE))
-            constraintsBuilder.setRequiresBatteryNotLow(true);*/
+                .setRequiresBatteryNotLow(batteryNoTooLow);
 
         // then create a OneTimeWorkRequest that uses those constraints
 
         return new OneTimeWorkRequest.Builder(BeginContinuationWorker.class)
                 .setConstraints(constraintsBuilder.build())
                 .build();
-    }
-
-    public static void enqueueWorkContinuationWithValidSession(Context context/*, WORKERS nextWorker*/) {
-        try {
-            WorkManager.getInstance(context)
-                    .beginWith(getSessionWaiterWorker())
-                    .then(getNextWorkerRequest())
-                    .enqueue();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-    }
-
-    private static OneTimeWorkRequest getNextWorkerRequest(/*WORKERS worker*/) {
-        return PostRecipeScheduledWorker.createPostRecipesWorker();
-
-        /*switch (worker) {
-            case GET_RECIPE:
-                return GetOneRecipeWorker.getOneRecipeWorker(recipeId);
-            case GET_CONTENT:
-                return GetRecipeContentWorker.getRecipeContentWorker(recipeId, null);
-            case POST_RECIPE:
-                return PostRecipeScheduledWorker.createPostRecipesWorker();
-            case GET_USER:
-                return GetUserDetailsWorker.getUserDetailsWorker();
-            default:
-                throw new RuntimeException("Worker is not valid!");
-        }*/
     }
 }
