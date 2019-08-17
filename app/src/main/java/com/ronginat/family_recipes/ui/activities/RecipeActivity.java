@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.net.Uri;
@@ -109,7 +110,7 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
     private boolean showLikeMessage = false;
     private long animationDuration = 700;
 
-    private int textColorPrimary, textColorSecondary,
+    private int textColorPrimary, /*textColorSecondary,*/
             navigationCollapsedColor, navigationExpandedColor;
     private ProgressBar uploadImagesProgressBar;
     private Uri imageUri;
@@ -156,17 +157,17 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
 
     private void loadColorsFromTheme() {
         TypedValue primaryValue = new TypedValue();
-        TypedValue secondValue = new TypedValue();
+        //TypedValue secondValue = new TypedValue();
         TypedValue navigationCollapsedValue = new TypedValue();
         TypedValue navigationExpandedValue = new TypedValue();
 
         getTheme().resolveAttribute(/*android.R.attr.textColorPrimary*/R.attr.collapsedIconsColor, primaryValue, true);
-        getTheme().resolveAttribute(/*android.R.attr.colorPrimaryDark*/R.attr.expandedIconsColor, secondValue, true);
+        //getTheme().resolveAttribute(/*android.R.attr.colorPrimaryDark*/R.attr.expandedIconsColor, secondValue, true);
         getTheme().resolveAttribute(R.attr.collapsedIconsColor, navigationCollapsedValue, true);
         getTheme().resolveAttribute(R.attr.expandedIconsColor, navigationExpandedValue, true);
 
         textColorPrimary = primaryValue.data;
-        textColorSecondary = secondValue.data;
+        //textColorSecondary = secondValue.data;
         navigationCollapsedColor = navigationCollapsedValue.data;
         navigationExpandedColor = navigationExpandedValue.data;
     }
@@ -215,7 +216,7 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
         //set the collapsed text color according to current theme
 
         collapsingToolbarLayout.setCollapsedTitleTextColor(textColorPrimary);
-        collapsingToolbarLayout.setExpandedTitleColor(textColorSecondary);
+        //collapsingToolbarLayout.setExpandedTitleColor(textColorSecondary);
         //collapsingToolbarLayout.setContentScrimColor(toolbarCollapsedColor);
         //setTitle(recipe.getName());
 
@@ -264,8 +265,7 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
 
         viewModel.getRecipe().observe(this, recipe -> {
             if (recipe != null) {
-                if (recipe.getName().length() > 14)
-                    collapsingToolbarLayout.setExpandedTitleTextAppearance(android.R.style.TextAppearance_Material_Widget_ActionBar_Subtitle);
+                adjustFontScale(getResources().getConfiguration(), recipe.getName());
                 collapsingToolbarLayout.setTitle(recipe.getName());
                 textViewDescription.setText(recipe.getDescription());
                 textViewDescription.animate().alpha(1f).setDuration(1000).start();
@@ -504,6 +504,22 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
                     getString(R.string.action_key_keep_screen_on), keepScreenOn);
             menuItem.setChecked(keepScreenOn);
             findViewById(android.R.id.content).setKeepScreenOn(keepScreenOn);
+        }
+    }
+
+    public void adjustFontScale(Configuration configuration, String name) {
+        if (collapsingToolbarLayout != null) {
+            if (configuration.fontScale >= 1.2f && name.length() > 13) {
+                if (name.length() < 20) { // below that means it's a very short title
+                    collapsingToolbarLayout.setExpandedTitleTextAppearance(R.style.Title_Medium);
+                } else if (name.length() < 30) {
+                    collapsingToolbarLayout.setExpandedTitleTextAppearance(R.style.Title_Small);
+                } else {
+                    collapsingToolbarLayout.setExpandedTitleTextAppearance(R.style.Title_Tiny);
+                }
+            } else {
+                collapsingToolbarLayout.setExpandedTitleTextAppearance(R.style.Title_Large);
+            }
         }
     }
 

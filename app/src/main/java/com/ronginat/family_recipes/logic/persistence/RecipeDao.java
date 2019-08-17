@@ -149,6 +149,9 @@ public interface RecipeDao {
     @Query("SELECT * FROM " + AppDatabases.TABLE_ACCESS)
     List<AccessEntity> getAllRecipeAccess();
 
+    @Query("DELETE FROM " + AppDatabases.TABLE_ACCESS + " where " + AccessEntity.KEY_ID + " = :id")
+    void deleteAccessById(String id);
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     void insertRecipeAccess(AccessEntity access);
 

@@ -23,6 +23,7 @@ import com.ronginat.family_recipes.layout.modelTO.CommentTO;
 import com.ronginat.family_recipes.layout.modelTO.RecipeTO;
 import com.ronginat.family_recipes.logic.persistence.Converters;
 import com.ronginat.family_recipes.logic.persistence.RecipeDao;
+import com.ronginat.family_recipes.logic.storage.StorageWrapper;
 import com.ronginat.family_recipes.model.AccessEntity;
 import com.ronginat.family_recipes.model.CommentEntity;
 import com.ronginat.family_recipes.model.ContentEntity;
@@ -297,7 +298,7 @@ public class RecipeRepository {
 
     // region Server
 
-    private void updateFromServer(@Nullable List<RecipeTO> list, AddedModifiedSize addedModifiedSize) {
+    private void updateFromServer(Context context, @Nullable List<RecipeTO> list, AddedModifiedSize addedModifiedSize) {
         if (list == null || list.isEmpty()) {
             //Log.e(TAG, "recipes from server, null");
             return;
@@ -312,6 +313,9 @@ public class RecipeRepository {
                 if (fromServer.isDeleted()) {
                     recipeDao.deleteRecipeById(fromServer.getId());
                     recipeDao.deleteContentById(fromServer.getId());
+                    boolean succes = deleteRecipeFiles(context, fromServer);
+                    if (succes)
+                        recipeDao.deleteAccessById(fromServer.getId());
                     addedModifiedSize.incrementModified();
                     addedModifiedSize.incrementSize();
                 } else {
@@ -358,6 +362,19 @@ public class RecipeRepository {
                 }
             }
         });
+    }
+
+    private boolean deleteRecipeFiles(Context context, @NonNull RecipeTO fromServer) {
+        boolean result = false;
+        if (fromServer.getThumbnail() != null) {
+            result = StorageWrapper.deleteFile(context.getExternalFilesDir(Constants.THUMB_DIR), fromServer.getThumbnail());
+        }
+        if (fromServer.getImages() != null && fromServer.getImages().size() > 0) {
+            for (String fileName: fromServer.getImages()) {
+                result = result && StorageWrapper.deleteFile(context.getExternalFilesDir(Constants.FOOD_DIR), fileName);
+            }
+        }
+        return result;
     }
 
     /**
@@ -420,7 +437,7 @@ public class RecipeRepository {
                     if (next.code() == STATUS_OK) {
                         //Log.e(TAG, "fetch recipes, " + next.body());
                         final AddedModifiedSize addedModifiedSize = new AddedModifiedSize();
-                        updateFromServer(next.body(), addedModifiedSize);
+                        updateFromServer(context, next.body(), addedModifiedSize);
                         String lastKey = next.headers().get(Constants.HEADER_LAST_EVAL_KEY);
                         if (lastKey != null && !lastKey.isEmpty())
                             // there are more updated recipes
@@ -461,7 +478,7 @@ public class RecipeRepository {
                     .subscribe(next -> {
                         if (next.code() == STATUS_OK) {
                             //Log.e(TAG, "more recipes, status 200");
-                            updateFromServer(next.body(), addedModifiedSize);
+                            updateFromServer(context, next.body(), addedModifiedSize);
                             String lastEvalKey = next.headers().get(Constants.HEADER_LAST_EVAL_KEY);
                             if (lastEvalKey != null && !lastEvalKey.isEmpty())
                                 // there are more updated recipes

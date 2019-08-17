@@ -23,4 +23,7 @@
 -keep class com.ronginat.family_recipes.viewmodels.**
 -keep class com.ronginat.family_recipes.viewmodels.** { *; }
 
+#
+-keep class com.ronginat.family_recipes.R$font { *; }
+
 -keepnames class com.ronginat.family_recipes.ui.activities.SettingsActivity.** { *; }

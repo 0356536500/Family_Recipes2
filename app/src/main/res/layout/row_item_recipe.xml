@@ -42,7 +42,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
             android:ellipsize="end"
-            android:maxLines="2"
+            android:maxLines="3"
             android:fontFamily="@font/open_sans_bold"
             android:text="@string/recycler_item_name"
             android:textSize="@dimen/item_name_text_size"

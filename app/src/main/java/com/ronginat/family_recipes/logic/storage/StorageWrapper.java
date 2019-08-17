@@ -286,6 +286,16 @@ public class StorageWrapper {
         }
     }
 
+    public static boolean deleteFile(File dir, @NonNull String fileName) {
+        if (dir != null) {
+            File file = new File(dir, fileName);
+            if (file.exists()) {
+                return file.delete();
+            }
+        }
+        return false;
+    }
+
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public static void deleteFilesFromCamera(Context context, @NonNull List<String> filesNames) {
         for (String name: filesNames) {

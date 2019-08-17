@@ -271,4 +271,24 @@
         <item name="android:windowExitAnimation">@android:anim/fade_out</item>
         <item name="android:value">500</item>
     </style>-->
+
+    <style name="MyBase.Title" parent="TextAppearance.AppCompat.Title">
+        <item name="android:textColor">?attr/expandedIconsColor</item>
+    </style>
+
+    <style name="Title.Large" parent="MyBase.Title">
+    </style>
+
+    <style name="Title.Medium" parent="MyBase.Title">
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <style name="Title.Small" parent="MyBase.Title">
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="Title.Tiny" parent="MyBase.Title">
+        <item name="android:textSize">14sp</item>
+    </style>
+
 </resources>
