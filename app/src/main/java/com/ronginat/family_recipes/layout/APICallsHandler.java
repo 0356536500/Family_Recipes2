@@ -221,7 +221,7 @@ public class APICallsHandler {
 
     public static Observable<Response<Map<String, String>>> getAppUpdates(String token, String deviceId) {
         RecipeInterface service = getReactiveRetrofitInstance().create(RecipeInterface.class);
-        return service.getAppUpdatesObservable(token, deviceId);
+        return service.getAppUpdatesObservable(token, deviceId, BuildConfig.VERSION_NAME);
     }
 
     // endregion

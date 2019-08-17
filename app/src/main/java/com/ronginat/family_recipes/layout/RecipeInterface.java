@@ -156,7 +156,8 @@ public interface RecipeInterface {
     @GET(update)
     Observable<Response<Map<String, String>>> getAppUpdatesObservable(
             @Header(Constants.AUTHORIZATION) String auth,
-            @Path(Constants.PATH_DEVICE_ID) String deviceId
+            @Path(Constants.PATH_DEVICE_ID) String deviceId,
+            @Query(Constants.QUERY_APP_VERSION) String appVersion
     );
 
     // endregion
