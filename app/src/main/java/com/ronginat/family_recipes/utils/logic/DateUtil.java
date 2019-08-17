@@ -74,7 +74,7 @@ public class DateUtil {
         SharedPreferencesHandler.writeString(context, UPDATED_CATS_KEY, updatedTime);
     }
 
-    private static Date getDateFromStringTimestamp(String timestamp) {
+    public static Date getDateFromStringTimestamp(String timestamp) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             return Date.from(Instant.parse(timestamp));
         } else {
@@ -85,6 +85,10 @@ public class DateUtil {
             }
             return new Date();
         }
+    }
+
+    public static String getDateStringFromLong(long timestamp) {
+        return DATE_FORMAT.format(new Date(timestamp));
     }
     //endregion
 

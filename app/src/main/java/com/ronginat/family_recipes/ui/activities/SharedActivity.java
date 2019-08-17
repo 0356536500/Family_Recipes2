@@ -3,7 +3,6 @@ package com.ronginat.family_recipes.ui.activities;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Base64;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -11,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.ronginat.family_recipes.R;
 import com.ronginat.family_recipes.utils.Constants;
 import com.ronginat.family_recipes.utils.logic.CrashLogger;
+import com.ronginat.family_recipes.utils.logic.DateUtil;
 
 public class SharedActivity extends AppCompatActivity {
 
@@ -32,13 +32,19 @@ public class SharedActivity extends AppCompatActivity {
                 //Log.e(TAG, data.getLastPathSegment());
                 CrashLogger.e(TAG, data.getPathSegments().toString());
                 String recipeId = data.getLastPathSegment();
-                String recipeDate = data.getQueryParameter(Constants.LAST_MODIFIED);
+                String recipeDate = data.getQueryParameter(Constants.SHARE_DATE_QUERY);
                 if (recipeId != null && !"".equals(recipeId) && recipeDate != null && !"".equals(recipeDate)) {
+                    CrashLogger.e(TAG, "id = " + Uri.decode(recipeId));
+                    CrashLogger.e(TAG, "date = " + Uri.decode(recipeDate));
+                    CrashLogger.e(TAG, "date = " + DateUtil.getDateStringFromLong(Long.valueOf(Uri.decode(recipeDate))));
                     Intent splashIntent = new Intent(SharedActivity.this, SplashActivity.class);
-                    splashIntent.putExtra(Constants.RECIPE_ID, new String(Base64.decode(recipeId.getBytes(), Base64.URL_SAFE)));
-                    splashIntent.putExtra(Constants.LAST_MODIFIED, new String(Base64.decode(recipeId.getBytes(), Base64.URL_SAFE)));
+                    splashIntent.putExtra(Constants.RECIPE_ID, Uri.decode(recipeId));
+                    splashIntent.putExtra(Constants.LAST_MODIFIED, DateUtil.getDateStringFromLong(Long.valueOf(Uri.decode(recipeDate))));
                     splashIntent.putExtra(Constants.SPLASH_ACTIVITY_CODE, Constants.SPLASH_ACTIVITY_CODE_RECIPE);
                     startActivityForResult(splashIntent, OPEN_RECIPE_REQUEST);
+                } else {
+                    setResult(RESULT_CANCELED);
+                    finish();
                 }
             }
             else {

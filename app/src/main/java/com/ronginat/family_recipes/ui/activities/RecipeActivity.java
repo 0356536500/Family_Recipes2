@@ -15,7 +15,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
-import android.util.Base64;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -64,6 +63,7 @@ import com.ronginat.family_recipes.ui.fragments.PagerDialogFragment;
 import com.ronginat.family_recipes.ui.fragments.PickImagesMethodDialog;
 import com.ronginat.family_recipes.utils.Constants;
 import com.ronginat.family_recipes.utils.logic.CrashLogger;
+import com.ronginat.family_recipes.utils.logic.DateUtil;
 import com.ronginat.family_recipes.utils.logic.HtmlHelper;
 import com.ronginat.family_recipes.utils.logic.SharedPreferencesHandler;
 import com.ronginat.family_recipes.utils.ui.MyDividerItemDecoration;
@@ -776,8 +776,8 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
         sendIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.app_name));
         sendIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.recipe_share_pre_url) + "\n\n" +
                 getString(R.string.share_url,
-                        Base64.encodeToString(recipeId.getBytes(), Base64.URL_SAFE),
-                        Base64.encodeToString(lastModifiedDate.getBytes(), Base64.URL_SAFE)));
+                        Uri.encode(recipeId),
+                        Uri.encode("" + DateUtil.getDateFromStringTimestamp(lastModifiedDate).getTime())));
         /*sendIntent.putExtra(Intent.EXTRA_STREAM, ExternalStorageHelper.getFileUri(this,
                 com.myapps.family_recipes.network.Constants.RECIPES_DIR, viewModel.getMaybeRecipeImages().getContent()));*/
         sendIntent.setType(getString(R.string.share_mime_type));
