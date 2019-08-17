@@ -14,8 +14,19 @@
     <string name="action_help">Help</string>
     <string name="search_hint">Type name…</string>
 
-    <!--ForgotPasswordActivity-->
+    <!--# region ForgotPasswordActivity -->
     <string name="Menu">Menu</string>
+    <string name="activity_password_forgot_your_password">Forgot your password?</string>
+    <string name="activity_password_check_code_info">Set your new password with the verification code that was sent to you</string>
+    <string name="activity_password_verification_code">Verification code</string>
+    <string name="activity_password_set_password">Set password</string>
+    <!--#endregion ForgotPasswordActivity -->
+
+    <!--# region NewPasswordActivity -->
+    <string name="activity_password_complete_to_continue">Complete the following to continue</string>
+    <string name="activity_password_new_password">New password</string>
+    <string name="activity_password_continue">Continue</string>
+    <!--#endregion NewPasswordActivity -->
 
     <!-- Sort Menu in MainActivity -->
     <string name="sort_action_recent">Recent</string>
@@ -57,8 +68,7 @@
     <string name="nav_main_sign_out">Sign out</string>
     <string name="nav_main_about">About</string>
 
-    <!-- Strings related to login -->
-    <string name="app_main_screen">Sign in</string>
+    <!--#region Strings related to login -->
     <string name="app_main_screen_title">Family Recipes</string>
     <string name="app_main_desc">A small app to manage our best recipes.</string>
     <string name="nav_drawer_open">Open navigation drawer</string>
@@ -67,6 +77,9 @@
     <string name="Password">Password</string>
     <string name="email">Email</string>
     <string name="ok" translatable="false">OK</string>
+    <string name="activity_login_sign_in">Sign in</string>
+    <string name="activity_login_forgot_password">Forgot password</string>
+    <!--#endregion Strings related to login -->
 
     <!--#region UNUSED SplashActivity -->
     <!-- values equal to com.myapps.family_recipes.utils.Constants$SPLASH_ACTIVITY_CODE -->

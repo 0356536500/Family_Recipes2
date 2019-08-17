@@ -7,7 +7,6 @@
     android:layout_marginLeft="@dimen/activity_horizontal_margin"
     android:layout_marginRight="@dimen/activity_horizontal_margin"
     android:layout_marginTop="@dimen/activity_vertical_margin"
-    tools:ignore="HardcodedText"
     android:id="@+id/activity_login_container"
     tools:context=".ui.activities.LoginActivity">
 
@@ -79,14 +78,14 @@
         android:layout_below="@+id/textViewUserIdLabel"
         android:layout_centerHorizontal="true"
         android:background="@drawable/text_border_selector"
-        android:hint="Username"
+        android:hint="@string/Username"
         android:inputType="textPersonName"/>
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textSize="@dimen/activity_text_padding"
+        android:textSize="@dimen/activity_text_size_tiny"
         android:text=" "
         android:textColor="@color/alert"
         android:id="@+id/textViewUserIdMessage"
@@ -111,14 +110,14 @@
         android:layout_below="@+id/textViewUserPasswordLabel"
         android:layout_centerHorizontal="true"
         android:background="@drawable/text_border_selector"
-        android:hint="Password"
+        android:hint="@string/Password"
         android:inputType="textPassword" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textSize="@dimen/activity_text_padding"
+        android:textSize="@dimen/activity_text_size_tiny"
         android:text=" "
         android:textColor="@color/alert"
         android:id="@+id/textViewUserPasswordMessage"
@@ -135,7 +134,7 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Sign in"
+        android:text="@string/activity_login_sign_in"
         android:textAllCaps="false"
         android:textColor="@color/white"
         android:textSize="@dimen/activity_button_text_size"
@@ -163,9 +162,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="Forgot password"
+        android:text="@string/activity_login_forgot_password"
         android:textColor="@color/button_default"
-        android:textSize="15sp"
+        android:textSize="@dimen/activity_text_size_small"
         android:id="@+id/textViewUserForgotPassword"
         android:focusable="true"
         android:clickable="true"

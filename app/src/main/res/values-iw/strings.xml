@@ -13,8 +13,19 @@
     <string name="action_help">עזרה</string>
     <string name="search_hint">הקלד/י לחיפוש…</string>
 
-    <!--ForgotPasswordActivity-->
+    <!--# region ForgotPasswordActivity -->
     <string name="Menu">תפריט</string>
+    <string name="activity_password_forgot_your_password">שכחת את הסיסמה?</string>
+    <string name="activity_password_check_code_info">הגדרת סיסמה חדשה באמצעות קוד אימות שנשלח אליך למייל</string>
+    <string name="activity_password_verification_code">קוד אימות</string>
+    <string name="activity_password_set_password">שינוי סיסמה</string>
+    <!--#endregion ForgotPasswordActivity -->
+
+    <!--# region NewPasswordActivity -->
+    <string name="activity_password_complete_to_continue">השלימו את הפרטים הבאים על מנת להמשיך</string>
+    <string name="activity_password_new_password">New password</string>
+    <string name="activity_password_continue">הבא</string>
+    <!--#endregion NewPasswordActivity -->
 
     <!-- Sort Menu in MainActivity -->
     <string name="sort_action_recent">חדשים</string>
@@ -53,8 +64,7 @@
     <string name="nav_main_sign_out">התנתק</string>
     <string name="nav_main_about">אודות</string>
 
-    <!-- Strings related to login -->
-    <string name="app_main_screen">Sign in</string>
+    <!--#region Strings related to login -->
     <string name="app_main_screen_title">מתכונים של המשפחה</string>
     <string name="app_main_desc">אפליקציה שמארגנת את המתכונים הכי טובים שיש</string>
     <string name="nav_drawer_open">Open navigation drawer</string>
@@ -62,6 +72,9 @@
     <string name="Username">שם משתמש</string>
     <string name="Password">סיסמה</string>
     <string name="email">אימייל</string>
+    <string name="activity_login_sign_in">כניסה</string>
+    <string name="activity_login_forgot_password">שכחתי את הסיסמה</string>
+    <!--#endregion Strings related to login -->
 
     <!--#region MainActivity -->
     <string name="main_activity_posted_new_recipe">תודה על המתכון!</string>
