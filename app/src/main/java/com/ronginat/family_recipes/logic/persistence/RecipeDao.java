@@ -93,6 +93,9 @@ public interface RecipeDao {
 
     // endregion
 
+    @Query("SELECT * FROM " + AppDatabases.TABLE_RECIPES + " where " + RecipeEntity.KEY_ID + " = :id")
+    RecipeEntity findRecipeById(String id);
+
     // region Get Rx RecipeEntity by id
     @Query("SELECT * FROM " + AppDatabases.TABLE_RECIPES + " where " + RecipeEntity.KEY_ID + " = :id")
     Single<RecipeEntity> getSingleRecipe(String id);

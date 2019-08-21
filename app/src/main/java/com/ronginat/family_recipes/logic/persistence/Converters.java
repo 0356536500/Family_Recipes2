@@ -62,7 +62,7 @@ public class Converters {
         return gson.toJson(list);
     }
 
-    @TypeConverter
+    //@TypeConverter
     public static List<CategoryEntity> fromCategoryTOList(List<CategoryTO> list) {
         List<CategoryEntity> entities = new ArrayList<>();
         if (list != null) {

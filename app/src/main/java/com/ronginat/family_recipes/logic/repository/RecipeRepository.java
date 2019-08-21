@@ -311,13 +311,15 @@ public class RecipeRepository {
                 // if not exists, insert to db.
                 // if deleted attribute is 'true' from server, delete locally.
                 if (fromServer.isDeleted()) {
-                    recipeDao.deleteRecipeById(fromServer.getId());
-                    recipeDao.deleteContentById(fromServer.getId());
-                    boolean succes = deleteRecipeFiles(context, fromServer);
-                    if (succes)
-                        recipeDao.deleteAccessById(fromServer.getId());
-                    addedModifiedSize.incrementModified();
-                    addedModifiedSize.incrementSize();
+                    if (recipeDao.findRecipeById(fromServer.getId()) != null) {
+                        recipeDao.deleteRecipeById(fromServer.getId());
+                        recipeDao.deleteContentById(fromServer.getId());
+                        boolean success = deleteRecipeFiles(context, fromServer);
+                        if (success)
+                            recipeDao.deleteAccessById(fromServer.getId());
+                        addedModifiedSize.incrementModified();
+                        addedModifiedSize.incrementSize();
+                    }
                 } else {
                     recipeDao.getMaybeRecipe(fromServer.getId())
                             .subscribe(new DisposableMaybeObserver<RecipeEntity>() {
