@@ -228,6 +228,7 @@
     <string name="pick_image_dialog_gallery">גלריה</string>
     <string name="pick_image_dialog_choose">בחירה</string>
     <string name="pick_image_dialog_cancel">ביטול</string>
+    <string name="pick_image_dialog_message"> של מתכון, עדיף שתצולם כשהמכשיר מוחזק לרוחב לקבלת תוצאות טובות יותר<b>התמונה הראשונה</b></string>
 
     <!--#region Notifications builder -->
     <string name="notification_new_recipe_channel_title">התחדשנו במתכון! %1$s, מאת %2$s</string>

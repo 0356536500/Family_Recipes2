@@ -226,6 +226,8 @@ public class StorageWrapper {
         final int qualityDiff = 10;
 
         int quality = (int)(((float)COMPRESSION_REQUIRED / (float)dest.length()) * 200);
+        if (dest.length() > 8000000L)
+            quality = (int)(((float)COMPRESSION_REQUIRED / ((float)dest.length() / 4)) * 345);
         quality = quality > 100 ? 100 : quality;
 
         FileOutputStream out = new FileOutputStream(dest);

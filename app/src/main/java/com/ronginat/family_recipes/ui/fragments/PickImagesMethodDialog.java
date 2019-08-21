@@ -9,12 +9,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.TextView;
 
 import com.ronginat.family_recipes.R;
+import com.ronginat.family_recipes.utils.Constants;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
+
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.reactivex.subjects.PublishSubject;
@@ -26,6 +30,8 @@ public class PickImagesMethodDialog extends DialogFragment {
 
     public enum Option { CAMERA, GALLERY, CANCEL }
     public PublishSubject<Option> dispatchInfo;
+    @BindView(R.id.pick_image_dialog_message)
+    TextView messageTextView;
 
     public PickImagesMethodDialog() {
         this.dispatchInfo = PublishSubject.create();
@@ -57,6 +63,15 @@ public class PickImagesMethodDialog extends DialogFragment {
         }
 
         ButterKnife.bind(this, view);
+
+        Bundle arguments = getArguments();
+        if (arguments != null) {
+            CharSequence message = arguments.getCharSequence(Constants.BODY);
+            if (message != null) {
+                messageTextView.setVisibility(View.VISIBLE);
+                messageTextView.setText(message);
+            }
+        }
     }
 
     @SuppressWarnings("UnusedParameters")

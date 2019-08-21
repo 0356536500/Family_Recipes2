@@ -1,13 +1,11 @@
 package com.ronginat.family_recipes.ui.activities;
 
-import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.ClipData;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
@@ -33,8 +31,6 @@ import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.AppCompatEditText;
 import androidx.appcompat.widget.ShareActionProvider;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.core.view.MenuItemCompat;
 import androidx.core.widget.ContentLoadingProgressBar;
 import androidx.fragment.app.DialogFragment;
@@ -82,7 +78,7 @@ import io.reactivex.schedulers.Schedulers;
 
 public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOffsetChangedListener {
 
-    private static final int MY_PERMISSIONS_REQUEST_STORAGE = 11;
+    //private static final int MY_PERMISSIONS_REQUEST_STORAGE = 11;
     private static final int CAMERA_REQUEST = 2;
     private static final int GALLERY_REQUEST = 1;
 
@@ -476,8 +472,8 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
 
         switch (itemId) {
             case R.id.action_add_photo:
-                if (hasStoragePermission())
-                    showChooseDialog();
+                //if (hasStoragePermission())
+                showChooseDialog(viewModel.getImagePath().getValue() != null);
                 return true;
             case R.id.action_share:
                 handleShareRecipe();
@@ -527,7 +523,12 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
     }
 
     // region Add Photos
-    private void showChooseDialog() {
+
+    /**
+     * Show message only when the recipe doesn't have thumbnail linked to it
+     * @param showMessage whether or not to show first image message about landscape shooting
+     */
+    private void showChooseDialog(boolean showMessage) {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         Fragment prev = getSupportFragmentManager().findFragmentByTag("dialog");
         if (prev != null) {
@@ -537,6 +538,11 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
 
         // Create and show the dialog.
         PickImagesMethodDialog pickImageDialog = new PickImagesMethodDialog();
+        if (showMessage) {
+            Bundle bundle = new Bundle();
+            bundle.putCharSequence(Constants.BODY, getText(R.string.pick_image_dialog_message));
+            pickImageDialog.setArguments(bundle);
+        }
         pickImageDialog.show(ft, "dialog");
 
         compositeDisposable.add(pickImageDialog.dispatchInfo
@@ -585,7 +591,7 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
     }
 
     private void dispatchGalleryIntent() {
-        Intent intent = new Intent(Intent.ACTION_PICK);
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.setDataAndType(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
         intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
         startActivityForResult(intent, GALLERY_REQUEST);
@@ -596,7 +602,7 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
         startActivityForResult(intent, GALLERY_REQUEST);*/
     }
 
-    private boolean hasStoragePermission() {
+    /*private boolean hasStoragePermission() {
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -611,9 +617,9 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
             // Permission has already been granted
             return true;
         }
-    }
+    }*/
 
-    @Override
+    /*@Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         // If request is cancelled, the result arrays are empty.
         if (requestCode == MY_PERMISSIONS_REQUEST_STORAGE) {
@@ -624,7 +630,7 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
                 showChooseDialog();
             }
         }
-    }
+    }*/
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -726,7 +732,7 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
                     break;
 
                 case DialogInterface.BUTTON_NEUTRAL:
-                    showChooseDialog();
+                    showChooseDialog(false);
                     break;
             }
             dialog.dismiss();

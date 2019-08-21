@@ -1,9 +1,7 @@
 package com.ronginat.family_recipes.ui.fragments;
 
-import android.Manifest;
 import android.content.ClipData;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -18,7 +16,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable;
 
@@ -53,7 +50,7 @@ import static android.app.Activity.RESULT_OK;
  * Created by ronginat on 30/10/2018.
  */
 public class PostRecipePickPhotosFragment extends PostRecipeBaseFragment {
-    private static final int MY_PERMISSIONS_REQUEST_STORAGE = 11;
+    //private static final int MY_PERMISSIONS_REQUEST_STORAGE = 11;
     private final String TAG = getClass().getSimpleName();
 
     private static final int CAMERA_REQUEST = 0;
@@ -150,8 +147,8 @@ public class PostRecipePickPhotosFragment extends PostRecipeBaseFragment {
             maxImagesSnackbar.show();
             return;
         }
-        if (hasStoragePermission())
-            showChooseDialog();
+        //if (hasStoragePermission())
+        showChooseDialog(imagesNamesToUpload.size() == 0);
     }
 
     @SuppressWarnings("UnusedParameters")
@@ -165,8 +162,8 @@ public class PostRecipePickPhotosFragment extends PostRecipeBaseFragment {
         initialContainer.setVisibility(View.VISIBLE);
     }
 
-    private void showChooseDialog() {
-        PickImagesMethodDialog pickImageDialog = activity.showPickImagesDialog();
+    private void showChooseDialog(boolean showMessage) {
+        PickImagesMethodDialog pickImageDialog = activity.showPickImagesDialog(showMessage);
 
         compositeDisposable.add(pickImageDialog.dispatchInfo
                 .subscribeOn(Schedulers.io())
@@ -218,7 +215,7 @@ public class PostRecipePickPhotosFragment extends PostRecipeBaseFragment {
         startActivityForResult(intent, GALLERY_REQUEST);
     }
 
-    private boolean hasStoragePermission() {
+    /*private boolean hasStoragePermission() {
         if (ContextCompat.checkSelfPermission(activity,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -233,9 +230,9 @@ public class PostRecipePickPhotosFragment extends PostRecipeBaseFragment {
             // Permission has already been granted
             return true;
         }
-    }
+    }*/
 
-    @Override
+    /*@Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == MY_PERMISSIONS_REQUEST_STORAGE) {
             // If request is cancelled, the result arrays are empty.
@@ -243,10 +240,10 @@ public class PostRecipePickPhotosFragment extends PostRecipeBaseFragment {
                     && grantResults[0] == PackageManager.PERMISSION_GRANTED
                     && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
 
-                showChooseDialog();
+                showChooseDialog(true);
             }
         }
-    }
+    }*/
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {

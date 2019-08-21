@@ -34,6 +34,7 @@ import com.ronginat.family_recipes.ui.fragments.PostRecipeFirstFragment;
 import com.ronginat.family_recipes.ui.fragments.PostRecipeGenerateContentFragment;
 import com.ronginat.family_recipes.ui.fragments.PostRecipePickPhotosFragment;
 import com.ronginat.family_recipes.ui.fragments.PreviewDialogFragment;
+import com.ronginat.family_recipes.utils.Constants;
 import com.ronginat.family_recipes.utils.ui.FabExtensionAnimator;
 import com.ronginat.family_recipes.utils.ui.ViewHider;
 import com.ronginat.family_recipes.viewmodels.PostRecipeViewModel;
@@ -359,7 +360,7 @@ public class PostRecipeActivity extends MyBaseActivity {
         newFragment.show(ft, "dialog");
     }
 
-    public PickImagesMethodDialog showPickImagesDialog() {
+    public PickImagesMethodDialog showPickImagesDialog(boolean showMessage) {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         Fragment prev = getSupportFragmentManager().findFragmentByTag("photos_dialog");
         if (prev != null) {
@@ -369,6 +370,11 @@ public class PostRecipeActivity extends MyBaseActivity {
 
         // Create and show the dialog.
         PickImagesMethodDialog pickImageDialog = new PickImagesMethodDialog();
+        if (showMessage) {
+            Bundle bundle = new Bundle();
+            bundle.putCharSequence(Constants.BODY, getText(R.string.pick_image_dialog_message));
+            pickImageDialog.setArguments(bundle);
+        }
         pickImageDialog.show(ft, "photos_dialog");
 
         return pickImageDialog;

@@ -298,8 +298,9 @@
     <!-- pick image dialog -->
     <string name="pick_image_dialog_camera">Camera</string>
     <string name="pick_image_dialog_gallery">Gallery</string>
-    <string name="pick_image_dialog_choose">Choose</string>
+    <string name="pick_image_dialog_choose">Choose Method</string>
     <string name="pick_image_dialog_cancel">Cancel</string>
+    <string name="pick_image_dialog_message"><b>The first image</b> of a recipe should be taken in landscape mode for more beautiful results</string>
 
     <!-- Notification Channels -->
     <string name="notification_system_update_channel_id" translatable="false">systemUpdates</string>
