@@ -40,7 +40,7 @@ public class FirebaseStorageHelper {
                                             .getFile(file)
                                             .addOnCompleteListener(task -> {
                                                 if (task.isSuccessful()) {
-                                                    emitter.onSuccess(ExternalStorageHelper.getFileAbsolutePath(context, dir, key));
+                                                    emitter.onSuccess(ExternalStorageHelper.getFileAbsoluteUri(context, dir, key));
                                                 } else {
                                                     if (task.getException() != null)
                                                         task.getException().printStackTrace();
@@ -86,7 +86,7 @@ public class FirebaseStorageHelper {
                         .getFile(file)
                         .addOnCompleteListener(task -> {
                             if (task.isSuccessful()) {
-                                emitter.onSuccess(ExternalStorageHelper.getFileAbsolutePath(context, dir, key));
+                                emitter.onSuccess(ExternalStorageHelper.getFileAbsoluteUri(context, dir, key));
                             } else {
                                 if (task.getException() != null)
                                     task.getException().printStackTrace();

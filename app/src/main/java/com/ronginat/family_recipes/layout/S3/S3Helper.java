@@ -3,7 +3,6 @@ package com.ronginat.family_recipes.layout.S3;
 import android.content.Context;
 import android.net.Uri;
 import android.os.StrictMode;
-import android.util.Log;
 
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferNetworkLossHandler;
@@ -164,7 +163,7 @@ class S3Helper {
                     CrashLogger.e(TAG, "state changed, " + state.name());
                     if (TransferState.COMPLETED == state) {
                         // Handle a completed upload.
-                        emitter.onSuccess(ExternalStorageHelper.getFileAbsolutePath(context, dir, key));
+                        emitter.onSuccess(ExternalStorageHelper.getFileAbsoluteUri(context, dir, key));
                     }
                     if (TransferState.FAILED == state) {
                         if (!emitter.isDisposed())

@@ -40,7 +40,6 @@ public class MyMessagingService extends FirebaseMessagingService {
     @SuppressWarnings("FieldCanBeLocal")
     private final String DEFAULT_GROUP = "com.myapps.family_recipes.DEFAULT";
 
-    //private CompositeDisposable compositeDisposable;
     @SuppressWarnings("FieldCanBeLocal")
     private final int SUMMARY_ID = 0;
 
@@ -48,14 +47,12 @@ public class MyMessagingService extends FirebaseMessagingService {
     public void onCreate() {
         super.onCreate();
         //registerReceiver(mReceiver, intentFilter);
-        //compositeDisposable = new CompositeDisposable();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         //unregisterReceiver(mReceiver);
-        //compositeDisposable.clear();
     }
 
     @Override
@@ -86,28 +83,6 @@ public class MyMessagingService extends FirebaseMessagingService {
         super.onNewToken(token);
         CrashLogger.e(TAG, "Refreshed token: " + token);
         SharedPreferencesHandler.writeString(getApplicationContext(), Constants.NEW_FIREBASE_TOKEN, token);
-        /*compositeDisposable.add(AppHelper.currSessionObservable
-                .subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.io())
-                .subscribe(currSession -> {
-                    if (currSession != null) {
-                        if (SharedPreferencesHandler.getString(getApplicationContext(), Constants.NEW_FIREBASE_TOKEN) != null) {
-                            APICallsHandler.registerNewToken(currSession.getAccessToken().getJWTToken(), MyApplication.getDeviceId(), token, message -> {
-                                if (message != null)
-                                    Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-                                else {
-                                    SharedPreferencesHandler.removeString(getApplicationContext(), Constants.NEW_FIREBASE_TOKEN);
-                                    compositeDisposable.clear();
-                                }
-                            });
-                        } else
-                            compositeDisposable.clear();
-                    }
-                }, error -> {
-                    CrashLogger.logException(error);
-                    compositeDisposable.clear();
-                })
-        );*/
     }
 
     /**
@@ -218,6 +193,7 @@ public class MyMessagingService extends FirebaseMessagingService {
     private NotificationCompat.Builder getSummaryBuilderUI() {
         return new NotificationCompat.Builder(this, getString(R.string.notification_new_recipe_channel_id))
                 .setSmallIcon(R.drawable.ic_status_logo)
+                .setAutoCancel(true)
                 .setColorized(true)
                 .setColor(ContextCompat.getColor(this, R.color.logo_foreground))
                 //.setNumber(messageCount)

@@ -137,7 +137,7 @@
     <string name="alert_dialog_upload_photos_cancel">Cancel</string>
     <string name="alert_dialog_upload_photos_finish">Upload %1$d images</string>
     <string name="alert_dialog_upload_photos_take_more">More</string>
-    <string name="alert_dialog_upload_photos_max_limit">Can upload up to %1$d images</string>
+    <string name="alert_dialog_upload_photos_max_limit">Can upload up to %1$d images.\nWill upload the first %1$d you chose</string>
     <string name="upload_images_success">Images uploaded successfully!</string>
     <string name="upload_images_failed">Failed to upload images</string>
 
@@ -161,7 +161,7 @@
     <string name="post_recipe_advanced_step_hr">divider</string>
     <string name="post_recipe_advanced_step_bold">Bold</string>
     <string name="post_recipe_advanced_step_under_score">Underscore</string>
-    <string name="post_recipe_offline_upload_message">Upload when connection is established</string>
+    <string name="post_recipe_offline_upload_message">Will upload once connection is established</string>
     <string name="post_recipe_online_upload_message">Uploading the recipe…</string>
     <string name="post_recipe_snacbar_close">Close</string>
 
@@ -185,7 +185,7 @@
     <string name="post_recipe_pick_photos_reset_button">Reset</string>
     <string name="post_recipe_pick_photos_initial_state">No photos</string>
     <string name="post_recipe_pick_photos_browse_empty_message">You haven\'t picked any Image</string>
-    <string name="post_recipe_pick_photos_camera_empty_message">You haven\'t take a picture</string>
+    <string name="post_recipe_pick_photos_camera_empty_message">You haven\'t taken a picture</string>
 
     <!--#region PostRecipe Instructions -->
     <string name="post_recipe_instructions_general_help1">Create the most readable recipe possible</string>

@@ -48,9 +48,9 @@ public class PostRecipeViewModel extends ViewModel {
         recipe.setContent(html);
     }
 
-    public void setImagesUris(List<String> imagesUris) {
-        if (imagesUris != null) {
-            List<String> paths = new ArrayList<>(imagesUris);
+    public void setImagesNames(List<String> imagesNames) {
+        if (imagesNames != null) {
+            List<String> paths = new ArrayList<>(imagesNames);
             recipe.setImages(paths);
         }
     }

@@ -115,7 +115,7 @@
     <string name="alert_dialog_upload_photos_cancel">ביטול</string>
     <string name="alert_dialog_upload_photos_finish">העלה %1$d תמונות</string>
     <string name="alert_dialog_upload_photos_take_more">עוד</string>
-    <string name="alert_dialog_upload_photos_max_limit">מותר להעלות עד %1$d תמונות</string>
+    <string name="alert_dialog_upload_photos_max_limit">מותר להעלות עד %1$d תמונות. יועלו %1$d הראשונות שנבחרו</string>
     <string name="upload_images_success">התמונות הועלו בהצלחה!</string>
     <string name="upload_images_failed">שגיאה בהעלאת התמונות</string>
 
@@ -135,7 +135,7 @@
     <string name="post_recipe_advanced_step_hr">קו הפרדה</string>
     <string name="post_recipe_advanced_step_bold">טקסט מודגש</string>
     <string name="post_recipe_advanced_step_under_score">קו תחתון</string>
-    <string name="post_recipe_offline_upload_message">יעלה כשתתחבר/י לאינטרנט</string>
+    <string name="post_recipe_offline_upload_message">יעלה אוטומטית כשיהיה חיבור לאינטרנט</string>
     <string name="post_recipe_online_upload_message">מעלה את המתכון…</string>
     <string name="post_recipe_snacbar_close">סגור</string>
 

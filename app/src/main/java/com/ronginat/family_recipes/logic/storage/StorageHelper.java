@@ -7,14 +7,9 @@ import android.graphics.Matrix;
 import android.net.Uri;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.exifinterface.media.ExifInterface;
 
-import com.ronginat.family_recipes.R;
 import com.ronginat.family_recipes.layout.Constants;
-import com.ronginat.family_recipes.layout.MiddleWareForNetwork;
-import com.ronginat.family_recipes.layout.S3.OnlineStorageWrapper;
-import com.ronginat.family_recipes.utils.MyCallback;
 import com.ronginat.family_recipes.utils.logic.CrashLogger;
 
 import java.io.File;
@@ -35,66 +30,18 @@ import java.util.concurrent.Executors;
 
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
-import io.reactivex.Single;
 
 import static com.ronginat.family_recipes.logic.Constants.COMPRESSION_MAX;
 import static com.ronginat.family_recipes.logic.Constants.COMPRESSION_MIN;
 import static com.ronginat.family_recipes.logic.Constants.COMPRESSION_REQUIRED;
 
-public class StorageWrapper {
-    //private static final String TAG = StorageWrapper.class.getSimpleName();
+/**
+ * Created by ronginat on 18/08/2019
+ */
+public class StorageHelper {
+    private static final String TAG = StorageHelper.class.getSimpleName();
 
-    public static Single<Uri> getThumbFile(Context context, String fileName) {
-        if(fileName == null || fileName.equals(""))
-            return Single.error(new Throwable(""));
-        Uri path = ExternalStorageHelper.getFileUri(context, Constants.THUMB_DIR, fileName);
-        //Log.e("StorageWrapper", "get local path - " + path);
-        if(path != null)
-            return Single.just(path);
-        else if (MiddleWareForNetwork.checkInternetConnection(context)){
-            return OnlineStorageWrapper.downloadThumbFile(context, fileName);
-        }
-        else
-            return Single.error(new Throwable(context.getString(R.string.no_internet_message)));
-    }
-
-    public static void getFoodFile(Context context, String fileName, MyCallback<Uri> callback) {
-        if(fileName == null || fileName.equals(""))
-            return;
-        Uri path = ExternalStorageHelper.getFileUri(context, Constants.FOOD_DIR, fileName);
-        //Log.e("StorageWrapper", "get local path - " + path);
-        if(path != null)
-            callback.onFinished(path);
-        else if (MiddleWareForNetwork.checkInternetConnection(context)){
-            OnlineStorageWrapper.downloadFoodFile(context, fileName, callback);
-        }
-        else
-            callback.onFinished(null);
-    }
-
-    public static Uri getLocalFile(Context context, @Nullable String fileName) {
-        if(fileName == null || fileName.equals(""))
-            return null;
-        return ExternalStorageHelper.getFileUri(context, Constants.TEMP_IMAGES_DIR, fileName);
-    }
-
-    public static String getLocalFilePath(Context context, @Nullable String fileName) {
-        if (fileName != null)
-            return ExternalStorageHelper.getFileAbsolutePath(context, Constants.TEMP_IMAGES_DIR, fileName);
-        return null;
-    }
-
-    /**
-     * Supply a file in local dedicated folder of the new update to be downloaded
-     * @param context application
-     * @param fileName the name of the new update file
-     * @return file from {@link Context#getExternalFilesDir(String)} to store the app download
-     */
-    public static File getFileToDownloadUpdateInto(Context context, String fileName) {
-        File dir = context.getExternalFilesDir(Constants.APK_DIR);
-        return new File(dir, fileName);
-    }
-
+    @NonNull
     public static File createImageFile(Context context) throws IOException {
         // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.ENGLISH).format(new Date());
@@ -107,8 +54,18 @@ public class StorageWrapper {
         );
     }
 
-    public static Flowable<Map.Entry<Integer, String>> copyFiles(Context context, @NonNull List<Uri> list) {
-        if (list.size() > 0) {
+    /*private static File createFileForCloning(Context context, @NonNull Uri uri) throws IOException {
+        String extension = null;
+        if (ContentResolver.SCHEME_CONTENT.equals(uri.getScheme())) {
+            extension = MimeTypeMap.getSingleton().getExtensionFromMimeType(context.getContentResolver().getType(uri));
+        } else if (ContentResolver.SCHEME_FILE.equals(uri.getScheme()) && uri.getPath() != null) {
+            extension = MimeTypeMap.getFileExtensionFromUrl(Uri.fromFile(new File(uri.getPath())).toString());
+        }
+        return createImageFile(context, "." + extension);
+    }*/
+
+    public static Flowable<Map.Entry<Integer, String>> copyFiles(Context context, List<Uri> list) {
+        if (list != null && list.size() > 0) {
             ExecutorService executor = Executors.newFixedThreadPool(4);
             return Flowable.create(emitter -> {
                 List<Callable<Object>> callableList = new ArrayList<>();
@@ -122,16 +79,9 @@ public class StorageWrapper {
 
             }, BackpressureStrategy.BUFFER);
         }
-        // never happens
         return Flowable.error(new Throwable("no files"));
     }
 
-    /**
-     * Copy file from input uri and return the copied file's name.
-     * @param context application context
-     * @param uri input file Uri
-     * @return Copied file's name (from {@link Constants#TEMP_IMAGES_DIR} directory)
-     */
     private static String copyFile(Context context, @NonNull Uri uri) {
         String path = null;
         InputStream in = null;
@@ -152,10 +102,12 @@ public class StorageWrapper {
                 // rotate image if required
                 in = context.getContentResolver().openInputStream(uri);
                 if (in != null) {
+                    CrashLogger.e(TAG, "original size = " + dest.length());
                     rotateAndSave(in, dest, getImageRotationDegree(context, uri));
                     in.close();
                 }
-                path = dest.getName();
+
+                path = dest.getAbsolutePath();
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -246,50 +198,21 @@ public class StorageWrapper {
     /*
      * Copy image orientation when compressing an existing file
      */
-    /*private static void copyExif(String oldPath, String newPath) {
+    /*private static int copyExif(@NonNull InputStream src, String dest) {
         try {
-            ExifInterface oldExif = new ExifInterface(oldPath);
-            String exifOrientation = oldExif.getAttribute(ExifInterface.TAG_ORIENTATION);
+            ExifInterface oldExif = new ExifInterface(src);
+            int exifOrientation = oldExif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
             String date = oldExif.getAttribute(ExifInterface.TAG_DATETIME);
 
-            ExifInterface newExif = new ExifInterface(newPath);
-            newExif.setAttribute(ExifInterface.TAG_ORIENTATION, exifOrientation);
+            ExifInterface newExif = new ExifInterface(dest);
+            newExif.setAttribute(ExifInterface.TAG_ORIENTATION, String.valueOf(exifOrientation));
             newExif.setAttribute(ExifInterface.TAG_DATETIME, date);
             newExif.saveAttributes();
+            return oldExif.getRotationDegrees();
 
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }    */
-
-    public static boolean deleteFile(File dir, @NonNull String fileName) {
-        if (dir != null) {
-            File file = new File(dir, fileName);
-            if (file.exists()) {
-                return file.delete();
-            }
-        }
-        return false;
-    }
-
-    public static void deleteFilesFromLocalPictures(Context context, @NonNull List<String> filesNames) {
-        for (String name: filesNames) {
-            deleteFileFromLocalPictures(context, name);
-
-            /*Uri uri = ExternalStorageHelper.getFileAbsoluteUri(context, Constants.TEMP_IMAGES_DIR, name);
-            if (uri != null && uri.getPath() != null) {
-                new File(uri.getPath()).delete();
-                //Log.e(TAG, "deleting " + name + ", " + new File(uri.getPath()).delete());
-            }*/
-        }
-    }
-
-    @SuppressWarnings("UnusedReturnValue")
-    public static boolean deleteFileFromLocalPictures(Context context, @NonNull String filesName) {
-        File file = new File(context.getExternalFilesDir(Constants.TEMP_IMAGES_DIR), filesName);
-        if (file.exists()) {
-            return file.delete();
-        }
-        return false;
-    }
+        return 0;
+    }*/
 }

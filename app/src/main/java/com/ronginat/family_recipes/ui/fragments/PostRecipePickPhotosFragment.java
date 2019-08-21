@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.ClipData;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -19,22 +20,25 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.swiperefreshlayout.widget.CircularProgressDrawable;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.android.material.snackbar.Snackbar;
 import com.ronginat.family_recipes.R;
 import com.ronginat.family_recipes.logic.storage.ExternalStorageHelper;
 import com.ronginat.family_recipes.logic.storage.StorageWrapper;
 import com.ronginat.family_recipes.ui.baseclasses.PostRecipeBaseFragment;
 import com.ronginat.family_recipes.utils.Constants;
+import com.ronginat.family_recipes.utils.logic.CrashLogger;
 import com.ronginat.family_recipes.utils.ui.FabExtensionAnimator;
 import com.ronginat.family_recipes.viewmodels.PostRecipeViewModel;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.Executors;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -50,7 +54,7 @@ import static android.app.Activity.RESULT_OK;
  */
 public class PostRecipePickPhotosFragment extends PostRecipeBaseFragment {
     private static final int MY_PERMISSIONS_REQUEST_STORAGE = 11;
-    //private final String TAG = getClass().getSimpleName();
+    private final String TAG = getClass().getSimpleName();
 
     private static final int CAMERA_REQUEST = 0;
     private static final int GALLERY_REQUEST = 1;
@@ -63,8 +67,8 @@ public class PostRecipePickPhotosFragment extends PostRecipeBaseFragment {
     private PostRecipeViewModel viewModel;
 
     private LinearLayout.LayoutParams layoutParams;
-    private List<String> imagesPathsToUpload = new ArrayList<>(), cameraImagesToDeleteAfterUpload = new ArrayList<>();
-    private Uri imageUri;
+    private List<String> imagesNamesToUpload = new ArrayList<>();
+    private Uri cameraUri;
 
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
     private Snackbar maxImagesSnackbar;
@@ -128,7 +132,7 @@ public class PostRecipePickPhotosFragment extends PostRecipeBaseFragment {
     @Override
     protected View.OnClickListener getFabClickListener() {
         return view -> {
-            viewModel.setImagesUris(imagesPathsToUpload);
+            viewModel.setImagesNames(imagesNamesToUpload);
             activity.postRecipe();
         };
     }
@@ -142,7 +146,7 @@ public class PostRecipePickPhotosFragment extends PostRecipeBaseFragment {
     @SuppressWarnings("UnusedParameters")
     @OnClick(R.id.pick_photos_choose_button)
     void photosClickListener(View view){
-        if (imagesPathsToUpload.size() >= Constants.MAX_FILES_TO_UPLOAD) {
+        if (imagesNamesToUpload.size() >= Constants.MAX_FILES_TO_UPLOAD) {
             maxImagesSnackbar.show();
             return;
         }
@@ -153,10 +157,9 @@ public class PostRecipePickPhotosFragment extends PostRecipeBaseFragment {
     @SuppressWarnings("UnusedParameters")
     @OnClick(R.id.pick_photos_reset_button)
     void resetClickListener(View view) {
-        StorageWrapper.deleteFilesFromCamera(activity, cameraImagesToDeleteAfterUpload);
-        cameraImagesToDeleteAfterUpload.clear();
-        imagesPathsToUpload.clear();
-        imageUri = null;
+        StorageWrapper.deleteFilesFromLocalPictures(activity, imagesNamesToUpload);
+        imagesNamesToUpload.clear();
+        cameraUri = null;
 
         imagesContainer.removeAllViews();
         initialContainer.setVisibility(View.VISIBLE);
@@ -191,12 +194,12 @@ public class PostRecipePickPhotosFragment extends PostRecipeBaseFragment {
             try {
                 // Create the File where the photo should go
                 File photoFile = StorageWrapper.createImageFile(activity);
-                imageUri = Uri.fromFile(photoFile);
+                cameraUri = Uri.fromFile(photoFile);
                 Uri uri = ExternalStorageHelper.getFileUri(activity, photoFile);
                 /*Uri uri = FileProvider.getUriForFile(activity,
                         getString(R.string.appPackage),
                         photoFile);*/
-                //Log.e(TAG, "before shooting, file: " + imageUri.getPath());
+                //Log.e(TAG, "before shooting, file: " + cameraUri.getPath());
                 if (uri != null) {
                     intent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
                     startActivityForResult(intent, CAMERA_REQUEST);
@@ -250,106 +253,103 @@ public class PostRecipePickPhotosFragment extends PostRecipeBaseFragment {
         super.onActivityResult(requestCode, resultCode, data);
         //Log.e(TAG, "onActivityResult");
         try {
+            List<Uri> urisToCopy = new ArrayList<>();
+            File cameraFile = null;
             switch (requestCode) {
                 case CAMERA_REQUEST:
-                    //Log.e(TAG, "camera result, " + imageUri.getPath());
-                    if (imageUri.getPath() != null) {
+                    if (cameraUri != null && cameraUri.getPath() != null) {
                         if (resultCode == RESULT_OK) {
-                            File file = new File(imageUri.getPath());
-                            //Log.e(TAG, "camera absolute path, " + file.getAbsolutePath());
-                            //Log.e(TAG, "file bytes = " + file.length());
-
-                            imagesPathsToUpload.add(file.getAbsolutePath());
-                            cameraImagesToDeleteAfterUpload.add(file.getName());
-
-                            Executors.newSingleThreadExecutor().execute(() ->
-                                    StorageWrapper.rotateImageIfRequired(activity, imageUri));
-                            displayNewImage(imageUri.getPath());
-
+                            if (cameraUri.getPath() != null) {
+                                urisToCopy.add(cameraUri);
+                                cameraFile = new File(cameraUri.getPath());
+                            }
                         } else {
-                            File file = new File(imageUri.getPath());
-                            if (file.delete())
+                            if (StorageWrapper.deleteFileFromLocalPictures(activity, new File(cameraUri.getPath()).getName()))
                                 Toast.makeText(activity, R.string.post_recipe_pick_photos_camera_empty_message, Toast.LENGTH_SHORT).show();
                         }
                     }
                     break;
                 case GALLERY_REQUEST:
-                    if (resultCode == RESULT_OK && null != data && data.getData() != null) {
-                        //single image
-                        //Log.e(TAG, data.getData().getPath());
-                        //Log.e(TAG, StorageWrapper.getRealPathFromURI(this, data.getData()));
-                        String path = StorageWrapper.getRealPathFromURI(activity, data.getData());
-                        imagesPathsToUpload.add(path);
-                        displayNewImage(path);
-
-                    } else if(data != null && null != data.getClipData()) {
-                        //multiple images
-                        //Log.e(TAG, String.valueOf(data.getClipData().getItemCount()));
-
-                        ClipData mClipData = data.getClipData();
-
-                        int pickedImageCounter;
-
-                        if (imagesPathsToUpload.size() + mClipData.getItemCount() > Constants.MAX_FILES_TO_UPLOAD)
-                            maxImagesSnackbar.show();
-
-                        for (pickedImageCounter = 0; pickedImageCounter < mClipData.getItemCount()
-                                && imagesPathsToUpload.size() < Constants.MAX_FILES_TO_UPLOAD; pickedImageCounter++) {
-                            //Log.e(TAG, mClipData.getItemAt(pickedImageCounter).getUri().getPath());
-                            String path = StorageWrapper.getRealPathFromURI(activity, mClipData.getItemAt(pickedImageCounter).getUri());
-                            imagesPathsToUpload.add(path);
-                            displayNewImage(path);
+                    if (resultCode == RESULT_OK && data != null) {
+                        if (data.getData() != null) { // single image
+                            urisToCopy.add(data.getData());
+                        }
+                        else if (data.getClipData() != null) { // multiple images
+                            ClipData mClipData = data.getClipData();
+                            for (int i = 0; i < mClipData.getItemCount(); i++) {
+                                urisToCopy.add(mClipData.getItemAt(i).getUri());
+                            }
                         }
                     } else {
                         Toast.makeText(activity, R.string.post_recipe_pick_photos_browse_empty_message,
                                 Toast.LENGTH_SHORT).show();
                     }
+                    break;
             }
+            loadChosenImages(urisToCopy, cameraFile);
         } catch (Exception e) {
             //Log.e(TAG, e.getMessage());
             e.printStackTrace();
         }
     }
 
-    private void displayNewImage(String imagePath) {
-        initialContainer.setVisibility(View.GONE);
-        ImageView imageView = new ImageView(getActivity());
-
-        imageView.setAdjustViewBounds(true);
-        imageView.setScaleType(ImageView.ScaleType.FIT_XY);
-        imageView.setLayoutParams(layoutParams);
-
-        imagesContainer.addView(imageView);
-        Glide.with(activity)
-                .load(imagePath)
-                .into(imageView);
+    /**
+     * Inflate layouts and convert chosen images (Uris) to local compressed images.
+     */
+    private void loadChosenImages(List<Uri> list, @Nullable File originalFileFromCamera) {
+        if (list.size() > 0) {
+            List<Uri> urisToCopy = new ArrayList<>();
+            if (list.size() + imagesNamesToUpload.size() > Constants.MAX_FILES_TO_UPLOAD) {
+                urisToCopy.addAll(list.subList(0, Constants.MAX_FILES_TO_UPLOAD - imagesNamesToUpload.size()));
+                maxImagesSnackbar.show();
+            } else
+                urisToCopy.addAll(list);
+            String[] listPaths = new String[urisToCopy.size()];
+            Drawable[] progressBars = new Drawable[urisToCopy.size()];
+            int startIndex = imagesContainer.getChildCount();
+            compositeDisposable.add(StorageWrapper.copyFiles(activity, urisToCopy)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .doOnSubscribe(subscription -> inflateImages(urisToCopy.size(), progressBars))
+                    .subscribe(entry -> {
+                        listPaths[entry.getKey()] = entry.getValue();
+                        Glide
+                                .with(this)
+                                .load(StorageWrapper.getLocalFile(activity, entry.getValue()))
+                                .placeholder(progressBars[entry.getKey()])
+                                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                                .skipMemoryCache(true)
+                                .into((ImageView)imagesContainer.getChildAt(startIndex + entry.getKey()));
+                        }, throwable -> CrashLogger.e(TAG, throwable.getMessage()), () -> {
+                            if (originalFileFromCamera != null)
+                                StorageWrapper.deleteFileFromLocalPictures(activity, originalFileFromCamera.getName());
+                            imagesNamesToUpload.addAll(Arrays.asList(listPaths));
+                        }
+                    ));
+        }
     }
 
-    /*private void showWithProperRotation(String filePath, ImageView imageView) {
-        // check the rotation of the image and display it properly
-        Bitmap bitmap = BitmapFactory.decodeFile(filePath);
-        ExifInterface exif;
-        try {
-            exif = new ExifInterface(filePath);
-
-            int orientation = exif.getAttributeInt(
-                    ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
-            Matrix matrix = new Matrix();
-            if (orientation == ExifInterface.ORIENTATION_ROTATE_90) {
-                matrix.postRotate(90);
-            } else if (orientation == ExifInterface.ORIENTATION_ROTATE_180) {
-                matrix.postRotate(180);
-            } else if (orientation == ExifInterface.ORIENTATION_ROTATE_270) {
-                matrix.postRotate(270);
-            }
-            Log.d("EXIF", "Exif: " + orientation);
-
-            bitmap = Bitmap.createBitmap(bitmap, 0, 0,
-                    bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-            imageView.setImageBitmap(bitmap);
-
-        } catch (IOException e) {
-            Log.e(TAG, e.getMessage());
+    /**
+     * Inflate a specific number of {@link ImageView}s. For each, set a loading drawable and save its reference for later.
+     * @param size number of {@link ImageView}s to inflate
+     * @param drawables empty array that will contain the progressBars of each inflated layout
+     */
+    private void inflateImages(int size, Drawable[] drawables) {
+        //imagesContainer.removeAllViews();
+        initialContainer.setVisibility(View.INVISIBLE);
+        for (int i = 0; i < size; i++) {
+            ImageView imageView = new ImageView(activity);
+            imageView.setScaleType(ImageView.ScaleType.FIT_XY);
+            imageView.setLayoutParams(layoutParams);
+            imageView.setAdjustViewBounds(true);
+            CircularProgressDrawable circularProgressDrawable = new CircularProgressDrawable(activity);
+            circularProgressDrawable.setStrokeWidth(15f);
+            circularProgressDrawable.setCenterRadius(80f);
+            //circularProgressDrawable.setColorFilter(new PorterDuffColorFilter(Color.BLACK, PorterDuff.Mode.SRC_ATOP));
+            circularProgressDrawable.start();
+            drawables[i] = circularProgressDrawable;
+            imagesContainer.addView(imageView);
+            imageView.setImageDrawable(circularProgressDrawable);
         }
-    }*/
+    }
 }

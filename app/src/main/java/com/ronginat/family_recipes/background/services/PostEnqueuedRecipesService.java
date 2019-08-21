@@ -25,7 +25,6 @@ import com.ronginat.family_recipes.logic.repository.RecipeRepository;
 import com.ronginat.family_recipes.logic.storage.StorageWrapper;
 import com.ronginat.family_recipes.model.PendingRecipeEntity;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -166,9 +165,9 @@ public class PostEnqueuedRecipesService extends Service {
                     uploadFoodFilesSync(
                             results.get(RESPONSE_KEY_RECIPE_ID),
                             results.get(RESPONSE_KEY_RECIPE_MODIFIED),
-                            compressFiles(recipe.getImages())
+                            retrievePathsFromNames(recipe.getImages())
                     );
-                    deleteLocalFiles(getLocalImages(recipe.getImages()));
+                    StorageWrapper.deleteFilesFromLocalPictures(getApplicationContext(), recipe.getImages());
                 } else {
                     // finish upload the recipe
                     repository.dispatchInfo.onNext(getApplicationContext().getString(
@@ -193,31 +192,19 @@ public class PostEnqueuedRecipesService extends Service {
         }
     }
 
-    private List<String> getLocalImages(@Nullable List<String> images) {
-        if (images != null) {
-            List<String> localImages = new ArrayList<>();
-            for (String path : images) {
-                if (path.contains(getApplicationContext().getString(R.string.appPackage)))
-                    localImages.add(path);
-            }
-            return localImages;
-        }
-        return null;
-    }
 
     @Nullable
-    private List<String> compressFiles(List<String> paths) {
-        List<String> compressedFiles = null;
-        if (paths != null) {
-            compressedFiles = new ArrayList<>();
-            for (String path: paths) {
-                String compressedPath = StorageWrapper.compressFile(this, path);
-                if (compressedPath != null) {
-                    compressedFiles.add(compressedPath);
-                }
+    private List<String> retrievePathsFromNames(List<String> names) {
+        List<String> paths = null;
+        if (names != null) {
+            paths = new ArrayList<>();
+            for (String name: names) {
+                String path = StorageWrapper.getLocalFilePath(getApplicationContext(), name);
+                if (path != null)
+                    paths.add(path);
             }
         }
-        return compressedFiles;
+        return paths;
     }
 
     private void uploadFoodFilesSync(String id, String lastModifiedDate, @Nullable List<String> foodFiles) {
@@ -251,7 +238,6 @@ public class PostEnqueuedRecipesService extends Service {
                         }
                     }
                 }
-                deleteLocalFiles(foodFiles);
                 repository.dispatchInfo.onNext(getApplicationContext().getString(
                         uploadImagesSuccess ?
                                 R.string.main_activity_posted_new_recipe : R.string.post_recipe_error));
@@ -276,15 +262,5 @@ public class PostEnqueuedRecipesService extends Service {
             }
         } /*else
             Log.e(TAG, "urls are null");*/
-    }
-
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-    private void deleteLocalFiles(List<String> files) {
-        if (files != null && !files.isEmpty()) {
-            for (int i = 0; i < files.size(); i++) {
-                new File(files.get(i)).delete();
-            }
-        }
-        //new File(recipe.getContent()).delete();
     }
 }

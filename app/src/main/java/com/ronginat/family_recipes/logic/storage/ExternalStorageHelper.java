@@ -3,6 +3,7 @@ package com.ronginat.family_recipes.logic.storage;
 import android.content.Context;
 import android.net.Uri;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.FileProvider;
 
@@ -20,7 +21,7 @@ public class ExternalStorageHelper {
      * @return path of requested file from cache if available or from app root storage. null if file not exists
      */
     @Nullable
-    public static Uri getFileAbsolutePath(Context context, String dir, String fileName){
+    public static Uri getFileAbsoluteUri(Context context, String dir, String fileName){
         File filesDir = context.getExternalFilesDir(dir);
         File file = new File(filesDir, fileName);
         Uri uri = Uri.fromFile(file);
@@ -50,9 +51,8 @@ public class ExternalStorageHelper {
     }
 
     /**
-     * @see ExternalStorageHelper#getFileAbsolutePath(Context, String, String)
+     * @see ExternalStorageHelper#getFileAbsoluteUri(Context, String, String)
      */
-    @SuppressWarnings("JavadocReference")
     @Nullable
     public static Uri getFileUri(Context context, File file) {
         Uri uri = FileProvider.getUriForFile(context, context.getString(R.string.appPackage), file);
@@ -60,6 +60,18 @@ public class ExternalStorageHelper {
             //Log.e("ExternalStorageHelper", uri.getPath() + " exists");
             return uri;
         }
+        return null;
+    }
+
+    /**
+     * get absolute path of given local dir and file name.
+     */
+    @SuppressWarnings("SameParameterValue")
+    @Nullable
+    static String getFileAbsolutePath(Context context, @NonNull String dir, @NonNull String fileName) {
+        File file = new File(context.getExternalFilesDir(dir), fileName);
+        if (file.exists())
+            return file.getAbsolutePath();
         return null;
     }
 
@@ -94,18 +106,6 @@ public class ExternalStorageHelper {
             return pathStr;
         else
             return null;
-    }*/
-
-    /*
-     * @param context - context of application
-     * @return path for app storage root
-     */
-    /*public static Uri getFilesRootPath(Context context, String dir) {
-        File root = context.getExternalFilesDir(dir);
-        if (root != null) {
-            return FileProvider.getUriForFile(context, context.getString(R.string.appPackage), root);
-        }
-        return null;
     }*/
 
     public static File getFileForOnlineDownload(Context context, String dir, String fileName) {

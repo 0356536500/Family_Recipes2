@@ -1,6 +1,7 @@
 package com.ronginat.family_recipes.viewmodels;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Handler;
 
@@ -201,6 +202,14 @@ public class RecipeViewModel extends ViewModel {
         if (recipe != null)
             PostFoodImagesService.startActionPostImages(context, recipe.getId(),
                     recipe.getLastModifiedDate(), imagesPathsToUpload);
+        else {
+            // send failure intent
+            Intent intent = new Intent();
+            intent.setAction(com.ronginat.family_recipes.utils.Constants.ACTION_UPLOAD_IMAGES_SERVICE);
+            intent.putExtra("flag", false);
+            context.sendBroadcast(intent);
+        }
+
     }
 
     public void refreshRecipeDelayed(Context context) {

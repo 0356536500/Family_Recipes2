@@ -16,7 +16,6 @@ import com.ronginat.family_recipes.logic.repository.RecipeRepository;
 import com.ronginat.family_recipes.logic.storage.StorageWrapper;
 import com.ronginat.family_recipes.utils.Constants;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -65,26 +64,15 @@ public class PostFoodImagesService extends IntentService {
             final String action = intent.getAction();
             if (action != null) {
                 if (ACTION_POST_IMAGES.equals(action)) {
-                    final List<String> files = intent.getStringArrayListExtra(EXTRA_PARAM1);
+                    final List<String> filesNames = intent.getStringArrayListExtra(EXTRA_PARAM1);
                     String id = intent.getStringExtra(EXTRA_PARAM2);
                     String lastModifiedDate = intent.getStringExtra(EXTRA_PARAM3);
-                    handleActionPostImagesSync(id, lastModifiedDate, compressFiles(files));
-                    deleteLocalFiles(getLocalImages(files));
+                    handleActionPostImagesSync(id, lastModifiedDate, retrievePathsFromNames(filesNames));
+                    if (filesNames != null)
+                        StorageWrapper.deleteFilesFromLocalPictures(getApplicationContext(), filesNames);
                 }
             }
         }
-    }
-
-    private List<String> getLocalImages(@Nullable List<String> images) {
-        if (images != null) {
-            List<String> localImages = new ArrayList<>();
-            for (String path : images) {
-                if (path.contains(getApplicationContext().getString(R.string.appPackage)))
-                    localImages.add(path);
-            }
-            return localImages;
-        }
-        return null;
     }
 
     private void sendIntentUploadImagesFinishedToUser(boolean finish) {
@@ -94,32 +82,18 @@ public class PostFoodImagesService extends IntentService {
         sendBroadcast(intent);
     }
 
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-    private void deleteLocalFiles(List<String> files) {
-        if (files != null && !files.isEmpty()) {
-            for (int i = 0; i < files.size(); i++) {
-                new File(files.get(i)).delete();
-            }
-        }
-        //new File(recipe.getContent()).delete();
-    }
-
     @Nullable
-    private List<String> compressFiles(List<String> paths) {
-        List<String> compressedFiles = null;
-        if (paths != null) {
-            compressedFiles = new ArrayList<>();
-            for (String path: paths) {
-                String compressedPath = StorageWrapper.compressFile(this, path);
-                if (compressedPath != null) {
-                    compressedFiles.add(compressedPath);
-                    /*File compressedFile = new File(compressedPath);
-                    Log.e(TAG, "compressed file bytes = " + compressedFile.length());
-                    compressedFile.deleteOnExit();*/
-                }
+    private List<String> retrievePathsFromNames(List<String> names) {
+        List<String> paths = null;
+        if (names != null) {
+            paths = new ArrayList<>();
+            for (String name: names) {
+                String path = StorageWrapper.getLocalFilePath(getApplicationContext(), name);
+                if (path != null)
+                    paths.add(path);
             }
         }
-        return compressedFiles;
+        return paths;
     }
 
     /**
@@ -176,7 +150,5 @@ public class PostFoodImagesService extends IntentService {
             Log.e(TAG, "urls are nulls");
             sendIntentUploadImagesFinishedToUser(false);
         }
-
-        deleteLocalFiles(foodFiles);
     }
 }

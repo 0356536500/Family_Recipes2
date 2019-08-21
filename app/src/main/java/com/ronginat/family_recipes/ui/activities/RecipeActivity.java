@@ -73,8 +73,8 @@ import com.ronginat.searchfilter.animator.FiltersListItemAnimator;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.Executors;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -86,7 +86,7 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
     private static final int CAMERA_REQUEST = 2;
     private static final int GALLERY_REQUEST = 1;
 
-    //private final String TAG = RecipeActivity.class.getSimpleName();
+    private final String TAG = RecipeActivity.class.getSimpleName();
     private AppBarLayout appBarLayout;
 
     private Toolbar toolbar;
@@ -113,9 +113,9 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
     private int textColorPrimary, /*textColorSecondary,*/
             navigationCollapsedColor, navigationExpandedColor;
     private ProgressBar uploadImagesProgressBar;
-    private Uri imageUri;
-    private List<String> imagesPathsToUpload = new ArrayList<>(), cameraImagesToDeleteAfterUpload = new ArrayList<>();
-    private CompositeDisposable compositeDisposable = new CompositeDisposable();
+    private Uri cameraUri;
+    private List<String> imagesNamesToUpload = new ArrayList<>();
+    private CompositeDisposable compositeDisposable;
 
     private ShareActionProvider mShareActionProvider;
 
@@ -127,7 +127,7 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
         setContentView(R.layout.activity_recipe);
 
         loadColorsFromTheme();
-
+        compositeDisposable = new CompositeDisposable();
         Bundle extras = getIntent().getExtras();
         if(extras != null) {
             this.recipeId = extras.getString(Constants.RECIPE_ID);
@@ -146,10 +146,13 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
     protected void onDestroy() {
         super.onDestroy();
         compositeDisposable.clear();
-        try {
-            unregisterReceiver(mReceiver);
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        if (isWaitingForBroadcast) {
+            try {
+                unregisterReceiver(mReceiver);
+                isWaitingForBroadcast = false;
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
         }
     }
 
@@ -552,7 +555,7 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
                             break;
                     }
                     pickImageDialog.dismiss();
-                }, Throwable::printStackTrace, compositeDisposable::clear)
+                }, Throwable::printStackTrace)
         );
     }
 
@@ -565,12 +568,12 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
             try {
                 // Create the File where the photo should go
                 File photoFile = StorageWrapper.createImageFile(this);
-                imageUri = Uri.fromFile(photoFile);
+                cameraUri = Uri.fromFile(photoFile);
                 Uri uri = ExternalStorageHelper.getFileUri(this, photoFile);
-                /*imageUri = FileProvider.getUriForFile(this,
+                /*cameraUri = FileProvider.getUriForFile(this,
                         getString(R.string.appPackage),
                         photoFile);*/
-                //Log.e(TAG, "before shooting, file: " + imageUri.getPath());
+                //Log.e(TAG, "before shooting, file: " + cameraUri.getPath());
                 if (uri != null) {
                     intent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
                     startActivityForResult(intent, CAMERA_REQUEST);
@@ -626,62 +629,77 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        //Log.e(TAG, "onActivityResult");
         try {
+            List<Uri> urisToCopy = new ArrayList<>();
+            File cameraFile = null;
             switch (requestCode) {
                 case CAMERA_REQUEST:
-                    //Log.e(TAG, "camera result, " + imageUri.getPath());
-                    if (imageUri.getPath() != null) {
+                    if (cameraUri != null && cameraUri.getPath() != null) {
                         if (resultCode == RESULT_OK) {
-                            File file = new File(imageUri.getPath());
-                            //Log.e(TAG, "camera absolute path, " + file.getAbsolutePath());
-                            //Log.e(TAG, "file bytes = " + file.length());
-
-                            imagesPathsToUpload.add(imageUri.getPath());
-                            cameraImagesToDeleteAfterUpload.add(file.getName());
-
-                            Executors.newSingleThreadExecutor().execute(() ->
-                                    StorageWrapper.rotateImageIfRequired(this, imageUri));
-                            pickImagesConfirmationDialog();
-
+                            if (cameraUri.getPath() != null) {
+                                urisToCopy.add(cameraUri);
+                                cameraFile = new File(cameraUri.getPath());
+                            }
                         } else {
-                            File file = new File(imageUri.getPath());
-                            if (file.delete())
+                            if (StorageWrapper.deleteFileFromLocalPictures(this, new File(cameraUri.getPath()).getName()))
                                 Toast.makeText(this, R.string.post_recipe_pick_photos_camera_empty_message, Toast.LENGTH_SHORT).show();
                         }
                     }
                     break;
                 case GALLERY_REQUEST:
-                    if (resultCode == RESULT_OK && null != data && data.getData() != null) {
-                        //single image
-                        //Log.e(TAG, data.getData().getPath());
-                        //Log.e(TAG, StorageWrapper.getRealPathFromURI(this, data.getData()));
-                        imagesPathsToUpload.add(StorageWrapper.getRealPathFromURI(this, data.getData()));
-
-                        pickImagesConfirmationDialog();
-
-                    } else if(data != null && null != data.getClipData()) {
-                        //multiple images
-                        //Log.e(TAG, String.valueOf(data.getClipData().getItemCount()));
-
-                        ClipData mClipData = data.getClipData();
-
-                        int pickedImageCounter;
-
-                        for (pickedImageCounter = 0; pickedImageCounter < mClipData.getItemCount(); pickedImageCounter++) {
-                            //Log.e(TAG, mClipData.getItemAt(pickedImageCounter).getUri().getPath());
-
-                            imagesPathsToUpload.add(StorageWrapper.getRealPathFromURI(this, mClipData.getItemAt(pickedImageCounter).getUri()));
+                    if (resultCode == RESULT_OK && data != null) {
+                        if (data.getData() != null) { // single image
+                            urisToCopy.add(data.getData());
                         }
-                        pickImagesConfirmationDialog();
+                        else if (data.getClipData() != null) { // multiple images
+                            ClipData mClipData = data.getClipData();
+                            for (int i = 0; i < mClipData.getItemCount(); i++) {
+                                urisToCopy.add(mClipData.getItemAt(i).getUri());
+                            }
+                        }
                     } else {
                         Toast.makeText(this, R.string.post_recipe_pick_photos_browse_empty_message,
                                 Toast.LENGTH_SHORT).show();
                     }
+                    break;
             }
+            loadChosenImages(urisToCopy, cameraFile);
         } catch (Exception e) {
             CrashLogger.logException(e);
             e.printStackTrace();
+        }
+    }
+
+    /**
+     * Inflate layouts and convert chosen images (Uris) to local compressed images.
+     */
+    private void loadChosenImages(List<Uri> list, @Nullable File originalFileFromCamera) {
+        if (list.size() > 0 && imagesNamesToUpload.size() < Constants.MAX_FILES_TO_UPLOAD) {
+            List<Uri> urisToCopy = new ArrayList<>();
+            if (list.size() + imagesNamesToUpload.size() > Constants.MAX_FILES_TO_UPLOAD) {
+                urisToCopy.addAll(list.subList(0, Constants.MAX_FILES_TO_UPLOAD - imagesNamesToUpload.size()));
+            } else
+                urisToCopy.addAll(list);
+            String[] listPaths = new String[urisToCopy.size()];
+            compositeDisposable.add(StorageWrapper.copyFiles(this, urisToCopy)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .doOnSubscribe(subscription -> uploadImagesProgressBar.setVisibility(View.VISIBLE))
+                    .subscribe(entry ->
+                                    listPaths[entry.getKey()] = entry.getValue(),
+                            throwable -> CrashLogger.e(TAG, throwable.getMessage()), () -> {
+                                if (originalFileFromCamera != null)
+                                    StorageWrapper.deleteFileFromLocalPictures(this, originalFileFromCamera.getName());
+                                imagesNamesToUpload.addAll(Arrays.asList(listPaths));
+                                uploadImagesProgressBar.setVisibility(View.INVISIBLE);
+                                pickImagesConfirmationDialog();
+                            }
+                    ));
+        } else {
+            if (originalFileFromCamera != null)
+                StorageWrapper.deleteFileFromLocalPictures(this, originalFileFromCamera.getName());
+            uploadImagesProgressBar.setVisibility(View.INVISIBLE);
+            pickImagesConfirmationDialog();
         }
     }
 
@@ -696,8 +714,9 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
                     //Yes button clicked
                     IntentFilter intentFilter = new IntentFilter();
                     intentFilter.addAction(Constants.ACTION_UPLOAD_IMAGES_SERVICE);
+                    isWaitingForBroadcast = true;
                     registerReceiver(mReceiver, intentFilter);
-                    viewModel.postImages(this, imagesPathsToUpload);
+                    viewModel.postImages(this, imagesNamesToUpload);
                     uploadImagesProgressBar.setVisibility(View.VISIBLE);
                     break;
 
@@ -713,20 +732,25 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
             dialog.dismiss();
         };
 
+        DialogInterface.OnCancelListener dialogCancelListener = dialog -> resetUploadDetails();
+
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        if (imagesPathsToUpload.size() > Constants.MAX_FILES_TO_UPLOAD) {
+        if (imagesNamesToUpload.size() > Constants.MAX_FILES_TO_UPLOAD) {
             builder = builder.setMessage(getString(R.string.alert_dialog_upload_photos_max_limit, Constants.MAX_FILES_TO_UPLOAD));
-            imagesPathsToUpload = imagesPathsToUpload.subList(0, Constants.MAX_FILES_TO_UPLOAD);
+            imagesNamesToUpload = imagesNamesToUpload.subList(0, Constants.MAX_FILES_TO_UPLOAD);
         }
+
         //builder/*.setTitle(R.string.action_add_photo)*/
         builder.setTitle(R.string.alert_dialog_upload_photos_confirmation)
                 //.setMessage(R.string.alert_dialog_upload_photos_confirmation)
-                .setPositiveButton(getString(R.string.alert_dialog_upload_photos_finish, imagesPathsToUpload.size()), dialogClickListener)
+                .setPositiveButton(getString(R.string.alert_dialog_upload_photos_finish, imagesNamesToUpload.size()), dialogClickListener)
                 .setNegativeButton(R.string.alert_dialog_upload_photos_cancel, dialogClickListener)
                 .setNeutralButton(R.string.alert_dialog_upload_photos_take_more, dialogClickListener)
+                .setOnCancelListener(dialogCancelListener)
                 .show();
     }
 
+    private boolean isWaitingForBroadcast = false;
     /**
      * The BroadcastReceiver that listens for discovered devices and changes the title when
      * uploading is finished
@@ -748,18 +772,20 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
                         Toast.makeText(RecipeActivity.this, R.string.upload_images_failed, Toast.LENGTH_SHORT).show();
                     }
                     uploadImagesProgressBar.setVisibility(View.INVISIBLE);
-                    resetUploadDetails();
+                    //resetUploadDetails();
                 }
+                isWaitingForBroadcast = false;
                 unregisterReceiver(mReceiver);
             }
         }
     };
 
     private void resetUploadDetails() {
-        StorageWrapper.deleteFilesFromCamera(this, cameraImagesToDeleteAfterUpload);
-        cameraImagesToDeleteAfterUpload.clear();
-        imagesPathsToUpload.clear();
-        imageUri = null;
+        if (cameraUri != null && cameraUri.getPath() != null && new File(cameraUri.getPath()).exists())
+            imagesNamesToUpload.add(new File(cameraUri.getPath()).getName());
+        StorageWrapper.deleteFilesFromLocalPictures(this, imagesNamesToUpload);
+        imagesNamesToUpload.clear();
+        cameraUri = null;
     }
 
     // endregion

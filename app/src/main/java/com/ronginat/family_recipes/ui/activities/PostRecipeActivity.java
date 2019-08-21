@@ -25,6 +25,7 @@ import com.leinardi.android.speeddial.SpeedDialView;
 import com.ronginat.family_recipes.R;
 import com.ronginat.family_recipes.layout.MiddleWareForNetwork;
 import com.ronginat.family_recipes.logic.Injection;
+import com.ronginat.family_recipes.logic.storage.StorageWrapper;
 import com.ronginat.family_recipes.ui.baseclasses.MyBaseActivity;
 import com.ronginat.family_recipes.ui.baseclasses.PostRecipeBaseFragment;
 import com.ronginat.family_recipes.ui.fragments.PagerDialogFragment;
@@ -63,7 +64,7 @@ public class PostRecipeActivity extends MyBaseActivity {
     private View.OnClickListener expandedButtonListener;
     private ViewHider fabHider;
     private int currentIndex = 0;
-    private boolean inPreview = false, fabMayChangeExpandState = true;
+    private boolean inPreview = false, fabMayChangeExpandState = true, isRecipeEnqueued = false;
 
 
     @Override
@@ -83,6 +84,23 @@ public class PostRecipeActivity extends MyBaseActivity {
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
+        if (savedInstanceState != null)
+            isRecipeEnqueued = savedInstanceState.getBoolean("enqueued");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // delete dangling local images
+        if (!isRecipeEnqueued && viewModel.recipe.getImages() != null) {
+            StorageWrapper.deleteFilesFromLocalPictures(this, viewModel.recipe.getImages());
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        outState.putBoolean("enqueued", isRecipeEnqueued);
+        super.onSaveInstanceState(outState);
     }
 
     private void initFloatingElementsAndHelpers() {
@@ -358,6 +376,7 @@ public class PostRecipeActivity extends MyBaseActivity {
 
     public void postRecipe() {
         viewModel.postRecipe(this);
+        isRecipeEnqueued = true;
         if (MiddleWareForNetwork.checkInternetConnection(this))
             Toast.makeText(this, R.string.post_recipe_online_upload_message, Toast.LENGTH_LONG).show();
         else
