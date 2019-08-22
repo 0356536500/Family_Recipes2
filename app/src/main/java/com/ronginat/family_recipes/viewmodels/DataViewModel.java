@@ -231,15 +231,18 @@ public class DataViewModel extends ViewModel {
         context.registerReceiver(onComplete,
                 new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
 
-        ((DownloadManager)context.getSystemService(DOWNLOAD_SERVICE)).enqueue(new DownloadManager.Request(uri)
-                .setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI |
-                        DownloadManager.Request.NETWORK_MOBILE)
-                .setAllowedOverRoaming(false)
-                .setTitle(appUpdateFile.getName())
-                .setDescription("Downloading app update")
-                .setDestinationUri(Uri.fromFile(appUpdateFile))
-                .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)
-        );
+        DownloadManager downloadManager = (DownloadManager)context.getSystemService(DOWNLOAD_SERVICE);
+        if (downloadManager != null) {
+            downloadManager.enqueue(new DownloadManager.Request(uri)
+                    .setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI |
+                            DownloadManager.Request.NETWORK_MOBILE)
+                    .setAllowedOverRoaming(false)
+                    .setTitle(appUpdateFile.getName())
+                    .setDescription("Downloading app update")
+                    .setDestinationUri(Uri.fromFile(appUpdateFile))
+                    .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)
+            );
+        }
     }
 
     public void installApp(Context context, File appUpdateFile) {

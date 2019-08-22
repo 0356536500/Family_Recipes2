@@ -56,7 +56,7 @@ public class MyMessagingService extends FirebaseMessagingService {
     }
 
     @Override
-    public void onMessageReceived(RemoteMessage remoteMessage) {
+    public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
         CrashLogger.e(TAG, "onMessageReceived");
         CrashLogger.e(TAG, remoteMessage.getData().toString());
@@ -64,22 +64,22 @@ public class MyMessagingService extends FirebaseMessagingService {
         // Check if message contains a notification payload.
         if (remoteMessage.getNotification() != null) {
             CrashLogger.e(TAG, "Message Notification: " + remoteMessage.getNotification().toString());
-            remoteMessage.getNotification().getClickAction();
+            //remoteMessage.getNotification().getClickAction();
         }
 
-        if (/*remoteMessage.getNotification() == null && */remoteMessage.getData() != null) {
+        /*if (remoteMessage.getNotification() == null && remoteMessage.getData() != null) { */
             /*
             Instead of sending a “notification” entry in the payload, change it for a “data” entry.
             In this way the notifications will ALWAYS be managed by the app through onMessageReceived
             https://medium.com/@cdmunoz/working-easily-with-fcm-push-notifications-in-android-e1804c80f74
             */
-            sendNotification(remoteMessage.getData());
-        }
+        sendNotification(remoteMessage.getData());
+        //}
 
     }
 
     @Override
-    public void onNewToken(String token) {
+    public void onNewToken(@NonNull String token) {
         super.onNewToken(token);
         CrashLogger.e(TAG, "Refreshed token: " + token);
         SharedPreferencesHandler.writeString(getApplicationContext(), Constants.NEW_FIREBASE_TOKEN, token);

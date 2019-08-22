@@ -1,2 +1,4 @@
 /build
 fabric.properties
+/src/main/java/com/ronginat/family_recipes/ui/activities/TestActivity.java
+/src/main/res/layout/activity_test.xml
