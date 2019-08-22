@@ -1,12 +1,10 @@
 package com.ronginat.family_recipes.ui.activities;
 
-import android.Manifest;
 import android.annotation.TargetApi;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -20,8 +18,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProviders;
@@ -249,7 +245,7 @@ public class SettingsActivity extends MyBaseActivity
 
         // region App Updates
 
-        private static final int REQUEST_WRITE_PERMISSION = 186;
+        //private static final int REQUEST_WRITE_PERMISSION = 186;
         private File appUpdateFile;
         private Uri uri;
 
@@ -290,21 +286,7 @@ public class SettingsActivity extends MyBaseActivity
         }
 
         private void updateApp() {
-            if (canReadWriteExternalAndInstallPackages()) {
-                viewModel.downloadNewAppVersion(activity, onComplete, uri, appUpdateFile);
-            } else {
-                if (ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                    new AlertDialog.Builder(activity)
-                            .setCancelable(true)
-                            .setTitle(R.string.main_activity_permission_to_install_updates_title)
-                            .setMessage(R.string.main_activity_permission_to_install_updates_message)
-                            .setPositiveButton(android.R.string.yes, (dialog, which) ->
-                                    requestPermission())
-                            .create()
-                            .show();
-                } else
-                    requestPermission();
-            }
+            viewModel.downloadNewAppVersion(activity, onComplete, uri, appUpdateFile);
         }
 
         BroadcastReceiver onComplete=new BroadcastReceiver() {
@@ -314,27 +296,6 @@ public class SettingsActivity extends MyBaseActivity
                 activity.unregisterReceiver(this);
             }
         };
-
-        @Override
-        public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-            if (requestCode == REQUEST_WRITE_PERMISSION && grantResults[0] == PackageManager.PERMISSION_GRANTED)
-                viewModel.downloadNewAppVersion(activity, onComplete, uri, appUpdateFile);
-            else
-                Toast.makeText(activity, "Permission denied", Toast.LENGTH_LONG).show();
-        }
-
-        private void requestPermission() {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-                requestPermissions(new String[]{
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE
-                }, REQUEST_WRITE_PERMISSION);
-        }
-
-        private boolean canReadWriteExternalAndInstallPackages() {
-            return Build.VERSION.SDK_INT < Build.VERSION_CODES.M ||
-                    ContextCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                            != PackageManager.PERMISSION_GRANTED;
-        }
 
         // endregion
 

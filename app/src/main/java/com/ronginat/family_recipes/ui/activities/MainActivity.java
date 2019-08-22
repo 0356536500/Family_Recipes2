@@ -1,11 +1,9 @@
 package com.ronginat.family_recipes.ui.activities;
 
-import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.graphics.Canvas;
 import android.graphics.ColorFilter;
 import android.graphics.Paint;
@@ -31,8 +29,6 @@ import androidx.annotation.StringRes;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
@@ -90,7 +86,6 @@ public class MainActivity extends MyBaseActivity implements BackStack.BackStackH
     private MyFragment currentFragment;//, allRecipesFragment, favoritesRecipesFragment;
 
     private IntentFilter customFilter;
-    private String lastOrderBy;
 
     private int toolbarColorPrimary, toolbarColorSecond;
 
@@ -661,7 +656,7 @@ public class MainActivity extends MyBaseActivity implements BackStack.BackStackH
 
     // region App Updates
 
-    private static final int REQUEST_WRITE_PERMISSION = 786;
+    //private static final int REQUEST_WRITE_PERMISSION = 786;
     private File appUpdateFile;
     private Uri uri;
 
@@ -704,7 +699,8 @@ public class MainActivity extends MyBaseActivity implements BackStack.BackStackH
     }
 
     private void updateApp() {
-        if (canReadWriteExternalAndInstallPackages()) {
+        viewModel.downloadNewAppVersion(this, onComplete, uri, appUpdateFile);
+        /*if (canReadWriteExternalAndInstallPackages()) {
             viewModel.downloadNewAppVersion(this, onComplete, uri, appUpdateFile);
         } else {
             if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
@@ -718,7 +714,7 @@ public class MainActivity extends MyBaseActivity implements BackStack.BackStackH
                         .show();
             } else
                 requestPermission();
-        }
+        }*/
     }
 
     BroadcastReceiver onComplete=new BroadcastReceiver() {
@@ -729,7 +725,7 @@ public class MainActivity extends MyBaseActivity implements BackStack.BackStackH
         }
     };
 
-    @Override
+    /*@Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == REQUEST_WRITE_PERMISSION && grantResults[0] == PackageManager.PERMISSION_GRANTED)
             viewModel.downloadNewAppVersion(this, onComplete, uri, appUpdateFile);
@@ -748,7 +744,7 @@ public class MainActivity extends MyBaseActivity implements BackStack.BackStackH
         return Build.VERSION.SDK_INT < Build.VERSION_CODES.M ||
                 ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                         != PackageManager.PERMISSION_GRANTED;
-    }
+    }*/
 
     // endregion
 
