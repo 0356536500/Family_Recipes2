@@ -10,24 +10,20 @@ import android.util.Log;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
-import com.ronginat.family_recipes.layout.Constants;
+import com.google.gson.Gson;
 import com.ronginat.family_recipes.layout.cognito.AppHelper;
-import com.ronginat.family_recipes.logic.storage.StorageWrapper;
 import com.ronginat.family_recipes.utils.logic.DateUtil;
 
-import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.io.File;
-import java.nio.charset.Charset;
+import java.util.Arrays;
 
 import io.reactivex.Maybe;
 import io.reactivex.disposables.CompositeDisposable;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -46,35 +42,11 @@ public class ExampleInstrumentedTest {
     }
 
     @Test
-    public void testCompression() {
-        //Uri uri = Uri.parse("/storage/emulated/0/Download/eagckh5.jpg");
-        //String realPath = "/storage/emulated/0/Download/eagckh5.jpg";//StorageWrapper.getRealPathFromURI(ApplicationProvider.getApplicationContext(), uri);
-        //String realPath = "/storage/emulated/0/Download/legion_ver5_xxlg.jpg";
-        //String realPath = "/storage/emulated/0/Download/20190520_121440.jpg"; // 10MB > 902KB > 224KB (-10 quality) | 580KB (-5 quality)
-        //String realPath = "/storage/emulated/0/Download/20190119_114310.jpg"; // 7MB > 585KB
-        //String compressPath = StorageWrapper.compressFile(ApplicationProvider.getApplicationContext(), realPath);
-
-        String path = "/storage/emulated/0/Android/data/com.myapps.family_recipes/files/Pictures/test_large.jpg"; // ~6MB
-        String compressPath = StorageWrapper.compressFile(ApplicationProvider.getApplicationContext(), path);
-
-        //assertTrue(!realPath.equals(compressPath));
-        assertThat(new File(compressPath).length(), Matchers.lessThan(new File(path).length()));
-    }
-
-    //@Test
-    public void copyFileTest() {
-        String path = "/storage/emulated/0/Android/data/com.myapps.family_recipes/files/Pictures/food--1.jpg";
-        String cloned = StorageWrapper.compressFile(ApplicationProvider.getApplicationContext(), path);
-        assertEquals(new File(path).length(), new File(cloned).length());
-    }
-
-    //@Test
-    public void rotationFromGalleryTest() {
-        String path = "/storage/emulated/0/Android/data/com.myapps.family_recipes/files/Pictures/test.jpg";
-        File pictures = ApplicationProvider.getApplicationContext().getExternalFilesDir(Constants.TEMP_IMAGES_DIR);
-        File image = new File(pictures, "test.jpg");
-        StorageWrapper.rotateImageIfRequired(ApplicationProvider.getApplicationContext(), Uri.fromFile(image));
-        assertTrue(true);
+    public void gsonParseTest() {
+        Gson gson = new Gson();
+        String string = gson.toJson(Arrays.asList("test0", "test1", "test2"));
+        Log.e(getClass().getSimpleName(), string);
+        assertTrue(string.contains("\"test1\""));
     }
 
     //@Test

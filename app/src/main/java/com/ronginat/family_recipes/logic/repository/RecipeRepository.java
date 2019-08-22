@@ -665,6 +665,20 @@ public class RecipeRepository {
         executor.execute(recipeDao::deleteAllRecipes);
     }*/
 
+    /**
+     * Check for images that aren't linked to any recipe
+     */
+    public boolean findIfImageIsDangling(String name) {
+        return recipeDao.findImageReferenceCount(name) == 0;
+    }
+
+    /**
+     * Check for thumbnails that aren't linked to any recipe
+     */
+    public boolean findIfThumbnailIsDangling(String name) {
+        return recipeDao.findThumbnailReferenceCount(name) == 0;
+    }
+
     // region Recipe Access
 
       // region Update/Insert Access

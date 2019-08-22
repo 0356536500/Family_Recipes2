@@ -187,6 +187,12 @@ public interface RecipeDao {
     /*@Query("SELECT * FROM " + AppDatabases.TABLE_RECIPES + " where " + RecipeEntity.KEY_NAME + " = :name")
     List<RecipeEntity> findRecipesByName(String name);*/
 
+    @Query("SELECT COUNT(" + RecipeEntity.KEY_ID + ") FROM " + AppDatabases.TABLE_RECIPES + " where " + RecipeEntity.KEY_IMAGES + " LIKE '%\"' || :name || '\"%'")
+    int findImageReferenceCount(String name);
+
+    @Query("SELECT COUNT(" + RecipeEntity.KEY_ID + ") FROM " + AppDatabases.TABLE_RECIPES + " where " + RecipeEntity.KEY_THUMBNAIL + " = :name")
+    int findThumbnailReferenceCount(String name);
+
     // endregion
 
     // region recipe content

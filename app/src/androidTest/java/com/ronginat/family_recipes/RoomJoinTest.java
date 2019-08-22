@@ -3,6 +3,10 @@ package com.ronginat.family_recipes;
 import android.content.Context;
 import android.util.Log;
 
+import androidx.room.Room;
+import androidx.test.core.app.ApplicationProvider;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+
 import com.ronginat.family_recipes.logic.persistence.AppDatabases;
 import com.ronginat.family_recipes.logic.persistence.PendingRecipeDao;
 import com.ronginat.family_recipes.logic.persistence.RecipeDao;
@@ -16,20 +20,18 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import androidx.room.Room;
-import androidx.test.core.app.ApplicationProvider;
-import androidx.test.ext.junit.runners.AndroidJUnit4;
-
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.isIn;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by ronginat on 05/04/2019.
@@ -52,6 +54,35 @@ public class RoomJoinTest {
     public void closeDb() {
         recipeDao.deleteAllRecipes();
         db.close();
+    }
+
+    @Test
+    public void findRecipeByImageNameTest() {
+        List<RecipeEntity> list = AppDatabases.generateData("test", 3);
+        list.forEach(entity -> entity.setImages(Collections.singletonList(entity.getId())));
+        list.get(0).setImages(Arrays.asList("test0", "test1", "test2"));
+        list.get(1).setImages(Arrays.asList("test1", "test2"));
+        list.get(2).setImages(Collections.singletonList("test2"));
+        recipeDao.insertAll(list);
+
+        assertEquals(list.get(1).getImages().size(), 2);
+        assertEquals(recipeDao.findImageReferenceCount("test0"),1);
+        assertEquals(recipeDao.findImageReferenceCount("test1"),2);
+        assertEquals(recipeDao.findImageReferenceCount("test2"),3);
+        assertEquals(recipeDao.findImageReferenceCount("test3"),0);
+    }
+
+    @Test
+    public void findIfThumbIsNotDanglingTest() {
+        List<RecipeEntity> list = AppDatabases.generateData("test", 2);
+        list.forEach(entity -> entity.setThumbnail(entity.getId()));
+        /*list.get(0).setThumbnail("test0");
+        list.get(1).setThumbnail("test1");*/
+        recipeDao.insertAll(list);
+
+        assertTrue(recipeDao.findThumbnailReferenceCount("test0") > 0);
+        assertTrue(recipeDao.findThumbnailReferenceCount("test1") > 0);
+        assertEquals(recipeDao.findThumbnailReferenceCount("test2"),0);
     }
 
     @Test
