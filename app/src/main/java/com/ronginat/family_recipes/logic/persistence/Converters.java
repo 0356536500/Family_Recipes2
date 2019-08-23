@@ -1,12 +1,17 @@
 package com.ronginat.family_recipes.logic.persistence;
 
+import android.graphics.Color;
+
 import com.google.gson.Gson;
+import com.google.gson.JsonParseException;
 import com.google.gson.reflect.TypeToken;
 import com.ronginat.family_recipes.model.CategoryEntity;
 import com.ronginat.family_recipes.layout.modelTO.CategoryTO;
+import com.ronginat.family_recipes.utils.logic.CrashLogger;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import androidx.room.TypeConverter;
@@ -25,7 +30,12 @@ public class Converters {
     public static List<String> fromString(String value) {
         Type type = new TypeToken<List<String>>() { }
                 .getType();
-        return gson.fromJson(value, type);
+        try {
+            return gson.fromJson(value, type);
+        } catch (JsonParseException ex) {
+            CrashLogger.logException(ex);
+            return Collections.singletonList("error");
+        }
     }
 
     /*@TypeConverter
@@ -52,9 +62,16 @@ public class Converters {
 
     @TypeConverter
     public static List<CategoryEntity> fromStringToCategories(String categories) {
-        //Log.e(getClass().getSimpleName(), "set string categories, " + categories);
+        //CrashLogger.e(getClass().getSimpleName(), "set string categories, " + categories);
         Type type = new TypeToken<List<CategoryEntity>>() {}.getType();
-        return gson.fromJson(categories, type);
+        try {
+            return gson.fromJson(categories, type);
+        } catch (JsonParseException ex) {
+            CrashLogger.logException(ex);
+            List<CategoryEntity> errorList = new ArrayList<>();
+            errorList.add(new CategoryEntity.Builder().name("error").color(Color.RED).build());
+            return errorList;
+        }
     }
 
     @TypeConverter

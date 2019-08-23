@@ -82,6 +82,7 @@ public class MainActivity extends MyBaseActivity implements BackStack.BackStackH
     //public MenuItem sortMenuItem;
 
     //private List<MyFragment> myFragments;
+    private Bundle savedInstanceState;
     private BackStack backStack;
     private MyFragment currentFragment;//, allRecipesFragment, favoritesRecipesFragment;
 
@@ -117,6 +118,7 @@ public class MainActivity extends MyBaseActivity implements BackStack.BackStackH
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        this.savedInstanceState = savedInstanceState;
 
         bindUI();
         loadColorsFromTheme();
@@ -134,17 +136,14 @@ public class MainActivity extends MyBaseActivity implements BackStack.BackStackH
         //whiteNotificationBar(recyclerView);
     }
 
-    //@RequiresApi(api = Build.VERSION_CODES.N)
     @Override
-    protected void onPostCreate(@Nullable Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-        // create fragments only when first created, not after change language
-        if (savedInstanceState == null) {
-            // first creation
-            initFragments();
-            handleDataFromIntentAndStart();
-            checkIfUpdateAvailable();
-        } else {
+    protected void onPostResume() {
+        super.onPostResume();
+        // re-create fragments only after configuration had changed (language, theme)
+        // do it in onPostResume to fix the bug that occurs in onPostCreate:
+        // java.lang.IllegalStateException: Can not perform this action after onSaveInstanceState
+        // androidx.fragment.app.FragmentManagerImpl.checkStateLoss + 1536 (FragmentManagerImpl.java:1536)
+        if (savedInstanceState != null){
             CrashLogger.e(TAG, "restore fragments!!!");
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && BuildConfig.DEBUG) {
                 getSupportFragmentManager().getFragments()
@@ -160,7 +159,35 @@ public class MainActivity extends MyBaseActivity implements BackStack.BackStackH
             currentFragment = backStack.peekTopFragment();
             /*currentFragment = (MyFragment) getSupportFragmentManager()
                     .findFragmentById(R.id.main_frame);*/
+            savedInstanceState = null;
         }
+    }
+
+    @Override
+    protected void onPostCreate(@Nullable Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        // create fragments only when first created, not after change language
+        if (savedInstanceState == null) {
+            // first creation
+            initFragments();
+            handleDataFromIntentAndStart();
+            checkIfUpdateAvailable();
+        } /*else {
+            CrashLogger.e(TAG, "restore fragments!!!");
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && BuildConfig.DEBUG) {
+                getSupportFragmentManager().getFragments()
+                        .stream()
+                        .filter(fragment -> fragment instanceof MyFragment)
+                        .map(fragment -> (MyFragment) fragment)
+                        .collect(Collectors.toList())
+                        .forEach(myFragment -> CrashLogger.e(TAG, getString(myFragment.getMyTag())));
+            }
+            // restore after shutdown
+            if (backStack == null)
+                backStack = BackStack.restoreBackStackFromList(savedInstanceState, this, getSupportFragmentManager().getFragments()); // FragmentManager contains the last fragment
+            currentFragment = backStack.peekTopFragment();
+            //currentFragment = (MyFragment) getSupportFragmentManager().findFragmentById(R.id.main_frame);
+        }*/
     }
 
     // region BackStack

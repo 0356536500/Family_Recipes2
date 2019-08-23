@@ -157,36 +157,36 @@ public class CategoryEntity implements FilterModel {
     }
 
 
-    public static class CategoryBuilder {
+    public static class Builder {
         private String builderName;
         private String builderColor;
         private String builderStringCategories = null;
         private List<CategoryEntity> builderCategories = null;
 
 
-        public CategoryBuilder() {}
+        public Builder() {}
 
-        public CategoryBuilder name (@NonNull String name) {
+        public Builder name (@NonNull String name) {
             this.builderName = name;
             return this;
         }
 
-        public CategoryBuilder color (String color) {
+        public Builder color (String color) {
             this.builderColor = color;
             return this;
         }
 
-        public CategoryBuilder color (int color) {
+        public Builder color (int color) {
             this.builderColor = "#" + Integer.toHexString(color & 0x00ffffff);
             return this;
         }
 
-        public CategoryBuilder categories (List<CategoryEntity> categories) {
+        public Builder categories (List<CategoryEntity> categories) {
             this.builderCategories = categories;
             return this;
         }
 
-        public CategoryBuilder categories (String categories) {
+        public Builder categories (String categories) {
             this.builderStringCategories = categories;
             return this;
         }

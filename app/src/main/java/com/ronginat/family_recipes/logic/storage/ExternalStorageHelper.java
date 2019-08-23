@@ -7,7 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.FileProvider;
 
-import com.ronginat.family_recipes.R;
+import com.ronginat.family_recipes.BuildConfig;
 
 import java.io.File;
 import java.io.IOException;
@@ -42,7 +42,7 @@ public class ExternalStorageHelper {
     static Uri getFileUri(Context context, String dir, String fileName){
         File filesDir = context.getExternalFilesDir(dir);
         File file = new File(filesDir, fileName);
-        Uri uri = FileProvider.getUriForFile(context, context.getString(R.string.appPackage), file);
+        Uri uri = FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID, file);
         if (file.exists()) {
             //Log.e("ExternalStorageHelper", uri.getPath() + " exists");
             return uri;
@@ -55,7 +55,7 @@ public class ExternalStorageHelper {
      */
     @Nullable
     public static Uri getFileUri(Context context, File file) {
-        Uri uri = FileProvider.getUriForFile(context, context.getString(R.string.appPackage), file);
+        Uri uri = FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID, file);
         if (file.exists()) {
             //Log.e("ExternalStorageHelper", uri.getPath() + " exists");
             return uri;

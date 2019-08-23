@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 
 import static com.ronginat.family_recipes.logic.Constants.MIN_APK_FOLDER_SIZE_TO_START_DELETING_CONTENT;
 import static com.ronginat.family_recipes.logic.Constants.MIN_FOOD_FOLDER_SIZE_TO_START_DELETING_CONTENT;
@@ -92,13 +93,28 @@ public class DeleteOldFilesWorker extends Worker {
     private long deleteDanglingImages(@NonNull File dir, long originalSize, Dangling dangling) {
         File[] files = dir.listFiles();
         long modifiedSize = originalSize, deleteCount = 0L;
+
         if (files != null) {
-            for (File file: files) {
-                if (dangling.isDangling(file.getName())) {
-                    long currentFileSize = file.length();
-                    if (file.delete()) {
-                        deleteCount++;
-                        modifiedSize -= currentFileSize;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                Counter counter = new Counter(originalSize);
+                Stream.of(files)
+                        .filter(file -> dangling.isDangling(file.getName()))
+                        .forEach(file -> {
+                            long currentFileSize = file.length();
+                            if (file.delete()) {
+                                counter.deleteOne();
+                                counter.deleteFile(currentFileSize);
+                            }
+                        });
+                return counter.getFolderSize();
+            } else {
+                for (File file : files) {
+                    if (dangling.isDangling(file.getName())) {
+                        long currentFileSize = file.length();
+                        if (file.delete()) {
+                            deleteCount++;
+                            modifiedSize -= currentFileSize;
+                        }
                     }
                 }
             }
@@ -240,5 +256,27 @@ public class DeleteOldFilesWorker extends Worker {
 
     private interface Dangling {
         boolean isDangling(String name);
+    }
+
+    class Counter {
+        int deleteCount;
+        long folderSize;
+
+        Counter(long folderSize) {
+            this.deleteCount = 0;
+            this.folderSize = folderSize;
+        }
+
+        synchronized void deleteOne() {
+            deleteCount++;
+        }
+
+        synchronized void deleteFile(long deletedSize) {
+            folderSize -= deletedSize;
+        }
+
+        long getFolderSize() {
+            return folderSize;
+        }
     }
 }

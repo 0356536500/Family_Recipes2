@@ -55,7 +55,7 @@ public abstract class AppDatabases extends RoomDatabase {
                                             getInstance(context)
                                                     .categoriesDao()
                                                     .insertCategory(
-                                                            new CategoryEntity.CategoryBuilder()
+                                                            new CategoryEntity.Builder()
                                                                     .name(context.getString(R.string.str_all_selected))
                                                                     .color(ContextCompat.getColor(context, R.color.search_filter_text_light))
                                                                     .build()
@@ -84,27 +84,27 @@ public abstract class AppDatabases extends RoomDatabase {
 
     /*private static List<RecipeEntity> generate5Recipes() {
         List<RecipeEntity> recipeEntities = new ArrayList<>();
-        recipeEntities.add(new RecipeEntity.RecipeBuilder()
+        recipeEntities.add(new RecipeEntity.Builder()
                 .id("1")
                 .name("מרק עוף")
                 .meLike(false)
                 .build());
-        recipeEntities.add(new RecipeEntity.RecipeBuilder()
+        recipeEntities.add(new RecipeEntity.Builder()
                 .id("2")
                 .name("alef")
                 .meLike(false)
                 .build());
-        recipeEntities.add(new RecipeEntity.RecipeBuilder()
+        recipeEntities.add(new RecipeEntity.Builder()
                 .id("3")
                 .name("bet")
                 .meLike(false)
                 .build());
-        recipeEntities.add(new RecipeEntity.RecipeBuilder()
+        recipeEntities.add(new RecipeEntity.Builder()
                 .id("4")
                 .name("פסטה פרמזן")
                 .meLike(true)
                 .build());
-        recipeEntities.add(new RecipeEntity.RecipeBuilder()
+        recipeEntities.add(new RecipeEntity.Builder()
                 .id("5")
                 .name("עוף בגריל")
                 .meLike(true)
@@ -122,7 +122,7 @@ public abstract class AppDatabases extends RoomDatabase {
                 categories.add(cats[pos]);
                 categories.add(cats[pos - 1]);
 
-                data.add(new RecipeEntity.RecipeBuilder()
+                data.add(new RecipeEntity.Builder()
                         .id(name + i)
                         .name(name + i)
                         .description("desc " + name + i)

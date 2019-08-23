@@ -69,7 +69,7 @@ public class AllRecipesFragment extends RecyclerWithFiltersAbstractFragment impl
         viewModel.getCategories().observe(this, categories -> {
             if (categories != null && !categories.isEmpty()) {
                 tags = new ArrayList<>(categories);
-                tags.add(0, new CategoryEntity.CategoryBuilder()
+                tags.add(0, new CategoryEntity.Builder()
                         .name(getString(R.string.str_all_selected))
                         .color(ContextCompat.getColor(activity, R.color.search_filter_text_dark))
                         .build());

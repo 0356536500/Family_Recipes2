@@ -5,9 +5,8 @@
     <external-path name="thumbnails" path="Android/data/com.ronginat.family_recipes/files/thumbnails" />
     <external-path name="apk" path="Android/data/com.ronginat.family_recipes/files/apk" />
     <external-path name="my_food_images" path="Android/data/com.ronginat.family_recipes/files/food-pictures" />-->
-    <external-path name="my_images" path="Android/data/com.ronginat.family_recipes.debug/files/Pictures" />
-    <external-path name="recipes" path="Android/data/com.ronginat.family_recipes.debug/files/recipes" />
-    <external-path name="thumbnails" path="Android/data/com.ronginat.family_recipes.debug/files/thumbnails" />
-    <external-path name="apk" path="Android/data/com.ronginat.family_recipes.debug/files/apk" />
-    <external-path name="my_food_images" path="Android/data/com.ronginat.family_recipes.debug/files/food-pictures" />
+    <external-files-path name="my_images" path="Pictures" />
+    <external-files-path name="thumbnails" path="thumbnails" />
+    <external-files-path name="apk" path="apk" />
+    <external-files-path name="my_food_images" path="food-pictures" />
 </paths>

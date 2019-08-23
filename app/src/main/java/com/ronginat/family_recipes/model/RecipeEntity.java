@@ -270,7 +270,7 @@ public class RecipeEntity implements Serializable {
                 '}';
     }
 
-    public static class RecipeBuilder {
+    public static class Builder {
         private String builderId;
         private String builderName;
         private String builderDescription;
@@ -286,64 +286,64 @@ public class RecipeEntity implements Serializable {
 
         private boolean builderMeLike;
 
-        public RecipeBuilder() {}
+        public Builder() {}
 
-        public RecipeEntity.RecipeBuilder id (String id) {
+        public Builder id (String id) {
             this.builderId = id;
             return this;
         }
 
-        public RecipeEntity.RecipeBuilder name (String name) {
+        public Builder name (String name) {
             this.builderName = name;
             return this;
         }
 
-        public RecipeEntity.RecipeBuilder description (String description) {
+        public Builder description (String description) {
             this.builderDescription = description;
             return this;
         }
 
-        public RecipeEntity.RecipeBuilder creationDate(String createdAt) {
+        public Builder creationDate(String createdAt) {
             this.builderCreatedAt = createdAt;
             return this;
         }
 
-        public RecipeEntity.RecipeBuilder lastModifiedAt (String lastModifiedAt) {
+        public Builder lastModifiedAt (String lastModifiedAt) {
             this.builderLastModifiedAt = lastModifiedAt;
             return this;
         }
 
-        public RecipeEntity.RecipeBuilder author (String author) {
+        public Builder author (String author) {
             this.builderAuthor = author;
             return this;
         }
 
-        public RecipeEntity.RecipeBuilder thumbnail (String thumbnail) {
+        public Builder thumbnail (String thumbnail) {
             this.builderThumbnail = thumbnail;
             return this;
         }
 
-        public RecipeEntity.RecipeBuilder categoriesJson (String categoriesJson) {
+        public Builder categoriesJson (String categoriesJson) {
             this.builderCategories = categoriesJson;
             return this;
         }
 
-        public RecipeEntity.RecipeBuilder categories (List<String> categories) {
+        public Builder categories (List<String> categories) {
             this.builderListCategories = categories;
             return this;
         }
 
-        public RecipeEntity.RecipeBuilder imagesJson (String foodFilesJson) {
+        public Builder imagesJson (String foodFilesJson) {
             this.builderImages = foodFilesJson;
             return this;
         }
 
-        public RecipeEntity.RecipeBuilder likes (int likes) {
+        public Builder likes (int likes) {
             this.builderLikes = likes;
             return this;
         }
 
-        public RecipeEntity.RecipeBuilder meLike (boolean meLike) {
+        public Builder meLike (boolean meLike) {
             this.builderMeLike = meLike;
             return this;
         }

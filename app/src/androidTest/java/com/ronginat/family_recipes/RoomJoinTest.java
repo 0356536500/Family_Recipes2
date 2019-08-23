@@ -87,7 +87,7 @@ public class RoomJoinTest {
 
     @Test
     public void writeRecipesWithAccessAndGetFirstAccess() {
-        /*RecipeEntity recipe = new RecipeEntity.RecipeBuilder()
+        /*RecipeEntity recipe = new RecipeEntity.Builder()
                 .id("1")
                 .name("test name")
                 .description("test description")
