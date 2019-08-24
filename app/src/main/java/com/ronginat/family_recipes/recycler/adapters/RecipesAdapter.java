@@ -55,6 +55,7 @@ import io.reactivex.schedulers.Schedulers;
 public class RecipesAdapter extends PagedListAdapter<RecipeMinimal, RecipesAdapter.MyViewHolder> {
     private Context context;
     private int thumbnailSize, thumbnailDefaultSize;
+    private final int thumbCorners;
 
     private List<CategoryEntity> categoryList;
 
@@ -185,6 +186,8 @@ public class RecipesAdapter extends PagedListAdapter<RecipeMinimal, RecipesAdapt
         circularColor = typedValue.data;
         this.thumbnailSize = (int) this.context.getResources().getDimension(R.dimen.thumbnail);
         this.thumbnailDefaultSize = (int) this.context.getResources().getDimension(R.dimen.thumbnail_default);
+        this.thumbCorners = (int) (this.context.getResources().getDimension(R.dimen.thumbnail_corner_radius) /
+                this.context.getResources().getDisplayMetrics().density);
     }
 
     public void setCategoryList(List<CategoryEntity> categoryList) {
@@ -284,8 +287,9 @@ public class RecipesAdapter extends PagedListAdapter<RecipeMinimal, RecipesAdapt
                                         .load(path)
                                         .placeholder(circularProgressDrawable)
                                         //.apply(new RequestOptions().override((int) context.getResources().getDimension(R.dimen.thumbnail)))
-                                        .transform(new RoundedCorners(40))// TODO: change to constant
+                                        .transform(new RoundedCorners(thumbCorners))
                                         //.optionalCircleCrop()
+                                        .error(R.drawable.food_default_small)
                                         .into(holder.thumbnail);
                             }
                             dispose();
