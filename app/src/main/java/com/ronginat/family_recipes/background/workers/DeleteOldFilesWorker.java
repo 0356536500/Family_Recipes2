@@ -92,7 +92,8 @@ public class DeleteOldFilesWorker extends Worker {
 
     private long deleteDanglingImages(@NonNull File dir, long originalSize, Dangling dangling) {
         File[] files = dir.listFiles();
-        long modifiedSize = originalSize, deleteCount = 0L;
+        long modifiedSize = originalSize;
+        int deleteCount = 0;
 
         if (files != null) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {

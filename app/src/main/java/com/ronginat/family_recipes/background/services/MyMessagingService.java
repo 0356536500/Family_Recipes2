@@ -38,7 +38,7 @@ public class MyMessagingService extends FirebaseMessagingService {
     private static final String TAG = MyMessagingService.class.getSimpleName();
 
     @SuppressWarnings("FieldCanBeLocal")
-    private final String DEFAULT_GROUP = "com.myapps.family_recipes.DEFAULT";
+    private final String DEFAULT_GROUP = "com.ronginat.family_recipes.DEFAULT";
 
     @SuppressWarnings("FieldCanBeLocal")
     private final int SUMMARY_ID = 0;
@@ -158,6 +158,8 @@ public class MyMessagingService extends FirebaseMessagingService {
                         .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_logo_foreground))
                         .setContentTitle(buildNotificationTitle(channelId, data))
                         .setContentText(buildNotificationMessage(channelId, data.get(Constants.BODY)))
+                        .setStyle(new NotificationCompat.BigTextStyle()
+                                .bigText(buildNotificationMessage(channelId, data.get(Constants.BODY))))
                         .setAutoCancel(true)
                         .setSound(defaultSoundUri)
                         .setColorized(true)
