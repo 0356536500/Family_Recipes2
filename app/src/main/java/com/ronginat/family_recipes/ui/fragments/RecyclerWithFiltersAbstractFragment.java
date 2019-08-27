@@ -1,6 +1,5 @@
 package com.ronginat.family_recipes.ui.fragments;
 
-import android.animation.ValueAnimator;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
@@ -193,16 +192,6 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
         mFilter.build();
     }
 
-    /**
-     * Change {@link #recyclerView} padding according to
-     */
-    private void changeRecyclerPadding(int from, int to) {
-        ValueAnimator animator = ValueAnimator.ofInt(from, to);
-        animator.setDuration(Constants.RECYCLER_TRANSLATE_ANIMATION_DURATION);
-        animator.addUpdateListener(valueAnimator -> recyclerView.post(() -> recyclerView.setPadding(0, (int) valueAnimator.getAnimatedValue() , 0, 0)));
-        animator.start();
-    }
-
     // region setName Views
     private void initRecycler() {
         recyclerView.setItemAnimator(new FiltersListItemAnimator());
@@ -211,8 +200,6 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
             public void show() {
                 if (mFilter != null && mFilter.isCollapsed()) {
                     filtersViewHider.show();
-                    changeRecyclerPadding(0, getResources().getDimensionPixelSize(R.dimen.container_height));
-                    //recyclerView.post(() -> recyclerView.setPadding(0, getResources().getDimensionPixelSize(R.dimen.container_height) , 0, 0));
                     //mFilter.animate().translationY(0).setInterpolator(new DecelerateInterpolator(1.5f)).start();
                 }
             }
@@ -221,8 +208,6 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
             public void hide() {
                 if (mFilter != null && mFilter.isCollapsed()) {
                     filtersViewHider.hide();
-                    changeRecyclerPadding(getResources().getDimensionPixelSize(R.dimen.container_height), 0);
-                    //recyclerView.post(() -> recyclerView.setPadding(0, 0, 0, 0));
                     //mFilter.animate().translationY(-mFilter.getHeight()).setInterpolator(new AccelerateInterpolator(2)).start();
                 }
             }

@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import com.ronginat.family_recipes.model.CategoryEntity;
 import com.ronginat.family_recipes.utils.Constants;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -71,5 +72,19 @@ public class RecipesAdapterHelper {
             }
         }
         return color;
+    }
+
+
+    /**
+     * Remove from UI redundant categories that are very similar to each other
+     */
+    public List<String> trimCategories(@NonNull List<String> categoryList) {
+        List<String> result = new ArrayList<>(categoryList);
+
+        if (result.contains("בשר") || result.contains("עוף")) {
+            result.remove("בשרי");
+        }
+
+        return result;
     }
 }

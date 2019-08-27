@@ -23,7 +23,7 @@ public class HtmlHelper {
     //private static final String BODY_TEXT_STYLE = "style=font-family:sans-serif";
     private static final String DIV_META_STYLE_HEB = "dir=rtl lang=he class=recipe";
     private static final String LINE_BREAK = "br";
-    public static final String HORIZONTAL_RULE = "hr";
+    public static final String HORIZONTAL_RULE = "hr width=90%";
     public static final String LIST_ROW = "li";
     public static final String PARAGRAPH = "p";
 

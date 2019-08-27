@@ -24,6 +24,7 @@ import android.widget.ToggleButton;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.paging.PagedListAdapter;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
@@ -159,7 +160,7 @@ public class RecipesAdapter extends PagedListAdapter<RecipeMinimal, RecipesAdapt
                 inflateCategories(this, recipe);
             // hide previous categories
             else
-                prepareCategoriesLayout(this, recipe);
+                prepareCategoriesLayout(this, recipe.getCategories());
 
             //load image of the food or default if not exists
             loadImage(this, recipe);
@@ -223,10 +224,11 @@ public class RecipesAdapter extends PagedListAdapter<RecipeMinimal, RecipesAdapt
 
     private void inflateCategories(MyViewHolder holder, RecipeMinimal recipe) {
         if (recipe.getCategories() != null && !recipe.getCategories().isEmpty()) {
-            prepareCategoriesLayout(holder, recipe);
+            List<String> trimmedCategories = categoriesHelper.trimCategories(recipe.getCategories());
+            prepareCategoriesLayout(holder, trimmedCategories);
 
             int i = 0;
-            for (String category: recipe.getCategories()) {
+            for (String category: trimmedCategories) {
                 View view = holder.categoriesLayout.getChildAt(i++);
                 // show view
                 view.setVisibility(View.VISIBLE);
@@ -240,8 +242,8 @@ public class RecipesAdapter extends PagedListAdapter<RecipeMinimal, RecipesAdapt
     /**
      * Do as little changes as possible to the categories layout, to avoid redundant inflation
      */
-    private void prepareCategoriesLayout(MyViewHolder holder, RecipeMinimal recipe) {
-        int numberOfCategories = recipe.getCategories() != null ? recipe.getCategories().size() : 0;
+    private void prepareCategoriesLayout(MyViewHolder holder, @Nullable List<String> categories) {
+        int numberOfCategories = categories != null ? categories.size() : 0;
         int currentNumOfViews = holder.categoriesLayout.getChildCount();
         // hide redundant views
         if (currentNumOfViews > numberOfCategories) {

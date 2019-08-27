@@ -241,7 +241,7 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
 
         // progressBar in expanded toolbar background, till image is loaded
         CircularProgressDrawable circularProgressDrawable = new CircularProgressDrawable(getBaseContext());
-        circularProgressDrawable.setStrokeWidth(10f);
+        circularProgressDrawable.setStrokeWidth(15f);
         circularProgressDrawable.setCenterRadius(80f);
         circularProgressDrawable.start();
         imageViewCollapsingImage.setImageDrawable(circularProgressDrawable);
