@@ -17,7 +17,6 @@ import androidx.viewpager.widget.PagerAdapter;
 import com.bumptech.glide.Glide;
 import com.ronginat.family_recipes.R;
 import com.ronginat.family_recipes.logic.storage.StorageWrapper;
-import com.ronginat.family_recipes.model.RecipeEntity;
 
 import java.util.List;
 

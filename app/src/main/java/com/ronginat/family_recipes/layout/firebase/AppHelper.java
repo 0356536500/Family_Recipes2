@@ -95,7 +95,7 @@ public class AppHelper {
         FirebaseAuth.getInstance()
                 .signInWithCustomToken(token)
                 .addOnCompleteListener(task -> {
-                    if (task.isSuccessful() && task.getResult() != null) {
+                    if (task.isSuccessful() && task.getResult() != null && task.getResult().getUser() != null) {
                         updateAuthSession(context, task.getResult().getUser());
                         //Log.e(TAG, "signInWithCustomToken:success");
                     } else {

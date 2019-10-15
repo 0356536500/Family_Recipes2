@@ -55,8 +55,11 @@ public class FirestoreHelper {
      * if no internet connection, return the {@param username} as Displayed name
      */
     public Single<String> getUserDisplayedName(Context context, String username) {
-        if (users.containsKey(username))
-            return Single.just(users.get(username));
+        if (users.containsKey(username)) {
+            String name = users.get(username);
+            if (name != null)
+                return Single.just(name);
+        }
 
         // when no network, return the username as displayed name
         if (!MiddleWareForNetwork.checkInternetConnection(context))

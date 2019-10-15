@@ -12,6 +12,7 @@
     app:cardBackgroundColor="?attr/tileBackgroundColor"
     app:cardCornerRadius="@dimen/item_corner_radius"
     android:clipToPadding="true"
+    android:clipChildren="true"
     android:layout_marginTop="5dp"
     android:layout_marginBottom="5dp"
     android:layout_marginStart="@dimen/recipe_content_margin_small"
