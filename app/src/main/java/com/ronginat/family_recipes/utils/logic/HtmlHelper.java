@@ -179,4 +179,11 @@ public class HtmlHelper {
             return "<h3>Failed to load about page</h3>";
         }
     }
+
+    public static String INSERT_TITLE(String content, String name) {
+        String title = String.format("<h2>%s</h2>", name);
+        StringBuilder buffer = new StringBuilder(content);
+        buffer.insert(content.indexOf(">") + 1, title);
+        return buffer.toString();
+    }
 }

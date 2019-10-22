@@ -7,6 +7,7 @@
     <string name="action_filter">סינון</string>
     <string name="action_sort_toggle">מיון לפי</string>
     <string name="action_share">שיתוף</string>
+    <string name="action_share_as_image">שיתוף כתמונה</string>
     <string name="action_keep_screen_on">השאר מסך דולק</string>
     <string name="action_add_photo">הוספת תמונה</string>
     <string name="action_refresh">רענן</string>
@@ -47,7 +48,7 @@
     <string name="sort_toggle_text_on">חדשים</string>
     <string name="sort_toggle_text_off">פופלריים</string>
 
-    <string name="title_activity_recipe">מתכון</string>
+    <string name="title_activity_recipe">טוען…</string>
     <string name="title_activity_create_recipe">מתכון חדש</string>
     <string name="title_activity_new_password">סיסמא חדשה</string>
     <string name="title_activity_forgot_password">שכחתי סיסמא</string>

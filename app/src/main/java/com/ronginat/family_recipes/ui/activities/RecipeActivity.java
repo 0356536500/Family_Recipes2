@@ -7,6 +7,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.net.Uri;
@@ -19,6 +22,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -67,6 +71,7 @@ import com.ronginat.family_recipes.viewmodels.RecipeViewModel;
 import com.ronginat.searchfilter.animator.FiltersListItemAnimator;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -479,6 +484,9 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
                 handleShareRecipe();
                 // https://developer.android.com/training/sharing/send
                 return true;
+            case R.id.action_share_as_image:
+                handleShareRecipeAsImage();
+                return true;
             case R.id.action_keep_screen_on:
                 updateKeepScreenOn(item, !item.isChecked());
         }
@@ -803,8 +811,7 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
         StrictMode.setVmPolicy(builder.build());*/
         RecipeEntity entity = viewModel.getRecipe().getValue();
         String lastModifiedDate = entity != null && entity.getLastModifiedDate() != null ? entity.getLastModifiedDate() : "";
-        Intent sendIntent = new Intent();
-        sendIntent.setAction(Intent.ACTION_SEND);
+        Intent sendIntent = new Intent(Intent.ACTION_SEND);
         sendIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.app_name));
         sendIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.recipe_share_pre_url) + "\n\n" +
                 getString(R.string.share_url,
@@ -817,6 +824,77 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
                 Intent.FLAG_GRANT_READ_URI_PERMISSION);*/
         setShareIntent(sendIntent);
         //startActivity(Intent.createChooser(sendIntent, "Share"));
+    }
+
+    /**
+     * Reload the WebView with title (the recipe's name) and save it to an image file to be shared.
+     * After creating an image file, reload the original content again.
+     */
+    private void handleShareRecipeAsImage() {
+        String content = viewModel.getRecipeContent().getValue();
+        RecipeEntity entity = viewModel.getRecipe().getValue();
+        if (content != null && entity != null) {
+            String contentWithTitle = HtmlHelper.INSERT_TITLE(content, entity.getName());
+            myWebView.loadDataWithBaseURL(Constants.ASSET_FILE_BASE_URL,
+                    HtmlHelper.GET_CSS_LINK() + contentWithTitle, "text/html", "UTF-8", null);
+            myWebView.setWebViewClient(new WebViewClient() {
+                @Override
+                public void onPageFinished(WebView view, String url) {
+                    super.onPageFinished(view, url);
+                    new Handler().postDelayed(() -> {
+                        Bitmap bitmap = createBitmapFromWebView();
+                        try {
+                            File screenshot = StorageWrapper.createImageFile(getApplicationContext(), entity.getName());
+                            FileOutputStream out = new FileOutputStream(screenshot);
+                            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+                            out.close();
+                            // reload the webView with the original content
+                            myWebView.setWebViewClient(null);
+                            loadRecipeHtml(content);
+                            shareRecipeAsImage(screenshot);
+                        } catch (IOException e) {
+                            CrashLogger.logException(e);
+                        }
+                        /*ImageView imageView = new ImageView(getApplicationContext());
+                        CoordinatorLayout.LayoutParams lp = new CoordinatorLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                        lp.gravity = Gravity.CENTER;
+                        imageView.setLayoutParams(lp);
+                        imageView.setImageBitmap(bitmap);
+                        ViewGroup root = findViewById(R.id.recipe_root);
+                        root.addView(imageView);*/
+                    }, 100);
+                }
+            });
+        }
+    }
+
+    /**
+     * Share image with ACTION_SEND.
+     * @param image file representing the image to be shared
+     */
+    private void shareRecipeAsImage(File image) {
+        Uri uri = ExternalStorageHelper.getFileUri(this, image);
+        if (uri != null) {
+            Intent sendIntent = new Intent(Intent.ACTION_SEND);
+            sendIntent.addFlags(
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            sendIntent.setDataAndType(uri, getContentResolver().getType(uri));
+            sendIntent.putExtra(Intent.EXTRA_STREAM, uri);
+            startActivity(Intent.createChooser(sendIntent, getString(R.string.action_share)));
+        }
+    }
+
+    private Bitmap createBitmapFromWebView() {
+        //myWebView.measure(0, 0);
+        myWebView.measure(View.MeasureSpec.makeMeasureSpec(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED),
+                View.MeasureSpec.makeMeasureSpec(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED));
+        Bitmap bitmap = Bitmap.createBitmap(myWebView.getMeasuredWidth(), myWebView.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        Paint paint = new Paint();
+        int height = bitmap.getHeight();
+        canvas.drawBitmap(bitmap, 0, height, paint);
+        myWebView.draw(canvas);
+        return bitmap;
     }
 
     private void setShareIntent(Intent shareIntent) {
