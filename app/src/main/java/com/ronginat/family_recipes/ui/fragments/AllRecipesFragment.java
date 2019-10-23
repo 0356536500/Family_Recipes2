@@ -28,6 +28,7 @@ public class AllRecipesFragment extends RecyclerWithFiltersAbstractFragment impl
 
         setRefreshLayout();
 
+        new Handler().postDelayed(() -> viewModel.applyQuery(queryModel), 500);
         Bundle arguments = getArguments();
         if (arguments != null && arguments.getBoolean(Constants.FIRST_LOAD_FRAGMENT, false)) {
             new Handler().postDelayed(() -> {
@@ -35,7 +36,7 @@ public class AllRecipesFragment extends RecyclerWithFiltersAbstractFragment impl
                     firstLoadingProgressBar.setVisibility(View.VISIBLE);
                     viewModel.fetchFromServer(activity, false);
                 }
-                viewModel.applyQuery(queryModel);
+                //viewModel.applyQuery(queryModel);
             }, 500);
 
             if (activity.getIntent().getBooleanExtra("login", false)) {

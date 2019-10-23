@@ -3,10 +3,20 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    >
+    android:layout_height="match_parent">
 
-    <androidx.appcompat.widget.AppCompatImageView
+    <com.ortiz.touchview.TouchImageView
+        android:id="@+id/item_image"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:src="@drawable/mountains"
+
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <!--<androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/item_image"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -17,6 +27,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        />
+        />-->
 
 </androidx.constraintlayout.widget.ConstraintLayout>

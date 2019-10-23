@@ -40,8 +40,10 @@ public class PagerDialogFragment extends DialogFragment {
 
         if (getArguments() != null) {
             pagerType = (PAGER_TYPE) getArguments().getSerializable(PAGER_TYPE_KEY);
-            if (PAGER_TYPE.IMAGES.equals(pagerType))
+            if (PAGER_TYPE.IMAGES.equals(pagerType)) {
+                //setStyle(DialogFragment.STYLE_NORMAL, android.R.style.Theme_Material_Dialog);
                 foodFiles = getArguments().getStringArrayList(Constants.PAGER_FOOD_IMAGES);
+            }
         }
     }
 

@@ -165,13 +165,22 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
 
             orderBy = com.ronginat.family_recipes.logic.Constants.SORT_RECENT;
 
-            initViewModel();
-            //initCategories();
-            initRecycler();
-
-            // Associate searchable configuration with the SearchView
-            setSearchView(activity.getMenu());
         }
+        initViewModel();
+        //initCategories();
+        initRecycler();
+
+        // Associate searchable configuration with the SearchView
+        setSearchView(activity.getMenu());
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        recyclerView.clearOnScrollListeners();
+        viewModel.getPagedRecipes().removeObservers(activity);
+        viewModel.getCategories().removeObservers(activity);
+        viewModel.getInfo().removeObservers(activity);
     }
 
     protected abstract void initViewModel();
@@ -258,25 +267,28 @@ public abstract class RecyclerWithFiltersAbstractFragment extends MyFragment imp
             searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                 @Override
                 public boolean onQueryTextSubmit(String query) {
-                    // filter recycler view when search submitted
-                    MenuItem searchMenuItem = activity.getSearchMenuItem();
-                    if (searchMenuItem != null) {
-                        searchMenuItem.collapseActionView();
+                    if (isVisible()) {
+                        // filter recycler view when search submitted
+                        MenuItem searchMenuItem = activity.getSearchMenuItem();
+                        if (searchMenuItem != null) {
+                            searchMenuItem.collapseActionView();
+                        }
+                        Toast.makeText(activity, getString(R.string.search_submit_message, query), Toast.LENGTH_SHORT).show();
+                        lastQuery = query;
+                        queryModel.setSearch(lastQuery);
+                        viewModel.applyQuery(queryModel);
                     }
-                    Toast.makeText(activity, getString(R.string.search_submit_message, query), Toast.LENGTH_SHORT).show();
-                    lastQuery = query;
-                    queryModel.setSearch(lastQuery);
-                    viewModel.applyQuery(queryModel);
                     return true;
                 }
 
                 @Override
                 public boolean onQueryTextChange(String query) {
-                    // filter recycler view when text is changed
-                    if ("".equals(query))
-                        lastQuery = query;
-                    queryModel.setSearch(query);
-                    viewModel.applyQuery(queryModel);
+                    if (isVisible()) {// filter recycler view when text is changed
+                        if ("".equals(query))
+                            lastQuery = query;
+                        queryModel.setSearch(query);
+                        viewModel.applyQuery(queryModel);
+                    }
                     return true;
                 }
             });

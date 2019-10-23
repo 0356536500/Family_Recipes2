@@ -67,7 +67,7 @@ dependencies {
     implementation 'androidx.preference:preference:1.1.0'
     implementation 'androidx.exifinterface:exifinterface:1.0.0'
 
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.0-beta2'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.0-beta3'
 
     // region LifeCycle
     def lifecycle_version = "2.1.0"
@@ -131,8 +131,8 @@ dependencies {
 
     // endregion
 
-    // region Dagger 2 - injection library
-    /*def dagger_version = "2.20"
+    /*// region Dagger 2 - injection library
+    def dagger_version = "2.20"
     // Add Dagger dependencies
     implementation "com.google.dagger:dagger:$dagger_version"
     annotationProcessor "com.google.dagger:dagger-compiler:$dagger_version"
@@ -189,7 +189,7 @@ dependencies {
         // endregion
     // endregion
 
-
+    // region Small libraries
     //view pager with dots indicator
     implementation 'com.tbuonomo.andrui:viewpagerdotsindicator:3.0.3'
 
@@ -197,6 +197,9 @@ dependencies {
     //implementation 'com.ernestoyaquello.dragdropswiperecyclerview:drag-drop-swipe-recyclerview:0.4.1'
 
     implementation 'com.leinardi.android:speed-dial:3.0.0'
+
+    // ImageView with zoom
+    implementation 'com.github.MikeOrtiz:TouchImageView:2.3.0'
 
     // endregion
 

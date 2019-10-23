@@ -117,6 +117,7 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
     private Uri cameraUri;
     private List<String> imagesNamesToUpload = new ArrayList<>();
     private CompositeDisposable compositeDisposable;
+    private File createdSharedImageFile;
 
     private ShareActionProvider mShareActionProvider;
 
@@ -129,6 +130,7 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
 
         loadColorsFromTheme();
         compositeDisposable = new CompositeDisposable();
+        createdSharedImageFile = null;
         Bundle extras = getIntent().getExtras();
         if(extras != null) {
             this.recipeId = extras.getString(Constants.RECIPE_ID);
@@ -155,6 +157,9 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
                 ex.printStackTrace();
             }
         }
+        if (createdSharedImageFile != null &&
+                createdSharedImageFile.delete())
+            createdSharedImageFile = null;
     }
 
     // endregion
@@ -844,24 +849,17 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
                     new Handler().postDelayed(() -> {
                         Bitmap bitmap = createBitmapFromWebView();
                         try {
-                            File screenshot = StorageWrapper.createImageFile(getApplicationContext(), entity.getName());
-                            FileOutputStream out = new FileOutputStream(screenshot);
-                            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+                            createdSharedImageFile = StorageWrapper.createImageFile(getApplicationContext(), entity.getName(), "png");
+                            FileOutputStream out = new FileOutputStream(createdSharedImageFile);
+                            bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
                             out.close();
                             // reload the webView with the original content
                             myWebView.setWebViewClient(null);
                             loadRecipeHtml(content);
-                            shareRecipeAsImage(screenshot);
+                            shareRecipeAsImage();
                         } catch (IOException e) {
                             CrashLogger.logException(e);
                         }
-                        /*ImageView imageView = new ImageView(getApplicationContext());
-                        CoordinatorLayout.LayoutParams lp = new CoordinatorLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                        lp.gravity = Gravity.CENTER;
-                        imageView.setLayoutParams(lp);
-                        imageView.setImageBitmap(bitmap);
-                        ViewGroup root = findViewById(R.id.recipe_root);
-                        root.addView(imageView);*/
                     }, 100);
                 }
             });
@@ -870,10 +868,10 @@ public class RecipeActivity extends MyBaseActivity implements AppBarLayout.OnOff
 
     /**
      * Share image with ACTION_SEND.
-     * @param image file representing the image to be shared
+     * {@link #createdSharedImageFile} represents the image file to be shared
      */
-    private void shareRecipeAsImage(File image) {
-        Uri uri = ExternalStorageHelper.getFileUri(this, image);
+    private void shareRecipeAsImage() {
+        Uri uri = ExternalStorageHelper.getFileUri(this, createdSharedImageFile);
         if (uri != null) {
             Intent sendIntent = new Intent(Intent.ACTION_SEND);
             sendIntent.addFlags(
