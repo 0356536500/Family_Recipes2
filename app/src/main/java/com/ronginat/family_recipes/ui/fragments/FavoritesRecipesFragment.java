@@ -58,9 +58,5 @@ public class FavoritesRecipesFragment extends RecyclerWithFiltersAbstractFragmen
                 mAdapter.setCategoryList(categories);
             }
         });
-        /*viewModel.getInfoFromLastFetch().observe(this, s -> {
-            if (s != null)
-                Toast.makeText(activity, s, Toast.LENGTH_LONG).show();
-        });*/
     }
 }
